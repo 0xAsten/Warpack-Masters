@@ -1,44 +1,32 @@
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset=".github/mark-dark.svg">
-  <img alt="Dojo logo" align="right" width="120" src=".github/mark-light.svg">
-</picture>
 
-<a href="https://twitter.com/dojostarknet">
-<img src="https://img.shields.io/twitter/follow/dojostarknet?style=social"/>
-</a>
-<a href="https://github.com/dojoengine/dojo">
-<img src="https://img.shields.io/github/stars/dojoengine/dojo?style=social"/>
-</a>
+## Backpack
 
-[![discord](https://img.shields.io/badge/join-dojo-green?logo=discord&logoColor=white)](https://discord.gg/PwDa2mKhR4)
-[![Telegram Chat][tg-badge]][tg-url]
+The bag of the player. The default size is 9x7.
 
-[tg-badge]: https://img.shields.io/endpoint?color=neon&logo=telegram&label=chat&style=flat-square&url=https%3A%2F%2Ftg.sumanjay.workers.dev%2Fdojoengine
-[tg-url]: https://t.me/dojoengine
+## Items property
 
-# Dojo Starter: Official Guide
+- width
+   Grids occupied by the item in the x-axis. The minimun is 1.
+- height
+   Grid occupied by the item in the y-axis. The minimun is 1.
+- price
+   The gold cost of the item.
+- damage
+   The damage the item does.
+- armor
+   The armor the item gives.
+- chance
+   The accuracy for damage if the item is a weapon. The chance to dodge if the item is armor.
+- cooldown
+   The time in seconds the item takes to be used again. The item only be used once if the cooldown is 0.
+- heal
+   The amount of health the item heals.
 
-The official Dojo Starter guide, the quickest and most streamlined way to get your Dojo Autonomous World up and running. This guide will assist you with the initial setup, from cloning the repository to deploying your world.
+## Items extra property after bought
 
-Read the full tutorial [here](https://book.dojoengine.org/cairo/hello-dojo)
-
----
-
-## Contribution
-
-This starter project is a constant work in progress and contributions are greatly appreciated!
-
-1. **Report a Bug**
-
-   - If you think you have encountered a bug, and we should know about it, feel free to report it [here](https://github.com/dojoengine/dojo-starter/issues) and we will take care of it.
-
-2. **Request a Feature**
-
-   - You can also request for a feature [here](https://github.com/dojoengine/dojo-starter/issues), and if it's viable, it will be picked for development.
-
-3. **Create a Pull Request**
-   - It can't get better then this, your pull request will be appreciated by the community.
-
-For any other questions, feel free to reach out to us [here](https://dojoengine.org/contact).
-
-Happy coding!
+- where
+   Placed in the inventory or in the storage
+- position
+   The first grid (x, y) occupied by the item in the inventory
+- rotation
+   Possible values: 0, 90, 180, 270.
