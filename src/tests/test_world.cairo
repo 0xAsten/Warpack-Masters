@@ -11,7 +11,7 @@ mod tests {
     // import test utils
     use dojo_starter::{
         systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait}},
-        models::{backpack::{Backpack, backpack}}
+        models::{backpack::{Backpack, backpack, Grid, GridTrait}}
     };
 
 
@@ -32,6 +32,25 @@ mod tests {
 
         let backpack = get!(world, caller, Backpack);
 
-        assert(backpack.gridSize == 10, 'gridSize should be 10');
+        assert(!backpack.grid.is_zero(), 'grid should not be 0');
+    }
+
+    #[test]
+    #[should_panic]
+    #[available_gas(30000000)]
+    fn test_spawn_already_exists() {
+        let caller = starknet::contract_address_const::<0x0>();
+
+        let mut models = array![backpack::TEST_CLASS_HASH];
+
+        let world = spawn_test_world(models);
+
+        let contract_address = world
+            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
+        let actions_system = IActionsDispatcher { contract_address };
+
+        actions_system.spawn();
+
+        actions_system.spawn();
     }
 }

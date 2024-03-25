@@ -3,12 +3,16 @@ trait IActions<TContractState> {
     fn spawn(self: @TContractState);
 }
 
+
 #[dojo::contract]
 mod actions {
     use super::IActions;
 
     use starknet::{ContractAddress, get_caller_address};
-    use dojo_starter::models::{backpack::{Backpack}};
+    use dojo_starter::models::{backpack::{Backpack, Grid, GridTrait}};
+
+    const GRID_X: usize = 9;
+    const GRID_Y: usize = 7;
 
     #[event]
     #[derive(Drop, starknet::Event)]
@@ -20,7 +24,6 @@ mod actions {
     #[derive(Drop, starknet::Event)]
     struct Spawned {
         player: ContractAddress,
-        gridSize: u8
     }
 
     #[abi(embed_v0)]
@@ -30,11 +33,12 @@ mod actions {
 
             let player = get_caller_address();
 
-            let backpack = get!(world, player, (Backpack));
+            let player_exists = get!(world, player, (Backpack));
+            assert(player_exists.grid.is_zero(), 'Player already exists');
 
-            set!(world, (Backpack { player, gridSize: 10 },));
+            set!(world, (Backpack { player, grid: Grid { x: GRID_X, y: GRID_Y } },));
 
-            emit!(world, Spawned { player: player, gridSize: 10 });
+            emit!(world, Spawned { player: player });
         }
     }
 }
