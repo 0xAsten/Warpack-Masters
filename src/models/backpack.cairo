@@ -34,7 +34,7 @@ struct BackpackGrids {
     x: usize,
     #[key]
     y: usize,
-    occupy: bool,
+    occupied: bool,
 }
 
 #[cfg(test)]
@@ -52,15 +52,15 @@ mod tests {
     #[available_gas(100000)]
     fn test_grids_occupy() {
         let player = starknet::contract_address_const::<0x0>();
-        let backpack_grids = BackpackGrids { player: player, x: 0, y: 0, occupy: true, };
-        assert(backpack_grids.occupy, 'not occupy');
+        let backpack_grids = BackpackGrids { player: player, x: 0, y: 0, occupied: true, };
+        assert(backpack_grids.occupied, 'not occupy');
     }
 
     #[test]
     #[available_gas(100000)]
     fn test_grids_not_occupy() {
         let player = starknet::contract_address_const::<0x0>();
-        let backpack_grids = BackpackGrids { player: player, x: 0, y: 0, occupy: false, };
-        assert(!backpack_grids.occupy, 'occupy');
+        let backpack_grids = BackpackGrids { player: player, x: 0, y: 0, occupied: false, };
+        assert(!backpack_grids.occupied, 'occupy');
     }
 }

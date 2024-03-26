@@ -50,3 +50,32 @@ The bag of the player. The default size is 9x7.
 - rotation
 
    Possible values: 0, 90, 180, 270.
+
+
+## Models
+
+### Backpack
+
+purpose: To store the grid size of the player's backpack.
+
+indexed: `player` type of `ContractAddress`
+
+value: `grid` type of `Grid`
+
+```
+struct Grid {
+    x: usize,
+    y: usize
+}
+```
+
+### BackpackGrids
+
+purpose: To store the backpack grids indicating if they are occupied or not.
+
+indexed:
+- `player` type of `ContractAddress`
+- `x` type of `usize`
+- `y` type of `usize`
+
+value: `occupied` type of `bool`
