@@ -43,7 +43,7 @@ mod actions {
             emit!(world, Spawned { player: player });
         }
 
-        fn place_item(self: @TContractState, item_id: u32, x: usize, y: usize, rotation: usize) {
+        fn place_item(self: @ContractState, item_id: u32, x: usize, y: usize, rotation: usize) {
             let world = self.world_dispatcher.read();
 
             let player = get_caller_address();
