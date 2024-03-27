@@ -9,9 +9,15 @@ struct CharacterItem {
     itemId: usize,
     // is it in inventory or in storage
     where: felt252,
-    position: (usize, usize),
+    position: Position,
     // 0, 90, 180, 270
     rotation: usize,
+}
+
+#[derive(Copy, Drop, Serde, Introspect)]
+struct Position {
+    x: usize,
+    y: usize
 }
 
 

@@ -1,7 +1,19 @@
 #[starknet::interface]
 trait IActions<TContractState> {
-    fn spawn(self: @TContractState);
-    fn place_item(self: @TContractState, item_id: u32, x: usize, y: usize, rotation: usize);
+    fn spawn(ref self: TContractState);
+    fn place_item(ref self: TContractState, item_id: u32, x: usize, y: usize, rotation: usize);
+    fn add_item(
+        ref self: TContractState,
+        name: felt252,
+        width: usize,
+        height: usize,
+        price: usize,
+        damage: usize,
+        armor: usize,
+        chance: usize,
+        cooldown: usize,
+        heal: usize
+    );
 }
 
 
@@ -10,11 +22,15 @@ mod actions {
     use super::IActions;
 
     use starknet::{ContractAddress, get_caller_address};
-    use dojo_starter::models::{backpack::{Backpack, BackpackGrids, Grid, GridTrait}};
-    use dojo_starter::models::{CharacterItem::{CharacterItem, CharacterItemsCounter}};
+    use warpack_masters::models::{backpack::{Backpack, BackpackGrids, Grid, GridTrait}};
+    use warpack_masters::models::{
+        CharacterItem::{CharacterItem, CharacterItemsCounter, Position}, Item::{Item, ItemsCounter}
+    };
 
     const GRID_X: usize = 9;
     const GRID_Y: usize = 7;
+
+    const ITEMS_COUNTER_ID: felt252 = 'ITEMS_COUNTER_ID';
 
     #[event]
     #[derive(Drop, starknet::Event)]
@@ -30,7 +46,7 @@ mod actions {
 
     #[abi(embed_v0)]
     impl ActionsImpl of IActions<ContractState> {
-        fn spawn(self: @ContractState) {
+        fn spawn(ref self: ContractState) {
             let world = self.world_dispatcher.read();
 
             let player = get_caller_address();
@@ -43,7 +59,40 @@ mod actions {
             emit!(world, Spawned { player: player });
         }
 
-        fn place_item(self: @ContractState, item_id: u32, x: usize, y: usize, rotation: usize) {
+        fn add_item(
+            ref self: ContractState,
+            name: felt252,
+            width: usize,
+            height: usize,
+            price: usize,
+            damage: usize,
+            armor: usize,
+            chance: usize,
+            cooldown: usize,
+            heal: usize
+        ) {
+            let world = self.world_dispatcher.read();
+
+            let mut counter = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
+            counter.count += 1;
+
+            let item = Item {
+                id: counter.count,
+                name,
+                width,
+                height,
+                price,
+                damage,
+                armor,
+                chance,
+                cooldown,
+                heal,
+            };
+
+            set!(world, (counter, item));
+        }
+
+        fn place_item(ref self: ContractState, item_id: u32, x: usize, y: usize, rotation: usize) {
             let world = self.world_dispatcher.read();
 
             let player = get_caller_address();
@@ -121,7 +170,7 @@ mod actions {
                     id: char_items.count,
                     itemId: item_id,
                     where: 'inventory',
-                    position: (x, y),
+                    position: Position { x, y },
                     rotation,
                 })
             );

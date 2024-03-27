@@ -1,6 +1,6 @@
 [package]
 cairo-version = "2.4.0"
-name = "dojo_starter"
+name = "warpack_masters"
 version = "0.5.1"
 
 [cairo]

@@ -5,6 +5,7 @@ mod systems {
 mod models {
     mod backpack;
     mod CharacterItem;
+    mod Item;
 }
 
 mod tests {

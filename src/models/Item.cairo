@@ -15,3 +15,10 @@ struct Item {
     cooldown: usize,
     heal: usize,
 }
+
+#[derive(Model, Drop, Serde)]
+struct ItemsCounter {
+    #[key]
+    id: felt252,
+    count: usize,
+}
