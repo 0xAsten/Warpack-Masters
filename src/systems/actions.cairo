@@ -48,11 +48,11 @@ mod actions {
 
             let player = get_caller_address();
 
-            assert!(x <= GRID_X, "x out of range");
-            assert!(y <= GRID_Y, "y out of range");
-            assert!(
+            assert(x <= GRID_X, 'x out of range');
+            assert(y <= GRID_Y, 'y out of range');
+            assert(
                 rotation == 0 || rotation == 90 || rotation == 180 || rotation == 270,
-                "invalid rotation"
+                'invalid rotation'
             );
 
             let item = get!(world, item_id, (Item));
@@ -60,158 +60,63 @@ mod actions {
             let item_h = item.height;
             let item_w = item.width;
 
-            let mut i = 0;
-            let mut j = 0;
+            assert(x + item_w <= GRID_X, 'item out of bound for x');
+            assert(y + item_h <= GRID_Y, 'item out of bound for y');
 
             let mut player_backpack_grids = get!(world, (player, x, y), (BackpackGrids));
 
-            assert!(player_backpack_grids.occupied, "Already occupied");
+            assert(!player_backpack_grids.occupied, 'Already occupied');
 
-            if rotation == 0 {
+            // if the item is 1x1, occupy the empty grid
+            if item_h == 1 && item_w == 1 {
+                set!(world, (BackpackGrids { player: player, x: x, y: y, occupied: true }));
+            } else {
+                let mut x_max = 0;
+                let mut y_max = 0;
+
+                // only check grids which are above the starting (x,y)
+                if rotation == 0 || rotation == 180 {
+                    x_max = x + item_w - 1;
+                    y_max = y + item_h - 1;
+                }
+
+                // only check grids which are to the right of the starting (x,y)
+                if rotation == 90 || rotation == 270 {
+                    //item_h becomes item_w and vice versa
+                    x_max = x + item_h - 1;
+                    y_max = y + item_w - 1;
+                }
+
+                let mut i = x;
+                let mut j = y;
                 loop {
+                    if i > x_max {
+                        break;
+                    }
+                    loop {
+                        if j > y_max {
+                            break;
+                        }
+                        set!(world, (BackpackGrids { player: player, x: i, y: j, occupied: true }));
+                        j += 1;
+                    };
                     i += 1;
-
-                    if i >= item_h {
-                        break;
-                    }
-
-                    let mut player_backpack_grids = get!(
-                        world, (player, x, y + i), (BackpackGrids)
-                    );
-
-                    assert!(!player_backpack_grids.occupied, "Grid Occupied at ({}, {})", x, y + i);
-
-                    set!(world, (BackpackGrids { x: x, y: y + i, occupied: true }))
-                };
-
-                loop {
-                    j += 1;
-
-                    if j >= item_w {
-                        break;
-                    }
-
-                    let mut player_backpack_grids = get!(
-                        world, (player, x + j, y), (BackpackGrids)
-                    );
-
-                    assert!(!player_backpack_grids.occupied, "Grid Occupied at ({}, {})", x + j);
-
-                    set!(world, (BackpackGrids { x: x, y: y + i, occupied: true }))
-                };
+                }
             }
 
-            if rotation == 180 {
-                loop {
-                    i += 1;
-
-                    if i >= item_h {
-                        break;
-                    }
-
-                    let mut player_backpack_grids = get!(
-                        world, (player, x, y - i), (BackpackGrids)
-                    );
-
-                    assert!(!player_backpack_grids.occupied, "Grid Occupied at ({}, {})", x, y - i);
-
-                    set!(world, (BackpackGrids { x: x, y: y - i, occupied: true }))
-                };
-
-                loop {
-                    j += 1;
-
-                    if j >= item_w {
-                        break;
-                    }
-
-                    let mut player_backpack_grids = get!(
-                        world, (player, x - j, y), (BackpackGrids)
-                    );
-
-                    assert!(!player_backpack_grids.occupied, "Grid Occupied at ({}, {})", x - j, y);
-
-                    set!(world, (BackpackGrids { x: x - j, y: y, occupied: true }))
-                };
-            }
-
-            if rotation == 90 {
-                loop {
-                    i += 1;
-
-                    if i >= item_h {
-                        break;
-                    }
-
-                    let mut player_backpack_grids = get!(
-                        world, (player, x + i, y), (BackpackGrids)
-                    );
-
-                    assert!(!player_backpack_grids.occupied, "Grid Occupied at ({}, {})", x + i, y);
-
-                    set!(world, (BackpackGrids { x: x + i, y: y, occupied: true }))
-                };
-
-                loop {
-                    j += 1;
-
-                    if j >= item_w {
-                        break;
-                    }
-
-                    let mut player_backpack_grids = get!(
-                        world, (player, x, y + j), (BackpackGrids)
-                    );
-
-                    assert!(!player_backpack_grids.occupied, "Grid Occupied at ({}, {})", x, y + j);
-
-                    set!(world, (BackpackGrids { x: x, y: y + j, occupied: true }))
-                };
-            }
-
-            if rotation == 270 {
-                loop {
-                    i += 1;
-
-                    if i >= item_h {
-                        break;
-                    }
-
-                    let mut player_backpack_grids = get!(
-                        world, (player, x - i, y), (BackpackGrids)
-                    );
-
-                    assert!(!player_backpack_grids.occupied, "Grid Occupied at ({}, {})", x - 1, y);
-
-                    set!(world, (BackpackGrids { x: x - i, y: y, occupied: true }))
-                };
-
-                loop {
-                    j += 1;
-
-                    if j >= item_w {
-                        break;
-                    }
-
-                    let mut player_backpack_grids = get!(
-                        world, (player, x, y - j), (BackpackGrids)
-                    );
-
-                    assert!(!player_backpack_grids.occupied, "Grid Occupied at ({}, {})", x, y - j);
-
-                    set!(world, (BackpackGrids { x: x, y: y - j, occupied: true }))
-                };
-            }
-
-            let mut char_items_count = get!(world, player, (CharacterItemsCounter));
-            char_items_count += 1;
-            set!(world, player, (CharacterItemsCounter { player, count: char_items_count }));
+            let mut char_items = get!(world, player, (CharacterItemsCounter));
+            char_items.count += 1;
+            set!(world, (CharacterItemsCounter { player, count: char_items.count }));
 
             set!(
                 world,
-                (player, char_items_count),
                 (CharacterItem {
-                    player, id: char_items_count, itemId: item_id, where: 'inventory', rotation,
+                    player,
+                    id: char_items.count,
+                    itemId: item_id,
+                    where: 'inventory',
+                    position: (x, y),
+                    rotation,
                 })
             );
         }
