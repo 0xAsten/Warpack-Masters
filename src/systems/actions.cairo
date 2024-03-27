@@ -97,6 +97,12 @@ mod actions {
                         if j > y_max {
                             break;
                         }
+
+                        let mut player_backpack_grid_data = get!(
+                            world, (player, i, j), (BackpackGrids)
+                        );
+                        assert(!player_backpack_grid_data.occupied, 'Already occupied');
+
                         set!(world, (BackpackGrids { player: player, x: i, y: j, occupied: true }));
                         j += 1;
                     };
