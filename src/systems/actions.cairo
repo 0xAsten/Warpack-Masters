@@ -109,9 +109,6 @@ mod actions {
             let item_h = item.height;
             let item_w = item.width;
 
-            assert(x + item_w <= GRID_X, 'item out of bound for x');
-            assert(y + item_h <= GRID_Y, 'item out of bound for y');
-
             let mut player_backpack_grids = get!(world, (player, x, y), (BackpackGrids));
 
             assert(!player_backpack_grids.occupied, 'Already occupied');
@@ -136,6 +133,9 @@ mod actions {
                     y_max = y + item_w - 1;
                 }
 
+                assert(x_max < GRID_X, 'item out of bound for x');
+                assert(y_max < GRID_Y, 'item out of bound for y');
+
                 let mut i = x;
                 let mut j = y;
                 loop {
@@ -155,6 +155,7 @@ mod actions {
                         set!(world, (BackpackGrids { player: player, x: i, y: j, occupied: true }));
                         j += 1;
                     };
+                    j = y;
                     i += 1;
                 }
             }
