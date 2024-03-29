@@ -1,3 +1,5 @@
+use starknet::ContractAddress;
+
 #[starknet::interface]
 trait IActions<TContractState> {
     fn spawn(ref self: TContractState);
@@ -14,6 +16,7 @@ trait IActions<TContractState> {
         cooldown: usize,
         heal: usize
     );
+    fn is_world_owner(ref self: TContractState, caller: ContractAddress) -> bool;
 }
 
 
@@ -71,6 +74,13 @@ mod actions {
             cooldown: usize,
             heal: usize
         ) {
+            let caller = get_caller_address();
+
+            assert(self.is_world_owner(caller), 'caller not world owner');
+
+            assert(width > 0 && width <= GRID_X, 'width not in range');
+            assert(height > 0 && height <= GRID_Y, 'height not in range');
+
             let world = self.world_dispatcher.read();
 
             let mut counter = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
@@ -175,6 +185,15 @@ mod actions {
                     rotation,
                 })
             );
+        }
+
+        fn is_world_owner(ref self: ContractState, caller: ContractAddress) -> bool {
+            let world = self.world_dispatcher.read();
+
+            // resource id of world is 0
+            let is_owner = world.is_owner(caller, 0);
+
+            is_owner
         }
     }
 }
