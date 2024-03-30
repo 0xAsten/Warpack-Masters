@@ -13,7 +13,8 @@ mod tests {
         systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait}},
         models::backpack::{Backpack, backpack, BackpackGrids, Grid, GridTrait},
         models::Item::{Item, item, ItemsCounter},
-        models::CharacterItem::{CharacterItem, Position, CharacterItemsCounter}
+        models::CharacterItem::{CharacterItem, Position, CharacterItemsCounter},
+        models::Character::{Character, character, Class},
     };
 
     use warpack_masters::systems::actions::actions::ITEMS_COUNTER_ID;
@@ -24,7 +25,9 @@ mod tests {
     fn test_place_item() {
         let player = starknet::contract_address_const::<0x0>();
 
-        let mut models = array![backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH];
+        let mut models = array![
+            backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH, character::TEST_CLASS_HASH
+        ];
 
         let world = spawn_test_world(models);
 
@@ -32,11 +35,11 @@ mod tests {
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.spawn();
+        actions_system.spawn('Alice', Class::Warlock);
 
-        actions_system.add_item('Sword', 1, 3, 100, 10, 10, 5, 10, 5);
-        actions_system.add_item('Shield', 2, 2, 50, 0, 5, 5, 10, 5);
-        actions_system.add_item('Potion', 1, 1, 20, 0, 0, 5, 10, 15);
+        actions_system.add_item('Sword', 1, 3, 100, 10, 10, 5, 10, 5, 9);
+        actions_system.add_item('Shield', 2, 2, 50, 0, 5, 5, 10, 5, 9);
+        actions_system.add_item('Potion', 1, 1, 20, 0, 0, 5, 10, 15, 9);
 
         let item = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
         assert(item.count == 3, 'total item count mismatch');
@@ -104,7 +107,9 @@ mod tests {
     fn test_place_item_revert_x_out_of_range() {
         let player = starknet::contract_address_const::<0x0>();
 
-        let mut models = array![backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH];
+        let mut models = array![
+            backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH, character::TEST_CLASS_HASH
+        ];
 
         let world = spawn_test_world(models);
 
@@ -112,9 +117,9 @@ mod tests {
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.spawn();
+        actions_system.spawn('Alice', Class::Warlock);
 
-        actions_system.add_item('Sword', 1, 3, 100, 10, 10, 5, 10, 5);
+        actions_system.add_item('Sword', 1, 3, 100, 10, 10, 5, 10, 5, 9);
 
         // place a sword on (10,0)
         actions_system.place_item(1, 10, 0, 0);
@@ -126,7 +131,9 @@ mod tests {
     fn test_place_item_revert_y_out_of_range() {
         let player = starknet::contract_address_const::<0x0>();
 
-        let mut models = array![backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH];
+        let mut models = array![
+            backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH, character::TEST_CLASS_HASH
+        ];
 
         let world = spawn_test_world(models);
 
@@ -134,9 +141,9 @@ mod tests {
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.spawn();
+        actions_system.spawn('Alice', Class::Warlock);
 
-        actions_system.add_item('Sword', 1, 3, 100, 10, 10, 5, 10, 5);
+        actions_system.add_item('Sword', 1, 3, 100, 10, 10, 5, 10, 5, 9);
 
         // place a sword on (0,10)
         actions_system.place_item(1, 0, 10, 0);
@@ -148,7 +155,9 @@ mod tests {
     fn test_place_item_revert_invalid_rotation() {
         let player = starknet::contract_address_const::<0x0>();
 
-        let mut models = array![backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH];
+        let mut models = array![
+            backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH, character::TEST_CLASS_HASH
+        ];
 
         let world = spawn_test_world(models);
 
@@ -156,9 +165,9 @@ mod tests {
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.spawn();
+        actions_system.spawn('Alice', Class::Warlock);
 
-        actions_system.add_item('Sword', 1, 3, 100, 10, 10, 5, 10, 5);
+        actions_system.add_item('Sword', 1, 3, 100, 10, 10, 5, 10, 5, 9);
 
         // place a sword on (0,0) with rotation 30
         actions_system.place_item(1, 0, 0, 30);
@@ -170,7 +179,9 @@ mod tests {
     fn test_place_item_revert_x_OOB() {
         let player = starknet::contract_address_const::<0x0>();
 
-        let mut models = array![backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH];
+        let mut models = array![
+            backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH, character::TEST_CLASS_HASH
+        ];
 
         let world = spawn_test_world(models);
 
@@ -178,9 +189,9 @@ mod tests {
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.spawn();
+        actions_system.spawn('Alice', Class::Warlock);
 
-        actions_system.add_item('Sword', 1, 3, 100, 10, 10, 5, 10, 5);
+        actions_system.add_item('Sword', 1, 3, 100, 10, 10, 5, 10, 5, 9);
 
         // place a sword on (8,6) with rotation 90
         actions_system.place_item(1, 8, 6, 90);
@@ -192,7 +203,9 @@ mod tests {
     fn test_place_item_revert_y_OOB() {
         let player = starknet::contract_address_const::<0x0>();
 
-        let mut models = array![backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH];
+        let mut models = array![
+            backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH, character::TEST_CLASS_HASH
+        ];
 
         let world = spawn_test_world(models);
 
@@ -200,9 +213,9 @@ mod tests {
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.spawn();
+        actions_system.spawn('Alice', Class::Warlock);
 
-        actions_system.add_item('Sword', 1, 3, 100, 10, 10, 5, 10, 5);
+        actions_system.add_item('Sword', 1, 3, 100, 10, 10, 5, 10, 5, 9);
 
         // place a sword on (0,6)
         actions_system.place_item(1, 0, 6, 0);
@@ -214,7 +227,9 @@ mod tests {
     fn test_place_item_revert_occupied_grids() {
         let player = starknet::contract_address_const::<0x0>();
 
-        let mut models = array![backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH];
+        let mut models = array![
+            backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH, character::TEST_CLASS_HASH
+        ];
 
         let world = spawn_test_world(models);
 
@@ -222,9 +237,9 @@ mod tests {
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.spawn();
+        actions_system.spawn('Alice', Class::Warlock);
 
-        actions_system.add_item('Sword', 1, 3, 100, 10, 10, 5, 10, 5);
+        actions_system.add_item('Sword', 1, 3, 100, 10, 10, 5, 10, 5, 9);
 
         // place a sword on (0,4)
         actions_system.place_item(1, 0, 4, 0);

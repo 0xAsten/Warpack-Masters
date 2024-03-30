@@ -1,8 +1,10 @@
+use warpack_masters::models::Character::Class;
+
 use starknet::ContractAddress;
 
 #[starknet::interface]
 trait IActions<TContractState> {
-    fn spawn(ref self: TContractState);
+    fn spawn(ref self: TContractState, name: felt252, class: Class);
     fn place_item(ref self: TContractState, item_id: u32, x: usize, y: usize, rotation: usize);
     fn add_item(
         ref self: TContractState,
@@ -14,8 +16,10 @@ trait IActions<TContractState> {
         armor: usize,
         chance: usize,
         cooldown: usize,
-        heal: usize
+        heal: usize,
+        rarity: usize,
     );
+    fn buy_item(ref self: TContractState, item_id: u32);
     fn is_world_owner(ref self: TContractState, caller: ContractAddress) -> bool;
 }
 
@@ -29,9 +33,12 @@ mod actions {
     use warpack_masters::models::{
         CharacterItem::{CharacterItem, CharacterItemsCounter, Position}, Item::{Item, ItemsCounter}
     };
+    use warpack_masters::models::Character::{Character, Class};
 
     const GRID_X: usize = 9;
     const GRID_Y: usize = 7;
+    const INIT_GOLD: usize = 4;
+    const INIT_HEALTH: usize = 25;
 
     const ITEMS_COUNTER_ID: felt252 = 'ITEMS_COUNTER_ID';
 
@@ -49,7 +56,7 @@ mod actions {
 
     #[abi(embed_v0)]
     impl ActionsImpl of IActions<ContractState> {
-        fn spawn(ref self: ContractState) {
+        fn spawn(ref self: ContractState, name: felt252, class: Class) {
             let world = self.world_dispatcher.read();
 
             let player = get_caller_address();
@@ -58,6 +65,7 @@ mod actions {
             assert(player_exists.grid.is_zero(), 'Player already exists');
 
             set!(world, (Backpack { player, grid: Grid { x: GRID_X, y: GRID_Y } },));
+            set!(world, (Character { player, name, class, gold: INIT_GOLD, health: INIT_HEALTH }));
 
             emit!(world, Spawned { player: player });
         }
@@ -72,7 +80,8 @@ mod actions {
             armor: usize,
             chance: usize,
             cooldown: usize,
-            heal: usize
+            heal: usize,
+            rarity: usize,
         ) {
             let caller = get_caller_address();
 
@@ -97,6 +106,7 @@ mod actions {
                 chance,
                 cooldown,
                 heal,
+                rarity
             };
 
             set!(world, (counter, item));
@@ -184,6 +194,31 @@ mod actions {
                 })
             );
             set!(world, (char_items,));
+        }
+
+        fn buy_item(ref self: ContractState, item_id: u32) {
+            let world = self.world_dispatcher.read();
+
+            let player = get_caller_address();
+            let item = get!(world, item_id, (Item));
+            let mut player_char = get!(world, player, (Character));
+
+            assert(player_char.gold >= item.price, 'Not enough gold');
+            player_char.gold -= item.price;
+
+            let mut char_items_counter = get!(world, player, (CharacterItemsCounter));
+            char_items_counter.count += 1;
+
+            let char_item = CharacterItem {
+                player,
+                id: char_items_counter.count,
+                itemId: item_id,
+                where: 'storage',
+                position: Position { x: 999, y: 999 },
+                rotation: 0,
+            };
+
+            set!(world, (player_char, char_items_counter, char_item));
         }
 
         fn is_world_owner(ref self: ContractState, caller: ContractAddress) -> bool {

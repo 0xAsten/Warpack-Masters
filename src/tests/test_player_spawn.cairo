@@ -13,7 +13,8 @@ mod tests {
         systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait}},
         models::backpack::{Backpack, backpack, Grid, GridTrait},
         models::Item::{Item, item, ItemsCounter},
-        models::CharacterItem::{CharacterItem, Position, CharacterItemsCounter}
+        models::CharacterItem::{CharacterItem, Position, CharacterItemsCounter},
+        models::Character::{Character, character, Class},
     };
 
     use warpack_masters::systems::actions::actions::ITEMS_COUNTER_ID;
@@ -24,7 +25,7 @@ mod tests {
     fn test_spawn() {
         let caller = starknet::contract_address_const::<0x0>();
 
-        let mut models = array![backpack::TEST_CLASS_HASH];
+        let mut models = array![backpack::TEST_CLASS_HASH, character::TEST_CLASS_HASH];
 
         let world = spawn_test_world(models);
 
@@ -32,7 +33,7 @@ mod tests {
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.spawn();
+        actions_system.spawn('Alice', Class::Warlock);
 
         let backpack = get!(world, caller, Backpack);
 
@@ -45,7 +46,7 @@ mod tests {
     fn test_spawn_already_exists() {
         let caller = starknet::contract_address_const::<0x0>();
 
-        let mut models = array![backpack::TEST_CLASS_HASH];
+        let mut models = array![backpack::TEST_CLASS_HASH, character::TEST_CLASS_HASH];
 
         let world = spawn_test_world(models);
 
@@ -53,8 +54,8 @@ mod tests {
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.spawn();
+        actions_system.spawn('Alice', Class::Warlock);
 
-        actions_system.spawn();
+        actions_system.spawn('Bob', Class::Warrior);
     }
 }
