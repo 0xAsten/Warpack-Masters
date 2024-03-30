@@ -35,7 +35,7 @@ mod tests {
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let actions_system = IActionsDispatcher { contract_address };
 
-        let item_one_name = 'Sword';
+        let item_one_name: felt252 = 'Sword';
         let item_one_width = 1;
         let item_one_height = 3;
         let item_one_price = 100;
@@ -46,8 +46,8 @@ mod tests {
         let item_one_heal = 5;
         let item_one_rarity = 5;
 
-        let item_one_new_name = 'Wood Sword';
-        let item_one_new_price = 70;
+        let item_one_new_name: felt252 = 'Wood Sword';
+        let item_one_new_price: felt252 = 70;
 
         actions_system
             .add_item(
@@ -84,7 +84,7 @@ mod tests {
         assert(item_one_data.name == item_one_new_name, 'Item one name mismatch');
         assert(item_one_data.width == item_one_width, 'Item one width mismatch');
         assert(item_one_data.height == item_one_height, 'Item one height mismatch');
-        assert(item_one_data.price == item_one_new_price, 'Item one price mismatch');
+        assert(item_one_data.price.into() == item_one_new_price, 'Item one price mismatch');
         assert(item_one_data.damage == item_one_damage, 'Item one damage mismatch');
         assert(item_one_data.armor == item_one_armor, 'Item one armor mismatch');
         assert(item_one_data.chance == item_one_chance, 'Item one chance mismatch');
