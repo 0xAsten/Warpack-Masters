@@ -14,6 +14,7 @@ struct Item {
     chance: usize,
     cooldown: usize,
     heal: usize,
+    rarity: usize,
 }
 
 #[derive(Model, Drop, Serde)]
