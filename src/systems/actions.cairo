@@ -21,7 +21,7 @@ trait IActions<TContractState> {
     );
     fn edit_item(ref self: TContractState, item_id: u32, item_key: felt252, item_value: felt252);
     fn buy_item(ref self: TContractState, item_id: u32);
-    fn is_world_owner(ref self: TContractState, caller: ContractAddress) -> bool;
+    fn is_world_owner(self: @TContractState, caller: ContractAddress) -> bool;
 }
 
 
@@ -309,7 +309,7 @@ mod actions {
             set!(world, (player_char, char_items_counter, char_item));
         }
 
-        fn is_world_owner(ref self: ContractState, caller: ContractAddress) -> bool {
+        fn is_world_owner(self: @ContractState, caller: ContractAddress) -> bool {
             let world = self.world_dispatcher.read();
 
             // resource id of world is 0
