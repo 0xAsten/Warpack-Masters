@@ -1,5 +1,7 @@
 use warpack_masters::models::Character::Class;
 
+use starknet::ContractAddress;
+
 #[starknet::interface]
 trait IActions<TContractState> {
     fn spawn(ref self: TContractState, name: felt252, class: Class);
@@ -17,7 +19,9 @@ trait IActions<TContractState> {
         heal: usize,
         rarity: usize,
     );
+    fn edit_item(ref self: TContractState, item_id: u32, item_key: felt252, item_value: felt252);
     fn buy_item(ref self: TContractState, item_id: u32);
+    fn is_world_owner(ref self: TContractState, caller: ContractAddress) -> bool;
 }
 
 
@@ -80,6 +84,13 @@ mod actions {
             heal: usize,
             rarity: usize,
         ) {
+            let caller = get_caller_address();
+
+            assert(self.is_world_owner(caller), 'caller not world owner');
+
+            assert(width > 0 && width <= GRID_X, 'width not in range');
+            assert(height > 0 && height <= GRID_Y, 'height not in range');
+
             let world = self.world_dispatcher.read();
 
             let mut counter = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
@@ -101,6 +112,93 @@ mod actions {
 
             set!(world, (counter, item));
         }
+
+        fn edit_item(
+            ref self: ContractState, item_id: u32, item_key: felt252, item_value: felt252
+        ) {
+            let caller = get_caller_address();
+
+            assert(self.is_world_owner(caller), 'caller not world owner');
+
+            let world = self.world_dispatcher.read();
+
+            let mut item_data = get!(world, item_id, (Item));
+
+            match item_key {
+                // name
+                0 => {
+                    item_data.name = item_value;
+                    set!(world, (item_data,));
+                },
+                // width
+                1 => {
+                    let new_width: usize = item_value.try_into().unwrap();
+                    assert(new_width > 0 && new_width <= GRID_X, 'new_width not in range');
+
+                    item_data.width = new_width;
+                    set!(world, (item_data,));
+                },
+                // height
+                2 => {
+                    let new_height: usize = item_value.try_into().unwrap();
+                    assert(new_height > 0 && new_height <= GRID_X, 'new_height not in range');
+
+                    item_data.height = new_height;
+                    set!(world, (item_data,));
+                },
+                // price
+                3 => {
+                    let new_price: usize = item_value.try_into().unwrap();
+
+                    item_data.price = new_price;
+                    set!(world, (item_data,));
+                },
+                // damage
+                4 => {
+                    let new_damage: usize = item_value.try_into().unwrap();
+
+                    item_data.damage = new_damage;
+                    set!(world, (item_data,));
+                },
+                // armor
+                5 => {
+                    let new_armor: usize = item_value.try_into().unwrap();
+
+                    item_data.armor = new_armor;
+                    set!(world, (item_data,));
+                },
+                // chance
+                6 => {
+                    let new_chance: usize = item_value.try_into().unwrap();
+
+                    item_data.chance = new_chance;
+                    set!(world, (item_data,));
+                },
+                // cooldown
+                7 => {
+                    let new_cooldown: usize = item_value.try_into().unwrap();
+
+                    item_data.cooldown = new_cooldown;
+                    set!(world, (item_data,));
+                },
+                // heal
+                8 => {
+                    let new_heal: usize = item_value.try_into().unwrap();
+
+                    item_data.heal = new_heal;
+                    set!(world, (item_data,));
+                },
+                // rarity
+                9 => {
+                    let new_rarity: usize = item_value.try_into().unwrap();
+
+                    item_data.rarity = new_rarity;
+                    set!(world, (item_data,));
+                },
+                _ => { panic!("Invalid item_key: {}", item_key); }
+            }
+        }
+
 
         fn place_item(ref self: ContractState, item_id: u32, x: usize, y: usize, rotation: usize) {
             let world = self.world_dispatcher.read();
@@ -209,6 +307,15 @@ mod actions {
             };
 
             set!(world, (player_char, char_items_counter, char_item));
+        }
+
+        fn is_world_owner(ref self: ContractState, caller: ContractAddress) -> bool {
+            let world = self.world_dispatcher.read();
+
+            // resource id of world is 0
+            let is_owner = world.is_owner(caller, 0);
+
+            is_owner
         }
     }
 }
