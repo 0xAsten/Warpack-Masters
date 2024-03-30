@@ -52,7 +52,7 @@ mod tests {
         let mut backpack_grid_data = get!(world, (player, 0, 6), BackpackGrids);
         assert(backpack_grid_data.occupied == true, '(0,6) should be occupied');
 
-        let characterItemsCounter = get!(world, player, CharacterItemsCounter);
+        let mut characterItemsCounter = get!(world, player, CharacterItemsCounter);
         let characterItem = get!(world, (player, characterItemsCounter.count), CharacterItem);
         assert(characterItem.itemId == characterItemsCounter.count, 'item id should equal count');
         assert(characterItem.where == 'inventory', 'item should be in inventory');
@@ -74,7 +74,8 @@ mod tests {
 
         let mut backpack_grid_data = get!(world, (player, 2, 6), BackpackGrids);
         assert(backpack_grid_data.occupied == true, '(2,6) should be occupied');
-        let characterItemsCounter = get!(world, player, CharacterItemsCounter);
+
+        characterItemsCounter = get!(world, player, CharacterItemsCounter);
         let characterItem = get!(world, (player, characterItemsCounter.count), CharacterItem);
         assert(characterItem.itemId == characterItemsCounter.count, 'item id should equal count');
         assert(characterItem.where == 'inventory', 'item should be in inventory');
@@ -88,7 +89,7 @@ mod tests {
         let mut backpack_grid_data = get!(world, (player, 1, 4), BackpackGrids);
         assert(backpack_grid_data.occupied == true, '(1,4) should be occupied');
 
-        let characterItemsCounter = get!(world, player, CharacterItemsCounter);
+        characterItemsCounter = get!(world, player, CharacterItemsCounter);
         let characterItem = get!(world, (player, characterItemsCounter.count), CharacterItem);
         // assert(characterItem.itemId == characterItemsCounter.count, 'item id should equal count');
         assert(characterItem.where == 'inventory', 'item should be in inventory');

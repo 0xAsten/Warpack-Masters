@@ -162,8 +162,6 @@ mod actions {
 
             let mut char_items = get!(world, player, (CharacterItemsCounter));
             char_items.count += 1;
-            set!(world, (CharacterItemsCounter { player, count: char_items.count }));
-
             set!(
                 world,
                 (CharacterItem {
@@ -175,6 +173,7 @@ mod actions {
                     rotation,
                 })
             );
+            set!(world, (char_items,));
         }
     }
 }
