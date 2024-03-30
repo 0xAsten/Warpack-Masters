@@ -42,6 +42,7 @@ mod tests {
         let item_one_chance = 5;
         let item_one_cooldown = 10;
         let item_one_heal = 5;
+        let item_one_rarity = 5;
 
         let item_two_name = 'Shield';
         let item_two_width = 2;
@@ -52,6 +53,7 @@ mod tests {
         let item_two_chance = 5;
         let item_two_cooldown = 10;
         let item_two_heal = 5;
+        let item_two_rarity = 5;
 
         let item_three_name = 'Potion';
         let item_three_width = 1;
@@ -62,6 +64,7 @@ mod tests {
         let item_three_chance = 5;
         let item_three_cooldown = 10;
         let item_three_heal = 15;
+        let item_three_rarity = 10;
 
         actions_system
             .add_item(
@@ -73,7 +76,8 @@ mod tests {
                 item_one_armor,
                 item_one_chance,
                 item_one_cooldown,
-                item_one_heal
+                item_one_heal,
+                item_one_rarity,
             );
 
         actions_system
@@ -86,7 +90,8 @@ mod tests {
                 item_two_armor,
                 item_two_chance,
                 item_two_cooldown,
-                item_two_heal
+                item_two_heal,
+                item_two_rarity
             );
 
         actions_system
@@ -99,7 +104,8 @@ mod tests {
                 item_three_armor,
                 item_three_chance,
                 item_three_cooldown,
-                item_three_heal
+                item_three_heal,
+                item_three_rarity
             );
 
         let item = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
@@ -115,6 +121,7 @@ mod tests {
         assert(item_one_data.chance == item_one_chance, 'Item one chance mismatch');
         assert(item_one_data.heal == item_one_heal, 'Item one heal mismatch');
         assert(item_one_data.cooldown == item_one_cooldown, 'Item one cooldown mismatch');
+        assert(item_one_data.rarity == item_one_rarity, 'Item one rarity mismatch');
 
         let item_two_data = get!(world, 2, (Item));
         assert(item_two_data.name == item_two_name, 'Item two name mismatch');
@@ -126,6 +133,7 @@ mod tests {
         assert(item_two_data.chance == item_two_chance, 'Item two chance mismatch');
         assert(item_two_data.heal == item_two_heal, 'Item two heal mismatch');
         assert(item_two_data.cooldown == item_two_cooldown, 'Item two cooldown mismatch');
+        assert(item_two_data.rarity == item_two_rarity, 'Item two rarity mismatch');
 
         let item_three_data = get!(world, 3, (Item));
         assert(item_three_data.name == item_three_name, 'Item three name mismatch');
@@ -137,6 +145,7 @@ mod tests {
         assert(item_three_data.chance == item_three_chance, 'Item three chance mismatch');
         assert(item_three_data.heal == item_three_heal, 'Item three heal mismatch');
         assert(item_three_data.cooldown == item_three_cooldown, 'Item three cooldown mismatch');
+        assert(item_three_data.rarity == item_three_rarity, 'Item three rarity mismatch');
     }
 
     #[test]
@@ -156,7 +165,7 @@ mod tests {
 
         set_contract_address(alice);
 
-        actions_system.add_item('Sword', 1, 3, 100, 10, 10, 5, 10, 5);
+        actions_system.add_item('Sword', 1, 3, 100, 10, 10, 5, 10, 5, 5);
     }
 
     #[test]
@@ -173,7 +182,7 @@ mod tests {
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.add_item('Sword', 10, 3, 100, 10, 10, 5, 10, 5);
+        actions_system.add_item('Sword', 10, 3, 100, 10, 10, 5, 10, 5, 5);
     }
 
     #[test]
@@ -190,7 +199,7 @@ mod tests {
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.add_item('Sword', 1, 8, 100, 10, 10, 5, 10, 5);
+        actions_system.add_item('Sword', 1, 8, 100, 10, 10, 5, 10, 5, 5);
     }
 }
 
