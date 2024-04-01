@@ -5,7 +5,9 @@ use starknet::ContractAddress;
 #[starknet::interface]
 trait IActions<TContractState> {
     fn spawn(ref self: TContractState, name: felt252, class: Class);
-    fn place_item(ref self: TContractState, item_id: u32, x: usize, y: usize, rotation: usize);
+    fn place_item(
+        ref self: TContractState, char_item_counter_id: u32, x: usize, y: usize, rotation: usize
+    );
     fn add_item(
         ref self: TContractState,
         name: felt252,
@@ -22,6 +24,7 @@ trait IActions<TContractState> {
     fn edit_item(ref self: TContractState, item_id: u32, item_key: felt252, item_value: felt252);
     fn buy_item(ref self: TContractState, item_id: u32);
     fn is_world_owner(self: @TContractState, caller: ContractAddress) -> bool;
+    fn is_item_owned(self: @TContractState, caller: ContractAddress, id: usize) -> bool;
 }
 
 
@@ -42,6 +45,8 @@ mod actions {
     const INIT_HEALTH: usize = 25;
 
     const ITEMS_COUNTER_ID: felt252 = 'ITEMS_COUNTER_ID';
+
+    const STORAGE_FLAG: usize = 999;
 
     #[event]
     #[derive(Drop, starknet::Event)]
@@ -200,7 +205,9 @@ mod actions {
         }
 
 
-        fn place_item(ref self: ContractState, item_id: u32, x: usize, y: usize, rotation: usize) {
+        fn place_item(
+            ref self: ContractState, char_item_counter_id: u32, x: usize, y: usize, rotation: usize
+        ) {
             let world = self.world_dispatcher.read();
 
             let player = get_caller_address();
@@ -212,6 +219,10 @@ mod actions {
                 'invalid rotation'
             );
 
+            assert(self.is_item_owned(player, char_item_counter_id), '');
+
+            let char_item_data = get!(world, (player, char_item_counter_id), (CharacterItem));
+            let item_id = char_item_data.itemId;
             let item = get!(world, item_id, (Item));
 
             let item_h = item.height;
@@ -269,7 +280,6 @@ mod actions {
             }
 
             let mut char_items = get!(world, player, (CharacterItemsCounter));
-            char_items.count += 1;
             set!(
                 world,
                 (CharacterItem {
@@ -302,7 +312,7 @@ mod actions {
                 id: char_items_counter.count,
                 itemId: item_id,
                 where: 'storage',
-                position: Position { x: 999, y: 999 },
+                position: Position { x: STORAGE_FLAG, y: STORAGE_FLAG },
                 rotation: 0,
             };
 
@@ -316,6 +326,24 @@ mod actions {
             let is_owner = world.is_owner(caller, 0);
 
             is_owner
+        }
+
+        fn is_item_owned(self: @ContractState, caller: ContractAddress, id: usize) -> bool {
+            let world = self.world_dispatcher.read();
+
+            let char_item_data = get!(world, (caller, id), (CharacterItem));
+
+            // item is not in inventory or storage
+            assert(char_item_data.where != '', 'item not owned by the player');
+
+            // if the item is in inventory, it is already placed
+            assert(char_item_data.where != 'inventory', 'item already placed');
+
+            if char_item_data.where == 'storage' {
+                return true;
+            }
+
+            false
         }
     }
 }
