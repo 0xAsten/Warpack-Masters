@@ -292,5 +292,35 @@ mod tests {
         // place a sword on (0,4)
         actions_system.place_item(1, 0, 4, 0);
     }
+
+
+    #[test]
+    #[available_gas(3000000000000000)]
+    #[should_panic(expected: ('item already placed', 'ENTRYPOINT_FAILED'))]
+    fn test_place_item_revert_item_not_already_placed() {
+        let alice = starknet::contract_address_const::<0x1337>();
+
+        let mut models = array![
+            backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH, character::TEST_CLASS_HASH
+        ];
+
+        let world = spawn_test_world(models);
+
+        let contract_address = world
+            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
+        let actions_system = IActionsDispatcher { contract_address };
+
+        actions_system.add_item('Sword', 1, 3, 1, 10, 10, 5, 10, 5, 9);
+
+        set_contract_address(alice);
+        actions_system.spawn('Alice', Class::Warlock);
+
+        actions_system.buy_item(1);
+
+        // place a sword on (0,4)
+        actions_system.place_item(1, 0, 4, 0);
+        // try to place the same sword on (1,4)
+        actions_system.place_item(1, 1, 4, 0);
+    }
 }
 

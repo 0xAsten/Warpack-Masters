@@ -46,6 +46,8 @@ mod actions {
 
     const ITEMS_COUNTER_ID: felt252 = 'ITEMS_COUNTER_ID';
 
+    const STORAGE_FLAG: usize = 999;
+
     #[event]
     #[derive(Drop, starknet::Event)]
     enum Event {
@@ -217,9 +219,7 @@ mod actions {
                 'invalid rotation'
             );
 
-            assert(
-                self.is_item_owned(player, char_item_counter_id), 'item not owned by the player'
-            );
+            assert(self.is_item_owned(player, char_item_counter_id), '');
 
             let char_item_data = get!(world, (player, char_item_counter_id), (CharacterItem));
             let item_id = char_item_data.itemId;
@@ -312,7 +312,7 @@ mod actions {
                 id: char_items_counter.count,
                 itemId: item_id,
                 where: 'storage',
-                position: Position { x: 999, y: 999 },
+                position: Position { x: STORAGE_FLAG, y: STORAGE_FLAG },
                 rotation: 0,
             };
 
@@ -333,7 +333,13 @@ mod actions {
 
             let char_item_data = get!(world, (caller, id), (CharacterItem));
 
-            if char_item_data.position.x == 999 && char_item_data.position.y == 999 {
+            // item is not in inventory or storage
+            assert(char_item_data.where != '', 'item not owned by the player');
+
+            // if the item is in inventory, it is already placed
+            assert(char_item_data.where != 'inventory', 'item already placed');
+
+            if char_item_data.where == 'storage' {
                 return true;
             }
 
