@@ -20,7 +20,7 @@ mod tests {
         models::Character::{Character, character, Class},
     };
 
-    use warpack_masters::systems::actions::actions::{ITEMS_COUNTER_ID, INIT_GOLD};
+    use warpack_masters::systems::actions::actions::{ITEMS_COUNTER_ID, INIT_GOLD, STORAGE_FLAG};
 
 
     #[test]
@@ -84,8 +84,8 @@ mod tests {
         assert(char_item_data.id == 1, 'id mismatch');
         assert(char_item_data.itemId == 1, 'item id mismatch');
         assert(char_item_data.where == 'storage', 'where mismatch');
-        assert(char_item_data.position.x == 999, 'x position mismatch');
-        assert(char_item_data.position.y == 999, 'y position mismatch');
+        assert(char_item_data.position.x == STORAGE_FLAG, 'x position mismatch');
+        assert(char_item_data.position.y == STORAGE_FLAG, 'y position mismatch');
         assert(char_item_data.rotation == 0, 'rotation mismatch');
     }
 
