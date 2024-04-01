@@ -5,7 +5,9 @@ use starknet::ContractAddress;
 #[starknet::interface]
 trait IActions<TContractState> {
     fn spawn(ref self: TContractState, name: felt252, class: Class);
-    fn place_item(ref self: TContractState, item_id: u32, x: usize, y: usize, rotation: usize);
+    fn place_item(
+        ref self: TContractState, char_item_counter_id: u32, x: usize, y: usize, rotation: usize
+    );
     fn add_item(
         ref self: TContractState,
         name: felt252,
@@ -22,6 +24,7 @@ trait IActions<TContractState> {
     fn edit_item(ref self: TContractState, item_id: u32, item_key: felt252, item_value: felt252);
     fn buy_item(ref self: TContractState, item_id: u32);
     fn is_world_owner(self: @TContractState, caller: ContractAddress) -> bool;
+    fn is_item_owned(self: @TContractState, caller: ContractAddress, id: usize) -> bool;
 }
 
 
@@ -200,7 +203,9 @@ mod actions {
         }
 
 
-        fn place_item(ref self: ContractState, item_id: u32, x: usize, y: usize, rotation: usize) {
+        fn place_item(
+            ref self: ContractState, char_item_counter_id: u32, x: usize, y: usize, rotation: usize
+        ) {
             let world = self.world_dispatcher.read();
 
             let player = get_caller_address();
@@ -212,6 +217,12 @@ mod actions {
                 'invalid rotation'
             );
 
+            assert(
+                self.is_item_owned(player, char_item_counter_id), 'item not owned by the player'
+            );
+
+            let char_item_data = get!(world, (player, char_item_counter_id), (CharacterItem));
+            let item_id = char_item_data.itemId;
             let item = get!(world, item_id, (Item));
 
             let item_h = item.height;
@@ -269,7 +280,6 @@ mod actions {
             }
 
             let mut char_items = get!(world, player, (CharacterItemsCounter));
-            char_items.count += 1;
             set!(
                 world,
                 (CharacterItem {
@@ -316,6 +326,18 @@ mod actions {
             let is_owner = world.is_owner(caller, 0);
 
             is_owner
+        }
+
+        fn is_item_owned(self: @ContractState, caller: ContractAddress, id: usize) -> bool {
+            let world = self.world_dispatcher.read();
+
+            let char_item_data = get!(world, (caller, id), (CharacterItem));
+
+            if char_item_data.position.x == 999 && char_item_data.position.y == 999 {
+                return true;
+            }
+
+            false
         }
     }
 }
