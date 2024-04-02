@@ -400,11 +400,11 @@ mod actions {
             let mut player_char = get!(world, player, (Character));
 
             assert(char_item_data.where != '', 'item not owned');
+            assert(char_item_data.where != 'inventory', 'item in inventory');
 
             let item_price = item.price;
             let sell_price = item_price / 2;
 
-            char_item_data.itemId = 0;
             char_item_data.where = '';
             char_item_data.position.x = STORAGE_FLAG;
             char_item_data.position.y = STORAGE_FLAG;

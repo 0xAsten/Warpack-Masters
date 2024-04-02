@@ -108,7 +108,7 @@ mod tests {
         );
 
         let char_item_data = get!(world, (alice, 1), (CharacterItem));
-        assert(char_item_data.itemId == 0, 'sell one: item id mismatch');
+        assert(char_item_data.itemId == 1, 'sell one: item id mismatch');
         assert(char_item_data.where == '', 'sell one: where mismatch');
         assert(char_item_data.position.x == STORAGE_FLAG, 'sell one: x position mismatch');
         assert(char_item_data.position.y == STORAGE_FLAG, 'sell one: y position mismatch');
@@ -125,7 +125,7 @@ mod tests {
         );
 
         let char_item_data = get!(world, (alice, 2), (CharacterItem));
-        assert(char_item_data.itemId == 0, 'sell two: item id mismatch');
+        assert(char_item_data.itemId == 2, 'sell two: item id mismatch');
         assert(char_item_data.where == '', 'sell two: where mismatch');
         assert(char_item_data.position.x == STORAGE_FLAG, 'sell two: x position mismatch');
         assert(char_item_data.position.y == STORAGE_FLAG, 'sell two: y position mismatch');
@@ -183,6 +183,61 @@ mod tests {
 
         actions_system.spawn('Alice', Class::Warrior);
 
+        actions_system.sell_item(1);
+    }
+
+    #[test]
+    #[available_gas(3000000000000000)]
+    #[should_panic(expected: ('item in inventory', 'ENTRYPOINT_FAILED'))]
+    fn test_sell_item_revert_item_in_inventory() {
+        let owner = starknet::contract_address_const::<0x0>();
+        let alice = starknet::contract_address_const::<0x1337>();
+
+        let mut models = array![
+            backpack::TEST_CLASS_HASH,
+            character::TEST_CLASS_HASH,
+            item::TEST_CLASS_HASH,
+            character_items_counter::TEST_CLASS_HASH,
+            character_item::TEST_CLASS_HASH
+        ];
+
+        let world = spawn_test_world(models);
+
+        let contract_address = world
+            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
+        let actions_system = IActionsDispatcher { contract_address };
+
+        let item_one_name = 'Sword';
+        let item_one_width = 1;
+        let item_one_height = 3;
+        let item_one_price = 4;
+        let item_one_damage = 10;
+        let item_one_armor = 10;
+        let item_one_chance = 5;
+        let item_one_cooldown = 10;
+        let item_one_heal = 5;
+        let item_one_rarity = 5;
+
+        actions_system
+            .add_item(
+                item_one_name,
+                item_one_width,
+                item_one_height,
+                item_one_price,
+                item_one_damage,
+                item_one_armor,
+                item_one_chance,
+                item_one_cooldown,
+                item_one_heal,
+                item_one_rarity,
+            );
+
+        set_contract_address(alice);
+
+        actions_system.spawn('Alice', Class::Warrior);
+
+        actions_system.buy_item(1);
+        actions_system.place_item(1, 0, 4, 0);
         actions_system.sell_item(1);
     }
 }
