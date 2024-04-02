@@ -8,6 +8,7 @@ trait IActions<TContractState> {
     fn place_item(
         ref self: TContractState, char_item_counter_id: u32, x: usize, y: usize, rotation: usize
     );
+    fn undo_place_item(ref self: TContractState, char_item_counter_id: u32);
     fn add_item(
         ref self: TContractState,
         name: felt252,
@@ -293,6 +294,73 @@ mod actions {
             );
             set!(world, (char_items,));
         }
+
+
+        fn undo_place_item(ref self: ContractState, char_item_counter_id: u32) {
+            let world = self.world_dispatcher.read();
+
+            let player = get_caller_address();
+
+            let mut char_item_data = get!(world, (player, char_item_counter_id), (CharacterItem));
+            let item_id = char_item_data.itemId;
+            let item = get!(world, item_id, (Item));
+
+            assert(char_item_data.where == 'inventory', 'item not in inventory');
+
+            let x = char_item_data.position.x;
+            let y = char_item_data.position.y;
+            let rotation = char_item_data.rotation;
+            let item_h = item.height;
+            let item_w = item.width;
+
+            char_item_data.where = 'storage';
+            char_item_data.position.x = STORAGE_FLAG;
+            char_item_data.position.y = STORAGE_FLAG;
+            char_item_data.rotation = 0;
+
+            if item_h == 1 && item_w == 1 {
+                set!(world, (BackpackGrids { player: player, x: x, y: y, occupied: false }));
+            } else {
+                let mut x_max = 0;
+                let mut y_max = 0;
+
+                // only check grids which are above the starting (x,y)
+                if rotation == 0 || rotation == 180 {
+                    x_max = x + item_w - 1;
+                    y_max = y + item_h - 1;
+                }
+
+                // only check grids which are to the right of the starting (x,y)
+                if rotation == 90 || rotation == 270 {
+                    //item_h becomes item_w and vice versa
+                    x_max = x + item_h - 1;
+                    y_max = y + item_w - 1;
+                }
+
+                let mut i = x;
+                let mut j = y;
+                loop {
+                    if i > x_max {
+                        break;
+                    }
+                    loop {
+                        if j > y_max {
+                            break;
+                        }
+
+                        set!(
+                            world, (BackpackGrids { player: player, x: i, y: j, occupied: false })
+                        );
+                        j += 1;
+                    };
+                    j = y;
+                    i += 1;
+                }
+            }
+
+            set!(world, (char_item_data));
+        }
+
 
         fn buy_item(ref self: ContractState, item_id: u32) {
             let world = self.world_dispatcher.read();
