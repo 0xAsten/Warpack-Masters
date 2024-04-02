@@ -24,6 +24,7 @@ trait IActions<TContractState> {
     );
     fn edit_item(ref self: TContractState, item_id: u32, item_key: felt252, item_value: felt252);
     fn buy_item(ref self: TContractState, item_id: u32);
+    fn sell_item(ref self: TContractState, char_item_counter_id: u32);
     fn is_world_owner(self: @TContractState, caller: ContractAddress) -> bool;
     fn is_item_owned(self: @TContractState, caller: ContractAddress, id: usize) -> bool;
 }
@@ -386,6 +387,34 @@ mod actions {
 
             set!(world, (player_char, char_items_counter, char_item));
         }
+
+
+        fn sell_item(ref self: ContractState, char_item_counter_id: u32) {
+            let world = self.world_dispatcher.read();
+
+            let player = get_caller_address();
+
+            let mut char_item_data = get!(world, (player, char_item_counter_id), (CharacterItem));
+            let item_id = char_item_data.itemId;
+            let mut item = get!(world, item_id, (Item));
+            let mut player_char = get!(world, player, (Character));
+
+            assert(char_item_data.where != '', 'item not owned');
+            assert(char_item_data.where != 'inventory', 'item in inventory');
+
+            let item_price = item.price;
+            let sell_price = item_price / 2;
+
+            char_item_data.where = '';
+            char_item_data.position.x = STORAGE_FLAG;
+            char_item_data.position.y = STORAGE_FLAG;
+            char_item_data.rotation = 0;
+
+            player_char.gold += sell_price;
+
+            set!(world, (char_item_data, player_char));
+        }
+
 
         fn is_world_owner(self: @ContractState, caller: ContractAddress) -> bool {
             let world = self.world_dispatcher.read();

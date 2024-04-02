@@ -16,4 +16,5 @@ mod tests {
     mod test_edit_item;
     mod test_buy_item;
     mod test_undo_place_item;
+    mod test_sell_item;
 }
