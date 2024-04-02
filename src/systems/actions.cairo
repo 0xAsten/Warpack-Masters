@@ -398,7 +398,6 @@ mod actions {
             let item_id = char_item_data.itemId;
             let mut item = get!(world, item_id, (Item));
             let mut player_char = get!(world, player, (Character));
-            let mut char_items_counter = get!(world, player, (CharacterItemsCounter));
 
             assert(char_item_data.where != '', 'item not owned');
 
@@ -407,15 +406,13 @@ mod actions {
 
             char_item_data.itemId = 0;
             char_item_data.where = '';
-            char_item_data.position.x = 0;
-            char_item_data.position.y = 0;
+            char_item_data.position.x = STORAGE_FLAG;
+            char_item_data.position.y = STORAGE_FLAG;
             char_item_data.rotation = 0;
-
-            char_items_counter.count -= 1;
 
             player_char.gold += sell_price;
 
-            set!(world, (char_item_data, char_items_counter, player_char));
+            set!(world, (char_item_data, player_char));
         }
 
 

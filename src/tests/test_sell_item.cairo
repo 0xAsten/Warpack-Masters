@@ -21,7 +21,6 @@ mod tests {
     };
 
     use warpack_masters::systems::actions::actions::{ITEMS_COUNTER_ID, INIT_GOLD, STORAGE_FLAG};
-    use debug::PrintTrait;
 
 
     #[test]
@@ -107,31 +106,29 @@ mod tests {
             char_data.gold == prev_char_data.gold + (item_one_price / 2),
             'sell one: gold value mismatch'
         );
-        let char_item_counter_data = get!(world, alice, (CharacterItemsCounter));
-        assert(char_item_counter_data.count == 0, 'sell one: itemcount mismatch');
+
         let char_item_data = get!(world, (alice, 1), (CharacterItem));
         assert(char_item_data.itemId == 0, 'sell one: item id mismatch');
         assert(char_item_data.where == '', 'sell one: where mismatch');
-        assert(char_item_data.position.x == 0, 'sell one: x position mismatch');
-        assert(char_item_data.position.y == 0, 'sell one: y position mismatch');
+        assert(char_item_data.position.x == STORAGE_FLAG, 'sell one: x position mismatch');
+        assert(char_item_data.position.y == STORAGE_FLAG, 'sell one: y position mismatch');
         assert(char_item_data.rotation == 0, 'sell one: rotation mismatch');
 
         actions_system.buy_item(2);
         let prev_char_data = get!(world, alice, (Character));
 
-        actions_system.sell_item(1);
+        actions_system.sell_item(2);
         let char_data = get!(world, alice, (Character));
         assert(
             char_data.gold == prev_char_data.gold + (item_two_price / 2),
             'sell two: gold value mismatch'
         );
-        let char_item_counter_data = get!(world, alice, (CharacterItemsCounter));
-        assert(char_item_counter_data.count == 0, 'sell two: itemcount mismatch');
-        let char_item_data = get!(world, (alice, 1), (CharacterItem));
+
+        let char_item_data = get!(world, (alice, 2), (CharacterItem));
         assert(char_item_data.itemId == 0, 'sell two: item id mismatch');
         assert(char_item_data.where == '', 'sell two: where mismatch');
-        assert(char_item_data.position.x == 0, 'sell two: x position mismatch');
-        assert(char_item_data.position.y == 0, 'sell two: y position mismatch');
+        assert(char_item_data.position.x == STORAGE_FLAG, 'sell two: x position mismatch');
+        assert(char_item_data.position.y == STORAGE_FLAG, 'sell two: y position mismatch');
         assert(char_item_data.rotation == 0, 'sell two: rotation mismatch');
     }
 
@@ -139,7 +136,7 @@ mod tests {
     #[test]
     #[available_gas(3000000000000000)]
     #[should_panic(expected: ('item not owned', 'ENTRYPOINT_FAILED'))]
-    fn test_edit_item_revert_item_not_owned() {
+    fn test_sell_item_revert_item_not_owned() {
         let owner = starknet::contract_address_const::<0x0>();
         let alice = starknet::contract_address_const::<0x1337>();
 
