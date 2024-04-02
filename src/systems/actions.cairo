@@ -309,6 +309,7 @@ mod actions {
 
             let x = char_item_data.position.x;
             let y = char_item_data.position.y;
+            let rotation = char_item_data.rotation;
             let item_h = item.height;
             let item_w = item.width;
 
@@ -316,8 +317,6 @@ mod actions {
             char_item_data.position.x = STORAGE_FLAG;
             char_item_data.position.y = STORAGE_FLAG;
             char_item_data.rotation = 0;
-
-            let rotation = char_item_data.rotation;
 
             if item_h == 1 && item_w == 1 {
                 set!(world, (BackpackGrids { player: player, x: x, y: y, occupied: false }));
