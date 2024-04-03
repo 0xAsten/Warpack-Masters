@@ -17,7 +17,7 @@ mod tests {
         models::CharacterItem::{
             CharacterItemsCounter, character_items_counter, CharacterItem, character_item
         },
-        models::Character::{Character, character, Class},
+        models::Character::{Character, character, Class}, models::Shop::{Shop, shop}
     };
 
     use warpack_masters::systems::actions::actions::{ITEMS_COUNTER_ID, INIT_GOLD, STORAGE_FLAG};
@@ -34,7 +34,8 @@ mod tests {
             character::TEST_CLASS_HASH,
             item::TEST_CLASS_HASH,
             character_items_counter::TEST_CLASS_HASH,
-            character_item::TEST_CLASS_HASH
+            character_item::TEST_CLASS_HASH,
+            shop::TEST_CLASS_HASH
         ];
 
         let world = spawn_test_world(models);
@@ -52,7 +53,7 @@ mod tests {
         let item_one_chance = 5;
         let item_one_cooldown = 10;
         let item_one_heal = 5;
-        let item_one_rarity = 5;
+        let item_one_rarity = 1;
 
         let item_two_name = 'Shield';
         let item_two_width = 2;
@@ -63,7 +64,7 @@ mod tests {
         let item_two_chance = 5;
         let item_two_cooldown = 10;
         let item_two_heal = 5;
-        let item_two_rarity = 5;
+        let item_two_rarity = 1;
 
         actions_system
             .add_item(
@@ -96,6 +97,15 @@ mod tests {
         set_contract_address(alice);
 
         actions_system.spawn('Alice', Class::Warrior);
+        actions_system.reroll_shop();
+
+        // mock shop for testing
+        let mut shop_data = get!(world, alice, (Shop));
+        shop_data.item1 = 1;
+        shop_data.item2 = 2;
+        shop_data.item3 = 1;
+        shop_data.item4 = 2;
+        set!(world, (shop_data));
 
         actions_system.buy_item(1);
         let prev_char_data = get!(world, alice, (Character));
@@ -216,7 +226,7 @@ mod tests {
         let item_one_chance = 5;
         let item_one_cooldown = 10;
         let item_one_heal = 5;
-        let item_one_rarity = 5;
+        let item_one_rarity = 1;
 
         actions_system
             .add_item(
@@ -235,6 +245,7 @@ mod tests {
         set_contract_address(alice);
 
         actions_system.spawn('Alice', Class::Warrior);
+        actions_system.reroll_shop();
 
         actions_system.buy_item(1);
         actions_system.place_item(1, 0, 4, 0);

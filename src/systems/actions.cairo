@@ -376,6 +376,16 @@ mod actions {
             let world = self.world_dispatcher.read();
 
             let player = get_caller_address();
+
+            let shop_data = get!(world, player, (Shop));
+            assert(
+                shop_data.item1 == item_id
+                    || shop_data.item2 == item_id
+                    || shop_data.item3 == item_id
+                    || shop_data.item4 == item_id,
+                'item not on sale'
+            );
+
             let item = get!(world, item_id, (Item));
             let mut player_char = get!(world, player, (Character));
 
