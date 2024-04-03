@@ -104,6 +104,10 @@ mod actions {
             assert(width > 0 && width <= GRID_X, 'width not in range');
             assert(height > 0 && height <= GRID_Y, 'height not in range');
 
+            assert(price > 1, 'price must be greater than 1');
+
+            assert(rarity == 1 || rarity == 2 || rarity == 3, 'rarity not valid');
+
             let world = self.world_dispatcher.read();
 
             let mut counter = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
@@ -154,7 +158,7 @@ mod actions {
                 // height
                 2 => {
                     let new_height: usize = item_value.try_into().unwrap();
-                    assert(new_height > 0 && new_height <= GRID_X, 'new_height not in range');
+                    assert(new_height > 0 && new_height <= GRID_Y, 'new_height not in range');
 
                     item_data.height = new_height;
                     set!(world, (item_data,));
@@ -162,6 +166,7 @@ mod actions {
                 // price
                 3 => {
                     let new_price: usize = item_value.try_into().unwrap();
+                    assert(new_price > 1, 'new_price must be > 1');
 
                     item_data.price = new_price;
                     set!(world, (item_data,));
@@ -204,6 +209,10 @@ mod actions {
                 // rarity
                 9 => {
                     let new_rarity: usize = item_value.try_into().unwrap();
+                    assert(
+                        new_rarity == 1 || new_rarity == 2 || new_rarity == 3,
+                        'new_rarity not valid'
+                    );
 
                     item_data.rarity = new_rarity;
                     set!(world, (item_data,));
@@ -373,6 +382,16 @@ mod actions {
             let world = self.world_dispatcher.read();
 
             let player = get_caller_address();
+
+            let shop_data = get!(world, player, (Shop));
+            assert(
+                shop_data.item1 == item_id
+                    || shop_data.item2 == item_id
+                    || shop_data.item3 == item_id
+                    || shop_data.item4 == item_id,
+                'item not on sale'
+            );
+
             let item = get!(world, item_id, (Item));
             let mut player_char = get!(world, player, (Character));
 

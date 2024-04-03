@@ -19,8 +19,6 @@ mod tests {
 
     use warpack_masters::systems::actions::actions::{ITEMS_COUNTER_ID, INIT_GOLD, STORAGE_FLAG};
 
-    use debug::PrintTrait;
-
 
     #[test]
     #[should_panic(expected: ('No items found', 'ENTRYPOINT_FAILED'))]
