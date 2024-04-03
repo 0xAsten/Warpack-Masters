@@ -7,6 +7,7 @@ mod models {
     mod CharacterItem;
     mod Item;
     mod Character;
+    mod Shop;
 }
 
 mod tests {
@@ -17,4 +18,9 @@ mod tests {
     mod test_buy_item;
     mod test_undo_place_item;
     mod test_sell_item;
+    mod test_reroll_shop;
+}
+
+mod utils {
+    mod random;
 }
