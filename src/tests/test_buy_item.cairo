@@ -75,7 +75,7 @@ mod tests {
         actions_system.buy_item(1);
 
         let char_data = get!(world, alice, (Character));
-        assert(char_data.gold == INIT_GOLD - item_one_price, 'gold value mismatch');
+        assert(char_data.gold == INIT_GOLD + 1 - item_one_price, 'gold value mismatch');
 
         let char_item_counter_data = get!(world, alice, (CharacterItemsCounter));
         assert(char_item_counter_data.count == 1, 'total item count mismatch');

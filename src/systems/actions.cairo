@@ -76,7 +76,10 @@ mod actions {
             assert(player_exists.grid.is_zero(), 'Player already exists');
 
             set!(world, (Backpack { player, grid: Grid { x: GRID_X, y: GRID_Y } },));
-            set!(world, (Character { player, name, class, gold: INIT_GOLD, health: INIT_HEALTH }));
+            // add one gold for reroll shop
+            set!(
+                world, (Character { player, name, class, gold: INIT_GOLD + 1, health: INIT_HEALTH })
+            );
 
             emit!(world, Spawned { player: player });
         }
@@ -423,6 +426,9 @@ mod actions {
 
             let caller = get_caller_address();
 
+            let mut char = get!(world, caller, (Character));
+            assert(char.gold >= 1, 'Not enough gold');
+
             let mut shop = get!(world, caller, (Shop));
 
             // TODO: Will move these arrays after Dojo supports storing array
@@ -517,7 +523,9 @@ mod actions {
                 shop.item4 = *rare.at(random_index);
             }
 
-            set!(world, (shop,));
+            char.gold -= 1;
+
+            set!(world, (shop, char));
         }
 
 
