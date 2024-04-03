@@ -46,7 +46,7 @@ mod tests {
         let item_one_name = 'Sword';
         let item_one_width = 1;
         let item_one_height = 3;
-        let item_one_price = 1;
+        let item_one_price = 2;
         let item_one_damage = 10;
         let item_one_armor = 10;
         let item_one_chance = 5;

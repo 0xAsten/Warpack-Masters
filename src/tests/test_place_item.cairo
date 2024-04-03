@@ -36,15 +36,19 @@ mod tests {
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.add_item('Sword', 1, 3, 1, 10, 10, 5, 10, 5, 9);
-        actions_system.add_item('Shield', 2, 2, 1, 0, 5, 5, 10, 5, 9);
-        actions_system.add_item('Potion', 1, 1, 1, 0, 0, 5, 10, 15, 9);
+        actions_system.add_item('Sword', 1, 3, 2, 10, 10, 5, 10, 5, 9);
+        actions_system.add_item('Shield', 2, 2, 2, 0, 5, 5, 10, 5, 9);
+        actions_system.add_item('Potion', 1, 1, 2, 0, 0, 5, 10, 15, 9);
 
         let item = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
         assert(item.count == 3, 'total item count mismatch');
 
         set_contract_address(alice);
         actions_system.spawn('Alice', Class::Warlock);
+        // mock player gold for testing
+        let mut player_data = get!(world, alice, (Character));
+        player_data.gold = 100;
+        set!(world, (player_data));
 
         actions_system.buy_item(1);
         // place a sword on (0,4)
@@ -198,7 +202,7 @@ mod tests {
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.add_item('Sword', 1, 3, 1, 10, 10, 5, 10, 5, 9);
+        actions_system.add_item('Sword', 1, 3, 2, 10, 10, 5, 10, 5, 9);
 
         set_contract_address(alice);
         actions_system.spawn('Alice', Class::Warlock);
@@ -224,7 +228,7 @@ mod tests {
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.add_item('Sword', 1, 3, 1, 10, 10, 5, 10, 5, 9);
+        actions_system.add_item('Sword', 1, 3, 2, 10, 10, 5, 10, 5, 9);
 
         set_contract_address(alice);
         actions_system.spawn('Alice', Class::Warlock);
@@ -251,8 +255,8 @@ mod tests {
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.add_item('Sword', 1, 3, 1, 10, 10, 5, 10, 5, 9);
-        actions_system.add_item('Shield', 2, 2, 1, 0, 5, 5, 10, 5, 9);
+        actions_system.add_item('Sword', 1, 3, 2, 10, 10, 5, 10, 5, 9);
+        actions_system.add_item('Shield', 2, 2, 2, 0, 5, 5, 10, 5, 9);
 
         set_contract_address(alice);
         actions_system.spawn('Alice', Class::Warlock);
@@ -283,8 +287,8 @@ mod tests {
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.add_item('Sword', 1, 3, 1, 10, 10, 5, 10, 5, 9);
-        actions_system.add_item('Shield', 2, 2, 1, 0, 5, 5, 10, 5, 9);
+        actions_system.add_item('Sword', 1, 3, 10, 10, 10, 5, 10, 5, 9);
+        actions_system.add_item('Shield', 2, 2, 10, 0, 5, 5, 10, 5, 9);
 
         set_contract_address(alice);
         actions_system.spawn('Alice', Class::Warlock);
@@ -310,7 +314,7 @@ mod tests {
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.add_item('Sword', 1, 3, 1, 10, 10, 5, 10, 5, 9);
+        actions_system.add_item('Sword', 1, 3, 2, 10, 10, 5, 10, 5, 9);
 
         set_contract_address(alice);
         actions_system.spawn('Alice', Class::Warlock);
