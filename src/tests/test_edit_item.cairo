@@ -44,7 +44,7 @@ mod tests {
         let item_one_chance = 5;
         let item_one_cooldown = 10;
         let item_one_heal = 5;
-        let item_one_rarity = 5;
+        let item_one_rarity = 1;
 
         let item_one_new_name: felt252 = 'Wood Sword';
         let item_one_new_price: felt252 = 70;
@@ -162,6 +162,24 @@ mod tests {
         let actions_system = IActionsDispatcher { contract_address };
 
         actions_system.edit_item(1, 3, 1);
+    }
+
+
+    #[test]
+    #[available_gas(3000000000000000)]
+    #[should_panic(expected: ('new_rarity not valid', 'ENTRYPOINT_FAILED'))]
+    fn test_edit_item_revert_invalid_rarity() {
+        let owner = starknet::contract_address_const::<0x0>();
+
+        let mut models = array![backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH];
+
+        let world = spawn_test_world(models);
+
+        let contract_address = world
+            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
+        let actions_system = IActionsDispatcher { contract_address };
+
+        actions_system.edit_item(1, 9, 9);
     }
 }
 

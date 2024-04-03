@@ -173,7 +173,7 @@ mod tests {
         let item_one_chance = 5;
         let item_one_cooldown = 10;
         let item_one_heal = 5;
-        let item_one_rarity = 5;
+        let item_one_rarity = 1;
 
         actions_system
             .add_item(

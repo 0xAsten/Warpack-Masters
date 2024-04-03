@@ -106,6 +106,8 @@ mod actions {
 
             assert(price > 1, 'price must be greater than 1');
 
+            assert(rarity == 1 || rarity == 2 || rarity == 3, 'rarity not valid');
+
             let world = self.world_dispatcher.read();
 
             let mut counter = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
@@ -207,6 +209,10 @@ mod actions {
                 // rarity
                 9 => {
                     let new_rarity: usize = item_value.try_into().unwrap();
+                    assert(
+                        new_rarity == 1 || new_rarity == 2 || new_rarity == 3,
+                        'new_rarity not valid'
+                    );
 
                     item_data.rarity = new_rarity;
                     set!(world, (item_data,));
