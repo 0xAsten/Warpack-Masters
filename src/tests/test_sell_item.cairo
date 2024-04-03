@@ -25,7 +25,7 @@ mod tests {
 
     #[test]
     #[available_gas(3000000000000000)]
-    fn test_buy_item() {
+    fn test_sell_item() {
         let owner = starknet::contract_address_const::<0x0>();
         let alice = starknet::contract_address_const::<0x1337>();
 
