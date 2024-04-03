@@ -101,6 +101,8 @@ mod actions {
             assert(width > 0 && width <= GRID_X, 'width not in range');
             assert(height > 0 && height <= GRID_Y, 'height not in range');
 
+            assert(price > 1, 'price must be greater than 1');
+
             let world = self.world_dispatcher.read();
 
             let mut counter = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
@@ -151,7 +153,7 @@ mod actions {
                 // height
                 2 => {
                     let new_height: usize = item_value.try_into().unwrap();
-                    assert(new_height > 0 && new_height <= GRID_X, 'new_height not in range');
+                    assert(new_height > 0 && new_height <= GRID_Y, 'new_height not in range');
 
                     item_data.height = new_height;
                     set!(world, (item_data,));
@@ -159,6 +161,7 @@ mod actions {
                 // price
                 3 => {
                     let new_price: usize = item_value.try_into().unwrap();
+                    assert(new_price > 1, 'new_price must be > 1');
 
                     item_data.price = new_price;
                     set!(world, (item_data,));
