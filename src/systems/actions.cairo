@@ -2,15 +2,12 @@ use warpack_masters::models::Character::Class;
 
 use starknet::ContractAddress;
 
-#[starknet::interface]
-trait IActions<TContractState> {
-    fn spawn(ref self: TContractState, name: felt252, class: Class);
-    fn place_item(
-        ref self: TContractState, char_item_counter_id: u32, x: usize, y: usize, rotation: usize
-    );
-    fn undo_place_item(ref self: TContractState, char_item_counter_id: u32);
+#[dojo::interface]
+trait IActions {
+    fn spawn(name: felt252, class: Class);
+    fn place_item(char_item_counter_id: u32, x: usize, y: usize, rotation: usize);
+    fn undo_place_item(char_item_counter_id: u32);
     fn add_item(
-        ref self: TContractState,
         name: felt252,
         width: usize,
         height: usize,
@@ -22,12 +19,12 @@ trait IActions<TContractState> {
         heal: usize,
         rarity: usize,
     );
-    fn edit_item(ref self: TContractState, item_id: u32, item_key: felt252, item_value: felt252);
-    fn buy_item(ref self: TContractState, item_id: u32);
-    fn sell_item(ref self: TContractState, char_item_counter_id: u32);
-    fn is_world_owner(self: @TContractState, caller: ContractAddress) -> bool;
-    fn is_item_owned(self: @TContractState, caller: ContractAddress, id: usize) -> bool;
-    fn reroll_shop(ref self: TContractState);
+    fn edit_item(item_id: u32, item_key: felt252, item_value: felt252);
+    fn buy_item(item_id: u32);
+    fn sell_item(char_item_counter_id: u32);
+    fn is_world_owner(caller: ContractAddress) -> bool;
+    fn is_item_owned(caller: ContractAddress, id: usize) -> bool;
+    fn reroll_shop();
 }
 
 
@@ -53,23 +50,21 @@ mod actions {
 
     const STORAGE_FLAG: usize = 999;
 
-    #[event]
-    #[derive(Drop, starknet::Event)]
-    enum Event {
-        Spawned: Spawned,
-    }
+    // #[event]
+    // #[derive(Drop, starknet::Event)]
+    // enum Event {
+    //     Spawned: Spawned,
+    // }
 
-    // declaring custom event struct
-    #[derive(Drop, starknet::Event)]
-    struct Spawned {
-        player: ContractAddress,
-    }
+    // // declaring custom event struct
+    // #[derive(Drop, starknet::Event)]
+    // struct Spawned {
+    //     player: ContractAddress,
+    // }
 
     #[abi(embed_v0)]
     impl ActionsImpl of IActions<ContractState> {
-        fn spawn(ref self: ContractState, name: felt252, class: Class) {
-            let world = self.world_dispatcher.read();
-
+        fn spawn(world: IWorldDispatcher, name: felt252, class: Class) {
             let player = get_caller_address();
 
             let player_exists = get!(world, player, (Backpack));
@@ -80,12 +75,10 @@ mod actions {
             set!(
                 world, (Character { player, name, class, gold: INIT_GOLD + 1, health: INIT_HEALTH })
             );
-
-            emit!(world, Spawned { player: player });
         }
 
         fn add_item(
-            ref self: ContractState,
+            world: IWorldDispatcher,
             name: felt252,
             width: usize,
             height: usize,
@@ -108,8 +101,6 @@ mod actions {
 
             assert(rarity == 1 || rarity == 2 || rarity == 3, 'rarity not valid');
 
-            let world = self.world_dispatcher.read();
-
             let mut counter = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
             counter.count += 1;
 
@@ -131,13 +122,11 @@ mod actions {
         }
 
         fn edit_item(
-            ref self: ContractState, item_id: u32, item_key: felt252, item_value: felt252
+            world: IWorldDispatcher, item_id: u32, item_key: felt252, item_value: felt252
         ) {
             let caller = get_caller_address();
 
             assert(self.is_world_owner(caller), 'caller not world owner');
-
-            let world = self.world_dispatcher.read();
 
             let mut item_data = get!(world, item_id, (Item));
 
@@ -223,10 +212,8 @@ mod actions {
 
 
         fn place_item(
-            ref self: ContractState, char_item_counter_id: u32, x: usize, y: usize, rotation: usize
+            world: IWorldDispatcher, char_item_counter_id: u32, x: usize, y: usize, rotation: usize
         ) {
-            let world = self.world_dispatcher.read();
-
             let player = get_caller_address();
 
             assert(x <= GRID_X, 'x out of range');
@@ -312,9 +299,7 @@ mod actions {
         }
 
 
-        fn undo_place_item(ref self: ContractState, char_item_counter_id: u32) {
-            let world = self.world_dispatcher.read();
-
+        fn undo_place_item(world: IWorldDispatcher, char_item_counter_id: u32) {
             let player = get_caller_address();
 
             let mut char_item_data = get!(world, (player, char_item_counter_id), (CharacterItem));
@@ -378,9 +363,7 @@ mod actions {
         }
 
 
-        fn buy_item(ref self: ContractState, item_id: u32) {
-            let world = self.world_dispatcher.read();
-
+        fn buy_item(world: IWorldDispatcher, item_id: u32) {
             let player = get_caller_address();
 
             let shop_data = get!(world, player, (Shop));
@@ -414,9 +397,7 @@ mod actions {
         }
 
 
-        fn sell_item(ref self: ContractState, char_item_counter_id: u32) {
-            let world = self.world_dispatcher.read();
-
+        fn sell_item(world: IWorldDispatcher, char_item_counter_id: u32) {
             let player = get_caller_address();
 
             let mut char_item_data = get!(world, (player, char_item_counter_id), (CharacterItem));
@@ -440,9 +421,7 @@ mod actions {
             set!(world, (char_item_data, player_char));
         }
 
-        fn reroll_shop(ref self: ContractState) {
-            let world = self.world_dispatcher.read();
-
+        fn reroll_shop(world: IWorldDispatcher) {
             let caller = get_caller_address();
 
             let mut char = get!(world, caller, (Character));
@@ -573,18 +552,14 @@ mod actions {
         }
 
 
-        fn is_world_owner(self: @ContractState, caller: ContractAddress) -> bool {
-            let world = self.world_dispatcher.read();
-
+        fn is_world_owner(world: IWorldDispatcher, caller: ContractAddress) -> bool {
             // resource id of world is 0
             let is_owner = world.is_owner(caller, 0);
 
             is_owner
         }
 
-        fn is_item_owned(self: @ContractState, caller: ContractAddress, id: usize) -> bool {
-            let world = self.world_dispatcher.read();
-
+        fn is_item_owned(world: IWorldDispatcher, caller: ContractAddress, id: usize) -> bool {
             let char_item_data = get!(world, (caller, id), (CharacterItem));
 
             // item is not in inventory or storage
