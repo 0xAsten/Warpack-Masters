@@ -44,8 +44,6 @@ mod tests {
     #[should_panic]
     #[available_gas(30000000)]
     fn test_spawn_already_exists() {
-        let caller = starknet::contract_address_const::<0x0>();
-
         let mut models = array![backpack::TEST_CLASS_HASH, character::TEST_CLASS_HASH];
 
         let world = spawn_test_world(models);
