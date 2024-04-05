@@ -24,8 +24,6 @@ mod tests {
     #[should_panic(expected: ('No items found', 'ENTRYPOINT_FAILED'))]
     #[available_gas(3000000000000000)]
     fn test_reroll_shop_no_items() {
-        let owner = starknet::contract_address_const::<0x0>();
-
         let mut models = array![
             backpack::TEST_CLASS_HASH,
             character::TEST_CLASS_HASH,

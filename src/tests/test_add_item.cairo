@@ -23,8 +23,6 @@ mod tests {
     #[test]
     #[available_gas(3000000000000000)]
     fn test_add_item() {
-        let owner = starknet::contract_address_const::<0x0>();
-
         let mut models = array![backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH];
 
         let world = spawn_test_world(models);
@@ -197,7 +195,6 @@ mod tests {
     #[available_gas(3000000000000000)]
     #[should_panic(expected: ('caller not world owner', 'ENTRYPOINT_FAILED'))]
     fn test_add_item_revert_not_world_owner() {
-        let owner = starknet::contract_address_const::<0x0>();
         let alice = starknet::contract_address_const::<0x1337>();
 
         let mut models = array![backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH];
@@ -217,8 +214,6 @@ mod tests {
     #[available_gas(3000000000000000)]
     #[should_panic(expected: ('width not in range', 'ENTRYPOINT_FAILED'))]
     fn test_add_item_revert_width_not_in_range() {
-        let owner = starknet::contract_address_const::<0x0>();
-
         let mut models = array![backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH];
 
         let world = spawn_test_world(models);
@@ -234,8 +229,6 @@ mod tests {
     #[available_gas(3000000000000000)]
     #[should_panic(expected: ('height not in range', 'ENTRYPOINT_FAILED'))]
     fn test_add_item_revert_height_not_in_range() {
-        let owner = starknet::contract_address_const::<0x0>();
-
         let mut models = array![backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH];
 
         let world = spawn_test_world(models);
@@ -251,8 +244,6 @@ mod tests {
     #[available_gas(3000000000000000)]
     #[should_panic(expected: ('price must be greater than 1', 'ENTRYPOINT_FAILED'))]
     fn test_add_item_revert_price_not_valid() {
-        let owner = starknet::contract_address_const::<0x0>();
-
         let mut models = array![backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH];
 
         let world = spawn_test_world(models);
@@ -269,8 +260,6 @@ mod tests {
     #[available_gas(3000000000000000)]
     #[should_panic(expected: ('rarity not valid', 'ENTRYPOINT_FAILED'))]
     fn test_add_item_revert_invalid_rarity() {
-        let owner = starknet::contract_address_const::<0x0>();
-
         let mut models = array![backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH];
 
         let world = spawn_test_world(models);
