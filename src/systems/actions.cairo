@@ -345,19 +345,17 @@ mod actions {
                 }
             }
 
-            let mut char_items = get!(world, player, (CharacterItemsCounter));
             set!(
                 world,
                 (CharacterItem {
                     player,
-                    id: char_items.count,
+                    id: char_item_counter_id,
                     itemId: item_id,
                     where: 'inventory',
                     position: Position { x, y },
                     rotation,
                 })
             );
-            set!(world, (char_items,));
         }
 
 
