@@ -18,6 +18,10 @@ trait IActions {
         cooldown: usize,
         heal: usize,
         rarity: usize,
+        item_type: felt252,
+        stat_affected: felt252,
+        percentage: usize,
+        trigger_type: felt252
     );
     fn edit_item(item_id: u32, item_key: felt252, item_value: felt252);
     fn buy_item(item_id: u32);
@@ -73,7 +77,17 @@ mod actions {
             set!(world, (Backpack { player, grid: Grid { x: GRID_X, y: GRID_Y } },));
             // add one gold for reroll shop
             set!(
-                world, (Character { player, name, class, gold: INIT_GOLD + 1, health: INIT_HEALTH })
+                world,
+                (Character {
+                    player,
+                    name,
+                    class,
+                    gold: INIT_GOLD + 1,
+                    health: INIT_HEALTH,
+                    wins: 0,
+                    loss: 0,
+                    in_lobby: false
+                })
             );
         }
 
@@ -89,6 +103,10 @@ mod actions {
             cooldown: usize,
             heal: usize,
             rarity: usize,
+            item_type: felt252,
+            stat_affected: felt252,
+            percentage: usize,
+            trigger_type: felt252
         ) {
             let caller = get_caller_address();
 
@@ -100,6 +118,20 @@ mod actions {
             assert(price > 1, 'price must be greater than 1');
 
             assert(rarity == 1 || rarity == 2 || rarity == 3, 'rarity not valid');
+
+            // 0 - None
+            // 1 - start_of_round
+            // 2 - end_of_round
+            // 3 - on_hit
+            // 4 - on_attack
+            assert(
+                trigger_type == 0
+                    || trigger_type == 1
+                    || trigger_type == 2
+                    || trigger_type == 3
+                    || trigger_type == 4,
+                'trigger_type not valid'
+            );
 
             let mut counter = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
             counter.count += 1;
@@ -115,7 +147,11 @@ mod actions {
                 chance,
                 cooldown,
                 heal,
-                rarity
+                rarity,
+                item_type,
+                stat_affected,
+                percentage,
+                trigger_type,
             };
 
             set!(world, (counter, item));
@@ -204,6 +240,39 @@ mod actions {
                     );
 
                     item_data.rarity = new_rarity;
+                    set!(world, (item_data,));
+                },
+                // item_type
+                10 => {
+                    item_data.item_type = item_value;
+                    set!(world, (item_data,));
+                },
+                // stat_affected
+                11 => {
+                    item_data.stat_affected = item_value;
+                    set!(world, (item_data,));
+                },
+                // percentage
+                12 => {
+                    let new_percentage: usize = item_value.try_into().unwrap();
+
+                    item_data.percentage = new_percentage;
+                    set!(world, (item_data,));
+                },
+                // trigger_type
+                13 => {
+                    let new_trigger_type = item_value;
+
+                    assert(
+                        new_trigger_type == 0
+                            || new_trigger_type == 1
+                            || new_trigger_type == 2
+                            || new_trigger_type == 3
+                            || new_trigger_type == 4,
+                        'new_trigger_type not valid'
+                    );
+
+                    item_data.trigger_type = new_trigger_type;
                     set!(world, (item_data,));
                 },
                 _ => { panic!("Invalid item_key: {}", item_key); }
