@@ -43,6 +43,10 @@ mod tests {
         let item_one_cooldown = 10;
         let item_one_heal = 5;
         let item_one_rarity = 1;
+        let item_one_item_type = 'Weapon';
+        let item_one_stat_affected = '';
+        let item_one_percentage = 0;
+        let item_one_trigger_type = 0;
 
         let item_two_name = 'Shield';
         let item_two_width = 2;
@@ -54,6 +58,10 @@ mod tests {
         let item_two_cooldown = 10;
         let item_two_heal = 5;
         let item_two_rarity = 1;
+        let item_two_item_type = 'Weapon';
+        let item_two_stat_affected = '';
+        let item_two_percentage = 0;
+        let item_two_trigger_type = 0;
 
         let item_three_name = 'Potion';
         let item_three_width = 1;
@@ -65,6 +73,10 @@ mod tests {
         let item_three_cooldown = 10;
         let item_three_heal = 15;
         let item_three_rarity = 3;
+        let item_three_item_type = 'Buff';
+        let item_three_stat_affected = 'Health';
+        let item_three_percentage = 0;
+        let item_three_trigger_type = 2;
 
         actions_system
             .add_item(
@@ -78,6 +90,10 @@ mod tests {
                 item_one_cooldown,
                 item_one_heal,
                 item_one_rarity,
+                item_one_item_type,
+                item_one_stat_affected,
+                item_one_percentage,
+                item_one_trigger_type
             );
 
         actions_system
@@ -91,7 +107,11 @@ mod tests {
                 item_two_chance,
                 item_two_cooldown,
                 item_two_heal,
-                item_two_rarity
+                item_two_rarity,
+                item_two_item_type,
+                item_two_stat_affected,
+                item_two_percentage,
+                item_two_trigger_type
             );
 
         actions_system
@@ -105,47 +125,72 @@ mod tests {
                 item_three_chance,
                 item_three_cooldown,
                 item_three_heal,
-                item_three_rarity
+                item_three_rarity,
+                item_three_item_type,
+                item_three_stat_affected,
+                item_three_percentage,
+                item_three_trigger_type
             );
 
         let item = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
         assert(item.count == 3, 'total item count mismatch');
 
         let item_one_data = get!(world, 1, (Item));
-        assert(item_one_data.name == item_one_name, 'Item one name mismatch');
-        assert(item_one_data.width == item_one_width, 'Item one width mismatch');
-        assert(item_one_data.height == item_one_height, 'Item one height mismatch');
-        assert(item_one_data.price == item_one_price, 'Item one price mismatch');
-        assert(item_one_data.damage == item_one_damage, 'Item one damage mismatch');
-        assert(item_one_data.armor == item_one_armor, 'Item one armor mismatch');
-        assert(item_one_data.chance == item_one_chance, 'Item one chance mismatch');
-        assert(item_one_data.heal == item_one_heal, 'Item one heal mismatch');
-        assert(item_one_data.cooldown == item_one_cooldown, 'Item one cooldown mismatch');
-        assert(item_one_data.rarity == item_one_rarity, 'Item one rarity mismatch');
+        assert(item_one_data.name == item_one_name, 'Item 1 name mismatch');
+        assert(item_one_data.width == item_one_width, 'Item 1 width mismatch');
+        assert(item_one_data.height == item_one_height, 'Item 1 height mismatch');
+        assert(item_one_data.price == item_one_price, 'Item 1 price mismatch');
+        assert(item_one_data.damage == item_one_damage, 'Item 1 damage mismatch');
+        assert(item_one_data.armor == item_one_armor, 'Item 1 armor mismatch');
+        assert(item_one_data.chance == item_one_chance, 'Item 1 chance mismatch');
+        assert(item_one_data.heal == item_one_heal, 'Item 1 heal mismatch');
+        assert(item_one_data.cooldown == item_one_cooldown, 'Item 1 cooldown mismatch');
+        assert(item_one_data.rarity == item_one_rarity, 'Item 1 rarity mismatch');
+        assert(item_one_data.item_type == item_one_item_type, 'Item 1 item_type mismatch');
+        assert(
+            item_one_data.stat_affected == item_one_stat_affected, 'Item 1 stat_affected mismatch'
+        );
+        assert(item_one_data.percentage == item_one_percentage, 'Item 1 percentage mismatch');
+        assert(item_one_data.trigger_type == item_one_trigger_type, 'Item 1 trigger_type mismatch');
 
         let item_two_data = get!(world, 2, (Item));
-        assert(item_two_data.name == item_two_name, 'Item two name mismatch');
-        assert(item_two_data.width == item_two_width, 'Item two width mismatch');
-        assert(item_two_data.height == item_two_height, 'Item two height mismatch');
-        assert(item_two_data.price == item_two_price, 'Item two price mismatch');
-        assert(item_two_data.damage == item_two_damage, 'Item two damage mismatch');
-        assert(item_two_data.armor == item_two_armor, 'Item two armor mismatch');
-        assert(item_two_data.chance == item_two_chance, 'Item two chance mismatch');
-        assert(item_two_data.heal == item_two_heal, 'Item two heal mismatch');
-        assert(item_two_data.cooldown == item_two_cooldown, 'Item two cooldown mismatch');
-        assert(item_two_data.rarity == item_two_rarity, 'Item two rarity mismatch');
+        assert(item_two_data.name == item_two_name, 'Item 2 name mismatch');
+        assert(item_two_data.width == item_two_width, 'Item 2 width mismatch');
+        assert(item_two_data.height == item_two_height, 'Item 2 height mismatch');
+        assert(item_two_data.price == item_two_price, 'Item 2 price mismatch');
+        assert(item_two_data.damage == item_two_damage, 'Item 2 damage mismatch');
+        assert(item_two_data.armor == item_two_armor, 'Item 2 armor mismatch');
+        assert(item_two_data.chance == item_two_chance, 'Item 2 chance mismatch');
+        assert(item_two_data.heal == item_two_heal, 'Item 2 heal mismatch');
+        assert(item_two_data.cooldown == item_two_cooldown, 'Item 2 cooldown mismatch');
+        assert(item_two_data.rarity == item_two_rarity, 'Item 2 rarity mismatch');
+        assert(item_two_data.item_type == item_two_item_type, 'Item 2 item_type mismatch');
+        assert(
+            item_two_data.stat_affected == item_two_stat_affected, 'Item 2 stat_affected mismatch'
+        );
+        assert(item_two_data.percentage == item_two_percentage, 'Item 2 percentage mismatch');
+        assert(item_two_data.trigger_type == item_two_trigger_type, 'Item 2 trigger_type mismatch');
 
         let item_three_data = get!(world, 3, (Item));
-        assert(item_three_data.name == item_three_name, 'Item three name mismatch');
-        assert(item_three_data.width == item_three_width, 'Item three width mismatch');
-        assert(item_three_data.height == item_three_height, 'Item three height mismatch');
-        assert(item_three_data.price == item_three_price, 'Item three price mismatch');
-        assert(item_three_data.damage == item_three_damage, 'Item three damage mismatch');
-        assert(item_three_data.armor == item_three_armor, 'Item three armor mismatch');
-        assert(item_three_data.chance == item_three_chance, 'Item three chance mismatch');
-        assert(item_three_data.heal == item_three_heal, 'Item three heal mismatch');
-        assert(item_three_data.cooldown == item_three_cooldown, 'Item three cooldown mismatch');
-        assert(item_three_data.rarity == item_three_rarity, 'Item three rarity mismatch');
+        assert(item_three_data.name == item_three_name, 'Item 3 name mismatch');
+        assert(item_three_data.width == item_three_width, 'Item 3 width mismatch');
+        assert(item_three_data.height == item_three_height, 'Item 3 height mismatch');
+        assert(item_three_data.price == item_three_price, 'Item 3 price mismatch');
+        assert(item_three_data.damage == item_three_damage, 'Item 3 damage mismatch');
+        assert(item_three_data.armor == item_three_armor, 'Item 3 armor mismatch');
+        assert(item_three_data.chance == item_three_chance, 'Item 3 chance mismatch');
+        assert(item_three_data.heal == item_three_heal, 'Item 3 heal mismatch');
+        assert(item_three_data.cooldown == item_three_cooldown, 'Item 3 cooldown mismatch');
+        assert(item_three_data.rarity == item_three_rarity, 'Item 3 rarity mismatch');
+        assert(item_three_data.item_type == item_three_item_type, 'Item 3 item_type mismatch');
+        assert(
+            item_three_data.stat_affected == item_three_stat_affected,
+            'Item 3 stat_affected mismatch'
+        );
+        assert(item_three_data.percentage == item_three_percentage, 'Item 3 percentage mismatch');
+        assert(
+            item_three_data.trigger_type == item_three_trigger_type, 'Item 3 trigger_type mismatch'
+        );
     }
 
     #[test]
@@ -165,7 +210,7 @@ mod tests {
 
         set_contract_address(alice);
 
-        actions_system.add_item('Sword', 1, 3, 100, 10, 10, 5, 10, 5, 5);
+        actions_system.add_item('Sword', 1, 3, 100, 10, 10, 5, 10, 5, 5, 'Weapon', '', 0, 0);
     }
 
     #[test]
@@ -182,7 +227,7 @@ mod tests {
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.add_item('Sword', 10, 3, 100, 10, 10, 5, 10, 5, 5);
+        actions_system.add_item('Sword', 10, 3, 100, 10, 10, 5, 10, 5, 5, 'Weapon', '', 0, 0);
     }
 
     #[test]
@@ -199,7 +244,7 @@ mod tests {
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.add_item('Sword', 1, 8, 100, 10, 10, 5, 10, 5, 5);
+        actions_system.add_item('Sword', 1, 8, 100, 10, 10, 5, 10, 5, 5, 'Weapon', '', 0, 0);
     }
 
     #[test]
@@ -216,7 +261,7 @@ mod tests {
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.add_item('Sword', 1, 3, 1, 10, 10, 5, 10, 5, 5);
+        actions_system.add_item('Sword', 1, 3, 1, 10, 10, 5, 10, 5, 5, 'Weapon', '', 0, 0);
     }
 
 
@@ -234,7 +279,7 @@ mod tests {
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.add_item('Sword', 1, 3, 100, 10, 10, 5, 10, 5, 5);
+        actions_system.add_item('Sword', 1, 3, 100, 10, 10, 5, 10, 5, 5, 'Weapon', '', 0, 0);
     }
 }
 
