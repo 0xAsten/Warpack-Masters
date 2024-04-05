@@ -649,52 +649,55 @@ mod actions {
 
         fn fight(world: IWorldDispatcher) {
             let caller = get_caller_address();
+            let char = get!(world, caller, (Character));
 
-            let mut char = get!(world, caller, (Character));
-            let mut dummyCharCounter = get!(world, caller, (DummyCharacterCounter));
-            dummyCharCounter.count += 1;
+            if !char.dummied {
+                let mut char = get!(world, caller, (Character));
+                let mut dummyCharCounter = get!(world, caller, (DummyCharacterCounter));
+                dummyCharCounter.count += 1;
 
-            let dummyChar = DummyCharacter {
-                level: char.wins,
-                id: dummyCharCounter.count,
-                name: char.name,
-                class: char.class,
-                health: char.health,
-            };
-            // TODO: if player wins, wins plus 1 and dummied false
-            char.dummied = true;
+                let dummyChar = DummyCharacter {
+                    level: char.wins,
+                    id: dummyCharCounter.count,
+                    name: char.name,
+                    class: char.class,
+                    health: char.health,
+                };
+                // TODO: if player wins, wins plus 1 and dummied false
+                char.dummied = true;
 
-            let charItemsCounter = get!(world, caller, (CharacterItemsCounter));
-            let mut count = charItemsCounter.count;
+                let charItemsCounter = get!(world, caller, (CharacterItemsCounter));
+                let mut count = charItemsCounter.count;
 
-            if count > 0 {
-                loop {
-                    if count == 0 {
-                        break;
+                if count > 0 {
+                    loop {
+                        if count == 0 {
+                            break;
+                        }
+
+                        let charItem = get!(world, (caller, count), (CharacterItem));
+                        let mut dummyCharItemsCounter = get!(
+                            world, (char.wins, dummyCharCounter.count), (DummyCharacterItemsCounter)
+                        );
+                        dummyCharItemsCounter.count += 1;
+
+                        let dummyCharItem = DummyCharacterItem {
+                            level: char.wins,
+                            dummyCharId: dummyCharCounter.count,
+                            counterId: dummyCharItemsCounter.count,
+                            itemId: charItem.itemId,
+                            position: charItem.position,
+                            rotation: charItem.rotation,
+                        };
+
+                        set!(world, (dummyCharItemsCounter, dummyCharItem));
+
+                        count -= 1;
                     }
-
-                    let charItem = get!(world, (caller, count), (CharacterItem));
-                    let mut dummyCharItemsCounter = get!(
-                        world, (char.wins, dummyCharCounter.count), (DummyCharacterItemsCounter)
-                    );
-                    dummyCharItemsCounter.count += 1;
-
-                    let dummyCharItem = DummyCharacterItem {
-                        level: char.wins,
-                        dummyCharId: dummyCharCounter.count,
-                        counterId: dummyCharItemsCounter.count,
-                        itemId: charItem.itemId,
-                        position: charItem.position,
-                        rotation: charItem.rotation,
-                    };
-
-                    set!(world, (dummyCharItemsCounter, dummyCharItem));
-
-                    count -= 1;
                 }
-            }
 
-            set!(world, (char, dummyCharCounter, dummyChar));
+                set!(world, (char, dummyCharCounter, dummyChar));
+            }
         }
     }
 }
