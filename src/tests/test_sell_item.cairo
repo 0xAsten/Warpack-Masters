@@ -26,7 +26,6 @@ mod tests {
     #[test]
     #[available_gas(3000000000000000)]
     fn test_sell_item() {
-        let owner = starknet::contract_address_const::<0x0>();
         let alice = starknet::contract_address_const::<0x1337>();
 
         let mut models = array![
@@ -163,7 +162,6 @@ mod tests {
     #[available_gas(3000000000000000)]
     #[should_panic(expected: ('item not owned', 'ENTRYPOINT_FAILED'))]
     fn test_sell_item_revert_item_not_owned() {
-        let owner = starknet::contract_address_const::<0x0>();
         let alice = starknet::contract_address_const::<0x1337>();
 
         let mut models = array![
@@ -224,7 +222,6 @@ mod tests {
     #[available_gas(3000000000000000)]
     #[should_panic(expected: ('item in inventory', 'ENTRYPOINT_FAILED'))]
     fn test_sell_item_revert_item_in_inventory() {
-        let owner = starknet::contract_address_const::<0x0>();
         let alice = starknet::contract_address_const::<0x1337>();
 
         let mut models = array![
