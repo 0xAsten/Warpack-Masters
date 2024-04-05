@@ -1,12 +1,12 @@
 use starknet::ContractAddress;
-use warpack_masters::model::CharacterItem::Position;
+use warpack_masters::models::CharacterItem::Position;
 
 #[derive(Model, Drop, Serde)]
 struct DummyCharacterItem {
     #[key]
     level: usize,
     #[key]
-    id: u32,
+    dummyCharId: u32,
     #[key]
     counterId: usize,
     itemId: usize,
@@ -20,6 +20,6 @@ struct DummyCharacterItemsCounter {
     #[key]
     level: usize,
     #[key]
-    id: u32,
+    dummyCharId: u32,
     count: usize,
 }

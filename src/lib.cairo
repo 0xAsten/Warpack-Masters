@@ -9,6 +9,7 @@ mod models {
     mod Character;
     mod Shop;
     mod DummyCharacter;
+    mod DummyCharacterItem;
 }
 
 mod tests {
@@ -20,6 +21,7 @@ mod tests {
     mod test_undo_place_item;
     mod test_sell_item;
     mod test_reroll_shop;
+    mod test_fight;
 }
 
 mod utils {

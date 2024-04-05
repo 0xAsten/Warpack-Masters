@@ -29,6 +29,7 @@ trait IActions {
     fn is_world_owner(caller: ContractAddress) -> bool;
     fn is_item_owned(caller: ContractAddress, id: usize) -> bool;
     fn reroll_shop();
+    fn fight();
 }
 
 
@@ -44,6 +45,10 @@ mod actions {
     use warpack_masters::models::Character::{Character, Class};
     use warpack_masters::models::Shop::Shop;
     use warpack_masters::utils::random::{pseudo_seed, random};
+    use warpack_masters::models::DummyCharacter::{DummyCharacter, DummyCharacterCounter};
+    use warpack_masters::models::DummyCharacterItem::{
+        DummyCharacterItem, DummyCharacterItemsCounter
+    };
 
     const GRID_X: usize = 9;
     const GRID_Y: usize = 7;
@@ -79,7 +84,14 @@ mod actions {
             set!(
                 world,
                 (Character {
-                    player, name, class, gold: INIT_GOLD + 1, health: INIT_HEALTH, wins: 0, loss: 0,
+                    player,
+                    name,
+                    class,
+                    gold: INIT_GOLD + 1,
+                    health: INIT_HEALTH,
+                    wins: 0,
+                    loss: 0,
+                    dummied: false,
                 })
             );
         }
@@ -638,9 +650,51 @@ mod actions {
         fn fight(world: IWorldDispatcher) {
             let caller = get_caller_address();
 
-            let (player, charItem) = get!(world, caller, (Character, CharacterItem));
+            let mut char = get!(world, caller, (Character));
+            let mut dummyCharCounter = get!(world, caller, (DummyCharacterCounter));
+            dummyCharCounter.count += 1;
 
-            set!(world, (player {}, charItem));
+            let dummyChar = DummyCharacter {
+                level: char.wins,
+                id: dummyCharCounter.count,
+                name: char.name,
+                class: char.class,
+                health: char.health,
+            };
+            // TODO: if player wins, wins plus 1 and dummied false
+            char.dummied = true;
+
+            let charItemsCounter = get!(world, caller, (CharacterItemsCounter));
+            let mut count = charItemsCounter.count;
+
+            if count > 0 {
+                loop {
+                    if count == 0 {
+                        break;
+                    }
+
+                    let charItem = get!(world, (caller, count), (CharacterItem));
+                    let mut dummyCharItemsCounter = get!(
+                        world, (char.wins, dummyCharCounter.count), (DummyCharacterItemsCounter)
+                    );
+                    dummyCharItemsCounter.count += 1;
+
+                    let dummyCharItem = DummyCharacterItem {
+                        level: char.wins,
+                        dummyCharId: dummyCharCounter.count,
+                        counterId: dummyCharItemsCounter.count,
+                        itemId: charItem.itemId,
+                        position: charItem.position,
+                        rotation: charItem.rotation,
+                    };
+
+                    set!(world, (dummyCharItemsCounter, dummyCharItem));
+
+                    count -= 1;
+                }
+            }
+
+            set!(world, (char, dummyCharCounter, dummyChar));
         }
     }
 }
