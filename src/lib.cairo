@@ -8,6 +8,7 @@ mod models {
     mod Item;
     mod Character;
     mod Shop;
+    mod DummyCharacter;
 }
 
 mod tests {

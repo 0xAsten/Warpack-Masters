@@ -636,5 +636,13 @@ mod actions {
 
             false
         }
+
+        fn fight(world: IWorldDispatcher) {
+            let caller = get_caller_address();
+
+            let (player, charItem) = get!(world, caller, (Character, CharacterItem));
+
+            set!(world, (player {}, charItem));
+        }
     }
 }
