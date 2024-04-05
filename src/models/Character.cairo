@@ -10,8 +10,7 @@ struct Character {
     gold: usize,
     health: usize,
     wins: usize,
-    loss: usize,
-    in_lobby: bool
+    loss: usize
 }
 
 #[derive(Serde, Copy, Drop, Introspect, PartialEq)]

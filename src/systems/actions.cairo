@@ -79,14 +79,7 @@ mod actions {
             set!(
                 world,
                 (Character {
-                    player,
-                    name,
-                    class,
-                    gold: INIT_GOLD + 1,
-                    health: INIT_HEALTH,
-                    wins: 0,
-                    loss: 0,
-                    in_lobby: false
+                    player, name, class, gold: INIT_GOLD + 1, health: INIT_HEALTH, wins: 0, loss: 0,
                 })
             );
         }
