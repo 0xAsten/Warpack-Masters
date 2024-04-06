@@ -2,11 +2,12 @@
 set -euo pipefail
 pushd $(dirname "$0")/..
 
-export RPC_URL="https://api.cartridge.gg/x/warpack-master/katana"
+export RPC_URL="https://api.cartridge.gg/x/warpack-master/katana";
 
 export WORLD_ADDRESS=$(cat ./manifests/deployments/KATANA.json | jq -r '.world.address')
 
 export ACTIONS_ADDRESS=$(cat ./manifests/deployments/KATANA.json | jq -r '.contracts[] | select(.name == "warpack_masters::systems::actions::actions" ).address')
+
 
 echo "---------------------------------------------------------------------------"
 echo world : $WORLD_ADDRESS
@@ -14,9 +15,12 @@ echo " "
 echo actions : $ACTIONS_ADDRESS
 echo "---------------------------------------------------------------------------"
 
-# enable system -> models authorizations
-sozo auth grant --world $WORLD_ADDRESS --wait writer --rpc-url $RPC_URL \
-  Item,$ACTIONS_ADDRESS \
-  >/dev/null
 
-echo "Default authorizations have been successfully set."
+# sozo execute --world <WORLD_ADDRESS> <CONTRACT> <ENTRYPOINT>
+# 358486078052 is Sword
+# 91707909958756 is Shield
+# 1468365686984687211050012787699566 is Healing Potion
+# 75185137345906 Dagger
+# name,width,height,price,damage,armor,chance,cooldown,heal,rarity
+
+sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS add_item -c 358486078052,1,3,2,2,0,80,5,0,1 --wait --rpc-url $RPC_URL 

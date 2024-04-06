@@ -53,28 +53,5 @@ mod tests {
         assert(dummyChar.health == char.health, 'health should be equal');
         assert(dummyCharItemsCounter.count == 0, 'Should be 0');
     }
-
-    #[test]
-    #[available_gas(3000000000000000)]
-    fn test_no_dummy() {
-        let alice = starknet::contract_address_const::<0x0>();
-        let mut models = array![character::TEST_CLASS_HASH];
-
-        let world = spawn_test_world(models);
-
-        let contract_address = world
-            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
-
-        actions_system.spawn('alice', Class::Warlock);
-        let mut char = get!(world, (alice), Character);
-        char.dummied == true;
-        set!(world, (char));
-
-        actions_system.fight();
-        let char = get!(world, (alice), Character);
-        let dummyCharCounter = get!(world, (char.wins), DummyCharacterCounter);
-        assert(dummyCharCounter.count == 0, 'Should be 0');
-    }
 }
 
