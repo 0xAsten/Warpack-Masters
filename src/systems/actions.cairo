@@ -803,11 +803,11 @@ mod actions {
             let mut winner = 'player';
             loop {
                 turns += 1;
-
                 if turns >= 25_usize {
                     if char_health < dummy_health {
-                        winner = 'dummy'
+                        winner = 'dummy';
                     }
+                    break;
                 }
 
                 // total items to use in a turn 
