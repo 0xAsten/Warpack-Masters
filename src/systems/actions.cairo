@@ -669,35 +669,44 @@ mod actions {
                 let charItemsCounter = get!(world, caller, (CharacterItemsCounter));
                 let mut count = charItemsCounter.count;
 
-                if count > 0 {
-                    loop {
-                        if count == 0 {
-                            break;
-                        }
-
-                        let charItem = get!(world, (caller, count), (CharacterItem));
-                        let mut dummyCharItemsCounter = get!(
-                            world, (char.wins, dummyCharCounter.count), (DummyCharacterItemsCounter)
-                        );
-                        dummyCharItemsCounter.count += 1;
-
-                        let dummyCharItem = DummyCharacterItem {
-                            level: char.wins,
-                            dummyCharId: dummyCharCounter.count,
-                            counterId: dummyCharItemsCounter.count,
-                            itemId: charItem.itemId,
-                            position: charItem.position,
-                            rotation: charItem.rotation,
-                        };
-
-                        set!(world, (dummyCharItemsCounter, dummyCharItem));
-
-                        count -= 1;
+                loop {
+                    if count == 0 {
+                        break;
                     }
-                }
+
+                    let charItem = get!(world, (caller, count), (CharacterItem));
+                    let mut dummyCharItemsCounter = get!(
+                        world, (char.wins, dummyCharCounter.count), (DummyCharacterItemsCounter)
+                    );
+                    dummyCharItemsCounter.count += 1;
+
+                    let dummyCharItem = DummyCharacterItem {
+                        level: char.wins,
+                        dummyCharId: dummyCharCounter.count,
+                        counterId: dummyCharItemsCounter.count,
+                        itemId: charItem.itemId,
+                        position: charItem.position,
+                        rotation: charItem.rotation,
+                    };
+
+                    set!(world, (dummyCharItemsCounter, dummyCharItem));
+
+                    count -= 1;
+                };
 
                 set!(world, (char, dummyCharCounter, dummyChar));
             }
+
+            let char = get!(world, caller, (Character));
+            let (seed, _, _, _) = pseudo_seed();
+            let dummyCharCounter = get!(world, char.wins, (DummyCharacterCounter));
+            let mut random_index = random(seed, dummyCharCounter.count) + 1;
+            //TODO: Custom envet to emit the dummy Character ID for FE to render the dummy character and its items
+            let dummyChar = get!(world, (char.wins, random_index), DummyCharacter);
+
+            let dummyCharItemsCounter = get!(
+                world, (char.wins, random_index), (DummyCharacterItemsCounter)
+            );
         }
     }
 }
