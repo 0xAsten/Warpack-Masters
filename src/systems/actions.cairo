@@ -874,8 +874,6 @@ mod actions {
                             break;
                         }
                     }
-
-                    total_items -= 1;
                 }
             }
         // return winner;
