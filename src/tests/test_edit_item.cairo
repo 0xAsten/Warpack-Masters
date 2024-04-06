@@ -41,10 +41,6 @@ mod tests {
         let item_one_cooldown = 10;
         let item_one_heal = 5;
         let item_one_rarity = 1;
-        let item_one_item_type = 'Weapon';
-        let item_one_stat_affected = '';
-        let item_one_percentage = 0;
-        let item_one_trigger_type = 0;
 
         let item_one_new_name: felt252 = 'Wood Sword';
         let item_one_new_price: felt252 = 70;
@@ -61,10 +57,6 @@ mod tests {
                 item_one_cooldown,
                 item_one_heal,
                 item_one_rarity,
-                item_one_item_type,
-                item_one_stat_affected,
-                item_one_percentage,
-                item_one_trigger_type
             );
 
         actions_system.edit_item(1, 0, item_one_new_name);
@@ -80,12 +72,6 @@ mod tests {
         assert(item_one_data.heal == item_one_heal, 'Item 1 heal mismatch');
         assert(item_one_data.cooldown == item_one_cooldown, 'Item 1 cooldown mismatch');
         assert(item_one_data.rarity == item_one_rarity, 'Item 1 rarity mismatch');
-        assert(item_one_data.item_type == item_one_item_type, 'Item 1 item_type mismatch');
-        assert(
-            item_one_data.stat_affected == item_one_stat_affected, 'Item 1 stat_affected mismatch'
-        );
-        assert(item_one_data.percentage == item_one_percentage, 'Item 1 percentage mismatch');
-        assert(item_one_data.trigger_type == item_one_trigger_type, 'Item 1 trigger_type mismatch');
 
         actions_system.edit_item(1, 3, item_one_new_price);
 
@@ -101,12 +87,6 @@ mod tests {
         assert(item_one_data.heal == item_one_heal, 'Item 1 heal mismatch');
         assert(item_one_data.cooldown == item_one_cooldown, 'Item 1 cooldown mismatch');
         assert(item_one_data.rarity == item_one_rarity, 'Item 1 rarity mismatch');
-        assert(item_one_data.item_type == item_one_item_type, 'Item 1 item_type mismatch');
-        assert(
-            item_one_data.stat_affected == item_one_stat_affected, 'Item 1 stat_affected mismatch'
-        );
-        assert(item_one_data.percentage == item_one_percentage, 'Item 1 percentage mismatch');
-        assert(item_one_data.trigger_type == item_one_trigger_type, 'Item 1 trigger_type mismatch');
     }
 
     #[test]

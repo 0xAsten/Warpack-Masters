@@ -20,14 +20,6 @@ struct Item {
     // base heal
     heal: usize,
     rarity: usize,
-    // Weapon, Buff, Debuff
-    item_type: felt252,
-    // Health, Damage, Chance
-    stat_affected: felt252,
-    // For buffs and debuffs
-    percentage: usize,
-    // start_of_round, end_of_round, on_hit, on_attack, none
-    trigger_type: felt252
 }
 
 #[derive(Model, Drop, Serde)]

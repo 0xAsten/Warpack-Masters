@@ -53,10 +53,6 @@ mod tests {
         let item_one_cooldown = 10;
         let item_one_heal = 5;
         let item_one_rarity = 1;
-        let item_one_item_type = 'Weapon';
-        let item_one_stat_affected = '';
-        let item_one_percentage = 0;
-        let item_one_trigger_type = 0;
 
         actions_system
             .add_item(
@@ -70,10 +66,6 @@ mod tests {
                 item_one_cooldown,
                 item_one_heal,
                 item_one_rarity,
-                item_one_item_type,
-                item_one_stat_affected,
-                item_one_percentage,
-                item_one_trigger_type
             );
 
         set_contract_address(alice);
@@ -129,10 +121,6 @@ mod tests {
         let item_one_cooldown = 10;
         let item_one_heal = 5;
         let item_one_rarity = 1;
-        let item_one_item_type = 'Weapon';
-        let item_one_stat_affected = '';
-        let item_one_percentage = 0;
-        let item_one_trigger_type = 0;
 
         actions_system
             .add_item(
@@ -146,10 +134,6 @@ mod tests {
                 item_one_cooldown,
                 item_one_heal,
                 item_one_rarity,
-                item_one_item_type,
-                item_one_stat_affected,
-                item_one_percentage,
-                item_one_trigger_type
             );
 
         set_contract_address(alice);
@@ -191,10 +175,6 @@ mod tests {
         let item_one_cooldown = 10;
         let item_one_heal = 5;
         let item_one_rarity = 1;
-        let item_one_item_type = 'Weapon';
-        let item_one_stat_affected = '';
-        let item_one_percentage = 0;
-        let item_one_trigger_type = 0;
 
         actions_system
             .add_item(
@@ -208,10 +188,6 @@ mod tests {
                 item_one_cooldown,
                 item_one_heal,
                 item_one_rarity,
-                item_one_item_type,
-                item_one_stat_affected,
-                item_one_percentage,
-                item_one_trigger_type
             );
 
         set_contract_address(alice);
