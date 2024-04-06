@@ -10,6 +10,7 @@ mod models {
     mod Shop;
     mod DummyCharacter;
     mod DummyCharacterItem;
+    mod Array;
 }
 
 mod tests {
