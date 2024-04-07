@@ -1,3 +1,52 @@
+# Warpack Masters Dojo Jam 4 Submission
+
+### Project Summary
+
+Warpack Masters - Player-versus-Player (PvP) inventory management & autobattler game in the fantasy setting!
+
+Fight with your Warpacks filled with items. Items have different shapes and effects.
+Assemble the best Warpack and fight other players!
+Customise your build with rare and legendary items. Create the meta.
+
+
+### GitHub
+
+> [Github - Warpack Masters ](https://github.com/0xAsten/Warpack-Masters)
+
+### Play
+Game is live at (impulsedao.xyz/Warpack-Masters)
+
+### Twitter
+
+> (x.com/@Warpackmasters)
+
+### Team members
+
+0xAsten - leading Cairo development
+[github](https://github.com/0xAsten) / [twitter](https://twitter.com/0xasten)
+
+KahanMajmudar - Cairo developer
+
+[github](https://github.com/KahanMajmudar) / [twitter](https://twitter.com/KahanMajmudar)
+
+
+MrTrickster - Unity client developer;
+
+[site]()
+
+Exxcuro - artist;
+
+
+0xKube - product & vibes curator;
+
+[github](https://github.com/0xKube) / [twitter](https://twitter.com/0xKube)
+
+
+### Submission Tracks
+
+> Warpack Masters submitting to Road to Mainnet, New World, and Unity tracks.
+
+# Warpack Masters
 
 ## Backpack
 
