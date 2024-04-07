@@ -245,7 +245,7 @@ mod tests {
         actions_system.reroll_shop();
 
         actions_system.buy_item(1);
-        actions_system.place_item(1, 0, 4, 0);
+        actions_system.place_item(1, 1, 0, 0);
         actions_system.sell_item(1);
     }
 }

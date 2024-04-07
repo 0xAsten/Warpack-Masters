@@ -45,10 +45,13 @@ mod actions {
     use warpack_masters::models::DummyCharacterItem::{
         DummyCharacterItem, DummyCharacterItemsCounter
     };
+    use warpack_masters::models::BattleLog::{
+        BattleLog, BattleLogCounter, BattleLogDetail, BattleLogDetailCounter
+    };
 
-    const GRID_X: usize = 9;
-    const GRID_Y: usize = 7;
-    const INIT_GOLD: usize = 4;
+    const GRID_X: usize = 4;
+    const GRID_Y: usize = 3;
+    const INIT_GOLD: usize = 8;
     const INIT_HEALTH: usize = 25;
 
     const ITEMS_COUNTER_ID: felt252 = 'ITEMS_COUNTER_ID';
@@ -231,8 +234,8 @@ mod actions {
         ) {
             let player = get_caller_address();
 
-            assert(x <= GRID_X, 'x out of range');
-            assert(y <= GRID_Y, 'y out of range');
+            assert(x < GRID_X, 'x out of range');
+            assert(y < GRID_Y, 'y out of range');
             assert(
                 rotation == 0 || rotation == 90 || rotation == 180 || rotation == 270,
                 'invalid rotation'
@@ -639,15 +642,248 @@ mod actions {
             }
 
             let char = get!(world, caller, (Character));
-            let (seed, _, _, _) = pseudo_seed();
+            let (seed1, seed2, _, _) = pseudo_seed();
             let dummyCharCounter = get!(world, char.wins, (DummyCharacterCounter));
-            let mut random_index = random(seed, dummyCharCounter.count) + 1;
+            let mut random_index = random(seed1, dummyCharCounter.count) + 1;
+
             //TODO: Custom envet to emit the dummy Character ID for FE to render the dummy character and its items
             let dummyChar = get!(world, (char.wins, random_index), DummyCharacter);
+
+            // start the battle
+            let mut char_health: usize = char.health;
+            let mut dummy_health: usize = dummyChar.health;
+            let mut char_armor: usize = 0;
+            let mut dummy_armor: usize = 0;
+
+            let mut char_items_len: usize = 0;
+            let mut dummy_items_len: usize = 0;
+
+            // sort items
+            let mut items: Felt252Dict<u32> = Default::default();
+            let mut item_belongs: Felt252Dict<felt252> = Default::default();
+            let mut items_length: usize = 0;
+
+            let char_item_counter = get!(world, caller, (CharacterItemsCounter));
+            let mut char_item_count = char_item_counter.count;
+
+            loop {
+                if char_item_count == 0 {
+                    break;
+                }
+                let char_item = get!(world, (caller, char_item_count), (CharacterItem));
+                let item = get!(world, char_item.itemId, (Item));
+                let cooldown = item.cooldown;
+                let armor = item.armor;
+                if char_item.where == 'inventory' && cooldown > 0 {
+                    items.insert(items_length.into(), char_item.itemId);
+                    item_belongs.insert(items_length.into(), 'player');
+
+                    items_length += 1;
+                    char_items_len += 1;
+                } else if char_item.where == 'inventory' && cooldown == 0 {
+                    char_armor += armor;
+                }
+
+                char_item_count -= 1;
+            };
+
+            // debug
+            // loop {
+            //     if items_length == 0 {
+            //         break;
+            //     }
+            //     items.get(items_length.into() - 1).print();
+            //     item_belongs.get(items_length.into() - 1).print();
+            //     items_length -= 1;
+            // };
 
             let dummyCharItemsCounter = get!(
                 world, (char.wins, random_index), (DummyCharacterItemsCounter)
             );
+            let mut dummy_item_count = dummyCharItemsCounter.count;
+            loop {
+                if dummy_item_count == 0 {
+                    break;
+                }
+
+                let dummy_item = get!(
+                    world,
+                    (char.wins, dummyCharCounter.count, dummy_item_count),
+                    (DummyCharacterItem)
+                );
+                let item = get!(world, dummy_item.itemId, (Item));
+                if item.cooldown > 0 {
+                    items.insert(items_length.into(), dummy_item.itemId);
+                    item_belongs.insert(items_length.into(), 'dummy');
+
+                    items_length += 1;
+                    dummy_items_len += 1;
+                } else if item.cooldown == 0 {
+                    dummy_armor += item.armor;
+                }
+
+                dummy_item_count -= 1;
+            };
+
+            // sorting items based on cooldown in ascending order
+            let mut i: usize = 0;
+            let mut j: usize = 0;
+            loop {
+                if i >= items_length {
+                    break;
+                }
+                loop {
+                    if j >= (items_length - i - 1) {
+                        break;
+                    }
+
+                    // fetch respective itemids
+                    let items_at_j = items.get(j.into());
+                    let items_at_j_belongs = item_belongs.get(j.into());
+                    let items_at_j_plus_one = items.get((j + 1).into());
+                    let items_at_j_plus_one_belongs = item_belongs.get((j + 1).into());
+
+                    //fetch itemid data
+                    let item_data_at_j = get!(world, items_at_j, Item);
+                    let item_data_at_j_plus_one = get!(world, items_at_j_plus_one, Item);
+
+                    if item_data_at_j.cooldown > item_data_at_j_plus_one.cooldown {
+                        items.insert(j.into(), items_at_j_plus_one);
+                        item_belongs.insert(j.into(), items_at_j_plus_one_belongs);
+                        items.insert((j + 1).into(), items_at_j);
+                        item_belongs.insert((j + 1).into(), items_at_j_belongs);
+                    }
+
+                    j += 1;
+                };
+                j = 0;
+                i += 1;
+            };
+
+            // record the battle log
+            let mut battleLogCounter = get!(world, caller, (BattleLogCounter));
+            battleLogCounter.count += 1;
+            let battleLogCounterCount = battleLogCounter.count;
+
+            // battle logic
+            let mut turns = 0;
+            let mut winner = '';
+
+            loop {
+                turns += 1;
+                if turns >= 25_usize {
+                    if char_health <= dummy_health {
+                        winner = 'dummy';
+                    } else {
+                        winner = 'player';
+                    }
+                    break;
+                }
+
+                let mut i: usize = 0;
+
+                loop {
+                    let mut damageCaused: usize = 0;
+                    let mut selfHeal: usize = 0;
+                    let mut isDodged: bool = false;
+                    let mut healFailed: bool = false;
+
+                    if i == items_length {
+                        break;
+                    }
+
+                    let curr_item_index = items.get(i.into());
+                    let curr_item_belongs = item_belongs.get(i.into());
+
+                    let curr_item_data = get!(world, curr_item_index, (Item));
+                    let damage = curr_item_data.damage;
+                    let chance = curr_item_data.chance;
+                    let heal = curr_item_data.heal;
+
+                    let rand = random(seed2 + turns.into() + i.into(), 100);
+                    if rand < chance {
+                        if curr_item_belongs == 'player' {
+                            if heal > 0 {
+                                char_health += heal;
+                                selfHeal = heal;
+                            }
+                            if damage > 0 && damage > dummy_armor {
+                                damageCaused = damage - dummy_armor;
+                                if dummy_health <= damageCaused {
+                                    winner = 'player';
+                                    break;
+                                }
+
+                                dummy_health -= damageCaused;
+                            }
+                        } else {
+                            if heal > 0 {
+                                dummy_health += heal;
+                                selfHeal = heal;
+                            }
+                            if damage > 0 && damage > char_armor {
+                                damageCaused = damage - char_armor;
+                                if char_health <= damageCaused {
+                                    winner = 'dummy';
+                                    break;
+                                }
+
+                                char_health -= damageCaused;
+                            }
+                        }
+                    } else if rand >= chance && damage > 0 {
+                        isDodged = true;
+                    } else if rand >= chance && heal > 0 {
+                        healFailed = true;
+                    }
+
+                    let mut battleLogDetailCounter = get!(
+                        world, (caller, battleLogCounterCount), (BattleLogDetailCounter)
+                    );
+                    battleLogDetailCounter.count += 1;
+                    let battleLogDetail = BattleLogDetail {
+                        player: caller,
+                        battleLogId: battleLogCounterCount,
+                        id: battleLogDetailCounter.count,
+                        whoTriggered: curr_item_belongs,
+                        whichItem: curr_item_index,
+                        damageCaused: damageCaused,
+                        selfHeal: selfHeal,
+                        isDodged: isDodged,
+                        healFailed: healFailed,
+                    };
+
+                    set!(world, (battleLogDetailCounter, battleLogDetail));
+
+                    i += 1;
+                };
+
+                if winner != '' {
+                    break;
+                }
+            };
+
+            let battleLog = BattleLog {
+                player: caller,
+                id: battleLogCounter.count,
+                dummyCharLevel: char.wins,
+                dummyCharId: random_index,
+                winner: winner,
+            };
+            set!(world, (battleLogCounter, battleLog));
+
+            if winner == 'player' {
+                let mut char = get!(world, caller, (Character));
+                char.wins += 1;
+                char.dummied = false;
+                char.gold += 5;
+                if char.wins < 5 {
+                    char.health += 10;
+                } else if char.wins == 5 {
+                    char.health += 15;
+                }
+                set!(world, (char));
+            }
         }
     }
 }

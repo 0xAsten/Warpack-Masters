@@ -59,7 +59,7 @@ mod tests {
 
         actions_system.buy_item(1);
         // place a sword on (0,4)
-        actions_system.place_item(1, 0, 4, 0);
+        actions_system.place_item(1, 0, 0, 0);
 
         actions_system.undo_place_item(1);
 
@@ -78,7 +78,7 @@ mod tests {
 
         actions_system.buy_item(2);
         // place a shield on (1,5)
-        actions_system.place_item(2, 1, 5, 0);
+        actions_system.place_item(2, 0, 0, 0);
 
         actions_system.undo_place_item(2);
 
@@ -99,7 +99,7 @@ mod tests {
 
         actions_system.buy_item(3);
         // place a potion on (1,4)
-        actions_system.place_item(3, 1, 4, 0);
+        actions_system.place_item(3, 0, 0, 0);
 
         actions_system.undo_place_item(3);
         let characterItem = get!(world, (alice, 3), CharacterItem);

@@ -20,7 +20,6 @@ mod tests {
 
     use warpack_masters::systems::actions::actions::ITEMS_COUNTER_ID;
 
-
     #[test]
     #[available_gas(3000000000000000)]
     fn test_place_item() {
@@ -64,62 +63,62 @@ mod tests {
 
         actions_system.buy_item(1);
         // place a sword on (0,4)
-        actions_system.place_item(1, 0, 4, 0);
+        actions_system.place_item(1, 0, 0, 0);
         // (0,4) (0,5) (0,6) should be occupied
-        let mut backpack_grid_data = get!(world, (alice, 0, 4), BackpackGrids);
-        assert(backpack_grid_data.occupied == true, '(0,4) should be occupied');
+        let mut backpack_grid_data = get!(world, (alice, 0, 2), BackpackGrids);
+        assert(backpack_grid_data.occupied == true, '(0,2) should be occupied');
 
-        let mut backpack_grid_data = get!(world, (alice, 0, 5), BackpackGrids);
-        assert(backpack_grid_data.occupied == true, '(0,5) should be occupied');
+        let mut backpack_grid_data = get!(world, (alice, 0, 1), BackpackGrids);
+        assert(backpack_grid_data.occupied == true, '(0,1) should be occupied');
 
-        let mut backpack_grid_data = get!(world, (alice, 0, 6), BackpackGrids);
-        assert(backpack_grid_data.occupied == true, '(0,6) should be occupied');
+        let mut backpack_grid_data = get!(world, (alice, 0, 0), BackpackGrids);
+        assert(backpack_grid_data.occupied == true, '(0,0) should be occupied');
 
         let mut characterItemsCounter = get!(world, alice, CharacterItemsCounter);
         let characterItem = get!(world, (alice, characterItemsCounter.count), CharacterItem);
         assert(characterItem.itemId == characterItemsCounter.count, 'item id should equal count');
         assert(characterItem.where == 'inventory', 'item should be in inventory');
         assert(characterItem.position.x == 0, 'x position mismatch');
-        assert(characterItem.position.y == 4, 'y position mismatch');
+        assert(characterItem.position.y == 0, 'y position mismatch');
         assert(characterItem.rotation == 0, 'rotation mismatch');
 
         actions_system.buy_item(2);
         // place a shield on (1,5)
-        actions_system.place_item(2, 1, 5, 0);
+        actions_system.place_item(2, 1, 0, 0);
         // (1,5) (1,6) (2,5) (2,6) should be occupied
-        let mut backpack_grid_data = get!(world, (alice, 1, 5), BackpackGrids);
-        assert(backpack_grid_data.occupied == true, '(1,5) should be occupied');
+        let mut backpack_grid_data = get!(world, (alice, 1, 0), BackpackGrids);
+        assert(backpack_grid_data.occupied == true, '(1,0) should be occupied');
 
-        let mut backpack_grid_data = get!(world, (alice, 1, 6), BackpackGrids);
-        assert(backpack_grid_data.occupied == true, '(1,6) should be occupied');
+        let mut backpack_grid_data = get!(world, (alice, 1, 1), BackpackGrids);
+        assert(backpack_grid_data.occupied == true, '(1,1) should be occupied');
 
-        let mut backpack_grid_data = get!(world, (alice, 2, 5), BackpackGrids);
-        assert(backpack_grid_data.occupied == true, '(2,5) should be occupied');
+        let mut backpack_grid_data = get!(world, (alice, 2, 0), BackpackGrids);
+        assert(backpack_grid_data.occupied == true, '(2,0) should be occupied');
 
-        let mut backpack_grid_data = get!(world, (alice, 2, 6), BackpackGrids);
-        assert(backpack_grid_data.occupied == true, '(2,6) should be occupied');
+        let mut backpack_grid_data = get!(world, (alice, 2, 1), BackpackGrids);
+        assert(backpack_grid_data.occupied == true, '(2,1) should be occupied');
 
         characterItemsCounter = get!(world, alice, CharacterItemsCounter);
         let characterItem = get!(world, (alice, characterItemsCounter.count), CharacterItem);
         assert(characterItem.itemId == characterItemsCounter.count, 'item id should equal count');
         assert(characterItem.where == 'inventory', 'item should be in inventory');
         assert(characterItem.position.x == 1, 'x position mismatch');
-        assert(characterItem.position.y == 5, 'y position mismatch');
+        assert(characterItem.position.y == 0, 'y position mismatch');
         assert(characterItem.rotation == 0, 'rotation mismatch');
 
         actions_system.buy_item(3);
         // place a potion on (1,4)
-        actions_system.place_item(3, 1, 4, 0);
+        actions_system.place_item(3, 1, 2, 0);
         // (1,4) should be occupied
-        let mut backpack_grid_data = get!(world, (alice, 1, 4), BackpackGrids);
-        assert(backpack_grid_data.occupied == true, '(1,4) should be occupied');
+        let mut backpack_grid_data = get!(world, (alice, 1, 2), BackpackGrids);
+        assert(backpack_grid_data.occupied == true, '(1,2) should be occupied');
 
         characterItemsCounter = get!(world, alice, CharacterItemsCounter);
         let characterItem = get!(world, (alice, characterItemsCounter.count), CharacterItem);
         // assert(characterItem.itemId == characterItemsCounter.count, 'item id should equal count');
         assert(characterItem.where == 'inventory', 'item should be in inventory');
         assert(characterItem.position.x == 1, 'x position mismatch');
-        assert(characterItem.position.y == 4, 'y position mismatch');
+        assert(characterItem.position.y == 2, 'y position mismatch');
         assert(characterItem.rotation == 0, 'rotation mismatch');
     }
 
@@ -147,7 +146,7 @@ mod tests {
 
         actions_system.buy_item(1);
         // place a sword on (10,0)
-        actions_system.place_item(1, 10, 0, 0);
+        actions_system.place_item(1, 4, 0, 0);
     }
 
     #[test]
@@ -174,7 +173,7 @@ mod tests {
 
         actions_system.buy_item(1);
         // place a sword on (0,10)
-        actions_system.place_item(1, 0, 10, 0);
+        actions_system.place_item(1, 0, 3, 0);
     }
 
     #[test]
@@ -228,7 +227,7 @@ mod tests {
 
         actions_system.buy_item(1);
         // place a sword on (8,6) with rotation 90
-        actions_system.place_item(1, 8, 6, 90);
+        actions_system.place_item(1, 2, 0, 90);
     }
 
     #[test]
@@ -255,7 +254,7 @@ mod tests {
 
         actions_system.buy_item(1);
         // place a sword on (0,6)
-        actions_system.place_item(1, 0, 6, 0);
+        actions_system.place_item(1, 0, 1, 0);
     }
 
 
@@ -292,12 +291,12 @@ mod tests {
 
         actions_system.buy_item(1);
         // place a sword on (0,4)
-        actions_system.place_item(1, 0, 4, 0);
+        actions_system.place_item(1, 0, 0, 0);
 
         actions_system.buy_item(2);
         // try to place the shield on of the occupied grids
         // this will collide with grid (0,4)
-        actions_system.place_item(2, 0, 3, 0);
+        actions_system.place_item(2, 0, 1, 0);
     }
 
     #[test]
@@ -323,7 +322,7 @@ mod tests {
         actions_system.spawn('Alice', Class::Warlock);
 
         // place a sword on (0,4)
-        actions_system.place_item(1, 0, 4, 0);
+        actions_system.place_item(1, 0, 0, 0);
     }
 
 
@@ -352,9 +351,9 @@ mod tests {
         actions_system.buy_item(1);
 
         // place a sword on (0,4)
-        actions_system.place_item(1, 0, 4, 0);
+        actions_system.place_item(1, 0, 0, 0);
         // try to place the same sword on (1,4)
-        actions_system.place_item(1, 1, 4, 0);
+        actions_system.place_item(1, 1, 0, 0);
     }
 }
 
