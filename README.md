@@ -15,9 +15,9 @@ Follow Us: [Twitter @WarpackMasters](x.com/@Warpackmasters)
 
 0xAsten - leading Cairo development | [github](https://github.com/0xAsten) / [twitter](https://twitter.com/0xasten)
 
-0xKube - product & vibes curator | [github](https://github.com/0xKube) [twitter](https://twitter.com/0xKube)
+0xKube - product & vibes curator | [github](https://github.com/0xKube) / [twitter](https://twitter.com/0xKube)
 
-MrTrickster - Unity client developer | [website](mrtrickster.net)
+MrTrickster - Unity client developer | [website](https://mrtrickster.net)
 
 KahanMajmudar - Cairo developer | [github](https://github.com/KahanMajmudar) / [twitter](https://twitter.com/KahanMajmudar)
 
