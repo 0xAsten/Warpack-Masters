@@ -47,8 +47,8 @@ mod actions {
     };
     use warpack_masters::models::Array::{ArrayModel};
 
-    const GRID_X: usize = 9;
-    const GRID_Y: usize = 7;
+    const GRID_X: usize = 4;
+    const GRID_Y: usize = 3;
     const INIT_GOLD: usize = 4;
     const INIT_HEALTH: usize = 25;
 
@@ -232,8 +232,8 @@ mod actions {
         ) {
             let player = get_caller_address();
 
-            assert(x <= GRID_X, 'x out of range');
-            assert(y <= GRID_Y, 'y out of range');
+            assert(x < GRID_X, 'x out of range');
+            assert(y < GRID_Y, 'y out of range');
             assert(
                 rotation == 0 || rotation == 90 || rotation == 180 || rotation == 270,
                 'invalid rotation'
