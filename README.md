@@ -2,55 +2,40 @@
 
 ### Project Summary
 
-Warpack Masters - Player-versus-Player (PvP) inventory management & autobattler game in the fantasy setting!
+Warpack Masters is a competitive Player-versus-Player (PvP) game that combines inventory management and autobattler mechanics within a captivating fantasy theme.
 
-Fight with your Warpacks filled with items. Items have different shapes and effects.
-Assemble the best Warpack and fight other players!
-Customise your build with rare and legendary items. Create the meta.
+Engage in battles with Warpacks teeming with uniquely shaped and potent items. Strategize to assemble formidable Warpacks to outsmart and defeat other players in intense matches. Customize your arsenal with a variety of rare and legendary items to create and dominate the game's meta.
 
-
-### GitHub
-
-> [Github - Warpack Masters ](https://github.com/0xAsten/Warpack-Masters)
-
-### Play
-Game is live at (impulsedao.xyz/Warpack-Masters)
-
-### Twitter
-
-> (x.com/@Warpackmasters)
+### Quick Links
+Play Now: [Warpack Masters Live](impulsedao.xyz/Warpack-Masters)
+Source Code: [GitHub Repository](https://github.com/0xAsten/Warpack-Masters)
+Follow Us: [Twitter @WarpackMasters](x.com/@Warpackmasters)
 
 ### Team members
 
-0xAsten - leading Cairo development
-[github](https://github.com/0xAsten) / [twitter](https://twitter.com/0xasten)
+0xAsten - leading Cairo development | [github](https://github.com/0xAsten) / [twitter](https://twitter.com/0xasten)
 
-KahanMajmudar - Cairo developer
+0xKube - product & vibes curator | [github](https://github.com/0xKube) [twitter](https://twitter.com/0xKube)
 
-[github](https://github.com/KahanMajmudar) / [twitter](https://twitter.com/KahanMajmudar)
+MrTrickster - Unity client developer | [website](mrtrickster.net)
 
-
-MrTrickster - Unity client developer;
-
-[site]()
+KahanMajmudar - Cairo developer | [github](https://github.com/KahanMajmudar) / [twitter](https://twitter.com/KahanMajmudar)
 
 Exxcuro - artist;
-
-
-0xKube - product & vibes curator;
-
-[github](https://github.com/0xKube) / [twitter](https://twitter.com/0xKube)
-
 
 ### Submission Tracks
 
 > Warpack Masters submitting to Road to Mainnet, New World, and Unity tracks.
 
+
 # Warpack Masters
 
-## Backpack
+## Instant matchmaking using contract storage TODO :: 
+In autobattles and other fastpace games it's crucially importnant to provide instant feedback to a player. 
+We're creating dummy characters within the wolrd contract, and use mirror-images for instant matchmaking.
 
-The bag of the player. The default size is 9x7.
+
+## Backpack
 
 ## Items property
 
