@@ -51,7 +51,7 @@ mod actions {
 
     const GRID_X: usize = 4;
     const GRID_Y: usize = 3;
-    const INIT_GOLD: usize = 4;
+    const INIT_GOLD: usize = 8;
     const INIT_HEALTH: usize = 25;
 
     const ITEMS_COUNTER_ID: felt252 = 'ITEMS_COUNTER_ID';
@@ -871,6 +871,19 @@ mod actions {
                 winner: winner,
             };
             set!(world, (battleLogCounter, battleLog));
+
+            if winner == 'player' {
+                let mut char = get!(world, caller, (Character));
+                char.wins += 1;
+                char.dummied = false;
+                char.gold += 5;
+                if char.wins < 5 {
+                    char.health += 10;
+                } else if char.wins == 5 {
+                    char.health += 15;
+                }
+                set!(world, (char));
+            }
         }
     }
 }
