@@ -45,7 +45,9 @@ mod actions {
     use warpack_masters::models::DummyCharacterItem::{
         DummyCharacterItem, DummyCharacterItemsCounter
     };
-    use warpack_masters::models::Array::{ArrayModel};
+    use warpack_masters::models::BattleLog::{
+        BattleLog, BattleLogCounter, BattleLogDetail, BattleLogDetailCounter
+    };
 
     const GRID_X: usize = 4;
     const GRID_Y: usize = 3;
@@ -640,45 +642,64 @@ mod actions {
             }
 
             let char = get!(world, caller, (Character));
-            let (seed, _, _, _) = pseudo_seed();
+            let (seed1, seed2, _, _) = pseudo_seed();
             let dummyCharCounter = get!(world, char.wins, (DummyCharacterCounter));
-            let mut random_index = random(seed, dummyCharCounter.count) + 1;
+            let mut random_index = random(seed1, dummyCharCounter.count) + 1;
+
             //TODO: Custom envet to emit the dummy Character ID for FE to render the dummy character and its items
             let dummyChar = get!(world, (char.wins, random_index), DummyCharacter);
 
-            let dummyCharItemsCounter = get!(
-                world, (char.wins, random_index), (DummyCharacterItemsCounter)
-            );
+            // start the battle
+            let mut char_health: usize = char.health;
+            let mut dummy_health: usize = dummyChar.health;
+            let mut char_armor: usize = 0;
+            let mut dummy_armor: usize = 0;
 
-            let mut char_health = char.health;
-            let mut dummy_health = dummyChar.health;
-            let char_array_id = 1;
-            let dummy_array_id = 2;
-            let mut char_items_len = 0;
-            let mut dummy_items_len = 0;
+            let mut char_items_len: usize = 0;
+            let mut dummy_items_len: usize = 0;
+
+            // sort items
+            let mut items: Felt252Dict<u32> = Default::default();
+            let mut item_belongs: Felt252Dict<felt252> = Default::default();
+            let mut items_length: usize = 0;
 
             let char_item_counter = get!(world, caller, (CharacterItemsCounter));
             let mut char_item_count = char_item_counter.count;
+
             loop {
                 if char_item_count == 0 {
                     break;
                 }
-
                 let char_item = get!(world, (caller, char_item_count), (CharacterItem));
-                if char_item.where == 'inventory' {
-                    set!(
-                        world,
-                        (ArrayModel {
-                            array_id: char_array_id,
-                            array_index: char_item_count - 1,
-                            array_value: char_item.itemId
-                        })
-                    );
+                let item = get!(world, char_item.itemId, (Item));
+                let cooldown = item.cooldown;
+                let armor = item.armor;
+                if char_item.where == 'inventory' && cooldown > 0 {
+                    items.insert(items_length.into(), char_item.itemId);
+                    item_belongs.insert(items_length.into(), 'player');
+
+                    items_length += 1;
                     char_items_len += 1;
+                } else if char_item.where == 'inventory' && cooldown == 0 {
+                    char_armor += armor;
                 }
+
                 char_item_count -= 1;
             };
 
+            // debug
+            // loop {
+            //     if items_length == 0 {
+            //         break;
+            //     }
+            //     items.get(items_length.into() - 1).print();
+            //     item_belongs.get(items_length.into() - 1).print();
+            //     items_length -= 1;
+            // };
+
+            let dummyCharItemsCounter = get!(
+                world, (char.wins, random_index), (DummyCharacterItemsCounter)
+            );
             let mut dummy_item_count = dummyCharItemsCounter.count;
             loop {
                 if dummy_item_count == 0 {
@@ -690,57 +711,47 @@ mod actions {
                     (char.wins, dummyCharCounter.count, dummy_item_count),
                     (DummyCharacterItem)
                 );
-                set!(
-                    world,
-                    (ArrayModel {
-                        array_id: dummy_array_id,
-                        array_index: dummy_item_count - 1,
-                        array_value: dummy_item.itemId
-                    })
-                );
-                dummy_items_len += 1;
+                let item = get!(world, dummy_item.itemId, (Item));
+                if item.cooldown > 0 {
+                    items.insert(items_length.into(), dummy_item.itemId);
+                    item_belongs.insert(items_length.into(), 'dummy');
+
+                    items_length += 1;
+                    dummy_items_len += 1;
+                } else if item.cooldown == 0 {
+                    dummy_armor += item.armor;
+                }
+
                 dummy_item_count -= 1;
             };
 
-            // sorting player items based on cooldown in decending order
-            let mut i = 0;
-            let mut j = 0;
+            // sorting items based on cooldown in ascending order
+            let mut i: usize = 0;
+            let mut j: usize = 0;
             loop {
-                if i >= char_items_len {
+                if i >= items_length {
                     break;
                 }
                 loop {
-                    if j >= (char_items_len - i - 1) {
+                    if j >= (items_length - i - 1) {
                         break;
                     }
 
                     // fetch respective itemids
-                    let char_items_at_j = get!(world, (1, j), ArrayModel);
-                    let char_items_at_j_plus_one = get!(world, (1, j + 1), ArrayModel);
+                    let items_at_j = items.get(j.into());
+                    let items_at_j_belongs = item_belongs.get(j.into());
+                    let items_at_j_plus_one = items.get((j + 1).into());
+                    let items_at_j_plus_one_belongs = item_belongs.get((j + 1).into());
 
                     //fetch itemid data
-                    let item_data_at_j = get!(world, (char_items_at_j.array_value), Item);
-                    let item_data_at_j_plus_one = get!(
-                        world, (char_items_at_j_plus_one.array_value), Item
-                    );
+                    let item_data_at_j = get!(world, items_at_j, Item);
+                    let item_data_at_j_plus_one = get!(world, items_at_j_plus_one, Item);
 
-                    if item_data_at_j.cooldown < item_data_at_j_plus_one.cooldown {
-                        set!(
-                            world,
-                            (ArrayModel {
-                                array_id: char_array_id,
-                                array_index: j,
-                                array_value: char_items_at_j_plus_one.array_value
-                            })
-                        );
-                        set!(
-                            world,
-                            (ArrayModel {
-                                array_id: char_array_id,
-                                array_index: j + 1,
-                                array_value: char_items_at_j.array_value
-                            })
-                        );
+                    if item_data_at_j.cooldown > item_data_at_j_plus_one.cooldown {
+                        items.insert(j.into(), items_at_j_plus_one);
+                        item_belongs.insert(j.into(), items_at_j_plus_one_belongs);
+                        items.insert((j + 1).into(), items_at_j);
+                        item_belongs.insert((j + 1).into(), items_at_j_belongs);
                     }
 
                     j += 1;
@@ -749,134 +760,117 @@ mod actions {
                 i += 1;
             };
 
-            // sorting dummy player items based on cooldown in decending order
-            let mut i = 0;
-            let mut j = 0;
-
-            loop {
-                if i >= dummy_items_len {
-                    break;
-                }
-                loop {
-                    if j >= (dummy_items_len - i - 1) {
-                        break;
-                    }
-
-                    // fetch respective itemids
-                    let dummy_items_at_j = get!(world, (1, j), ArrayModel);
-                    let dummy_items_at_j_plus_one = get!(world, (1, j + 1), ArrayModel);
-
-                    //fetch itemid data
-                    let item_data_at_j = get!(world, (dummy_items_at_j.array_value), Item);
-                    let item_data_at_j_plus_one = get!(
-                        world, (dummy_items_at_j_plus_one.array_value), Item
-                    );
-
-                    if item_data_at_j.cooldown < item_data_at_j_plus_one.cooldown {
-                        set!(
-                            world,
-                            (ArrayModel {
-                                array_id: dummy_array_id,
-                                array_index: j,
-                                array_value: dummy_items_at_j_plus_one.array_value
-                            })
-                        );
-                        set!(
-                            world,
-                            (ArrayModel {
-                                array_id: dummy_array_id,
-                                array_index: j + 1,
-                                array_value: dummy_items_at_j.array_value
-                            })
-                        );
-                    }
-
-                    j += 1;
-                };
-                j = 0;
-                i += 1;
-            };
+            // record the battle log
+            let mut battleLogCounter = get!(world, caller, (BattleLogCounter));
+            battleLogCounter.count += 1;
+            let battleLogCounterCount = battleLogCounter.count;
 
             // battle logic
             let mut turns = 0;
+            let mut winner = '';
 
-            let mut winner = 'player';
             loop {
                 turns += 1;
                 if turns >= 25_usize {
-                    if char_health < dummy_health {
+                    if char_health <= dummy_health {
                         winner = 'dummy';
+                    } else {
+                        winner = 'player';
                     }
                     break;
                 }
 
-                // total items to use in a turn 
-                let mut total_items = char_items_len;
-                if char_items_len < dummy_items_len {
-                    total_items = dummy_items_len;
-                }
+                let mut i: usize = 0;
 
-                i = 0;
                 loop {
-                    if i == total_items {
+                    let mut damageCaused: usize = 0;
+                    let mut selfHeal: usize = 0;
+                    let mut isDodged: bool = false;
+                    let mut healFailed: bool = false;
+
+                    if i == items_length {
                         break;
                     }
+
+                    let curr_item_index = items.get(i.into());
+                    let curr_item_belongs = item_belongs.get(i.into());
+
+                    let curr_item_data = get!(world, curr_item_index, (Item));
+                    let damage = curr_item_data.damage;
+                    let chance = curr_item_data.chance;
+                    let heal = curr_item_data.heal;
+
+                    let rand = random(seed2 + turns.into() + i.into(), 100);
+                    if rand < chance {
+                        if curr_item_belongs == 'player' {
+                            if heal > 0 {
+                                char_health += heal;
+                                selfHeal = heal;
+                            }
+                            if damage > 0 && damage > dummy_armor {
+                                damageCaused = damage - dummy_armor;
+                                if dummy_health <= damageCaused {
+                                    winner = 'player';
+                                    break;
+                                }
+
+                                dummy_health -= damageCaused;
+                            }
+                        } else {
+                            if heal > 0 {
+                                dummy_health += heal;
+                                selfHeal = heal;
+                            }
+                            if damage > 0 && damage > char_armor {
+                                damageCaused = damage - char_armor;
+                                if char_health <= damageCaused {
+                                    winner = 'dummy';
+                                    break;
+                                }
+
+                                char_health -= damageCaused;
+                            }
+                        }
+                    } else if rand >= chance && damage > 0 {
+                        isDodged = true;
+                    } else if rand >= chance && heal > 0 {
+                        healFailed = true;
+                    }
+
+                    let mut battleLogDetailCounter = get!(
+                        world, (caller, battleLogCounterCount), (BattleLogDetailCounter)
+                    );
+                    battleLogDetailCounter.count += 1;
+                    let battleLogDetail = BattleLogDetail {
+                        player: caller,
+                        battleLogId: battleLogCounterCount,
+                        id: battleLogDetailCounter.count,
+                        whoTriggered: curr_item_belongs,
+                        whichItem: curr_item_index,
+                        damageCaused: damageCaused,
+                        selfHeal: selfHeal,
+                        isDodged: isDodged,
+                        healFailed: healFailed,
+                    };
+
+                    set!(world, (battleLogDetailCounter, battleLogDetail));
+
                     i += 1;
+                };
 
-                    // start from 1st item in the array model
-                    let dummy_curr_array_data = get!(world, (dummy_array_id, i), (ArrayModel));
-                    let dummy_curr_item_data = get!(
-                        world, (dummy_curr_array_data.array_value), (Item)
-                    );
-
-                    let dummy_damage = dummy_curr_item_data.damage;
-                    let dummy_armor = dummy_curr_item_data.armor;
-                    let dummy_chance = dummy_curr_item_data.chance;
-                    let dummy_heal = dummy_curr_item_data.heal;
-
-                    // start from 1st item in the array model
-                    let char_curr_array_data = get!(world, (char_array_id, i), (ArrayModel));
-                    let char_curr_item_data = get!(
-                        world, (char_curr_array_data.array_value), (Item)
-                    );
-
-                    let char_damage = char_curr_item_data.damage;
-                    let char_armor = char_curr_item_data.armor;
-                    let char_chance = char_curr_item_data.chance;
-                    let char_heal = char_curr_item_data.heal;
-
-                    // dummy attacks first
-                    // gen a pseudo-random number which can output a value between 0 and 100 to simulate chance
-                    let rand = random('seed', 10);
-                    if rand >= dummy_chance {
-                        if char_armor < dummy_damage {
-                            char_health -= (dummy_damage - char_armor);
-                        }
-                        dummy_health += dummy_heal;
-
-                        if char_health == 0 {
-                            winner = 'dummy';
-                            break;
-                        }
-                    }
-
-                    // player attacks second
-                    // gen a pseudo-random number which can output a value between 0 and 100 to simulate chance
-                    let rand = random('seed', 10);
-                    if rand >= char_chance {
-                        if dummy_armor < char_damage {
-                            dummy_health -= (char_damage - dummy_armor);
-                        }
-                        char_health += char_heal;
-
-                        if dummy_health == 0 {
-                            winner = 'player';
-                            break;
-                        }
-                    }
+                if winner != '' {
+                    break;
                 }
-            }
-        // return winner;
+            };
+
+            let battleLog = BattleLog {
+                player: caller,
+                id: battleLogCounter.count,
+                dummyCharLevel: char.wins,
+                dummyCharId: random_index,
+                winner: winner,
+            };
+            set!(world, (battleLogCounter, battleLog));
         }
     }
 }

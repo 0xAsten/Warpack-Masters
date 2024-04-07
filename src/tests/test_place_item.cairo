@@ -20,9 +20,6 @@ mod tests {
 
     use warpack_masters::systems::actions::actions::ITEMS_COUNTER_ID;
 
-    use debug::PrintTrait;
-
-
     #[test]
     #[available_gas(3000000000000000)]
     fn test_place_item() {
