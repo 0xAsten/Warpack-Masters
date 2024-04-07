@@ -687,16 +687,6 @@ mod actions {
                 char_item_count -= 1;
             };
 
-            // debug
-            // loop {
-            //     if items_length == 0 {
-            //         break;
-            //     }
-            //     items.get(items_length.into() - 1).print();
-            //     item_belongs.get(items_length.into() - 1).print();
-            //     items_length -= 1;
-            // };
-
             let dummyCharItemsCounter = get!(
                 world, (char.wins, random_index), (DummyCharacterItemsCounter)
             );
@@ -799,42 +789,46 @@ mod actions {
                     let damage = curr_item_data.damage;
                     let chance = curr_item_data.chance;
                     let heal = curr_item_data.heal;
+                    let cooldown = curr_item_data.cooldown;
 
-                    let rand = random(seed2 + turns.into() + i.into(), 100);
-                    if rand < chance {
-                        if curr_item_belongs == 'player' {
-                            if heal > 0 {
-                                char_health += heal;
-                                selfHeal = heal;
-                            }
-                            if damage > 0 && damage > dummy_armor {
-                                damageCaused = damage - dummy_armor;
-                                if dummy_health <= damageCaused {
-                                    winner = 'player';
-                                    break;
+                    // each turn is treated as 1 unit of cooldown 
+                    if turns % cooldown == 0 {
+                        let rand = random(seed2 + turns.into() + i.into(), 100);
+                        if rand < chance {
+                            if curr_item_belongs == 'player' {
+                                if heal > 0 {
+                                    char_health += heal;
+                                    selfHeal = heal;
                                 }
+                                if damage > 0 && damage > dummy_armor {
+                                    damageCaused = damage - dummy_armor;
+                                    if dummy_health <= damageCaused {
+                                        winner = 'player';
+                                        break;
+                                    }
 
-                                dummy_health -= damageCaused;
-                            }
-                        } else {
-                            if heal > 0 {
-                                dummy_health += heal;
-                                selfHeal = heal;
-                            }
-                            if damage > 0 && damage > char_armor {
-                                damageCaused = damage - char_armor;
-                                if char_health <= damageCaused {
-                                    winner = 'dummy';
-                                    break;
+                                    dummy_health -= damageCaused;
                                 }
+                            } else {
+                                if heal > 0 {
+                                    dummy_health += heal;
+                                    selfHeal = heal;
+                                }
+                                if damage > 0 && damage > char_armor {
+                                    damageCaused = damage - char_armor;
+                                    if char_health <= damageCaused {
+                                        winner = 'dummy';
+                                        break;
+                                    }
 
-                                char_health -= damageCaused;
+                                    char_health -= damageCaused;
+                                }
                             }
+                        } else if rand >= chance && damage > 0 {
+                            isDodged = true;
+                        } else if rand >= chance && heal > 0 {
+                            healFailed = true;
                         }
-                    } else if rand >= chance && damage > 0 {
-                        isDodged = true;
-                    } else if rand >= chance && heal > 0 {
-                        healFailed = true;
                     }
 
                     let mut battleLogDetailCounter = get!(
