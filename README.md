@@ -9,7 +9,7 @@ Engage in battles with Warpacks teeming with uniquely shaped and potent items. S
 ### Quick Links
 Play Now: [Warpack Masters Live](impulsedao.xyz/Warpack-Masters)
 Source Code: [GitHub Repository](https://github.com/0xAsten/Warpack-Masters)
-Follow Us: [Twitter @WarpackMasters](x.com/@Warpackmasters)
+Follow Us: [Twitter @WarpackMasters](https://twitter.com/WarpackMasters)
 
 ### Team members
 
@@ -31,8 +31,8 @@ Exxcuro - artist;
 # Warpack Masters
 
 ## Instant matchmaking using contract storage TODO :: 
-In autobattles and other fastpace games it's crucially importnant to provide instant feedback to a player. 
-We're creating dummy characters within the wolrd contract, and use mirror-images for instant matchmaking.
+In autobattles and other fastpace games, providing instant feedback to a player is crucial. 
+We're creating dummy characters within the world contract, and use mirror images for instant matchmaking.
 
 
 ## Backpack
