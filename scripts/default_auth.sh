@@ -2,7 +2,7 @@
 set -euo pipefail
 pushd $(dirname "$0")/..
 
-export RPC_URL="http://0.0.0.0:5050"
+export RPC_URL="https://api.cartridge.gg/x/warpack-master/katana"
 
 export WORLD_ADDRESS=$(cat ./manifests/deployments/KATANA.json | jq -r '.world.address')
 
@@ -27,6 +27,10 @@ sozo auth grant --world $WORLD_ADDRESS --rpc-url $RPC_URL --wait writer \
   DummyCharacterItemsCounter,$ACTIONS_ADDRESS \
   Item,$ACTIONS_ADDRESS \
   ItemsCounter,$ACTIONS_ADDRESS \
-  Shop,$ACTIONS_ADDRESS
+  Shop,$ACTIONS_ADDRESS \
+  BattleLog,$ACTIONS_ADDRESS \
+  BattleLogCounter,$ACTIONS_ADDRESS \
+  BattleLogDetail,$ACTIONS_ADDRESS \
+  BattleLogDetailCounter,$ACTIONS_ADDRESS
 
 echo "Default authorizations have been successfully set."
