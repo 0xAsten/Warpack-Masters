@@ -58,18 +58,6 @@ mod actions {
 
     const STORAGE_FLAG: usize = 999;
 
-    // #[event]
-    // #[derive(Drop, starknet::Event)]
-    // enum Event {
-    //     Spawned: Spawned,
-    // }
-
-    // // declaring custom event struct
-    // #[derive(Drop, starknet::Event)]
-    // struct Spawned {
-    //     player: ContractAddress,
-    // }
-
     #[abi(embed_v0)]
     impl ActionsImpl of IActions<ContractState> {
         fn spawn(world: IWorldDispatcher, name: felt252, class: Class) {
@@ -607,7 +595,6 @@ mod actions {
                     class: char.class,
                     health: char.health,
                 };
-                // TODO: if player wins, wins plus 1 and dummied false
                 char.dummied = true;
 
                 let charItemsCounter = get!(world, caller, (CharacterItemsCounter));
@@ -646,12 +633,13 @@ mod actions {
             let dummyCharCounter = get!(world, char.wins, (DummyCharacterCounter));
             let mut random_index = random(seed1, dummyCharCounter.count) + 1;
 
-            //TODO: Custom envet to emit the dummy Character ID for FE to render the dummy character and its items
             let dummyChar = get!(world, (char.wins, random_index), DummyCharacter);
 
             // start the battle
             let mut char_health: usize = char.health;
+            let char_health_flag: usize = char.health;
             let mut dummy_health: usize = dummyChar.health;
+            let dummy_health_flag: usize = dummyChar.health;
             let mut char_armor: usize = 0;
             let mut dummy_armor: usize = 0;
 
@@ -798,6 +786,9 @@ mod actions {
                             if curr_item_belongs == 'player' {
                                 if heal > 0 {
                                     char_health += heal;
+                                    if char_health > char_health_flag {
+                                        char_health = char_health_flag;
+                                    }
                                     selfHeal = heal;
                                 }
                                 if damage > 0 && damage > dummy_armor {
@@ -812,6 +803,9 @@ mod actions {
                             } else {
                                 if heal > 0 {
                                     dummy_health += heal;
+                                    if dummy_health > dummy_health_flag {
+                                        dummy_health = dummy_health_flag;
+                                    }
                                     selfHeal = heal;
                                 }
                                 if damage > 0 && damage > char_armor {
