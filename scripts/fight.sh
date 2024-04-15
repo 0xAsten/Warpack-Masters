@@ -16,5 +16,5 @@ echo actions : $ACTIONS_ADDRESS
 echo "---------------------------------------------------------------------------"
 
 sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS fight --wait --rpc-url $RPC_URL \
-	--account-address 0x32f35835b7cca077a83fd5e53c6036d7bb36d8d9542473198525399f568b7f6 \
-	--private-key 0x3454b66f83b00e67610adad5631f437a71834ad9dc0481ce36f1062945b955e
+	--account-address 0x6127f482962eae2119a47542e1a2115f7b7713eebd9a2fa9f02cb118cb737b5 \
+	--private-key 0x325721938864cfdb04706bf2b129015d03cdbb3301ac648965bf94d995bf5b4
