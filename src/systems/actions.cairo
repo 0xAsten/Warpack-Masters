@@ -838,6 +838,9 @@ mod actions {
             let caller = get_caller_address();
 
             let mut char = get!(world, caller, (Character));
+
+            assert(char.dummied == false, 'dummy already created');
+
             let mut dummyCharCounter = get!(world, char.wins, (DummyCharacterCounter));
             dummyCharCounter.count += 1;
 
