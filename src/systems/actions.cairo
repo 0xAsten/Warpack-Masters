@@ -1,10 +1,10 @@
-use warpack_masters::models::Character::Class;
+use warpack_masters::models::Character::WMClass;
 
 use starknet::ContractAddress;
 
 #[dojo::interface]
 trait IActions {
-    fn spawn(name: felt252, class: Class);
+    fn spawn(name: felt252, wmClass: WMClass);
     fn place_item(char_item_counter_id: u32, x: usize, y: usize, rotation: usize);
     fn undo_place_item(char_item_counter_id: u32);
     fn add_item(
@@ -38,7 +38,7 @@ mod actions {
     use warpack_masters::models::{
         CharacterItem::{CharacterItem, CharacterItemsCounter, Position}, Item::{Item, ItemsCounter}
     };
-    use warpack_masters::models::Character::{Character, Class};
+    use warpack_masters::models::Character::{Character, WMClass};
     use warpack_masters::models::Shop::Shop;
     use warpack_masters::utils::random::{pseudo_seed, random};
     use warpack_masters::models::DummyCharacter::{DummyCharacter, DummyCharacterCounter};
@@ -60,7 +60,7 @@ mod actions {
 
     #[abi(embed_v0)]
     impl ActionsImpl of IActions<ContractState> {
-        fn spawn(world: IWorldDispatcher, name: felt252, class: Class) {
+        fn spawn(world: IWorldDispatcher, name: felt252, wmClass: WMClass) {
             let player = get_caller_address();
 
             let player_exists = get!(world, player, (Backpack));
@@ -73,7 +73,7 @@ mod actions {
                 (Character {
                     player,
                     name,
-                    class,
+                    wmClass,
                     gold: INIT_GOLD + 1,
                     health: INIT_HEALTH,
                     wins: 0,
@@ -593,7 +593,7 @@ mod actions {
                     level: char.wins,
                     id: dummyCharCounter.count,
                     name: char.name,
-                    class: char.class,
+                    wmClass: char.wmClass,
                     health: char.health,
                 };
                 char.dummied = true;
