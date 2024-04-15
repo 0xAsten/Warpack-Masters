@@ -11,7 +11,7 @@ mod tests {
 
     // import test utils
     use warpack_masters::{
-        systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait, Class}},
+        systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait, WMClass}},
         models::backpack::{Backpack, backpack, BackpackGrids, Grid, GridTrait},
         models::Item::{Item, item, ItemsCounter}, models::Character::{Character, character},
         models::CharacterItem::{CharacterItem, Position, CharacterItemsCounter},
@@ -34,7 +34,7 @@ mod tests {
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.spawn('alice', Class::Warlock);
+        actions_system.spawn('alice', WMClass::Warlock);
         actions_system.fight();
 
         let char = get!(world, (alice), Character);
@@ -50,7 +50,7 @@ mod tests {
         assert(dummyChar.level == char.wins, 'Should be equal');
         assert(dummyChar.id == dummyCharCounter.count, '');
         assert(dummyChar.name == 'alice', 'name should be alice');
-        assert(dummyChar.class == Class::Warlock, 'class should be Warlock');
+        assert(dummyChar.wmClass == WMClass::Warlock, 'class should be Warlock');
         assert(dummyChar.health == char.health, 'health should be equal');
         assert(dummyCharItemsCounter.count == 0, 'Should be 0');
     }
@@ -69,7 +69,7 @@ mod tests {
 
         add_item(ref actions_system);
 
-        actions_system.spawn('alice', Class::Warlock);
+        actions_system.spawn('alice', WMClass::Warlock);
         actions_system.reroll_shop();
 
         let mut shop = get!(world, alice, (Shop));

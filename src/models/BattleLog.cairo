@@ -8,6 +8,7 @@ struct BattleLog {
     id: usize,
     dummyCharLevel: usize,
     dummyCharId: usize,
+    // dummy or player
     winner: felt252,
 }
 

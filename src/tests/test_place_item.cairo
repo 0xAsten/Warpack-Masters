@@ -15,7 +15,7 @@ mod tests {
         models::backpack::{Backpack, backpack, BackpackGrids, Grid, GridTrait},
         models::Item::{Item, item, ItemsCounter},
         models::CharacterItem::{CharacterItem, Position, CharacterItemsCounter},
-        models::Character::{Character, character, Class}, models::Shop::{Shop, shop}
+        models::Character::{Character, character, WMClass}, models::Shop::{Shop, shop}
     };
 
     use warpack_masters::systems::actions::actions::ITEMS_COUNTER_ID;
@@ -46,7 +46,7 @@ mod tests {
         assert(item.count == 3, 'total item count mismatch');
 
         set_contract_address(alice);
-        actions_system.spawn('Alice', Class::Warlock);
+        actions_system.spawn('Alice', WMClass::Warlock);
         actions_system.reroll_shop();
 
         // mock player gold for testing
@@ -141,7 +141,7 @@ mod tests {
         actions_system.add_item('Sword', 1, 3, 2, 10, 10, 5, 10, 5, 1);
 
         set_contract_address(alice);
-        actions_system.spawn('Alice', Class::Warlock);
+        actions_system.spawn('Alice', WMClass::Warlock);
         actions_system.reroll_shop();
 
         actions_system.buy_item(1);
@@ -168,7 +168,7 @@ mod tests {
         actions_system.add_item('Sword', 1, 3, 2, 10, 10, 5, 10, 5, 1);
 
         set_contract_address(alice);
-        actions_system.spawn('Alice', Class::Warlock);
+        actions_system.spawn('Alice', WMClass::Warlock);
         actions_system.reroll_shop();
 
         actions_system.buy_item(1);
@@ -195,7 +195,7 @@ mod tests {
         actions_system.add_item('Sword', 1, 3, 2, 10, 10, 5, 10, 5, 1);
 
         set_contract_address(alice);
-        actions_system.spawn('Alice', Class::Warlock);
+        actions_system.spawn('Alice', WMClass::Warlock);
         actions_system.reroll_shop();
 
         actions_system.buy_item(1);
@@ -222,7 +222,7 @@ mod tests {
         actions_system.add_item('Sword', 1, 3, 2, 10, 10, 5, 10, 5, 1);
 
         set_contract_address(alice);
-        actions_system.spawn('Alice', Class::Warlock);
+        actions_system.spawn('Alice', WMClass::Warlock);
         actions_system.reroll_shop();
 
         actions_system.buy_item(1);
@@ -249,7 +249,7 @@ mod tests {
         actions_system.add_item('Sword', 1, 3, 2, 10, 10, 5, 10, 5, 1);
 
         set_contract_address(alice);
-        actions_system.spawn('Alice', Class::Warlock);
+        actions_system.spawn('Alice', WMClass::Warlock);
         actions_system.reroll_shop();
 
         actions_system.buy_item(1);
@@ -278,7 +278,7 @@ mod tests {
         actions_system.add_item('Shield', 2, 2, 2, 0, 5, 5, 10, 5, 1);
 
         set_contract_address(alice);
-        actions_system.spawn('Alice', Class::Warlock);
+        actions_system.spawn('Alice', WMClass::Warlock);
         actions_system.reroll_shop();
 
         // mock shop for testing
@@ -319,7 +319,7 @@ mod tests {
         actions_system.add_item('Shield', 2, 2, 2, 0, 5, 5, 10, 5, 1);
 
         set_contract_address(alice);
-        actions_system.spawn('Alice', Class::Warlock);
+        actions_system.spawn('Alice', WMClass::Warlock);
 
         // place a sword on (0,4)
         actions_system.place_item(1, 0, 0, 0);
@@ -345,7 +345,7 @@ mod tests {
         actions_system.add_item('Sword', 1, 3, 2, 10, 10, 5, 10, 5, 1);
 
         set_contract_address(alice);
-        actions_system.spawn('Alice', Class::Warlock);
+        actions_system.spawn('Alice', WMClass::Warlock);
         actions_system.reroll_shop();
 
         actions_system.buy_item(1);

@@ -15,7 +15,7 @@ mod tests {
         models::backpack::{Backpack, backpack, BackpackGrids, Grid, GridTrait},
         models::Item::{Item, item, ItemsCounter},
         models::CharacterItem::{CharacterItem, Position, CharacterItemsCounter},
-        models::Character::{Character, character, Class}, models::Shop::{Shop, shop}
+        models::Character::{Character, character, WMClass}, models::Shop::{Shop, shop}
     };
 
     use warpack_masters::systems::actions::actions::{ITEMS_COUNTER_ID, STORAGE_FLAG};
@@ -44,7 +44,7 @@ mod tests {
         actions_system.add_item('Potion', 1, 1, 2, 0, 0, 5, 10, 15, 2);
 
         set_contract_address(alice);
-        actions_system.spawn('Alice', Class::Warlock);
+        actions_system.spawn('Alice', WMClass::Warlock);
         // mock player gold for testing
         let mut player_data = get!(world, alice, (Character));
         player_data.gold = 100;
@@ -132,7 +132,7 @@ mod tests {
         actions_system.add_item('Sword', 1, 3, 100, 10, 10, 5, 10, 5, 1);
 
         set_contract_address(alice);
-        actions_system.spawn('Alice', Class::Warlock);
+        actions_system.spawn('Alice', WMClass::Warlock);
 
         actions_system.undo_place_item(1);
     }

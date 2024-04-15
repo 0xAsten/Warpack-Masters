@@ -14,7 +14,7 @@ mod tests {
         models::CharacterItem::{
             CharacterItemsCounter, character_items_counter, CharacterItem, character_item
         },
-        models::Character::{Character, character, Class}, models::Shop::{Shop, shop},
+        models::Character::{Character, character, WMClass}, models::Shop::{Shop, shop},
     };
 
     use warpack_masters::systems::actions::actions::{ITEMS_COUNTER_ID, INIT_GOLD, STORAGE_FLAG};
@@ -38,7 +38,7 @@ mod tests {
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.spawn('Alice', Class::Warrior);
+        actions_system.spawn('Alice', WMClass::Warrior);
 
         actions_system.reroll_shop();
     }
@@ -87,7 +87,7 @@ mod tests {
                 item_one_rarity,
             );
 
-        actions_system.spawn('Alice', Class::Warrior);
+        actions_system.spawn('Alice', WMClass::Warrior);
 
         let shop = get!(world, owner, (Shop));
         assert(shop.item1 == 0, 'item1 should be 0');
@@ -143,7 +143,7 @@ mod tests {
                 item_one_rarity,
             );
 
-        actions_system.spawn('Alice', Class::Warrior);
+        actions_system.spawn('Alice', WMClass::Warrior);
 
         let mut char = get!(world, owner, (Character));
         char.gold -= INIT_GOLD + 1;

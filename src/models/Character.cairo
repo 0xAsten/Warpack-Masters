@@ -6,7 +6,7 @@ struct Character {
     player: ContractAddress,
     // must be less than 31 ASCII characters
     name: felt252,
-    class: Class,
+    wmClass: WMClass,
     gold: usize,
     health: usize,
     wins: usize,
@@ -15,7 +15,7 @@ struct Character {
 }
 
 #[derive(Serde, Copy, Drop, Introspect, PartialEq)]
-enum Class {
+enum WMClass {
     Warrior,
     Warlock,
 }
