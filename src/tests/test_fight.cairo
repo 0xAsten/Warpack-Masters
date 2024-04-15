@@ -35,6 +35,7 @@ mod tests {
         let actions_system = IActionsDispatcher { contract_address };
 
         actions_system.spawn('alice', WMClass::Warlock);
+        actions_system.create_dummy();
         actions_system.fight();
 
         let char = get!(world, (alice), Character);
@@ -87,6 +88,7 @@ mod tests {
         actions_system.buy_item(3);
         actions_system.place_item(3, 1, 2, 0);
         // actions_system.
+        actions_system.create_dummy();
         actions_system.fight();
     }
 

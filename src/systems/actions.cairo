@@ -26,6 +26,7 @@ trait IActions {
     fn is_item_owned(caller: ContractAddress, id: usize) -> bool;
     fn reroll_shop();
     fn fight();
+    fn create_dummy();
 }
 
 
@@ -584,50 +585,7 @@ mod actions {
             let caller = get_caller_address();
             let char = get!(world, caller, (Character));
 
-            if !char.dummied {
-                let mut char = get!(world, caller, (Character));
-                let mut dummyCharCounter = get!(world, char.wins, (DummyCharacterCounter));
-                dummyCharCounter.count += 1;
-
-                let dummyChar = DummyCharacter {
-                    level: char.wins,
-                    id: dummyCharCounter.count,
-                    name: char.name,
-                    wmClass: char.wmClass,
-                    health: char.health,
-                };
-                char.dummied = true;
-
-                let charItemsCounter = get!(world, caller, (CharacterItemsCounter));
-                let mut count = charItemsCounter.count;
-
-                loop {
-                    if count == 0 {
-                        break;
-                    }
-
-                    let charItem = get!(world, (caller, count), (CharacterItem));
-                    let mut dummyCharItemsCounter = get!(
-                        world, (char.wins, dummyCharCounter.count), (DummyCharacterItemsCounter)
-                    );
-                    dummyCharItemsCounter.count += 1;
-
-                    let dummyCharItem = DummyCharacterItem {
-                        level: char.wins,
-                        dummyCharId: dummyCharCounter.count,
-                        counterId: dummyCharItemsCounter.count,
-                        itemId: charItem.itemId,
-                        position: charItem.position,
-                        rotation: charItem.rotation,
-                    };
-
-                    set!(world, (dummyCharItemsCounter, dummyCharItem));
-
-                    count -= 1;
-                };
-
-                set!(world, (char, dummyCharCounter, dummyChar));
-            }
+            assert(char.dummied == true, 'dummy not created');
 
             let char = get!(world, caller, (Character));
             let (seed1, seed2, _, _) = pseudo_seed();
@@ -873,6 +831,54 @@ mod actions {
                 }
                 set!(world, (char));
             }
+        }
+
+
+        fn create_dummy(world: IWorldDispatcher) {
+            let caller = get_caller_address();
+
+            let mut char = get!(world, caller, (Character));
+            let mut dummyCharCounter = get!(world, char.wins, (DummyCharacterCounter));
+            dummyCharCounter.count += 1;
+
+            let dummyChar = DummyCharacter {
+                level: char.wins,
+                id: dummyCharCounter.count,
+                name: char.name,
+                wmClass: char.wmClass,
+                health: char.health,
+            };
+            char.dummied = true;
+
+            let charItemsCounter = get!(world, caller, (CharacterItemsCounter));
+            let mut count = charItemsCounter.count;
+
+            loop {
+                if count == 0 {
+                    break;
+                }
+
+                let charItem = get!(world, (caller, count), (CharacterItem));
+                let mut dummyCharItemsCounter = get!(
+                    world, (char.wins, dummyCharCounter.count), (DummyCharacterItemsCounter)
+                );
+                dummyCharItemsCounter.count += 1;
+
+                let dummyCharItem = DummyCharacterItem {
+                    level: char.wins,
+                    dummyCharId: dummyCharCounter.count,
+                    counterId: dummyCharItemsCounter.count,
+                    itemId: charItem.itemId,
+                    position: charItem.position,
+                    rotation: charItem.rotation,
+                };
+
+                set!(world, (dummyCharItemsCounter, dummyCharItem));
+
+                count -= 1;
+            };
+
+            set!(world, (char, dummyCharCounter, dummyChar));
         }
     }
 }
