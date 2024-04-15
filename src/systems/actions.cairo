@@ -367,6 +367,7 @@ mod actions {
         }
 
 
+        // TODO: bugfix, player can buy item1/2/3/4 from shop multiple times
         fn buy_item(world: IWorldDispatcher, item_id: u32) {
             let player = get_caller_address();
 
@@ -585,7 +586,7 @@ mod actions {
 
             if !char.dummied {
                 let mut char = get!(world, caller, (Character));
-                let mut dummyCharCounter = get!(world, caller, (DummyCharacterCounter));
+                let mut dummyCharCounter = get!(world, char.wins, (DummyCharacterCounter));
                 dummyCharCounter.count += 1;
 
                 let dummyChar = DummyCharacter {
