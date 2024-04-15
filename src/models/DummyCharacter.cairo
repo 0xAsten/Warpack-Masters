@@ -1,6 +1,6 @@
 use starknet::ContractAddress;
 
-use warpack_masters::models::Character::Class;
+use warpack_masters::models::Character::WMClass;
 
 #[derive(Model, Drop, Serde)]
 struct DummyCharacter {
@@ -9,7 +9,7 @@ struct DummyCharacter {
     #[key]
     id: u32,
     name: felt252,
-    class: Class,
+    wmClass: WMClass,
     health: usize,
 }
 

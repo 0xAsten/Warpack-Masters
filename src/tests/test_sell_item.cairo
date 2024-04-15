@@ -17,7 +17,7 @@ mod tests {
         models::CharacterItem::{
             CharacterItemsCounter, character_items_counter, CharacterItem, character_item
         },
-        models::Character::{Character, character, Class}, models::Shop::{Shop, shop}
+        models::Character::{Character, character, WMClass}, models::Shop::{Shop, shop}
     };
 
     use warpack_masters::systems::actions::actions::{ITEMS_COUNTER_ID, INIT_GOLD, STORAGE_FLAG};
@@ -95,7 +95,7 @@ mod tests {
 
         set_contract_address(alice);
 
-        actions_system.spawn('Alice', Class::Warrior);
+        actions_system.spawn('Alice', WMClass::Warrior);
         actions_system.reroll_shop();
 
         // mock shop for testing
@@ -189,7 +189,7 @@ mod tests {
 
         set_contract_address(alice);
 
-        actions_system.spawn('Alice', Class::Warrior);
+        actions_system.spawn('Alice', WMClass::Warrior);
 
         actions_system.sell_item(1);
     }
@@ -241,7 +241,7 @@ mod tests {
 
         set_contract_address(alice);
 
-        actions_system.spawn('Alice', Class::Warrior);
+        actions_system.spawn('Alice', WMClass::Warrior);
         actions_system.reroll_shop();
 
         actions_system.buy_item(1);

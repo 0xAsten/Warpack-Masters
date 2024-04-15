@@ -14,7 +14,7 @@ mod tests {
         models::backpack::{Backpack, backpack, Grid, GridTrait},
         models::Item::{Item, item, ItemsCounter},
         models::CharacterItem::{CharacterItem, Position, CharacterItemsCounter},
-        models::Character::{Character, character, Class},
+        models::Character::{Character, character, WMClass},
     };
 
     use warpack_masters::systems::actions::actions::ITEMS_COUNTER_ID;
@@ -33,7 +33,7 @@ mod tests {
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.spawn('Alice', Class::Warlock);
+        actions_system.spawn('Alice', WMClass::Warlock);
 
         let backpack = get!(world, caller, Backpack);
 
@@ -52,8 +52,8 @@ mod tests {
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.spawn('Alice', Class::Warlock);
+        actions_system.spawn('Alice', WMClass::Warlock);
 
-        actions_system.spawn('Bob', Class::Warrior);
+        actions_system.spawn('Bob', WMClass::Warrior);
     }
 }
