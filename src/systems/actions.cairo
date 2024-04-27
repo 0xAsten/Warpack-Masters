@@ -824,25 +824,25 @@ mod actions {
                         } else if rand >= chance && heal > 0 {
                             healFailed = true;
                         }
+
+                        let mut battleLogDetailCounter = get!(
+                            world, (caller, battleLogCounterCount), (BattleLogDetailCounter)
+                        );
+                        battleLogDetailCounter.count += 1;
+                        let battleLogDetail = BattleLogDetail {
+                            player: caller,
+                            battleLogId: battleLogCounterCount,
+                            id: battleLogDetailCounter.count,
+                            whoTriggered: curr_item_belongs,
+                            whichItem: curr_item_index,
+                            damageCaused: damageCaused,
+                            selfHeal: selfHeal,
+                            isDodged: isDodged,
+                            healFailed: healFailed,
+                        };
+
+                        set!(world, (battleLogDetailCounter, battleLogDetail));
                     }
-
-                    let mut battleLogDetailCounter = get!(
-                        world, (caller, battleLogCounterCount), (BattleLogDetailCounter)
-                    );
-                    battleLogDetailCounter.count += 1;
-                    let battleLogDetail = BattleLogDetail {
-                        player: caller,
-                        battleLogId: battleLogCounterCount,
-                        id: battleLogDetailCounter.count,
-                        whoTriggered: curr_item_belongs,
-                        whichItem: curr_item_index,
-                        damageCaused: damageCaused,
-                        selfHeal: selfHeal,
-                        isDodged: isDodged,
-                        healFailed: healFailed,
-                    };
-
-                    set!(world, (battleLogDetailCounter, battleLogDetail));
 
                     i += 1;
                 };

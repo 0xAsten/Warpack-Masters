@@ -15,9 +15,9 @@ dojo = { git = "https://github.com/dojoengine/dojo", tag = "v0.6.0" }
 initializer_class_hash = "0xbeef"
 
 [tool.dojo.env]
-rpc_url = "https://api.cartridge.gg/x/warpack-master/katana"
-account_address = "0x565fd2bceb42d6a6e867b2d8b3608e562cf1583d0c97240d2bb39da2ba4c456"
-private_key = "0x5f72532149b8419c4cdeb2a983944fbd85ce13866e8ed01c950b05db302d97e"
+rpc_url = "https://api.cartridge.gg/x/warpack-masters-v2/katana"
+account_address = "0xe30e817e8238a83a4c5542ebc40eb3740f0fbd39781948fdec0110a92ca108"
+private_key = "0x75ba890aee1fbd608bcca573cd9c5794e1014a45d49cb058f2b6be1274ff6aa"
 
 [tool.dojo.world]
 name = "Warpack Masters"

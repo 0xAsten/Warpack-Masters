@@ -2,7 +2,7 @@
 set -euo pipefail
 pushd $(dirname "$0")/..
 
-export RPC_URL="https://api.cartridge.gg/x/warpack-master/katana"
+export RPC_URL="https://api.cartridge.gg/x/warpack-masters-v2/katana"
 
 export WORLD_ADDRESS=$(cat ./manifests/deployments/KATANA.json | jq -r '.world.address')
 
