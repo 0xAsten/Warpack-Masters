@@ -686,9 +686,7 @@ mod actions {
                 }
 
                 let dummy_item = get!(
-                    world,
-                    (char.wins, dummyCharCounter.count, dummy_item_count),
-                    (DummyCharacterItem)
+                    world, (char.wins, random_index, dummy_item_count), (DummyCharacterItem)
                 );
                 let item = get!(world, dummy_item.itemId, (Item));
                 if item.cooldown > 0 {
