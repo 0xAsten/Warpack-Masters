@@ -584,7 +584,7 @@ mod actions {
         fn fight(world: IWorldDispatcher) {
             let caller = get_caller_address();
 
-            let char = get!(world, caller, (Character));
+            let mut char = get!(world, caller, (Character));
             let (seed1, seed2, _, _) = pseudo_seed();
             let dummyCharCounter = get!(world, char.wins, (DummyCharacterCounter));
             let mut random_index = random(seed1, dummyCharCounter.count) + 1;
@@ -815,7 +815,6 @@ mod actions {
             set!(world, (battleLogCounter, battleLog));
 
             if winner == 'player' {
-                let mut char = get!(world, caller, (Character));
                 char.wins += 1;
                 char.dummied = false;
                 char.gold += 5;
@@ -824,8 +823,10 @@ mod actions {
                 } else if char.wins == 5 {
                     char.health += 15;
                 }
-                set!(world, (char));
+            } else {
+                char.loss += 1;
             }
+            set!(world, (char));
         }
 
         fn create_dummy(world: IWorldDispatcher) {
