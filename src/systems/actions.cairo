@@ -857,7 +857,7 @@ mod actions {
 
                 let charItem = get!(world, (caller, count), (CharacterItem));
 
-                if (char_item.where == 'inventory') {
+                if (charItem.where == 'inventory') {
                     let mut dummyCharItemsCounter = get!(
                         world, (char.wins, dummyCharCounter.count), (DummyCharacterItemsCounter)
                     );
