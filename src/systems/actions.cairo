@@ -27,7 +27,7 @@ trait IActions {
     fn reroll_shop();
     fn fight();
     fn create_dummy();
-// fn rebirth();
+    fn rebirth(name: felt252, wmClass: WMClass);
 }
 
 
@@ -885,6 +885,54 @@ mod actions {
             };
 
             set!(world, (char, dummyCharCounter, dummyChar));
+        }
+
+        fn rebirth(world: IWorldDispatcher, name: felt252, wmClass: WMClass) {
+            let caller = get_caller_address();
+
+            let mut char = get!(world, caller, (Character));
+
+            assert(char.loss >= 5, 'loss not reached');
+
+            char.name = name;
+            char.wmClass = wmClass;
+            char.loss = 0;
+            char.wins = 0;
+            char.health = INIT_HEALTH;
+            char.gold = INIT_GOLD + 1;
+            char.dummied = false;
+
+            let charItemsCounter = get!(world, caller, (CharacterItemsCounter));
+            let mut count = charItemsCounter.count;
+
+            loop {
+                if count == 0 {
+                    break;
+                }
+
+                let charItem = get!(world, (caller, count), (CharacterItem));
+
+                if (charItem.where == 'inventory') {
+                    let mut charItemData = get!(world, (caller, count), (CharacterItem));
+                    charItemData.where = '';
+                    charItemData.position.x = STORAGE_FLAG;
+                    charItemData.position.y = STORAGE_FLAG;
+                    charItemData.rotation = 0;
+
+                    set!(world, (charItemData));
+                }
+
+                count -= 1;
+            };
+
+            // clear shop
+            let mut shop = get!(world, caller, (Shop));
+            shop.item1 = 0;
+            shop.item2 = 0;
+            shop.item3 = 0;
+            shop.item4 = 0;
+
+            set!(world, (char, shop));
         }
     }
 }
