@@ -30,6 +30,8 @@ trait IActions {
     fn rebirth(name: felt252, wmClass: WMClass);
 }
 
+// TODO: rename the count filed in counter model
+// TODO: consider restruct inventory items in case too much items owned by player increasing the loop time
 
 #[dojo::contract]
 mod actions {
