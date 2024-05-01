@@ -27,6 +27,7 @@ trait IActions {
     fn reroll_shop();
     fn fight();
     fn create_dummy();
+// fn rebirth();
 }
 
 
@@ -585,6 +586,10 @@ mod actions {
             let caller = get_caller_address();
 
             let mut char = get!(world, caller, (Character));
+
+            assert(char.dummied == true, 'dummy not created');
+            assert(char.loss < 5, 'max loss reached');
+
             let (seed1, seed2, _, _) = pseudo_seed();
             let dummyCharCounter = get!(world, char.wins, (DummyCharacterCounter));
             let mut random_index = random(seed1, dummyCharCounter.count) + 1;

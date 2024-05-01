@@ -35,6 +35,7 @@ mod tests {
         let actions_system = IActionsDispatcher { contract_address };
 
         actions_system.spawn('alice', WMClass::Warlock);
+        actions_system.create_dummy();
         actions_system.fight();
 
         let char = get!(world, (alice), Character);
@@ -87,6 +88,7 @@ mod tests {
         actions_system.buy_item(3);
         actions_system.place_item(3, 1, 2, 0);
         // actions_system.
+        actions_system.create_dummy();
         actions_system.fight();
     }
 
@@ -165,6 +167,47 @@ mod tests {
                 item_three_heal,
                 item_three_rarity,
             );
+    }
+
+    #[test]
+    #[available_gas(3000000000000000)]
+    #[should_panic(expected: ('dummy not created', 'ENTRYPOINT_FAILED'))]
+    fn test_dummy_not_created() {
+        starknet::contract_address_const::<0x0>();
+        let mut models = array![backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH];
+
+        let world = spawn_test_world(models);
+
+        let contract_address = world
+            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
+        let mut actions_system = IActionsDispatcher { contract_address };
+
+        actions_system.spawn('alice', WMClass::Warlock);
+
+        actions_system.fight();
+    }
+
+    #[test]
+    #[available_gas(3000000000000000)]
+    #[should_panic(expected: ('max loss reached', 'ENTRYPOINT_FAILED'))]
+    fn test_max_loss_reached() {
+        let alice = starknet::contract_address_const::<0x0>();
+        let mut models = array![backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH];
+
+        let world = spawn_test_world(models);
+
+        let contract_address = world
+            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
+        let mut actions_system = IActionsDispatcher { contract_address };
+
+        actions_system.spawn('alice', WMClass::Warlock);
+
+        let mut char = get!(world, (alice), Character);
+        char.loss = 5;
+        set!(world, (char));
+
+        actions_system.create_dummy();
+        actions_system.fight();
     }
 }
 
