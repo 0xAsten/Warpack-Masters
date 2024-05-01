@@ -927,6 +927,31 @@ mod actions {
                 count -= 1;
             };
 
+            // clear BackpackGrids
+            let mut i = 0;
+            let mut j = 0;
+            loop {
+                if i >= GRID_X {
+                    break;
+                }
+                loop {
+                    if j >= GRID_Y {
+                        break;
+                    }
+
+                    let player_backpack_grid_data = get!(world, (caller, i, j), (BackpackGrids));
+
+                    if player_backpack_grid_data.occupied {
+                        set!(
+                            world, (BackpackGrids { player: caller, x: i, y: j, occupied: false })
+                        );
+                    }
+                    j += 1;
+                };
+                j = 0;
+                i += 1;
+            };
+
             // clear shop
             let mut shop = get!(world, caller, (Shop));
             shop.item1 = 0;
