@@ -27,8 +27,11 @@ trait IActions {
     fn reroll_shop();
     fn fight();
     fn create_dummy();
+    fn rebirth(name: felt252, wmClass: WMClass);
 }
 
+// TODO: rename the count filed in counter model
+// TODO: consider restruct inventory items in case too much items owned by player increasing the loop time
 
 #[dojo::contract]
 mod actions {
@@ -583,11 +586,12 @@ mod actions {
 
         fn fight(world: IWorldDispatcher) {
             let caller = get_caller_address();
-            let char = get!(world, caller, (Character));
+
+            let mut char = get!(world, caller, (Character));
 
             assert(char.dummied == true, 'dummy not created');
+            assert(char.loss < 5, 'max loss reached');
 
-            let char = get!(world, caller, (Character));
             let (seed1, seed2, _, _) = pseudo_seed();
             let dummyCharCounter = get!(world, char.wins, (DummyCharacterCounter));
             let mut random_index = random(seed1, dummyCharCounter.count) + 1;
@@ -644,9 +648,7 @@ mod actions {
                 }
 
                 let dummy_item = get!(
-                    world,
-                    (char.wins, dummyCharCounter.count, dummy_item_count),
-                    (DummyCharacterItem)
+                    world, (char.wins, random_index, dummy_item_count), (DummyCharacterItem)
                 );
                 let item = get!(world, dummy_item.itemId, (Item));
                 if item.cooldown > 0 {
@@ -782,25 +784,25 @@ mod actions {
                         } else if rand >= chance && heal > 0 {
                             healFailed = true;
                         }
+
+                        let mut battleLogDetailCounter = get!(
+                            world, (caller, battleLogCounterCount), (BattleLogDetailCounter)
+                        );
+                        battleLogDetailCounter.count += 1;
+                        let battleLogDetail = BattleLogDetail {
+                            player: caller,
+                            battleLogId: battleLogCounterCount,
+                            id: battleLogDetailCounter.count,
+                            whoTriggered: curr_item_belongs,
+                            whichItem: curr_item_index,
+                            damageCaused: damageCaused,
+                            selfHeal: selfHeal,
+                            isDodged: isDodged,
+                            healFailed: healFailed,
+                        };
+
+                        set!(world, (battleLogDetailCounter, battleLogDetail));
                     }
-
-                    let mut battleLogDetailCounter = get!(
-                        world, (caller, battleLogCounterCount), (BattleLogDetailCounter)
-                    );
-                    battleLogDetailCounter.count += 1;
-                    let battleLogDetail = BattleLogDetail {
-                        player: caller,
-                        battleLogId: battleLogCounterCount,
-                        id: battleLogDetailCounter.count,
-                        whoTriggered: curr_item_belongs,
-                        whichItem: curr_item_index,
-                        damageCaused: damageCaused,
-                        selfHeal: selfHeal,
-                        isDodged: isDodged,
-                        healFailed: healFailed,
-                    };
-
-                    set!(world, (battleLogDetailCounter, battleLogDetail));
 
                     i += 1;
                 };
@@ -820,7 +822,6 @@ mod actions {
             set!(world, (battleLogCounter, battleLog));
 
             if winner == 'player' {
-                let mut char = get!(world, caller, (Character));
                 char.wins += 1;
                 char.dummied = false;
                 char.gold += 5;
@@ -829,10 +830,11 @@ mod actions {
                 } else if char.wins == 5 {
                     char.health += 15;
                 }
-                set!(world, (char));
+            } else {
+                char.loss += 1;
             }
+            set!(world, (char));
         }
-
 
         fn create_dummy(world: IWorldDispatcher) {
             let caller = get_caller_address();
@@ -862,26 +864,102 @@ mod actions {
                 }
 
                 let charItem = get!(world, (caller, count), (CharacterItem));
-                let mut dummyCharItemsCounter = get!(
-                    world, (char.wins, dummyCharCounter.count), (DummyCharacterItemsCounter)
-                );
-                dummyCharItemsCounter.count += 1;
 
-                let dummyCharItem = DummyCharacterItem {
-                    level: char.wins,
-                    dummyCharId: dummyCharCounter.count,
-                    counterId: dummyCharItemsCounter.count,
-                    itemId: charItem.itemId,
-                    position: charItem.position,
-                    rotation: charItem.rotation,
-                };
+                if (charItem.where == 'inventory') {
+                    let mut dummyCharItemsCounter = get!(
+                        world, (char.wins, dummyCharCounter.count), (DummyCharacterItemsCounter)
+                    );
+                    dummyCharItemsCounter.count += 1;
 
-                set!(world, (dummyCharItemsCounter, dummyCharItem));
+                    let dummyCharItem = DummyCharacterItem {
+                        level: char.wins,
+                        dummyCharId: dummyCharCounter.count,
+                        counterId: dummyCharItemsCounter.count,
+                        itemId: charItem.itemId,
+                        position: charItem.position,
+                        rotation: charItem.rotation,
+                    };
+
+                    set!(world, (dummyCharItemsCounter, dummyCharItem));
+                }
 
                 count -= 1;
             };
 
             set!(world, (char, dummyCharCounter, dummyChar));
+        }
+
+        fn rebirth(world: IWorldDispatcher, name: felt252, wmClass: WMClass) {
+            let caller = get_caller_address();
+
+            let mut char = get!(world, caller, (Character));
+
+            assert(char.loss >= 5, 'loss not reached');
+
+            char.name = name;
+            char.wmClass = wmClass;
+            char.loss = 0;
+            char.wins = 0;
+            char.health = INIT_HEALTH;
+            char.gold = INIT_GOLD + 1;
+            char.dummied = false;
+
+            let charItemsCounter = get!(world, caller, (CharacterItemsCounter));
+            let mut count = charItemsCounter.count;
+
+            loop {
+                if count == 0 {
+                    break;
+                }
+
+                let charItem = get!(world, (caller, count), (CharacterItem));
+
+                if (charItem.where == 'inventory') {
+                    let mut charItemData = get!(world, (caller, count), (CharacterItem));
+                    charItemData.where = '';
+                    charItemData.position.x = STORAGE_FLAG;
+                    charItemData.position.y = STORAGE_FLAG;
+                    charItemData.rotation = 0;
+
+                    set!(world, (charItemData));
+                }
+
+                count -= 1;
+            };
+
+            // clear BackpackGrids
+            let mut i = 0;
+            let mut j = 0;
+            loop {
+                if i >= GRID_X {
+                    break;
+                }
+                loop {
+                    if j >= GRID_Y {
+                        break;
+                    }
+
+                    let player_backpack_grid_data = get!(world, (caller, i, j), (BackpackGrids));
+
+                    if player_backpack_grid_data.occupied {
+                        set!(
+                            world, (BackpackGrids { player: caller, x: i, y: j, occupied: false })
+                        );
+                    }
+                    j += 1;
+                };
+                j = 0;
+                i += 1;
+            };
+
+            // clear shop
+            let mut shop = get!(world, caller, (Shop));
+            shop.item1 = 0;
+            shop.item2 = 0;
+            shop.item3 = 0;
+            shop.item4 = 0;
+
+            set!(world, (char, shop));
         }
     }
 }

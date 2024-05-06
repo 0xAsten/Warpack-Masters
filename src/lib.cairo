@@ -23,6 +23,7 @@ mod tests {
     mod test_sell_item;
     mod test_reroll_shop;
     mod test_fight;
+    mod test_rebirth;
 }
 
 mod utils {
