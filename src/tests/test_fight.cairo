@@ -92,6 +92,46 @@ mod tests {
         actions_system.fight();
     }
 
+    #[test]
+    #[available_gas(3000000000000000)]
+    #[should_panic(expected: ('dummy not created', 'ENTRYPOINT_FAILED'))]
+    fn test_revert_dummy_not_created() {
+        let alice = starknet::contract_address_const::<0x0>();
+        let mut models = array![backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH];
+
+        let world = spawn_test_world(models);
+
+        let contract_address = world
+            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
+        let actions_system = IActionsDispatcher { contract_address };
+
+        set_contract_address(alice);
+
+        actions_system.spawn('alice', WMClass::Warlock);
+        actions_system.fight();
+    }
+
+    #[test]
+    #[available_gas(3000000000000000)]
+    #[should_panic(expected: ('dummy already created', 'ENTRYPOINT_FAILED'))]
+    fn test_revert_dummy_already_created() {
+        let alice = starknet::contract_address_const::<0x0>();
+        let mut models = array![backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH];
+
+        let world = spawn_test_world(models);
+
+        let contract_address = world
+            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
+        let actions_system = IActionsDispatcher { contract_address };
+
+        set_contract_address(alice);
+
+        actions_system.spawn('alice', WMClass::Warlock);
+        actions_system.create_dummy();
+        actions_system.create_dummy();
+    }
+
+
     fn add_item(ref actions_system: IActionsDispatcher) {
         let item_one_name = 'Sword';
         let item_one_width = 1;

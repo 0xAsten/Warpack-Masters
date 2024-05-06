@@ -961,5 +961,56 @@ mod actions {
 
             set!(world, (char, shop));
         }
+
+
+        fn create_dummy(world: IWorldDispatcher) {
+            let caller = get_caller_address();
+
+            let mut char = get!(world, caller, (Character));
+
+            assert(char.dummied == false, 'dummy already created');
+
+            let mut dummyCharCounter = get!(world, char.wins, (DummyCharacterCounter));
+            dummyCharCounter.count += 1;
+
+            let dummyChar = DummyCharacter {
+                level: char.wins,
+                id: dummyCharCounter.count,
+                name: char.name,
+                wmClass: char.wmClass,
+                health: char.health,
+            };
+            char.dummied = true;
+
+            let charItemsCounter = get!(world, caller, (CharacterItemsCounter));
+            let mut count = charItemsCounter.count;
+
+            loop {
+                if count == 0 {
+                    break;
+                }
+
+                let charItem = get!(world, (caller, count), (CharacterItem));
+                let mut dummyCharItemsCounter = get!(
+                    world, (char.wins, dummyCharCounter.count), (DummyCharacterItemsCounter)
+                );
+                dummyCharItemsCounter.count += 1;
+
+                let dummyCharItem = DummyCharacterItem {
+                    level: char.wins,
+                    dummyCharId: dummyCharCounter.count,
+                    counterId: dummyCharItemsCounter.count,
+                    itemId: charItem.itemId,
+                    position: charItem.position,
+                    rotation: charItem.rotation,
+                };
+
+                set!(world, (dummyCharItemsCounter, dummyCharItem));
+
+                count -= 1;
+            };
+
+            set!(world, (char, dummyCharCounter, dummyChar));
+        }
     }
 }
