@@ -371,11 +371,12 @@ mod actions {
         }
 
 
-        // TODO: bugfix, player can buy item1/2/3/4 from shop multiple times
         fn buy_item(world: IWorldDispatcher, item_id: u32) {
             let player = get_caller_address();
 
-            let shop_data = get!(world, player, (Shop));
+            assert(item_id != 0, 'invalid item_id');
+
+            let mut shop_data = get!(world, player, (Shop));
             assert(
                 shop_data.item1 == item_id
                     || shop_data.item2 == item_id
@@ -393,6 +394,17 @@ mod actions {
             let mut char_items_counter = get!(world, player, (CharacterItemsCounter));
             char_items_counter.count += 1;
 
+            //delete respective item bought from the shop
+            if (shop_data.item1 == item_id) {
+                shop_data.item1 = 0
+            } else if (shop_data.item2 == item_id) {
+                shop_data.item2 = 0
+            } else if (shop_data.item3 == item_id) {
+                shop_data.item3 = 0
+            } else if (shop_data.item4 == item_id) {
+                shop_data.item4 = 0
+            }
+
             let char_item = CharacterItem {
                 player,
                 id: char_items_counter.count,
@@ -402,7 +414,7 @@ mod actions {
                 rotation: 0,
             };
 
-            set!(world, (player_char, char_items_counter, char_item));
+            set!(world, (player_char, char_items_counter, char_item, shop_data));
         }
 
 
