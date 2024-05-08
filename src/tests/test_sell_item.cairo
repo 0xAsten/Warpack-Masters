@@ -15,7 +15,9 @@ mod tests {
         models::backpack::{Backpack, backpack, BackpackGrids, Grid, GridTrait},
         models::Item::{Item, item, ItemsCounter},
         models::CharacterItem::{
-            CharacterItemsCounter, character_items_counter, CharacterItem, character_item
+            CharacterItemsCounter, character_items_counter, CharacterItem, character_item,
+            CharacterItemStorage, CharacterItemsStorageCounter, CharacterItemInventory,
+            CharacterItemsInventoryCounter
         },
         models::Character::{Character, character, WMClass}, models::Shop::{Shop, shop}
     };
@@ -116,12 +118,26 @@ mod tests {
             'sell one: gold value mismatch'
         );
 
+        let mut charItemsStorageCounter = get!(world, alice, CharacterItemsStorageCounter);
+        let mut charItemsInventoryCounter = get!(world, alice, CharacterItemsInventoryCounter);
+
+        //after sell place item storage count should be 0 and inventory count should be 0
+        assert(charItemsStorageCounter.count == 0, 'SC_SI-1');
+        assert(charItemsInventoryCounter.count == 0, 'IC_SI-1');
+
         let char_item_data = get!(world, (alice, 1), (CharacterItem));
+        let mut char_item_inv = get!(
+            world, (alice, char_item_data.inventory_id), (CharacterItemInventory)
+        );
+
         assert(char_item_data.itemId == 1, 'sell one: item id mismatch');
         assert(char_item_data.where == '', 'sell one: where mismatch');
         assert(char_item_data.position.x == STORAGE_FLAG, 'sell one: x position mismatch');
         assert(char_item_data.position.y == STORAGE_FLAG, 'sell one: y position mismatch');
         assert(char_item_data.rotation == 0, 'sell one: rotation mismatch');
+        assert(char_item_data.storage_id == 0, 'sell one: storage_id mismatch');
+        assert(char_item_data.inventory_id == 0, 'sell one: inventory_id mismatch');
+        assert(char_item_inv.itemId == 0, 'sell one: inv itemId mismatch');
 
         actions_system.buy_item(2);
         let prev_char_data = get!(world, alice, (Character));
@@ -133,12 +149,26 @@ mod tests {
             'sell two: gold value mismatch'
         );
 
+        charItemsStorageCounter = get!(world, alice, CharacterItemsStorageCounter);
+        charItemsInventoryCounter = get!(world, alice, CharacterItemsInventoryCounter);
+
+        //after sell place item storage count should be 0 and inventory count should be 0
+        assert(charItemsStorageCounter.count == 0, 'SC_SI-2');
+        assert(charItemsInventoryCounter.count == 0, 'IC_SI-2');
+
         let char_item_data = get!(world, (alice, 2), (CharacterItem));
+        let mut char_item_inv = get!(
+            world, (alice, char_item_data.inventory_id), (CharacterItemInventory)
+        );
+
         assert(char_item_data.itemId == 2, 'sell two: item id mismatch');
         assert(char_item_data.where == '', 'sell two: where mismatch');
         assert(char_item_data.position.x == STORAGE_FLAG, 'sell two: x position mismatch');
         assert(char_item_data.position.y == STORAGE_FLAG, 'sell two: y position mismatch');
         assert(char_item_data.rotation == 0, 'sell two: rotation mismatch');
+        assert(char_item_data.storage_id == 0, 'sell two: storage_id mismatch');
+        assert(char_item_data.inventory_id == 0, 'sell two: inventory_id mismatch');
+        assert(char_item_inv.itemId == 0, 'sell two: inv itemId mismatch');
     }
 
 

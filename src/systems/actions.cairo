@@ -31,7 +31,6 @@ trait IActions {
 }
 
 // TODO: rename the count filed in counter model
-// TODO: consider restruct inventory items in case too much items owned by player increasing the loop time
 
 #[dojo::contract]
 mod actions {
@@ -40,7 +39,11 @@ mod actions {
     use starknet::{ContractAddress, get_caller_address};
     use warpack_masters::models::{backpack::{Backpack, BackpackGrids, Grid, GridTrait}};
     use warpack_masters::models::{
-        CharacterItem::{CharacterItem, CharacterItemsCounter, Position}, Item::{Item, ItemsCounter}
+        CharacterItem::{
+            CharacterItem, CharacterItemStorage, CharacterItemsStorageCounter,
+            CharacterItemInventory, CharacterItemsInventoryCounter, CharacterItemsCounter, Position
+        },
+        Item::{Item, ItemsCounter}
     };
     use warpack_masters::models::Character::{Character, WMClass};
     use warpack_masters::models::Shop::Shop;
@@ -246,6 +249,15 @@ mod actions {
 
             assert(!player_backpack_grids.occupied, 'Already occupied');
 
+            let mut char_item_inventory_counter = get!(
+                world, player, (CharacterItemsInventoryCounter)
+            );
+            char_item_inventory_counter.count += 1;
+            let mut char_item_storage_counter = get!(world, player, (CharacterItemsStorageCounter));
+            char_item_storage_counter.count -= 1;
+            let storage_id = char_item_data.storage_id;
+            let inventory_id = char_item_inventory_counter.count;
+
             // if the item is 1x1, occupy the empty grid
             if item_h == 1 && item_w == 1 {
                 set!(world, (BackpackGrids { player: player, x: x, y: y, occupied: true }));
@@ -295,15 +307,24 @@ mod actions {
 
             set!(
                 world,
-                (CharacterItem {
-                    player,
-                    id: char_item_counter_id,
-                    itemId: item_id,
-                    where: 'inventory',
-                    position: Position { x, y },
-                    rotation,
-                })
+                (
+                    CharacterItem {
+                        player,
+                        id: char_item_counter_id,
+                        storage_id: 0,
+                        inventory_id,
+                        itemId: item_id,
+                        where: 'inventory',
+                        position: Position { x, y },
+                        rotation,
+                    },
+                    CharacterItemInventory {
+                        player, inventory_id, id: char_item_counter_id, itemId: item_id,
+                    },
+                    CharacterItemStorage { player, storage_id, id: char_item_counter_id, itemId: 0 }
+                )
             );
+            set!(world, (char_item_storage_counter, char_item_inventory_counter));
         }
 
 
@@ -326,6 +347,18 @@ mod actions {
             char_item_data.position.x = STORAGE_FLAG;
             char_item_data.position.y = STORAGE_FLAG;
             char_item_data.rotation = 0;
+
+            let mut char_item_inventory_counter = get!(
+                world, player, (CharacterItemsInventoryCounter)
+            );
+            char_item_inventory_counter.count -= 1;
+            let mut char_item_storage_counter = get!(world, player, (CharacterItemsStorageCounter));
+            char_item_storage_counter.count += 1;
+            let storage_id = char_item_storage_counter.count;
+            let inventory_id = char_item_data.inventory_id;
+
+            char_item_data.storage_id = storage_id;
+            char_item_data.inventory_id = 0;
 
             if item_h == 1 && item_w == 1 {
                 set!(world, (BackpackGrids { player: player, x: x, y: y, occupied: false }));
@@ -367,7 +400,18 @@ mod actions {
                 }
             }
 
-            set!(world, (char_item_data));
+            set!(
+                world,
+                (
+                    CharacterItemInventory {
+                        player, inventory_id, id: char_item_data.id, itemId: 0,
+                    },
+                    CharacterItemStorage {
+                        player, storage_id, id: char_item_data.id, itemId: item_id
+                    }
+                )
+            );
+            set!(world, (char_item_data, char_item_storage_counter, char_item_inventory_counter));
         }
 
 
@@ -394,6 +438,9 @@ mod actions {
             let mut char_items_counter = get!(world, player, (CharacterItemsCounter));
             char_items_counter.count += 1;
 
+            let mut char_item_storage_counter = get!(world, player, (CharacterItemsStorageCounter));
+            char_item_storage_counter.count += 1;
+
             //delete respective item bought from the shop
             if (shop_data.item1 == item_id) {
                 shop_data.item1 = 0
@@ -408,13 +455,23 @@ mod actions {
             let char_item = CharacterItem {
                 player,
                 id: char_items_counter.count,
+                storage_id: char_item_storage_counter.count,
+                inventory_id: 0,
                 itemId: item_id,
                 where: 'storage',
                 position: Position { x: STORAGE_FLAG, y: STORAGE_FLAG },
                 rotation: 0,
             };
 
-            set!(world, (player_char, char_items_counter, char_item, shop_data));
+            let char_item_storage = CharacterItemStorage {
+                player,
+                storage_id: char_item_storage_counter.count,
+                id: char_items_counter.count,
+                itemId: item_id,
+            };
+
+            set!(world, (player_char, char_items_counter, shop_data, char_item));
+            set!(world, (char_item_storage_counter, char_item_storage))
         }
 
 
@@ -429,6 +486,14 @@ mod actions {
             assert(char_item_data.where != '', 'item not owned');
             assert(char_item_data.where != 'inventory', 'item in inventory');
 
+            let mut char_item_storage_counter = get!(world, player, (CharacterItemsStorageCounter));
+            char_item_storage_counter.count -= 1;
+
+            let mut char_item_inv = get!(
+                world, (player, char_item_data.inventory_id), (CharacterItemInventory)
+            );
+            char_item_inv.itemId = 0;
+
             let item_price = item.price;
             let sell_price = item_price / 2;
 
@@ -436,10 +501,12 @@ mod actions {
             char_item_data.position.x = STORAGE_FLAG;
             char_item_data.position.y = STORAGE_FLAG;
             char_item_data.rotation = 0;
+            char_item_data.storage_id = 0;
+            char_item_data.inventory_id = 0;
 
             player_char.gold += sell_price;
 
-            set!(world, (char_item_data, player_char));
+            set!(world, (char_item_data, player_char, char_item_storage_counter, char_item_inv));
         }
 
         fn reroll_shop(world: IWorldDispatcher) {
@@ -626,24 +693,24 @@ mod actions {
             let mut item_belongs: Felt252Dict<felt252> = Default::default();
             let mut items_length: usize = 0;
 
-            let char_item_counter = get!(world, caller, (CharacterItemsCounter));
+            let char_item_counter = get!(world, caller, (CharacterItemsInventoryCounter));
             let mut char_item_count = char_item_counter.count;
 
             loop {
                 if char_item_count == 0 {
                     break;
                 }
-                let char_item = get!(world, (caller, char_item_count), (CharacterItem));
+                let char_item = get!(world, (caller, char_item_count), (CharacterItemInventory));
                 let item = get!(world, char_item.itemId, (Item));
                 let cooldown = item.cooldown;
                 let armor = item.armor;
-                if char_item.where == 'inventory' && cooldown > 0 {
+                if cooldown > 0 {
                     items.insert(items_length.into(), char_item.itemId);
                     item_belongs.insert(items_length.into(), 'player');
 
                     items_length += 1;
                     char_items_len += 1;
-                } else if char_item.where == 'inventory' && cooldown == 0 {
+                } else if cooldown == 0 {
                     char_armor += armor;
                 }
 
@@ -867,7 +934,7 @@ mod actions {
             };
             char.dummied = true;
 
-            let charItemsCounter = get!(world, caller, (CharacterItemsCounter));
+            let charItemsCounter = get!(world, caller, (CharacterItemsInventoryCounter));
             let mut count = charItemsCounter.count;
 
             loop {
@@ -875,25 +942,24 @@ mod actions {
                     break;
                 }
 
-                let charItem = get!(world, (caller, count), (CharacterItem));
+                let charItemInv = get!(world, (caller, count), (CharacterItemInventory));
+                let charItemData = get!(world, (caller, charItemInv.id), (CharacterItem));
 
-                if (charItem.where == 'inventory') {
-                    let mut dummyCharItemsCounter = get!(
-                        world, (char.wins, dummyCharCounter.count), (DummyCharacterItemsCounter)
-                    );
-                    dummyCharItemsCounter.count += 1;
+                let mut dummyCharItemsCounter = get!(
+                    world, (char.wins, dummyCharCounter.count), (DummyCharacterItemsCounter)
+                );
+                dummyCharItemsCounter.count += 1;
 
-                    let dummyCharItem = DummyCharacterItem {
-                        level: char.wins,
-                        dummyCharId: dummyCharCounter.count,
-                        counterId: dummyCharItemsCounter.count,
-                        itemId: charItem.itemId,
-                        position: charItem.position,
-                        rotation: charItem.rotation,
-                    };
+                let dummyCharItem = DummyCharacterItem {
+                    level: char.wins,
+                    dummyCharId: dummyCharCounter.count,
+                    counterId: dummyCharItemsCounter.count,
+                    itemId: charItemInv.itemId,
+                    position: charItemData.position,
+                    rotation: charItemData.rotation,
+                };
 
-                    set!(world, (dummyCharItemsCounter, dummyCharItem));
-                }
+                set!(world, (dummyCharItemsCounter, dummyCharItem));
 
                 count -= 1;
             };

@@ -14,7 +14,10 @@ mod tests {
         systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait}},
         models::backpack::{Backpack, backpack, BackpackGrids, Grid, GridTrait},
         models::Item::{Item, item, ItemsCounter},
-        models::CharacterItem::{CharacterItem, Position, CharacterItemsCounter},
+        models::CharacterItem::{
+            CharacterItem, CharacterItemStorage, CharacterItemsStorageCounter,
+            CharacterItemInventory, CharacterItemsInventoryCounter, CharacterItemsCounter, Position
+        },
         models::Character::{Character, character, WMClass}, models::Shop::{Shop, shop}
     };
 
@@ -23,6 +26,22 @@ mod tests {
     #[test]
     #[available_gas(3000000000000000)]
     fn test_place_item() {
+        // Error codes
+        // SC_B_PI-1 : storage count mismatch before place item 1
+        // IC_B_PI-1 : inventory count mismatch before place item 1
+        // SC_A_PI-1 : storage count mismatch after place item 1
+        // IC_A_PI-1 : inventory count mismatch after place item 1
+
+        // SC_B_PI-2 : storage count mismatch before place item 2
+        // IC_B_PI-2 : inventory count mismatch before place item 2
+        // SC_A_PI-2 : storage count mismatch after place item 2
+        // IC_A_PI-2 : inventory count mismatch after place item 2
+
+        // SC_B_PI-3 : storage count mismatch before place item 3
+        // IC_B_PI-3 : inventory count mismatch before place item 3
+        // SC_A_PI-3 : storage count mismatch after place item 3
+        // IC_A_PI-3 : inventory count mismatch after place item 3
+
         let alice = starknet::contract_address_const::<0x1337>();
 
         let mut models = array![
@@ -62,6 +81,14 @@ mod tests {
         set!(world, (shop_data));
 
         actions_system.buy_item(1);
+
+        let mut charItemsStorageCounter = get!(world, alice, CharacterItemsStorageCounter);
+        let mut charItemsInventoryCounter = get!(world, alice, CharacterItemsInventoryCounter);
+
+        //before place item storage count should be 1 and inventory count should be 0
+        assert(charItemsStorageCounter.count == 1, 'SC_B_PI-1');
+        assert(charItemsInventoryCounter.count == 0, 'IC_B_PI-1');
+
         // place a sword on (0,4)
         actions_system.place_item(1, 0, 0, 0);
         // (0,4) (0,5) (0,6) should be occupied
@@ -75,14 +102,34 @@ mod tests {
         assert(backpack_grid_data.occupied == true, '(0,0) should be occupied');
 
         let mut characterItemsCounter = get!(world, alice, CharacterItemsCounter);
+
         let characterItem = get!(world, (alice, characterItemsCounter.count), CharacterItem);
+        charItemsStorageCounter = get!(world, alice, CharacterItemsStorageCounter);
+        charItemsInventoryCounter = get!(world, alice, CharacterItemsInventoryCounter);
         assert(characterItem.itemId == characterItemsCounter.count, 'item id should equal count');
+        assert(characterItem.id == 1, 'id mismatch');
+        assert(characterItem.storage_id == 0, 'storage_id mismatch');
+        assert(
+            characterItem.inventory_id == charItemsInventoryCounter.count, 'inventory_id mismatch'
+        );
         assert(characterItem.where == 'inventory', 'item should be in inventory');
         assert(characterItem.position.x == 0, 'x position mismatch');
         assert(characterItem.position.y == 0, 'y position mismatch');
         assert(characterItem.rotation == 0, 'rotation mismatch');
 
+        //after place item storage count should be 0 and inventory count should be 1
+        assert(charItemsStorageCounter.count == 0, 'SC_A_PI-1');
+        assert(charItemsInventoryCounter.count == 1, 'IC_A_PI-1');
+
         actions_system.buy_item(2);
+
+        charItemsStorageCounter = get!(world, alice, CharacterItemsStorageCounter);
+        charItemsInventoryCounter = get!(world, alice, CharacterItemsInventoryCounter);
+
+        //before place item storage count should be 1 and inventory count should be 1
+        assert(charItemsStorageCounter.count == 1, 'SC_B_PI-2');
+        assert(charItemsInventoryCounter.count == 1, 'IC_B_PI-2');
+
         // place a shield on (1,5)
         actions_system.place_item(2, 1, 0, 0);
         // (1,5) (1,6) (2,5) (2,6) should be occupied
@@ -100,13 +147,33 @@ mod tests {
 
         characterItemsCounter = get!(world, alice, CharacterItemsCounter);
         let characterItem = get!(world, (alice, characterItemsCounter.count), CharacterItem);
+        charItemsStorageCounter = get!(world, alice, CharacterItemsStorageCounter);
+        charItemsInventoryCounter = get!(world, alice, CharacterItemsInventoryCounter);
+
         assert(characterItem.itemId == characterItemsCounter.count, 'item id should equal count');
+        assert(characterItem.id == 2, 'id mismatch');
+        assert(characterItem.storage_id == 0, 'storage_id mismatch');
+        assert(
+            characterItem.inventory_id == charItemsInventoryCounter.count, 'inventory_id mismatch'
+        );
         assert(characterItem.where == 'inventory', 'item should be in inventory');
         assert(characterItem.position.x == 1, 'x position mismatch');
         assert(characterItem.position.y == 0, 'y position mismatch');
         assert(characterItem.rotation == 0, 'rotation mismatch');
 
+        //after place item storage count should be 0 and inventory count should be 2
+        assert(charItemsStorageCounter.count == 0, 'SC_A_PI-2');
+        assert(charItemsInventoryCounter.count == 2, 'IC_A_PI-2');
+
         actions_system.buy_item(3);
+
+        charItemsStorageCounter = get!(world, alice, CharacterItemsStorageCounter);
+        charItemsInventoryCounter = get!(world, alice, CharacterItemsInventoryCounter);
+
+        //before place item storage count should be 1 and inventory count should be 2
+        assert(charItemsStorageCounter.count == 1, 'SC_B_PI-3');
+        assert(charItemsInventoryCounter.count == 2, 'IC_B_PI-3');
+
         // place a potion on (1,4)
         actions_system.place_item(3, 1, 2, 0);
         // (1,4) should be occupied
@@ -115,11 +182,23 @@ mod tests {
 
         characterItemsCounter = get!(world, alice, CharacterItemsCounter);
         let characterItem = get!(world, (alice, characterItemsCounter.count), CharacterItem);
-        // assert(characterItem.itemId == characterItemsCounter.count, 'item id should equal count');
+        charItemsStorageCounter = get!(world, alice, CharacterItemsStorageCounter);
+        charItemsInventoryCounter = get!(world, alice, CharacterItemsInventoryCounter);
+
+        assert(characterItem.itemId == characterItemsCounter.count, 'item id should equal count');
+        assert(characterItem.id == 3, 'id mismatch');
+        assert(characterItem.storage_id == 0, 'storage_id mismatch');
+        assert(
+            characterItem.inventory_id == charItemsInventoryCounter.count, 'inventory_id mismatch'
+        );
         assert(characterItem.where == 'inventory', 'item should be in inventory');
         assert(characterItem.position.x == 1, 'x position mismatch');
         assert(characterItem.position.y == 2, 'y position mismatch');
         assert(characterItem.rotation == 0, 'rotation mismatch');
+
+        //after place item storage count should be 0 and inventory count should be 3
+        assert(charItemsStorageCounter.count == 0, 'SC_A_PI-3');
+        assert(charItemsInventoryCounter.count == 3, 'IC_A_PI-3');
     }
 
     #[test]

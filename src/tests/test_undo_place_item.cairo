@@ -14,7 +14,10 @@ mod tests {
         systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait}},
         models::backpack::{Backpack, backpack, BackpackGrids, Grid, GridTrait},
         models::Item::{Item, item, ItemsCounter},
-        models::CharacterItem::{CharacterItem, Position, CharacterItemsCounter},
+        models::CharacterItem::{
+            CharacterItem, CharacterItemStorage, CharacterItemsStorageCounter,
+            CharacterItemInventory, CharacterItemsInventoryCounter, CharacterItemsCounter, Position
+        },
         models::Character::{Character, character, WMClass}, models::Shop::{Shop, shop}
     };
 
@@ -24,6 +27,17 @@ mod tests {
     #[test]
     #[available_gas(3000000000000000)]
     fn test_undo_place_item() {
+        // Error codes
+
+        // SC_A_UPI-1 : storage count mismatch after undo place item 1
+        // IC_A_UPI-1 : inventory count mismatch after undo place item 1
+
+        // SC_A_UPI-2 : storage count mismatch after undo place item 2
+        // IC_A_UPI-2 : inventory count mismatch after undo place item 2
+
+        // SC_A_UPI-3 : storage count mismatch after undo place item 3
+        // IC_A_UPI-3 : inventory count mismatch after undo place item 3
+
         let alice = starknet::contract_address_const::<0x1337>();
 
         let mut models = array![
@@ -63,7 +77,17 @@ mod tests {
 
         actions_system.undo_place_item(1);
 
+        let mut charItemsStorageCounter = get!(world, alice, CharacterItemsStorageCounter);
+        let mut charItemsInventoryCounter = get!(world, alice, CharacterItemsInventoryCounter);
+
+        //after undo place item storage count should be 1 and inventory count should be 0
+        assert(charItemsStorageCounter.count == 1, 'SC_B_UPI-1');
+        assert(charItemsInventoryCounter.count == 0, 'IC_B_UPI-1');
+
         let characterItem = get!(world, (alice, 1), CharacterItem);
+        assert(characterItem.id == 1, 'id mismatch');
+        assert(characterItem.storage_id == charItemsStorageCounter.count, 'storage_id mismatch');
+        assert(characterItem.inventory_id == 0, 'inventory_id mismatch');
         assert(characterItem.where == 'storage', 'item should be in storage');
         assert(characterItem.position.x == STORAGE_FLAG, 'x position not STORAGE_FLAG');
         assert(characterItem.position.y == STORAGE_FLAG, 'y position not STORAGE_FLAG');
@@ -82,7 +106,17 @@ mod tests {
 
         actions_system.undo_place_item(2);
 
+        charItemsStorageCounter = get!(world, alice, CharacterItemsStorageCounter);
+        charItemsInventoryCounter = get!(world, alice, CharacterItemsInventoryCounter);
+
+        //after undo place item storage count should be 2 and inventory count should be 0
+        assert(charItemsStorageCounter.count == 2, 'SC_B_UPI-2');
+        assert(charItemsInventoryCounter.count == 0, 'IC_B_UPI-2');
+
         let characterItem = get!(world, (alice, 2), CharacterItem);
+        assert(characterItem.id == 2, 'id mismatch');
+        assert(characterItem.storage_id == charItemsStorageCounter.count, 'storage_id mismatch');
+        assert(characterItem.inventory_id == 0, 'inventory_id mismatch');
         assert(characterItem.where == 'storage', 'item should be in storage');
         assert(characterItem.position.x == STORAGE_FLAG, 'x position not STORAGE_FLAG');
         assert(characterItem.position.y == STORAGE_FLAG, 'y position not STORAGE_FLAG');
@@ -102,7 +136,18 @@ mod tests {
         actions_system.place_item(3, 0, 0, 0);
 
         actions_system.undo_place_item(3);
+
+        charItemsStorageCounter = get!(world, alice, CharacterItemsStorageCounter);
+        charItemsInventoryCounter = get!(world, alice, CharacterItemsInventoryCounter);
+
+        //after undo place item storage count should be 3 and inventory count should be 0
+        assert(charItemsStorageCounter.count == 3, 'SC_B_UPI-3');
+        assert(charItemsInventoryCounter.count == 0, 'IC_B_UPI-3');
+
         let characterItem = get!(world, (alice, 3), CharacterItem);
+        assert(characterItem.id == 3, 'id mismatch');
+        assert(characterItem.storage_id == charItemsStorageCounter.count, 'storage_id mismatch');
+        assert(characterItem.inventory_id == 0, 'inventory_id mismatch');
         assert(characterItem.where == 'storage', 'item should be in storage');
         assert(characterItem.position.x == STORAGE_FLAG, 'x position not STORAGE_FLAG');
         assert(characterItem.position.y == STORAGE_FLAG, 'y position not STORAGE_FLAG');

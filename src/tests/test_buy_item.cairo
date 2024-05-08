@@ -15,7 +15,9 @@ mod tests {
         models::backpack::{Backpack, backpack, BackpackGrids, Grid, GridTrait},
         models::Item::{Item, item, ItemsCounter},
         models::CharacterItem::{
-            CharacterItemsCounter, character_items_counter, CharacterItem, character_item
+            CharacterItemsCounter, character_items_counter, CharacterItem, character_item,
+            CharacterItemStorage, CharacterItemsStorageCounter, CharacterItemInventory,
+            CharacterItemsInventoryCounter
         },
         models::Character::{Character, character, WMClass}, models::Shop::{Shop, shop}
     };
@@ -81,8 +83,13 @@ mod tests {
         let char_item_counter_data = get!(world, alice, (CharacterItemsCounter));
         assert(char_item_counter_data.count == 1, 'total item count mismatch');
 
+        let mut charItemsStorageCounter = get!(world, alice, CharacterItemsStorageCounter);
+        assert(charItemsStorageCounter.count == 1, 'storage cpunt mismatch');
+
         let char_item_data = get!(world, (alice, 1), (CharacterItem));
         assert(char_item_data.id == 1, 'id mismatch');
+        assert(char_item_data.storage_id == charItemsStorageCounter.count, 'storage_id mismatch');
+        assert(char_item_data.inventory_id == 0, 'inventory_id mismatch');
         assert(char_item_data.itemId == 1, 'item id mismatch');
         assert(char_item_data.where == 'storage', 'where mismatch');
         assert(char_item_data.position.x == STORAGE_FLAG, 'x position mismatch');
