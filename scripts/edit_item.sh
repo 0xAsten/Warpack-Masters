@@ -15,5 +15,8 @@ echo " "
 echo actions : $ACTIONS_ADDRESS
 echo "---------------------------------------------------------------------------"
 
-sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS edit_item -c 1,4,4 --wait --rpc-url $RPC_URL 
-sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS edit_item -c 4,4,3 --wait --rpc-url $RPC_URL 
+# id, property, value
+# 0. name 1. width 2. height 3. price 4. damage 5. armor 6. chance 7. cooldown 8. heal 9. rarity
+sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS edit_item -c 2,5,1 --wait --rpc-url $RPC_URL 
+sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS edit_item -c 3,7,5 --wait --rpc-url $RPC_URL 
+
