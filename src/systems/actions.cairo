@@ -917,7 +917,7 @@ mod actions {
             char.gold = INIT_GOLD + 1;
             char.dummied = false;
 
-            let charItemsCounter = get!(world, caller, (CharacterItemsCounter));
+            let mut charItemsCounter = get!(world, caller, (CharacterItemsCounter));
             let mut count = charItemsCounter.count;
 
             loop {
@@ -925,17 +925,15 @@ mod actions {
                     break;
                 }
 
-                let charItem = get!(world, (caller, count), (CharacterItem));
+                let mut charItemData = get!(world, (caller, count), (CharacterItem));
 
-                if (charItem.where == 'inventory') {
-                    let mut charItemData = get!(world, (caller, count), (CharacterItem));
-                    charItemData.where = '';
-                    charItemData.position.x = STORAGE_FLAG;
-                    charItemData.position.y = STORAGE_FLAG;
-                    charItemData.rotation = 0;
+                charItemData.itemId = 0;
+                charItemData.where = '';
+                charItemData.position.x = 0;
+                charItemData.position.y = 0;
+                charItemData.rotation = 0;
 
-                    set!(world, (charItemData));
-                }
+                set!(world, (charItemData));
 
                 count -= 1;
             };
@@ -972,7 +970,7 @@ mod actions {
             shop.item3 = 0;
             shop.item4 = 0;
 
-            set!(world, (char, shop));
+            set!(world, (char, shop, charItemsCounter));
         }
     }
 }

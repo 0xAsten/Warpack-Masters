@@ -42,6 +42,8 @@ mod tests {
         actions_system.rebirth('bob', WMClass::Warrior);
 
         let char = get!(world, (alice), Character);
+        let charItemCounter = get!(world, (alice), CharacterItemsCounter);
+        let playerShopData = get!(world, (alice), Shop);
         assert(!char.dummied, 'Should be false');
         assert(char.wins == 0, 'wins count should be 0');
         assert(char.loss == 0, 'loss count should be 0');
@@ -49,6 +51,11 @@ mod tests {
         assert(char.name == 'bob', 'name should be bob');
         assert(char.gold == INIT_GOLD + 1, 'gold should be init');
         assert(char.health == INIT_HEALTH, 'health should be init');
+        assert(charItemCounter.count == 0, 'item count should be 0');
+        assert(playerShopData.item1 == 0, 'item 1 should be 0');
+        assert(playerShopData.item2 == 0, 'item 2 should be 0');
+        assert(playerShopData.item3 == 0, 'item 3 should be 0');
+        assert(playerShopData.item4 == 0, 'item 4 should be 0');
     }
 
     #[test]
