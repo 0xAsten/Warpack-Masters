@@ -119,8 +119,8 @@ mod tests {
         let char_item_data = get!(world, (alice, 1), (CharacterItem));
         assert(char_item_data.itemId == 1, 'sell one: item id mismatch');
         assert(char_item_data.where == '', 'sell one: where mismatch');
-        assert(char_item_data.position.x == STORAGE_FLAG, 'sell one: x position mismatch');
-        assert(char_item_data.position.y == STORAGE_FLAG, 'sell one: y position mismatch');
+        assert(char_item_data.position.x == 0, 'sell one: x position mismatch');
+        assert(char_item_data.position.y == 0, 'sell one: y position mismatch');
         assert(char_item_data.rotation == 0, 'sell one: rotation mismatch');
 
         actions_system.buy_item(2);
@@ -136,8 +136,8 @@ mod tests {
         let char_item_data = get!(world, (alice, 2), (CharacterItem));
         assert(char_item_data.itemId == 2, 'sell two: item id mismatch');
         assert(char_item_data.where == '', 'sell two: where mismatch');
-        assert(char_item_data.position.x == STORAGE_FLAG, 'sell two: x position mismatch');
-        assert(char_item_data.position.y == STORAGE_FLAG, 'sell two: y position mismatch');
+        assert(char_item_data.position.x == 0, 'sell two: x position mismatch');
+        assert(char_item_data.position.y == 0, 'sell two: y position mismatch');
         assert(char_item_data.rotation == 0, 'sell two: rotation mismatch');
     }
 

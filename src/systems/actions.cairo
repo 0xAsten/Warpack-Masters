@@ -434,8 +434,8 @@ mod actions {
             let sell_price = item_price / 2;
 
             char_item_data.where = '';
-            char_item_data.position.x = STORAGE_FLAG;
-            char_item_data.position.y = STORAGE_FLAG;
+            char_item_data.position.x = 0;
+            char_item_data.position.y = 0;
             char_item_data.rotation = 0;
 
             player_char.gold += sell_price;
