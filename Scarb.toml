@@ -16,8 +16,8 @@ initializer_class_hash = "0xbeef"
 
 [tool.dojo.env]
 rpc_url = "https://api.cartridge.gg/x/warpack-masters-v2/katana"
-account_address = "0xe30e817e8238a83a4c5542ebc40eb3740f0fbd39781948fdec0110a92ca108"
-private_key = "0x75ba890aee1fbd608bcca573cd9c5794e1014a45d49cb058f2b6be1274ff6aa"
+account_address = ""
+private_key = ""
 
 [tool.dojo.world]
 name = "Warpack Masters"
