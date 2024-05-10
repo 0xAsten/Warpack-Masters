@@ -107,7 +107,7 @@ mod actions {
             assert(width > 0 && width <= GRID_X, 'width not in range');
             assert(height > 0 && height <= GRID_Y, 'height not in range');
 
-            assert(price > 1, 'price must be greater than 1');
+            assert(price > 0, 'price must be greater than 0');
 
             assert(rarity == 1 || rarity == 2 || rarity == 3, 'rarity not valid');
 
@@ -165,7 +165,7 @@ mod actions {
                 // price
                 3 => {
                     let new_price: usize = item_value.try_into().unwrap();
-                    assert(new_price > 1, 'new_price must be > 1');
+                    assert(new_price > 0, 'new_price must be > 0');
 
                     item_data.price = new_price;
                     set!(world, (item_data,));
