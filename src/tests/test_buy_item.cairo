@@ -14,9 +14,7 @@ mod tests {
         systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait}},
         models::backpack::{Backpack, backpack, BackpackGrids, Grid, GridTrait},
         models::Item::{Item, item, ItemsCounter},
-        models::CharacterItem::{
-            CharacterItemsCounter, character_items_counter, CharacterItem, character_item
-        },
+        models::CharacterItem::{CharacterItemStorage, CharacterItemsStorageCounter},
         models::Character::{Character, character, WMClass}, models::Shop::{Shop, shop}
     };
 
@@ -32,8 +30,6 @@ mod tests {
             backpack::TEST_CLASS_HASH,
             character::TEST_CLASS_HASH,
             item::TEST_CLASS_HASH,
-            character_items_counter::TEST_CLASS_HASH,
-            character_item::TEST_CLASS_HASH,
             shop::TEST_CLASS_HASH
         ];
 
@@ -78,16 +74,12 @@ mod tests {
         let char_data = get!(world, alice, (Character));
         assert(char_data.gold == INIT_GOLD - item_one_price, 'gold value mismatch');
 
-        let char_item_counter_data = get!(world, alice, (CharacterItemsCounter));
-        assert(char_item_counter_data.count == 1, 'total item count mismatch');
+        let storageItemCount = get!(world, alice, (CharacterItemsStorageCounter));
+        assert(storageItemCount.count == 1, 'total item count mismatch');
 
-        let char_item_data = get!(world, (alice, 1), (CharacterItem));
-        assert(char_item_data.id == 1, 'id mismatch');
-        assert(char_item_data.itemId == 1, 'item id mismatch');
-        assert(char_item_data.where == 'storage', 'where mismatch');
-        assert(char_item_data.position.x == STORAGE_FLAG, 'x position mismatch');
-        assert(char_item_data.position.y == STORAGE_FLAG, 'y position mismatch');
-        assert(char_item_data.rotation == 0, 'rotation mismatch');
+        let storageItem = get!(world, (alice, 1), (CharacterItemStorage));
+        assert(storageItem.id == 1, 'id mismatch');
+        assert(storageItem.itemId == 1, 'item id mismatch');
     }
 
 
@@ -98,11 +90,7 @@ mod tests {
         let alice = starknet::contract_address_const::<0x1337>();
 
         let mut models = array![
-            backpack::TEST_CLASS_HASH,
-            character::TEST_CLASS_HASH,
-            item::TEST_CLASS_HASH,
-            character_items_counter::TEST_CLASS_HASH,
-            character_item::TEST_CLASS_HASH
+            backpack::TEST_CLASS_HASH, character::TEST_CLASS_HASH, item::TEST_CLASS_HASH,
         ];
 
         let world = spawn_test_world(models);
@@ -152,11 +140,7 @@ mod tests {
         let alice = starknet::contract_address_const::<0x1337>();
 
         let mut models = array![
-            backpack::TEST_CLASS_HASH,
-            character::TEST_CLASS_HASH,
-            item::TEST_CLASS_HASH,
-            character_items_counter::TEST_CLASS_HASH,
-            character_item::TEST_CLASS_HASH
+            backpack::TEST_CLASS_HASH, character::TEST_CLASS_HASH, item::TEST_CLASS_HASH,
         ];
 
         let world = spawn_test_world(models);
@@ -204,11 +188,7 @@ mod tests {
         let alice = starknet::contract_address_const::<0x1337>();
 
         let mut models = array![
-            backpack::TEST_CLASS_HASH,
-            character::TEST_CLASS_HASH,
-            item::TEST_CLASS_HASH,
-            character_items_counter::TEST_CLASS_HASH,
-            character_item::TEST_CLASS_HASH
+            backpack::TEST_CLASS_HASH, character::TEST_CLASS_HASH, item::TEST_CLASS_HASH,
         ];
 
         let world = spawn_test_world(models);
@@ -270,11 +250,7 @@ mod tests {
         let alice = starknet::contract_address_const::<0x1337>();
 
         let mut models = array![
-            backpack::TEST_CLASS_HASH,
-            character::TEST_CLASS_HASH,
-            item::TEST_CLASS_HASH,
-            character_items_counter::TEST_CLASS_HASH,
-            character_item::TEST_CLASS_HASH
+            backpack::TEST_CLASS_HASH, character::TEST_CLASS_HASH, item::TEST_CLASS_HASH,
         ];
 
         let world = spawn_test_world(models);

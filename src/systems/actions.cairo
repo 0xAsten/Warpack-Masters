@@ -426,10 +426,6 @@ mod actions {
 
             if isUpdated == false {
                 storageCounter.count += 1;
-                // let storageId = storageCounter.count;
-                // let storageItem = CharacterItemStorage {
-                //     player, id: storageCounter.count, itemId: item_id,
-                // };
                 set!(
                     world,
                     (
