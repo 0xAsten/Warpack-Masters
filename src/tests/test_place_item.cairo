@@ -14,7 +14,10 @@ mod tests {
         systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait}},
         models::backpack::{Backpack, backpack, BackpackGrids, Grid, GridTrait},
         models::Item::{Item, item, ItemsCounter},
-        models::CharacterItem::{CharacterItem, Position, CharacterItemsCounter},
+        models::CharacterItem::{
+            Position, CharacterItemStorage, CharacterItemsStorageCounter, CharacterItemInventory,
+            CharacterItemsInventoryCounter
+        },
         models::Character::{Character, character, WMClass}, models::Shop::{Shop, shop}
     };
 
@@ -74,17 +77,24 @@ mod tests {
         let mut backpack_grid_data = get!(world, (alice, 0, 0), BackpackGrids);
         assert(backpack_grid_data.occupied == true, '(0,0) should be occupied');
 
-        let mut characterItemsCounter = get!(world, alice, CharacterItemsCounter);
-        let characterItem = get!(world, (alice, characterItemsCounter.count), CharacterItem);
-        assert(characterItem.itemId == characterItemsCounter.count, 'item id should equal count');
-        assert(characterItem.where == 'inventory', 'item should be in inventory');
-        assert(characterItem.position.x == 0, 'x position mismatch');
-        assert(characterItem.position.y == 0, 'y position mismatch');
-        assert(characterItem.rotation == 0, 'rotation mismatch');
+        let storageItemCounter = get!(world, alice, CharacterItemsStorageCounter);
+        assert(storageItemCounter.count == 1, 'storage item count mismatch');
+
+        let storageItem = get!(world, (alice, 1), CharacterItemStorage);
+        assert(storageItem.itemId == 0, 'item id should equal 0');
+
+        let inventoryItemCounter = get!(world, alice, CharacterItemsInventoryCounter);
+        assert(inventoryItemCounter.count == 1, 'inventory item count mismatch');
+
+        let invetoryItem = get!(world, (alice, 1), CharacterItemInventory);
+        assert(invetoryItem.itemId == 1, 'item id should equal 0');
+        assert(invetoryItem.position.x == 0, 'x position mismatch');
+        assert(invetoryItem.position.y == 0, 'y position mismatch');
+        assert(invetoryItem.rotation == 0, 'rotation mismatch');
 
         actions_system.buy_item(2);
         // place a shield on (1,5)
-        actions_system.place_item(2, 1, 0, 0);
+        actions_system.place_item(1, 1, 0, 0);
         // (1,5) (1,6) (2,5) (2,6) should be occupied
         let mut backpack_grid_data = get!(world, (alice, 1, 0), BackpackGrids);
         assert(backpack_grid_data.occupied == true, '(1,0) should be occupied');
@@ -98,28 +108,42 @@ mod tests {
         let mut backpack_grid_data = get!(world, (alice, 2, 1), BackpackGrids);
         assert(backpack_grid_data.occupied == true, '(2,1) should be occupied');
 
-        characterItemsCounter = get!(world, alice, CharacterItemsCounter);
-        let characterItem = get!(world, (alice, characterItemsCounter.count), CharacterItem);
-        assert(characterItem.itemId == characterItemsCounter.count, 'item id should equal count');
-        assert(characterItem.where == 'inventory', 'item should be in inventory');
-        assert(characterItem.position.x == 1, 'x position mismatch');
-        assert(characterItem.position.y == 0, 'y position mismatch');
-        assert(characterItem.rotation == 0, 'rotation mismatch');
+        let storageItemCounter = get!(world, alice, CharacterItemsStorageCounter);
+        assert(storageItemCounter.count == 1, 'storage item count mismatch');
+
+        let storageItem = get!(world, (alice, 1), CharacterItemStorage);
+        assert(storageItem.itemId == 0, 'item id should equal 0');
+
+        let inventoryItemCounter = get!(world, alice, CharacterItemsInventoryCounter);
+        assert(inventoryItemCounter.count == 2, 'inventory item count mismatch');
+
+        let invetoryItem = get!(world, (alice, 2), CharacterItemInventory);
+        assert(invetoryItem.itemId == 2, 'item id should equal 0');
+        assert(invetoryItem.position.x == 1, 'x position mismatch');
+        assert(invetoryItem.position.y == 0, 'y position mismatch');
+        assert(invetoryItem.rotation == 0, 'rotation mismatch');
 
         actions_system.buy_item(3);
         // place a potion on (1,4)
-        actions_system.place_item(3, 1, 2, 0);
+        actions_system.place_item(1, 1, 2, 0);
         // (1,4) should be occupied
         let mut backpack_grid_data = get!(world, (alice, 1, 2), BackpackGrids);
         assert(backpack_grid_data.occupied == true, '(1,2) should be occupied');
 
-        characterItemsCounter = get!(world, alice, CharacterItemsCounter);
-        let characterItem = get!(world, (alice, characterItemsCounter.count), CharacterItem);
-        // assert(characterItem.itemId == characterItemsCounter.count, 'item id should equal count');
-        assert(characterItem.where == 'inventory', 'item should be in inventory');
-        assert(characterItem.position.x == 1, 'x position mismatch');
-        assert(characterItem.position.y == 2, 'y position mismatch');
-        assert(characterItem.rotation == 0, 'rotation mismatch');
+        let storageItemCounter = get!(world, alice, CharacterItemsStorageCounter);
+        assert(storageItemCounter.count == 1, 'storage item count mismatch');
+
+        let storageItem = get!(world, (alice, 1), CharacterItemStorage);
+        assert(storageItem.itemId == 0, 'item id should equal 0');
+
+        let inventoryItemCounter = get!(world, alice, CharacterItemsInventoryCounter);
+        assert(inventoryItemCounter.count == 3, 'inventory item count mismatch');
+
+        let invetoryItem = get!(world, (alice, 3), CharacterItemInventory);
+        assert(invetoryItem.itemId == 3, 'item id should equal 0');
+        assert(invetoryItem.position.x == 1, 'x position mismatch');
+        assert(invetoryItem.position.y == 2, 'y position mismatch');
+        assert(invetoryItem.rotation == 0, 'rotation mismatch');
     }
 
     #[test]
@@ -229,7 +253,6 @@ mod tests {
         // place a sword on (8,6) with rotation 90
         actions_system.place_item(1, 2, 0, 90);
     }
-
     #[test]
     #[available_gas(3000000000000000)]
     #[should_panic(expected: ('item out of bound for y', 'ENTRYPOINT_FAILED'))]
@@ -256,7 +279,6 @@ mod tests {
         // place a sword on (0,6)
         actions_system.place_item(1, 0, 1, 0);
     }
-
 
     #[test]
     #[available_gas(3000000000000000)]
@@ -296,12 +318,12 @@ mod tests {
         actions_system.buy_item(2);
         // try to place the shield on of the occupied grids
         // this will collide with grid (0,4)
-        actions_system.place_item(2, 0, 1, 0);
+        actions_system.place_item(1, 0, 1, 0);
     }
 
     #[test]
     #[available_gas(3000000000000000)]
-    #[should_panic(expected: ('item not owned by the player', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected: ('item not owned', 'ENTRYPOINT_FAILED'))]
     fn test_place_item_revert_item_not_owned() {
         let alice = starknet::contract_address_const::<0x1337>();
 
@@ -325,10 +347,9 @@ mod tests {
         actions_system.place_item(1, 0, 0, 0);
     }
 
-
     #[test]
     #[available_gas(3000000000000000)]
-    #[should_panic(expected: ('item already placed', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected: ('item not owned', 'ENTRYPOINT_FAILED'))]
     fn test_place_item_revert_item_not_already_placed() {
         let alice = starknet::contract_address_const::<0x1337>();
 
