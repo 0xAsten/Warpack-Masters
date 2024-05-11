@@ -6,7 +6,7 @@ use starknet::ContractAddress;
 trait IActions {
     fn spawn(name: felt252, wmClass: WMClass);
     fn place_item(storage_item_id: u32, x: usize, y: usize, rotation: usize);
-    fn undo_place_item(char_item_counter_id: u32);
+    fn undo_place_item(inventory_item_id: u32);
     fn add_item(
         name: felt252,
         width: usize,
@@ -337,53 +337,49 @@ mod actions {
             set!(world, (storageItem));
         }
 
-        fn undo_place_item(world: IWorldDispatcher, char_item_counter_id: u32) {
+        fn undo_place_item(world: IWorldDispatcher, inventory_item_id: u32) {
             let player = get_caller_address();
 
-            let mut char_item_data = get!(world, (player, char_item_counter_id), (CharacterItem));
-            let item_id = char_item_data.itemId;
-            let item = get!(world, item_id, (Item));
+            let mut inventoryItem = get!(
+                world, (player, inventory_item_id), (CharacterItemInventory)
+            );
+            let itemId = inventoryItem.itemId;
+            assert(itemId != 0, 'invalid inventory item id');
+            let item = get!(world, itemId, (Item));
 
-            assert(char_item_data.where == 'inventory', 'item not in inventory');
+            let x = inventoryItem.position.x;
+            let y = inventoryItem.position.y;
+            let rotation = inventoryItem.rotation;
+            let itemHeight = item.height;
+            let itemWidth = item.width;
 
-            let x = char_item_data.position.x;
-            let y = char_item_data.position.y;
-            let rotation = char_item_data.rotation;
-            let item_h = item.height;
-            let item_w = item.width;
-
-            char_item_data.where = 'storage';
-            char_item_data.position.x = STORAGE_FLAG;
-            char_item_data.position.y = STORAGE_FLAG;
-            char_item_data.rotation = 0;
-
-            if item_h == 1 && item_w == 1 {
+            if itemHeight == 1 && itemWidth == 1 {
                 set!(world, (BackpackGrids { player: player, x: x, y: y, occupied: false }));
             } else {
-                let mut x_max = 0;
-                let mut y_max = 0;
+                let mut xMax = 0;
+                let mut yMax = 0;
 
                 // only check grids which are above the starting (x,y)
                 if rotation == 0 || rotation == 180 {
-                    x_max = x + item_w - 1;
-                    y_max = y + item_h - 1;
+                    xMax = x + itemWidth - 1;
+                    yMax = y + itemHeight - 1;
                 }
 
                 // only check grids which are to the right of the starting (x,y)
                 if rotation == 90 || rotation == 270 {
                     //item_h becomes item_w and vice versa
-                    x_max = x + item_h - 1;
-                    y_max = y + item_w - 1;
+                    xMax = x + itemHeight - 1;
+                    yMax = y + itemWidth - 1;
                 }
 
                 let mut i = x;
                 let mut j = y;
                 loop {
-                    if i > x_max {
+                    if i > xMax {
                         break;
                     }
                     loop {
-                        if j > y_max {
+                        if j > yMax {
                             break;
                         }
 
@@ -397,7 +393,41 @@ mod actions {
                 }
             }
 
-            set!(world, (char_item_data));
+            let mut storageCounter = get!(world, player, (CharacterItemsStorageCounter));
+            let mut count = storageCounter.count;
+            let mut isUpdated = false;
+            loop {
+                if count == 0 {
+                    break;
+                }
+
+                let mut storageItem = get!(world, (player, count), (CharacterItemStorage));
+                if storageItem.itemId == 0 {
+                    storageItem.itemId = itemId;
+                    isUpdated = true;
+                    set!(world, (storageItem));
+                    break;
+                }
+
+                count -= 1;
+            };
+
+            if isUpdated == false {
+                storageCounter.count += 1;
+                set!(
+                    world,
+                    (
+                        CharacterItemStorage { player, id: storageCounter.count, itemId: itemId, },
+                        CharacterItemsStorageCounter { player, count: storageCounter.count },
+                    )
+                );
+            }
+
+            inventoryItem.itemId = 0;
+            inventoryItem.position.x = 0;
+            inventoryItem.position.y = 0;
+            inventoryItem.rotation = 0;
+            set!(world, (inventoryItem));
         }
 
         fn buy_item(world: IWorldDispatcher, item_id: u32) {
