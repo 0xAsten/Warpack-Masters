@@ -11,9 +11,6 @@ mod tests {
         systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait}},
         models::backpack::{Backpack, backpack, BackpackGrids, Grid, GridTrait},
         models::Item::{Item, item, ItemsCounter},
-        models::CharacterItem::{
-            CharacterItemsCounter, character_items_counter, CharacterItem, character_item
-        },
         models::Character::{Character, character, WMClass}, models::Shop::{Shop, shop},
     };
 
@@ -25,11 +22,7 @@ mod tests {
     #[available_gas(3000000000000000)]
     fn test_reroll_shop_no_items() {
         let mut models = array![
-            backpack::TEST_CLASS_HASH,
-            character::TEST_CLASS_HASH,
-            item::TEST_CLASS_HASH,
-            character_items_counter::TEST_CLASS_HASH,
-            character_item::TEST_CLASS_HASH
+            backpack::TEST_CLASS_HASH, character::TEST_CLASS_HASH, item::TEST_CLASS_HASH,
         ];
 
         let world = spawn_test_world(models);
@@ -49,11 +42,7 @@ mod tests {
         let owner = starknet::contract_address_const::<0x0>();
 
         let mut models = array![
-            backpack::TEST_CLASS_HASH,
-            character::TEST_CLASS_HASH,
-            item::TEST_CLASS_HASH,
-            character_items_counter::TEST_CLASS_HASH,
-            character_item::TEST_CLASS_HASH
+            backpack::TEST_CLASS_HASH, character::TEST_CLASS_HASH, item::TEST_CLASS_HASH
         ];
 
         let world = spawn_test_world(models);
@@ -105,11 +94,7 @@ mod tests {
         let owner = starknet::contract_address_const::<0x0>();
 
         let mut models = array![
-            backpack::TEST_CLASS_HASH,
-            character::TEST_CLASS_HASH,
-            item::TEST_CLASS_HASH,
-            character_items_counter::TEST_CLASS_HASH,
-            character_item::TEST_CLASS_HASH
+            backpack::TEST_CLASS_HASH, character::TEST_CLASS_HASH, item::TEST_CLASS_HASH
         ];
 
         let world = spawn_test_world(models);

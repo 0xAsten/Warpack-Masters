@@ -19,8 +19,10 @@ sozo auth grant --world $WORLD_ADDRESS --rpc-url $RPC_URL --wait writer \
   Backpack,$ACTIONS_ADDRESS \
   BackpackGrids,$ACTIONS_ADDRESS \
   Character,$ACTIONS_ADDRESS \
-  CharacterItem,$ACTIONS_ADDRESS \
-  CharacterItemsCounter,$ACTIONS_ADDRESS \
+  CharacterItemStorage,$ACTIONS_ADDRESS \
+  CharacterItemsStorageCounter,$ACTIONS_ADDRESS \
+  CharacterItemInventory,$ACTIONS_ADDRESS \
+  CharacterItemsInventoryCounter,$ACTIONS_ADDRESS \
   DummyCharacter,$ACTIONS_ADDRESS \
   DummyCharacterCounter,$ACTIONS_ADDRESS \
   DummyCharacterItem,$ACTIONS_ADDRESS \

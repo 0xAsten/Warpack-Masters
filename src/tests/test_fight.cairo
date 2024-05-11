@@ -14,7 +14,10 @@ mod tests {
         systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait, WMClass}},
         models::backpack::{Backpack, backpack, BackpackGrids, Grid, GridTrait},
         models::Item::{Item, item, ItemsCounter}, models::Character::{Character, character},
-        models::CharacterItem::{CharacterItem, Position, CharacterItemsCounter},
+        models::CharacterItem::{
+            Position, CharacterItemStorage, CharacterItemsStorageCounter, CharacterItemInventory,
+            CharacterItemsInventoryCounter
+        },
         models::DummyCharacter::{DummyCharacter, DummyCharacterCounter},
         models::DummyCharacterItem::{DummyCharacterItem, DummyCharacterItemsCounter},
         models::Shop::Shop,
@@ -84,9 +87,9 @@ mod tests {
         actions_system.buy_item(1);
         actions_system.place_item(1, 0, 0, 0);
         actions_system.buy_item(2);
-        actions_system.place_item(2, 1, 0, 0);
+        actions_system.place_item(1, 1, 0, 0);
         actions_system.buy_item(3);
-        actions_system.place_item(3, 1, 2, 0);
+        actions_system.place_item(1, 1, 2, 0);
         // actions_system.
         actions_system.create_dummy();
         actions_system.fight();
