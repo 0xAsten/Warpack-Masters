@@ -27,3 +27,19 @@ struct CharacterItemsCounter {
     player: ContractAddress,
     count: usize,
 }
+
+#[derive(Model, Drop, Serde)]
+struct CharacterItemStorage {
+    #[key]
+    player: ContractAddress,
+    #[key]
+    id: usize,
+    itemId: usize,
+}
+
+#[derive(Model, Drop, Serde)]
+struct CharacterItemsStorageCounter {
+    #[key]
+    player: ContractAddress,
+    count: usize,
+}

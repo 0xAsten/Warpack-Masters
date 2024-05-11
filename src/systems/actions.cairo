@@ -21,7 +21,7 @@ trait IActions {
     );
     fn edit_item(item_id: u32, item_key: felt252, item_value: felt252);
     fn buy_item(item_id: u32);
-    fn sell_item(char_item_counter_id: u32);
+    fn sell_item(storage_item_id: u32);
     fn is_world_owner(caller: ContractAddress) -> bool;
     fn is_item_owned(caller: ContractAddress, id: usize) -> bool;
     fn reroll_shop();
@@ -40,7 +40,11 @@ mod actions {
     use starknet::{ContractAddress, get_caller_address};
     use warpack_masters::models::{backpack::{Backpack, BackpackGrids, Grid, GridTrait}};
     use warpack_masters::models::{
-        CharacterItem::{CharacterItem, CharacterItemsCounter, Position}, Item::{Item, ItemsCounter}
+        CharacterItem::{
+            CharacterItem, CharacterItemsCounter, Position, CharacterItemsStorageCounter,
+            CharacterItemStorage
+        },
+        Item::{Item, ItemsCounter}
     };
     use warpack_masters::models::Character::{Character, WMClass};
     use warpack_masters::models::Shop::Shop;
@@ -370,8 +374,6 @@ mod actions {
             set!(world, (char_item_data));
         }
 
-
-        // TODO: bugfix, player can buy item1/2/3/4 from shop multiple times
         fn buy_item(world: IWorldDispatcher, item_id: u32) {
             let player = get_caller_address();
 
@@ -392,9 +394,6 @@ mod actions {
             assert(player_char.gold >= item.price, 'Not enough gold');
             player_char.gold -= item.price;
 
-            let mut char_items_counter = get!(world, player, (CharacterItemsCounter));
-            char_items_counter.count += 1;
-
             //delete respective item bought from the shop
             if (shop_data.item1 == item_id) {
                 shop_data.item1 = 0
@@ -406,41 +405,62 @@ mod actions {
                 shop_data.item4 = 0
             }
 
-            let char_item = CharacterItem {
-                player,
-                id: char_items_counter.count,
-                itemId: item_id,
-                where: 'storage',
-                position: Position { x: STORAGE_FLAG, y: STORAGE_FLAG },
-                rotation: 0,
+            let mut storageCounter = get!(world, player, (CharacterItemsStorageCounter));
+            let mut count = storageCounter.count;
+            let mut isUpdated = false;
+            loop {
+                if count == 0 {
+                    break;
+                }
+
+                let mut storageItem = get!(world, (player, count), (CharacterItemStorage));
+                if storageItem.itemId == 0 {
+                    storageItem.itemId = item_id;
+                    isUpdated = true;
+                    set!(world, (storageItem));
+                    break;
+                }
+
+                count -= 1;
             };
 
-            set!(world, (player_char, char_items_counter, char_item, shop_data));
+            if isUpdated == false {
+                storageCounter.count += 1;
+                // let storageId = storageCounter.count;
+                // let storageItem = CharacterItemStorage {
+                //     player, id: storageCounter.count, itemId: item_id,
+                // };
+                set!(
+                    world,
+                    (
+                        CharacterItemStorage { player, id: storageCounter.count, itemId: item_id, },
+                        CharacterItemsStorageCounter { player, count: storageCounter.count },
+                    )
+                );
+            }
+
+            set!(world, (player_char, shop_data));
         }
 
 
-        fn sell_item(world: IWorldDispatcher, char_item_counter_id: u32) {
+        fn sell_item(world: IWorldDispatcher, storage_item_id: u32) {
             let player = get_caller_address();
 
-            let mut char_item_data = get!(world, (player, char_item_counter_id), (CharacterItem));
-            let item_id = char_item_data.itemId;
-            let mut item = get!(world, item_id, (Item));
-            let mut player_char = get!(world, player, (Character));
+            let mut storageItem = get!(world, (player, storage_item_id), (CharacterItemStorage));
+            let itemId = storageItem.itemId;
+            assert(itemId != 0, 'invalid item_id');
 
-            assert(char_item_data.where != '', 'item not owned');
-            assert(char_item_data.where != 'inventory', 'item in inventory');
+            let mut item = get!(world, itemId, (Item));
+            let mut playerChar = get!(world, player, (Character));
 
-            let item_price = item.price;
-            let sell_price = item_price / 2;
+            let itemPrice = item.price;
+            let sellPrice = itemPrice / 2;
 
-            char_item_data.where = '';
-            char_item_data.position.x = 0;
-            char_item_data.position.y = 0;
-            char_item_data.rotation = 0;
+            storageItem.itemId = 0;
 
-            player_char.gold += sell_price;
+            playerChar.gold += sellPrice;
 
-            set!(world, (char_item_data, player_char));
+            set!(world, (storageItem, playerChar));
         }
 
         fn reroll_shop(world: IWorldDispatcher) {
