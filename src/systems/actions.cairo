@@ -116,6 +116,19 @@ mod actions {
             assert(rarity == 1 || rarity == 2 || rarity == 3, 'rarity not valid');
 
             let mut counter = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
+            let mut count = counter.count;
+
+            loop {
+                if count == 0 {
+                    break;
+                }
+
+                let item = get!(world, count, (Item));
+                assert(item.name != name, 'item name already exists');
+
+                count -= 1;
+            };
+
             counter.count += 1;
 
             let item = Item {
