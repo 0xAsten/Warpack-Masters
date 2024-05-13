@@ -224,5 +224,21 @@ mod tests {
 
         actions_system.add_item('Sword', 1, 3, 100, 10, 10, 5, 10, 5, 5);
     }
+
+    #[test]
+    #[available_gas(3000000000000000)]
+    #[should_panic(expected: ('item name already exists', 'ENTRYPOINT_FAILED'))]
+    fn test_add_item_with_same_name() {
+        let mut models = array![backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH];
+
+        let world = spawn_test_world(models);
+
+        let contract_address = world
+            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
+        let actions_system = IActionsDispatcher { contract_address };
+
+        actions_system.add_item('Sword', 1, 3, 100, 10, 10, 5, 10, 5, 1);
+        actions_system.add_item('Sword', 1, 3, 100, 10, 10, 5, 10, 5, 1);
+    }
 }
 
