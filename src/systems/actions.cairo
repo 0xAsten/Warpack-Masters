@@ -5,8 +5,8 @@ use starknet::ContractAddress;
 #[dojo::interface]
 trait IActions {
     fn spawn(name: felt252, wmClass: WMClass);
-    fn place_item(char_item_counter_id: u32, x: usize, y: usize, rotation: usize);
-    fn undo_place_item(char_item_counter_id: u32);
+    fn place_item(storage_item_id: u32, x: usize, y: usize, rotation: usize);
+    fn undo_place_item(inventory_item_id: u32);
     fn add_item(
         name: felt252,
         width: usize,
@@ -21,9 +21,9 @@ trait IActions {
     );
     fn edit_item(item_id: u32, item_key: felt252, item_value: felt252);
     fn buy_item(item_id: u32);
-    fn sell_item(char_item_counter_id: u32);
-    fn is_world_owner(caller: ContractAddress) -> bool;
-    fn is_item_owned(caller: ContractAddress, id: usize) -> bool;
+    fn sell_item(storage_item_id: u32);
+    fn is_world_owner(player: ContractAddress) -> bool;
+    fn is_item_owned(player: ContractAddress, id: usize) -> bool;
     fn reroll_shop();
     fn fight();
     fn create_dummy();
@@ -40,7 +40,11 @@ mod actions {
     use starknet::{ContractAddress, get_caller_address};
     use warpack_masters::models::{backpack::{Backpack, BackpackGrids, Grid, GridTrait}};
     use warpack_masters::models::{
-        CharacterItem::{CharacterItem, CharacterItemsCounter, Position}, Item::{Item, ItemsCounter}
+        CharacterItem::{
+            Position, CharacterItemsStorageCounter, CharacterItemStorage, CharacterItemInventory,
+            CharacterItemsInventoryCounter
+        },
+        Item::{Item, ItemsCounter}
     };
     use warpack_masters::models::Character::{Character, WMClass};
     use warpack_masters::models::Shop::Shop;
@@ -100,9 +104,9 @@ mod actions {
             heal: usize,
             rarity: usize,
         ) {
-            let caller = get_caller_address();
+            let player = get_caller_address();
 
-            assert(self.is_world_owner(caller), 'caller not world owner');
+            assert(self.is_world_owner(player), 'player not world owner');
 
             assert(width > 0 && width <= GRID_X, 'width not in range');
             assert(height > 0 && height <= GRID_Y, 'height not in range');
@@ -112,6 +116,19 @@ mod actions {
             assert(rarity == 1 || rarity == 2 || rarity == 3, 'rarity not valid');
 
             let mut counter = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
+            let mut count = counter.count;
+
+            loop {
+                if count == 0 {
+                    break;
+                }
+
+                let item = get!(world, count, (Item));
+                assert(item.name != name, 'item name already exists');
+
+                count -= 1;
+            };
+
             counter.count += 1;
 
             let item = Item {
@@ -134,9 +151,9 @@ mod actions {
         fn edit_item(
             world: IWorldDispatcher, item_id: u32, item_key: felt252, item_value: felt252
         ) {
-            let caller = get_caller_address();
+            let player = get_caller_address();
 
-            assert(self.is_world_owner(caller), 'caller not world owner');
+            assert(self.is_world_owner(player), 'player not world owner');
 
             let mut item_data = get!(world, item_id, (Item));
 
@@ -222,7 +239,7 @@ mod actions {
 
 
         fn place_item(
-            world: IWorldDispatcher, char_item_counter_id: u32, x: usize, y: usize, rotation: usize
+            world: IWorldDispatcher, storage_item_id: u32, x: usize, y: usize, rotation: usize
         ) {
             let player = get_caller_address();
 
@@ -233,57 +250,55 @@ mod actions {
                 'invalid rotation'
             );
 
-            assert(self.is_item_owned(player, char_item_counter_id), '');
+            let mut storageItem = get!(world, (player, storage_item_id), (CharacterItemStorage));
 
-            let char_item_data = get!(world, (player, char_item_counter_id), (CharacterItem));
-            let item_id = char_item_data.itemId;
-            let item = get!(world, item_id, (Item));
+            assert(storageItem.itemId != 0, 'item not owned');
 
-            let item_h = item.height;
-            let item_w = item.width;
+            let itemId = storageItem.itemId;
+            let item = get!(world, itemId, (Item));
 
-            let mut player_backpack_grids = get!(world, (player, x, y), (BackpackGrids));
+            let itemHeight = item.height;
+            let itemWidth = item.width;
 
-            assert(!player_backpack_grids.occupied, 'Already occupied');
+            let playerBackpackGrids = get!(world, (player, x, y), (BackpackGrids));
+            assert(!playerBackpackGrids.occupied, 'Already occupied');
 
             // if the item is 1x1, occupy the empty grid
-            if item_h == 1 && item_w == 1 {
+            if itemHeight == 1 && itemWidth == 1 {
                 set!(world, (BackpackGrids { player: player, x: x, y: y, occupied: true }));
             } else {
-                let mut x_max = 0;
-                let mut y_max = 0;
+                let mut xMax = 0;
+                let mut yMax = 0;
 
                 // only check grids which are above the starting (x,y)
                 if rotation == 0 || rotation == 180 {
-                    x_max = x + item_w - 1;
-                    y_max = y + item_h - 1;
+                    xMax = x + itemWidth - 1;
+                    yMax = y + itemHeight - 1;
                 }
 
                 // only check grids which are to the right of the starting (x,y)
                 if rotation == 90 || rotation == 270 {
                     //item_h becomes item_w and vice versa
-                    x_max = x + item_h - 1;
-                    y_max = y + item_w - 1;
+                    xMax = x + itemHeight - 1;
+                    yMax = y + itemWidth - 1;
                 }
 
-                assert(x_max < GRID_X, 'item out of bound for x');
-                assert(y_max < GRID_Y, 'item out of bound for y');
+                assert(xMax < GRID_X, 'item out of bound for x');
+                assert(yMax < GRID_Y, 'item out of bound for y');
 
                 let mut i = x;
                 let mut j = y;
                 loop {
-                    if i > x_max {
+                    if i > xMax {
                         break;
                     }
                     loop {
-                        if j > y_max {
+                        if j > yMax {
                             break;
                         }
 
-                        let mut player_backpack_grid_data = get!(
-                            world, (player, i, j), (BackpackGrids)
-                        );
-                        assert(!player_backpack_grid_data.occupied, 'Already occupied');
+                        let playerBackpackGrids = get!(world, (player, i, j), (BackpackGrids));
+                        assert(!playerBackpackGrids.occupied, 'Already occupied');
 
                         set!(world, (BackpackGrids { player: player, x: i, y: j, occupied: true }));
                         j += 1;
@@ -293,67 +308,91 @@ mod actions {
                 }
             }
 
-            set!(
-                world,
-                (CharacterItem {
-                    player,
-                    id: char_item_counter_id,
-                    itemId: item_id,
-                    where: 'inventory',
-                    position: Position { x, y },
-                    rotation,
-                })
-            );
+            let mut inventoryCounter = get!(world, player, (CharacterItemsInventoryCounter));
+            let mut count = inventoryCounter.count;
+            let mut isUpdated = false;
+            loop {
+                if count == 0 {
+                    break;
+                }
+
+                let mut inventoryItem = get!(world, (player, count), (CharacterItemInventory));
+                if inventoryItem.itemId == 0 {
+                    inventoryItem.itemId = itemId;
+                    inventoryItem.position = Position { x, y };
+                    inventoryItem.rotation = rotation;
+                    isUpdated = true;
+                    set!(world, (inventoryItem));
+                    break;
+                }
+
+                count -= 1;
+            };
+
+            if isUpdated == false {
+                inventoryCounter.count += 1;
+                set!(
+                    world,
+                    (
+                        CharacterItemInventory {
+                            player,
+                            id: inventoryCounter.count,
+                            itemId: itemId,
+                            position: Position { x, y },
+                            rotation,
+                        },
+                        CharacterItemsInventoryCounter { player, count: inventoryCounter.count },
+                    )
+                );
+            }
+
+            storageItem.itemId = 0;
+            set!(world, (storageItem));
         }
 
-
-        fn undo_place_item(world: IWorldDispatcher, char_item_counter_id: u32) {
+        fn undo_place_item(world: IWorldDispatcher, inventory_item_id: u32) {
             let player = get_caller_address();
 
-            let mut char_item_data = get!(world, (player, char_item_counter_id), (CharacterItem));
-            let item_id = char_item_data.itemId;
-            let item = get!(world, item_id, (Item));
+            let mut inventoryItem = get!(
+                world, (player, inventory_item_id), (CharacterItemInventory)
+            );
+            let itemId = inventoryItem.itemId;
+            assert(itemId != 0, 'invalid inventory item id');
+            let item = get!(world, itemId, (Item));
 
-            assert(char_item_data.where == 'inventory', 'item not in inventory');
+            let x = inventoryItem.position.x;
+            let y = inventoryItem.position.y;
+            let rotation = inventoryItem.rotation;
+            let itemHeight = item.height;
+            let itemWidth = item.width;
 
-            let x = char_item_data.position.x;
-            let y = char_item_data.position.y;
-            let rotation = char_item_data.rotation;
-            let item_h = item.height;
-            let item_w = item.width;
-
-            char_item_data.where = 'storage';
-            char_item_data.position.x = STORAGE_FLAG;
-            char_item_data.position.y = STORAGE_FLAG;
-            char_item_data.rotation = 0;
-
-            if item_h == 1 && item_w == 1 {
+            if itemHeight == 1 && itemWidth == 1 {
                 set!(world, (BackpackGrids { player: player, x: x, y: y, occupied: false }));
             } else {
-                let mut x_max = 0;
-                let mut y_max = 0;
+                let mut xMax = 0;
+                let mut yMax = 0;
 
                 // only check grids which are above the starting (x,y)
                 if rotation == 0 || rotation == 180 {
-                    x_max = x + item_w - 1;
-                    y_max = y + item_h - 1;
+                    xMax = x + itemWidth - 1;
+                    yMax = y + itemHeight - 1;
                 }
 
                 // only check grids which are to the right of the starting (x,y)
                 if rotation == 90 || rotation == 270 {
                     //item_h becomes item_w and vice versa
-                    x_max = x + item_h - 1;
-                    y_max = y + item_w - 1;
+                    xMax = x + itemHeight - 1;
+                    yMax = y + itemWidth - 1;
                 }
 
                 let mut i = x;
                 let mut j = y;
                 loop {
-                    if i > x_max {
+                    if i > xMax {
                         break;
                     }
                     loop {
-                        if j > y_max {
+                        if j > yMax {
                             break;
                         }
 
@@ -367,11 +406,43 @@ mod actions {
                 }
             }
 
-            set!(world, (char_item_data));
+            let mut storageCounter = get!(world, player, (CharacterItemsStorageCounter));
+            let mut count = storageCounter.count;
+            let mut isUpdated = false;
+            loop {
+                if count == 0 {
+                    break;
+                }
+
+                let mut storageItem = get!(world, (player, count), (CharacterItemStorage));
+                if storageItem.itemId == 0 {
+                    storageItem.itemId = itemId;
+                    isUpdated = true;
+                    set!(world, (storageItem));
+                    break;
+                }
+
+                count -= 1;
+            };
+
+            if isUpdated == false {
+                storageCounter.count += 1;
+                set!(
+                    world,
+                    (
+                        CharacterItemStorage { player, id: storageCounter.count, itemId: itemId, },
+                        CharacterItemsStorageCounter { player, count: storageCounter.count },
+                    )
+                );
+            }
+
+            inventoryItem.itemId = 0;
+            inventoryItem.position.x = 0;
+            inventoryItem.position.y = 0;
+            inventoryItem.rotation = 0;
+            set!(world, (inventoryItem));
         }
 
-
-        // TODO: bugfix, player can buy item1/2/3/4 from shop multiple times
         fn buy_item(world: IWorldDispatcher, item_id: u32) {
             let player = get_caller_address();
 
@@ -392,9 +463,6 @@ mod actions {
             assert(player_char.gold >= item.price, 'Not enough gold');
             player_char.gold -= item.price;
 
-            let mut char_items_counter = get!(world, player, (CharacterItemsCounter));
-            char_items_counter.count += 1;
-
             //delete respective item bought from the shop
             if (shop_data.item1 == item_id) {
                 shop_data.item1 = 0
@@ -406,50 +474,67 @@ mod actions {
                 shop_data.item4 = 0
             }
 
-            let char_item = CharacterItem {
-                player,
-                id: char_items_counter.count,
-                itemId: item_id,
-                where: 'storage',
-                position: Position { x: STORAGE_FLAG, y: STORAGE_FLAG },
-                rotation: 0,
+            let mut storageCounter = get!(world, player, (CharacterItemsStorageCounter));
+            let mut count = storageCounter.count;
+            let mut isUpdated = false;
+            loop {
+                if count == 0 {
+                    break;
+                }
+
+                let mut storageItem = get!(world, (player, count), (CharacterItemStorage));
+                if storageItem.itemId == 0 {
+                    storageItem.itemId = item_id;
+                    isUpdated = true;
+                    set!(world, (storageItem));
+                    break;
+                }
+
+                count -= 1;
             };
 
-            set!(world, (player_char, char_items_counter, char_item, shop_data));
+            if isUpdated == false {
+                storageCounter.count += 1;
+                set!(
+                    world,
+                    (
+                        CharacterItemStorage { player, id: storageCounter.count, itemId: item_id, },
+                        CharacterItemsStorageCounter { player, count: storageCounter.count },
+                    )
+                );
+            }
+
+            set!(world, (player_char, shop_data));
         }
 
 
-        fn sell_item(world: IWorldDispatcher, char_item_counter_id: u32) {
+        fn sell_item(world: IWorldDispatcher, storage_item_id: u32) {
             let player = get_caller_address();
 
-            let mut char_item_data = get!(world, (player, char_item_counter_id), (CharacterItem));
-            let item_id = char_item_data.itemId;
-            let mut item = get!(world, item_id, (Item));
-            let mut player_char = get!(world, player, (Character));
+            let mut storageItem = get!(world, (player, storage_item_id), (CharacterItemStorage));
+            let itemId = storageItem.itemId;
+            assert(itemId != 0, 'invalid item_id');
 
-            assert(char_item_data.where != '', 'item not owned');
-            assert(char_item_data.where != 'inventory', 'item in inventory');
+            let mut item = get!(world, itemId, (Item));
+            let mut playerChar = get!(world, player, (Character));
 
-            let item_price = item.price;
-            let sell_price = item_price / 2;
+            let itemPrice = item.price;
+            let sellPrice = itemPrice / 2;
 
-            char_item_data.where = '';
-            char_item_data.position.x = 0;
-            char_item_data.position.y = 0;
-            char_item_data.rotation = 0;
+            storageItem.itemId = 0;
 
-            player_char.gold += sell_price;
+            playerChar.gold += sellPrice;
 
-            set!(world, (char_item_data, player_char));
+            set!(world, (storageItem, playerChar));
         }
 
         fn reroll_shop(world: IWorldDispatcher) {
-            let caller = get_caller_address();
+            let player = get_caller_address();
 
-            let mut char = get!(world, caller, (Character));
+            let mut char = get!(world, player, (Character));
             assert(char.gold >= 1, 'Not enough gold');
 
-            let mut shop = get!(world, caller, (Shop));
+            let mut shop = get!(world, player, (Shop));
 
             // TODO: Will move these arrays after Dojo supports storing array
             let mut common: Array<usize> = ArrayTrait::new();
@@ -574,33 +659,27 @@ mod actions {
         }
 
 
-        fn is_world_owner(world: IWorldDispatcher, caller: ContractAddress) -> bool {
+        fn is_world_owner(world: IWorldDispatcher, player: ContractAddress) -> bool {
             // resource id of world is 0
-            let is_owner = world.is_owner(caller, 0);
+            let is_owner = world.is_owner(player, 0);
 
             is_owner
         }
 
-        fn is_item_owned(world: IWorldDispatcher, caller: ContractAddress, id: usize) -> bool {
-            let char_item_data = get!(world, (caller, id), (CharacterItem));
+        fn is_item_owned(world: IWorldDispatcher, player: ContractAddress, id: usize) -> bool {
+            let storageItem = get!(world, (player, id), (CharacterItemStorage));
 
-            // item is not in inventory or storage
-            assert(char_item_data.where != '', 'item not owned by the player');
-
-            // if the item is in inventory, it is already placed
-            assert(char_item_data.where != 'inventory', 'item already placed');
-
-            if char_item_data.where == 'storage' {
-                return true;
+            if storageItem.itemId == 0 {
+                return false;
             }
 
-            false
+            true
         }
 
         fn fight(world: IWorldDispatcher) {
-            let caller = get_caller_address();
+            let player = get_caller_address();
 
-            let mut char = get!(world, caller, (Character));
+            let mut char = get!(world, player, (Character));
 
             assert(char.dummied == true, 'dummy not created');
             assert(char.loss < 5, 'max loss reached');
@@ -627,28 +706,28 @@ mod actions {
             let mut item_belongs: Felt252Dict<felt252> = Default::default();
             let mut items_length: usize = 0;
 
-            let char_item_counter = get!(world, caller, (CharacterItemsCounter));
-            let mut char_item_count = char_item_counter.count;
+            let inventoryItemsCounter = get!(world, player, (CharacterItemsInventoryCounter));
+            let mut inventoryItemCount = inventoryItemsCounter.count;
 
             loop {
-                if char_item_count == 0 {
+                if inventoryItemCount == 0 {
                     break;
                 }
-                let char_item = get!(world, (caller, char_item_count), (CharacterItem));
-                let item = get!(world, char_item.itemId, (Item));
+                let charItem = get!(world, (player, inventoryItemCount), (CharacterItemInventory));
+                let item = get!(world, charItem.itemId, (Item));
                 let cooldown = item.cooldown;
                 let armor = item.armor;
-                if char_item.where == 'inventory' && cooldown > 0 {
-                    items.insert(items_length.into(), char_item.itemId);
+                if cooldown > 0 {
+                    items.insert(items_length.into(), charItem.itemId);
                     item_belongs.insert(items_length.into(), 'player');
 
                     items_length += 1;
                     char_items_len += 1;
-                } else if char_item.where == 'inventory' && cooldown == 0 {
+                } else if cooldown == 0 {
                     char_armor += armor;
                 }
 
-                char_item_count -= 1;
+                inventoryItemCount -= 1;
             };
 
             let dummyCharItemsCounter = get!(
@@ -713,7 +792,7 @@ mod actions {
             };
 
             // record the battle log
-            let mut battleLogCounter = get!(world, caller, (BattleLogCounter));
+            let mut battleLogCounter = get!(world, player, (BattleLogCounter));
             battleLogCounter.count += 1;
             let battleLogCounterCount = battleLogCounter.count;
 
@@ -799,11 +878,11 @@ mod actions {
                         }
 
                         let mut battleLogDetailCounter = get!(
-                            world, (caller, battleLogCounterCount), (BattleLogDetailCounter)
+                            world, (player, battleLogCounterCount), (BattleLogDetailCounter)
                         );
                         battleLogDetailCounter.count += 1;
                         let battleLogDetail = BattleLogDetail {
-                            player: caller,
+                            player: player,
                             battleLogId: battleLogCounterCount,
                             id: battleLogDetailCounter.count,
                             whoTriggered: curr_item_belongs,
@@ -826,7 +905,7 @@ mod actions {
             };
 
             let battleLog = BattleLog {
-                player: caller,
+                player: player,
                 id: battleLogCounter.count,
                 dummyCharLevel: char.wins,
                 dummyCharId: random_index,
@@ -850,9 +929,9 @@ mod actions {
         }
 
         fn create_dummy(world: IWorldDispatcher) {
-            let caller = get_caller_address();
+            let player = get_caller_address();
 
-            let mut char = get!(world, caller, (Character));
+            let mut char = get!(world, player, (Character));
 
             assert(char.dummied == false, 'dummy already created');
 
@@ -868,33 +947,31 @@ mod actions {
             };
             char.dummied = true;
 
-            let charItemsCounter = get!(world, caller, (CharacterItemsCounter));
-            let mut count = charItemsCounter.count;
+            let inventoryItemCounter = get!(world, player, (CharacterItemsInventoryCounter));
+            let mut count = inventoryItemCounter.count;
 
             loop {
                 if count == 0 {
                     break;
                 }
 
-                let charItem = get!(world, (caller, count), (CharacterItem));
+                let inventoryItem = get!(world, (player, count), (CharacterItemInventory));
 
-                if (charItem.where == 'inventory') {
-                    let mut dummyCharItemsCounter = get!(
-                        world, (char.wins, dummyCharCounter.count), (DummyCharacterItemsCounter)
-                    );
-                    dummyCharItemsCounter.count += 1;
+                let mut dummyCharItemsCounter = get!(
+                    world, (char.wins, dummyCharCounter.count), (DummyCharacterItemsCounter)
+                );
+                dummyCharItemsCounter.count += 1;
 
-                    let dummyCharItem = DummyCharacterItem {
-                        level: char.wins,
-                        dummyCharId: dummyCharCounter.count,
-                        counterId: dummyCharItemsCounter.count,
-                        itemId: charItem.itemId,
-                        position: charItem.position,
-                        rotation: charItem.rotation,
-                    };
+                let dummyCharItem = DummyCharacterItem {
+                    level: char.wins,
+                    dummyCharId: dummyCharCounter.count,
+                    counterId: dummyCharItemsCounter.count,
+                    itemId: inventoryItem.itemId,
+                    position: inventoryItem.position,
+                    rotation: inventoryItem.rotation,
+                };
 
-                    set!(world, (dummyCharItemsCounter, dummyCharItem));
-                }
+                set!(world, (dummyCharItemsCounter, dummyCharItem));
 
                 count -= 1;
             };
@@ -903,9 +980,9 @@ mod actions {
         }
 
         fn rebirth(world: IWorldDispatcher, name: felt252, wmClass: WMClass) {
-            let caller = get_caller_address();
+            let player = get_caller_address();
 
-            let mut char = get!(world, caller, (Character));
+            let mut char = get!(world, player, (Character));
 
             assert(char.loss >= 5, 'loss not reached');
 
@@ -917,23 +994,39 @@ mod actions {
             char.gold = INIT_GOLD + 1;
             char.dummied = false;
 
-            let mut charItemsCounter = get!(world, caller, (CharacterItemsCounter));
-            let mut count = charItemsCounter.count;
+            let mut inventoryItemsCounter = get!(world, player, (CharacterItemsInventoryCounter));
+            let mut count = inventoryItemsCounter.count;
 
             loop {
                 if count == 0 {
                     break;
                 }
 
-                let mut charItemData = get!(world, (caller, count), (CharacterItem));
+                let mut inventoryItem = get!(world, (player, count), (CharacterItemInventory));
 
-                charItemData.itemId = 0;
-                charItemData.where = '';
-                charItemData.position.x = 0;
-                charItemData.position.y = 0;
-                charItemData.rotation = 0;
+                inventoryItem.itemId = 0;
+                inventoryItem.position.x = 0;
+                inventoryItem.position.y = 0;
+                inventoryItem.rotation = 0;
 
-                set!(world, (charItemData));
+                set!(world, (inventoryItem));
+
+                count -= 1;
+            };
+
+            let mut storageItemsCounter = get!(world, player, (CharacterItemsStorageCounter));
+            let mut count = storageItemsCounter.count;
+
+            loop {
+                if count == 0 {
+                    break;
+                }
+
+                let mut storageItem = get!(world, (player, count), (CharacterItemStorage));
+
+                storageItem.itemId = 0;
+
+                set!(world, (storageItem));
 
                 count -= 1;
             };
@@ -950,11 +1043,11 @@ mod actions {
                         break;
                     }
 
-                    let player_backpack_grid_data = get!(world, (caller, i, j), (BackpackGrids));
+                    let player_backpack_grid_data = get!(world, (player, i, j), (BackpackGrids));
 
                     if player_backpack_grid_data.occupied {
                         set!(
-                            world, (BackpackGrids { player: caller, x: i, y: j, occupied: false })
+                            world, (BackpackGrids { player: player, x: i, y: j, occupied: false })
                         );
                     }
                     j += 1;
@@ -964,13 +1057,15 @@ mod actions {
             };
 
             // clear shop
-            let mut shop = get!(world, caller, (Shop));
+            let mut shop = get!(world, player, (Shop));
             shop.item1 = 0;
             shop.item2 = 0;
             shop.item3 = 0;
             shop.item4 = 0;
 
-            set!(world, (char, shop, charItemsCounter));
+            inventoryItemsCounter.count = 0;
+            storageItemsCounter.count = 0;
+            set!(world, (char, shop, inventoryItemsCounter, storageItemsCounter));
         }
     }
 }

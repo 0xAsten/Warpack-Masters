@@ -13,8 +13,7 @@ mod tests {
     use warpack_masters::{
         systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait}},
         models::backpack::{Backpack, backpack, BackpackGrids, Grid, GridTrait},
-        models::Item::{Item, item, ItemsCounter},
-        models::CharacterItem::{CharacterItem, Position, CharacterItemsCounter}
+        models::Item::{Item, item, ItemsCounter}, models::CharacterItem::{Position}
     };
 
     use warpack_masters::systems::actions::actions::ITEMS_COUNTER_ID;
@@ -148,7 +147,7 @@ mod tests {
 
     #[test]
     #[available_gas(3000000000000000)]
-    #[should_panic(expected: ('caller not world owner', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected: ('player not world owner', 'ENTRYPOINT_FAILED'))]
     fn test_add_item_revert_not_world_owner() {
         let alice = starknet::contract_address_const::<0x1337>();
 
@@ -162,7 +161,7 @@ mod tests {
 
         set_contract_address(alice);
 
-        actions_system.add_item('Sword', 1, 3, 100, 10, 10, 5, 10, 5, 5);
+        actions_system.add_item('Sword', 1, 3, 100, 10, 10, 5, 10, 5, 1);
     }
 
     #[test]
@@ -197,7 +196,7 @@ mod tests {
 
     #[test]
     #[available_gas(3000000000000000)]
-    #[should_panic(expected: ('price must be greater than 1', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected: ('price must be greater than 0', 'ENTRYPOINT_FAILED'))]
     fn test_add_item_revert_price_not_valid() {
         let mut models = array![backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH];
 
@@ -207,7 +206,7 @@ mod tests {
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.add_item('Sword', 1, 3, 1, 10, 10, 5, 10, 5, 5);
+        actions_system.add_item('Sword', 1, 3, 0, 10, 10, 5, 10, 5, 1);
     }
 
 
@@ -224,6 +223,22 @@ mod tests {
         let actions_system = IActionsDispatcher { contract_address };
 
         actions_system.add_item('Sword', 1, 3, 100, 10, 10, 5, 10, 5, 5);
+    }
+
+    #[test]
+    #[available_gas(3000000000000000)]
+    #[should_panic(expected: ('item name already exists', 'ENTRYPOINT_FAILED'))]
+    fn test_add_item_with_same_name() {
+        let mut models = array![backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH];
+
+        let world = spawn_test_world(models);
+
+        let contract_address = world
+            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
+        let actions_system = IActionsDispatcher { contract_address };
+
+        actions_system.add_item('Sword', 1, 3, 100, 10, 10, 5, 10, 5, 1);
+        actions_system.add_item('Sword', 1, 3, 100, 10, 10, 5, 10, 5, 1);
     }
 }
 

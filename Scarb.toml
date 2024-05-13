@@ -15,7 +15,7 @@ dojo = { git = "https://github.com/dojoengine/dojo", tag = "v0.6.0" }
 initializer_class_hash = "0xbeef"
 
 [tool.dojo.env]
-rpc_url = "https://api.cartridge.gg/x/warpack-masters-v2/katana"
+rpc_url = "https://api.cartridge.gg/x/warpack-masters-v3/katana"
 account_address = ""
 private_key = ""
 

@@ -12,8 +12,7 @@ mod tests {
     use warpack_masters::{
         systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait}},
         models::backpack::{Backpack, backpack, Grid, GridTrait},
-        models::Item::{Item, item, ItemsCounter},
-        models::CharacterItem::{CharacterItem, Position, CharacterItemsCounter},
+        models::Item::{Item, item, ItemsCounter}, models::CharacterItem::{Position},
         models::Character::{Character, character, WMClass},
     };
 

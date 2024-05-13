@@ -13,8 +13,7 @@ mod tests {
     use warpack_masters::{
         systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait}},
         models::backpack::{Backpack, backpack, BackpackGrids, Grid, GridTrait},
-        models::Item::{Item, item, ItemsCounter},
-        models::CharacterItem::{CharacterItem, Position, CharacterItemsCounter}
+        models::Item::{Item, item, ItemsCounter}, models::CharacterItem::{Position}
     };
 
     use warpack_masters::systems::actions::actions::ITEMS_COUNTER_ID;
@@ -91,7 +90,7 @@ mod tests {
 
     #[test]
     #[available_gas(3000000000000000)]
-    #[should_panic(expected: ('caller not world owner', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected: ('player not world owner', 'ENTRYPOINT_FAILED'))]
     fn test_edit_item_revert_not_world_owner() {
         let alice = starknet::contract_address_const::<0x1337>();
 
@@ -140,7 +139,7 @@ mod tests {
 
     #[test]
     #[available_gas(3000000000000000)]
-    #[should_panic(expected: ('new_price must be > 1', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected: ('new_price must be > 0', 'ENTRYPOINT_FAILED'))]
     fn test_edit_item_revert_price_not_valid() {
         let mut models = array![backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH];
 
@@ -150,7 +149,7 @@ mod tests {
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.edit_item(1, 3, 1);
+        actions_system.edit_item(1, 3, 0);
     }
 
 
