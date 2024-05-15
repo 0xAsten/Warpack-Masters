@@ -6,20 +6,22 @@ struct Item {
     #[key]
     id: usize,
     name: felt252,
+    // 1.Melee 2.Ranged
+    weaponType: u8,
     width: usize,
     height: usize,
     price: usize,
     // Base damage
     damage: usize,
-    // Base armour
-    armor: usize,
     // Accuracy to trigger
     chance: usize,
     // item reuse time
     cooldown: usize,
-    // base heal
-    heal: usize,
     rarity: usize,
+    armor: usize,
+    heal: usize,
+    reflect: usize,
+    poison: usize,
 }
 
 #[derive(Model, Drop, Serde)]

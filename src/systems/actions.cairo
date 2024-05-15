@@ -53,9 +53,7 @@ mod actions {
     use warpack_masters::models::DummyCharacterItem::{
         DummyCharacterItem, DummyCharacterItemsCounter
     };
-    use warpack_masters::models::BattleLog::{
-        BattleLog, BattleLogCounter, BattleLogDetail, BattleLogDetailCounter
-    };
+    use warpack_masters::models::BattleLog::{BattleLog, BattleLogCounter, BattleLogDetail};
 
     const GRID_X: usize = 4;
     const GRID_Y: usize = 3;
@@ -695,11 +693,23 @@ mod actions {
             let char_health_flag: usize = char.health;
             let mut dummy_health: usize = dummyChar.health;
             let dummy_health_flag: usize = dummyChar.health;
-            let mut char_armor: usize = 0;
-            let mut dummy_armor: usize = 0;
 
             let mut char_items_len: usize = 0;
             let mut dummy_items_len: usize = 0;
+
+            // =========  buffs/debuffs ========= 
+            let mut char_armor: usize = 0;
+            let mut dummy_armor: usize = 0;
+
+            let mut char_heal: usize = 0;
+            let mut dummy_heal: usize = 0;
+
+            let mut char_reflect: usize = 0;
+            let mut dummy_reflect: usize = 0;
+
+            let mut char_poison: usize = 0;
+            let mut dummy_poison: usize = 0;
+            // =========  buffs/debuffs =========
 
             // sort items
             let mut items: Felt252Dict<u32> = Default::default();
@@ -716,7 +726,6 @@ mod actions {
                 let charItem = get!(world, (player, inventoryItemCount), (CharacterItemInventory));
                 let item = get!(world, charItem.itemId, (Item));
                 let cooldown = item.cooldown;
-                let armor = item.armor;
                 if cooldown > 0 {
                     items.insert(items_length.into(), charItem.itemId);
                     item_belongs.insert(items_length.into(), 'player');
@@ -724,7 +733,12 @@ mod actions {
                     items_length += 1;
                     char_items_len += 1;
                 } else if cooldown == 0 {
-                    char_armor += armor;
+                    // buff
+                    char_armor += item.armor;
+                    char_heal += item.heal;
+                    char_reflect += item.reflect;
+                    // debuff
+                    dummy_poison += item.poison;
                 }
 
                 inventoryItemCount -= 1;
@@ -750,7 +764,12 @@ mod actions {
                     items_length += 1;
                     dummy_items_len += 1;
                 } else if item.cooldown == 0 {
+                    // buff
                     dummy_armor += item.armor;
+                    dummy_heal += item.heal;
+                    dummy_reflect += item.reflect;
+                    // debuff
+                    char_poison += item.poison;
                 }
 
                 dummy_item_count -= 1;
@@ -796,6 +815,8 @@ mod actions {
             battleLogCounter.count += 1;
             let battleLogCounterCount = battleLogCounter.count;
 
+            let mut battleLogDetailCount = 0;
+
             // battle logic
             let mut turns = 0;
             let mut winner = '';
@@ -814,11 +835,6 @@ mod actions {
                 let mut i: usize = 0;
 
                 loop {
-                    let mut damageCaused: usize = 0;
-                    let mut selfHeal: usize = 0;
-                    let mut isDodged: bool = false;
-                    let mut healFailed: bool = false;
-
                     if i == items_length {
                         break;
                     }
@@ -829,7 +845,6 @@ mod actions {
                     let curr_item_data = get!(world, curr_item_index, (Item));
                     let damage = curr_item_data.damage;
                     let chance = curr_item_data.chance;
-                    let heal = curr_item_data.heal;
                     let cooldown = curr_item_data.cooldown;
 
                     // each turn is treated as 1 unit of cooldown 
@@ -837,67 +852,216 @@ mod actions {
                         let rand = random(seed2 + turns.into() + i.into(), 100);
                         if rand < chance {
                             if curr_item_belongs == 'player' {
-                                if heal > 0 {
-                                    char_health += heal;
-                                    if char_health > char_health_flag {
-                                        char_health = char_health_flag;
-                                    }
-                                    selfHeal = heal;
-                                }
-                                if damage > 0 && damage > dummy_armor {
-                                    damageCaused = damage - dummy_armor;
+                                if damage > 0 && damage >= dummy_armor {
+                                    let damageCaused = damage - dummy_armor;
+
+                                    battleLogDetailCount += 1;
+                                    let battleLogDetail = BattleLogDetail {
+                                        player: player,
+                                        battleLogId: battleLogCounterCount,
+                                        id: battleLogDetailCount,
+                                        whoTriggered: curr_item_belongs,
+                                        whichItem: curr_item_index,
+                                        damageCaused: damageCaused,
+                                        isDodged: false,
+                                        buffType: 0,
+                                        heal: 0,
+                                    };
+                                    set!(world, (battleLogDetail));
+
                                     if dummy_health <= damageCaused {
                                         winner = 'player';
                                         break;
                                     }
-
                                     dummy_health -= damageCaused;
                                 }
-                            } else {
-                                if heal > 0 {
-                                    dummy_health += heal;
-                                    if dummy_health > dummy_health_flag {
-                                        dummy_health = dummy_health_flag;
+                                // Reflect: Deals 1 damage per stack when hit with a Melee weapon (up to 100% of the damage).
+                                if item.weaponType == 1 && dummy_reflect > 0 {
+                                    let mut damageCaused = dummy_reflect;
+                                    if damageCaused > damage {
+                                        damageCaused = damage;
                                     }
-                                    selfHeal = heal;
-                                }
-                                if damage > 0 && damage > char_armor {
-                                    damageCaused = damage - char_armor;
+
+                                    battleLogDetailCount += 1;
+                                    let battleLogDetail = BattleLogDetail {
+                                        player: player,
+                                        battleLogId: battleLogCounterCount,
+                                        id: battleLogDetailCount,
+                                        whoTriggered: 'dummy',
+                                        whichItem: 0,
+                                        damageCaused: damageCaused,
+                                        isDodged: false,
+                                        buffType: 'reflect',
+                                        heal: 0,
+                                    };
+                                    set!(world, (battleLogDetail));
+
                                     if char_health <= damageCaused {
                                         winner = 'dummy';
                                         break;
                                     }
-
                                     char_health -= damageCaused;
+                                }
+                            } else {
+                                if damage > 0 && damage >= char_armor {
+                                    let damageCaused = damage - char_armor;
+
+                                    battleLogDetailCount += 1;
+                                    let battleLogDetail = BattleLogDetail {
+                                        player: player,
+                                        battleLogId: battleLogCounterCount,
+                                        id: battleLogDetailCount,
+                                        whoTriggered: curr_item_belongs,
+                                        whichItem: curr_item_index,
+                                        damageCaused: damageCaused,
+                                        isDodged: false,
+                                        buffType: 0,
+                                        heal: 0,
+                                    };
+                                    set!(world, (battleLogDetail));
+
+                                    if char_health <= damageCaused {
+                                        winner = 'dummy';
+                                        break;
+                                    }
+                                    char_health -= damageCaused;
+                                }
+
+                                // Reflect: Deals 1 damage per stack when hit with a Melee weapon (up to 100% of the damage).
+                                if item.weaponType == 1 && char_reflect > 0 {
+                                    let mut damageCaused = char_reflect;
+                                    if damageCaused > damage {
+                                        damageCaused = damage;
+                                    }
+
+                                    battleLogDetailCount += 1;
+                                    let battleLogDetail = BattleLogDetail {
+                                        player: player,
+                                        battleLogId: battleLogCounterCount,
+                                        id: battleLogDetailCount,
+                                        whoTriggered: 'player',
+                                        whichItem: 0,
+                                        damageCaused: damageCaused,
+                                        isDodged: false,
+                                        buffType: 'reflect',
+                                        heal: 0,
+                                    };
+                                    set!(world, (battleLogDetail));
+
+                                    if dummy_health <= damageCaused {
+                                        winner = 'player';
+                                        break;
+                                    }
+                                    dummy_health -= damageCaused;
                                 }
                             }
                         } else if rand >= chance && damage > 0 {
-                            isDodged = true;
-                        } else if rand >= chance && heal > 0 {
-                            healFailed = true;
+                            battleLogDetailCount += 1;
+                            let battleLogDetail = BattleLogDetail {
+                                player: player,
+                                battleLogId: battleLogCounterCount,
+                                id: battleLogDetailCount,
+                                whoTriggered: curr_item_belongs,
+                                whichItem: curr_item_index,
+                                damageCaused: 0,
+                                isDodged: true,
+                                buffType: 0,
+                                heal: 0,
+                            };
+                            set!(world, (battleLogDetail));
                         }
-
-                        let mut battleLogDetailCounter = get!(
-                            world, (player, battleLogCounterCount), (BattleLogDetailCounter)
-                        );
-                        battleLogDetailCounter.count += 1;
-                        let battleLogDetail = BattleLogDetail {
-                            player: player,
-                            battleLogId: battleLogCounterCount,
-                            id: battleLogDetailCounter.count,
-                            whoTriggered: curr_item_belongs,
-                            whichItem: curr_item_index,
-                            damageCaused: damageCaused,
-                            selfHeal: selfHeal,
-                            isDodged: isDodged,
-                            healFailed: healFailed,
-                        };
-
-                        set!(world, (battleLogDetailCounter, battleLogDetail));
                     }
 
                     i += 1;
                 };
+
+                // buff/debuffs
+                // Poison: Deals 1 damage per stack every 2 seconds.
+                // Heal: Regenerate 1 health per stack every 2 seconds.
+                if turns % 2 == 0 {
+                    if char_poison > 0 {
+                        if char_health <= char_poison {
+                            winner = 'dummy';
+                            break;
+                        }
+                        char_health -= char_poison;
+
+                        battleLogDetailCount += 1;
+                        let battleLogDetail = BattleLogDetail {
+                            player: player,
+                            battleLogId: battleLogCounterCount,
+                            id: battleLogDetailCount,
+                            whoTriggered: 'dummy',
+                            whichItem: 0,
+                            damageCaused: char_poison,
+                            isDodged: false,
+                            buffType: 'poison',
+                            heal: 0,
+                        };
+                        set!(world, (battleLogDetail));
+                    }
+                    if dummy_poison > 0 {
+                        if dummy_health <= dummy_poison {
+                            winner = 'player';
+                            break;
+                        }
+                        dummy_health -= dummy_poison;
+
+                        battleLogDetailCount += 1;
+                        let battleLogDetail = BattleLogDetail {
+                            player: player,
+                            battleLogId: battleLogCounterCount,
+                            id: battleLogDetailCount,
+                            whoTriggered: 'player',
+                            whichItem: 0,
+                            damageCaused: dummy_poison,
+                            isDodged: false,
+                            buffType: 'poison',
+                            heal: 0,
+                        };
+                        set!(world, (battleLogDetail));
+                    }
+                    if char_heal > 0 {
+                        char_health += char_heal;
+                        if char_health > char_health_flag {
+                            char_health = char_health_flag;
+                        }
+
+                        battleLogDetailCount += 1;
+                        let battleLogDetail = BattleLogDetail {
+                            player: player,
+                            battleLogId: battleLogCounterCount,
+                            id: battleLogDetailCount,
+                            whoTriggered: 'player',
+                            whichItem: 0,
+                            damageCaused: 0,
+                            isDodged: false,
+                            buffType: 'heal',
+                            heal: char_heal,
+                        };
+                        set!(world, (battleLogDetail));
+                    }
+                    if dummy_heal > 0 {
+                        dummy_health += dummy_heal;
+                        if dummy_health > dummy_health_flag {
+                            dummy_health = dummy_health_flag;
+                        }
+
+                        battleLogDetailCount += 1;
+                        let battleLogDetail = BattleLogDetail {
+                            player: player,
+                            battleLogId: battleLogCounterCount,
+                            id: battleLogDetailCount,
+                            whoTriggered: 'dummy',
+                            whichItem: 0,
+                            damageCaused: 0,
+                            isDodged: false,
+                            buffType: 'heal',
+                            heal: dummy_heal,
+                        };
+                        set!(world, (battleLogDetail));
+                    }
+                }
 
                 if winner != '' {
                     break;

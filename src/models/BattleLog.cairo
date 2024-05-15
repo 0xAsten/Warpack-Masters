@@ -32,16 +32,8 @@ struct BattleLogDetail {
     whoTriggered: felt252,
     whichItem: usize,
     damageCaused: usize,
-    selfHeal: usize,
     isDodged: bool,
-    healFailed: bool,
-}
-
-#[derive(Model, Drop, Serde)]
-struct BattleLogDetailCounter {
-    #[key]
-    player: ContractAddress,
-    #[key]
-    battleLogId: usize,
-    count: usize,
+    // heal / reflect / poison
+    buffType: felt252,
+    heal: usize,
 }
