@@ -15,9 +15,9 @@ trait IActions {
         damage: usize,
         armor: usize,
         chance: usize,
-        cooldown: usize,
+        cooldown: u8,
         heal: usize,
-        rarity: usize,
+        rarity: u8,
     );
     fn edit_item(item_id: u32, item_key: felt252, item_value: felt252);
     fn buy_item(item_id: u32);
@@ -64,6 +64,11 @@ mod actions {
 
     const STORAGE_FLAG: usize = 999;
 
+    const EFFECT_ARMOR = 'armor';
+    const EFFECT_REGEN = 'regen';
+    const EFFECT_REFLECT = 'reflect';
+    const EFFECT_POISON = 'poison';
+
     #[abi(embed_v0)]
     impl ActionsImpl of IActions<ContractState> {
         fn spawn(world: IWorldDispatcher, name: felt252, wmClass: WMClass) {
@@ -98,9 +103,9 @@ mod actions {
             damage: usize,
             armor: usize,
             chance: usize,
-            cooldown: usize,
+            cooldown: u8,
             heal: usize,
-            rarity: usize,
+            rarity: u8,
         ) {
             let player = get_caller_address();
 
@@ -818,12 +823,12 @@ mod actions {
             let mut battleLogDetailCount = 0;
 
             // battle logic
-            let mut turns = 0;
+            let mut seconds = 0;
             let mut winner = '';
 
             loop {
-                turns += 1;
-                if turns >= 25_usize {
+                seconds += 1;
+                if seconds >= 25_u8 {
                     if char_health <= dummy_health {
                         winner = 'dummy';
                     } else {
@@ -848,8 +853,8 @@ mod actions {
                     let cooldown = curr_item_data.cooldown;
 
                     // each turn is treated as 1 unit of cooldown 
-                    if turns % cooldown == 0 {
-                        let rand = random(seed2 + turns.into() + i.into(), 100);
+                    if seconds % cooldown == 0 {
+                        let rand = random(seed2 + seconds.into() + i.into(), 100);
                         if rand < chance {
                             if curr_item_belongs == 'player' {
                                 if damage > 0 && damage >= dummy_armor {
@@ -891,7 +896,7 @@ mod actions {
                                         whichItem: 0,
                                         damageCaused: damageCaused,
                                         isDodged: false,
-                                        buffType: 'reflect',
+                                        buffType: EFFECT_REFLECT,
                                         heal: 0,
                                     };
                                     set!(world, (battleLogDetail));
@@ -943,7 +948,7 @@ mod actions {
                                         whichItem: 0,
                                         damageCaused: damageCaused,
                                         isDodged: false,
-                                        buffType: 'reflect',
+                                        buffType: EFFECT_REFLECT,
                                         heal: 0,
                                     };
                                     set!(world, (battleLogDetail));
@@ -978,7 +983,7 @@ mod actions {
                 // buff/debuffs
                 // Poison: Deals 1 damage per stack every 2 seconds.
                 // Heal: Regenerate 1 health per stack every 2 seconds.
-                if turns % 2 == 0 {
+                if seconds % 2 == 0 {
                     if char_poison > 0 {
                         if char_health <= char_poison {
                             winner = 'dummy';
@@ -995,7 +1000,7 @@ mod actions {
                             whichItem: 0,
                             damageCaused: char_poison,
                             isDodged: false,
-                            buffType: 'poison',
+                            buffType: EFFECT_POISON,
                             heal: 0,
                         };
                         set!(world, (battleLogDetail));
@@ -1016,7 +1021,7 @@ mod actions {
                             whichItem: 0,
                             damageCaused: dummy_poison,
                             isDodged: false,
-                            buffType: 'poison',
+                            buffType: EFFECT_POISON,
                             heal: 0,
                         };
                         set!(world, (battleLogDetail));
@@ -1036,7 +1041,7 @@ mod actions {
                             whichItem: 0,
                             damageCaused: 0,
                             isDodged: false,
-                            buffType: 'heal',
+                            buffType: EFFECT_REGEN,
                             heal: char_heal,
                         };
                         set!(world, (battleLogDetail));
@@ -1056,7 +1061,7 @@ mod actions {
                             whichItem: 0,
                             damageCaused: 0,
                             isDodged: false,
-                            buffType: 'heal',
+                            buffType: EFFECT_REGEN,
                             heal: dummy_heal,
                         };
                         set!(world, (battleLogDetail));
