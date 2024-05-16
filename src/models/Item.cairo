@@ -6,8 +6,8 @@ struct Item {
     #[key]
     id: usize,
     name: felt252,
-    // 1.Melee 2.Ranged
-    weaponType: u8,
+    // 1 - Melee Weapon, 2 - Ranged Weapon, 3 - Gear
+    itemType: u8,
     width: usize,
     height: usize,
     price: usize,
@@ -19,7 +19,7 @@ struct Item {
     cooldown: u8,
     rarity: u8,
     // Effects
-    // activation 0 - passive, 1 - on start, 2 - on hit
+    // activation 0 - passive, 1 - on start, 2 - on hit, 3 - on cooldown
     armor: usize,
     armorActivation: u8,
     regen: usize,

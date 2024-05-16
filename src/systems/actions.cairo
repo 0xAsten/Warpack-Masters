@@ -706,8 +706,8 @@ mod actions {
             let mut char_armor: usize = 0;
             let mut dummy_armor: usize = 0;
 
-            let mut char_heal: usize = 0;
-            let mut dummy_heal: usize = 0;
+            let mut char_regen: usize = 0;
+            let mut dummy_regen: usize = 0;
 
             let mut char_reflect: usize = 0;
             let mut dummy_reflect: usize = 0;
@@ -739,11 +739,19 @@ mod actions {
                     char_items_len += 1;
                 } else if cooldown == 0 {
                     // buff
-                    char_armor += item.armor;
-                    char_heal += item.heal;
-                    char_reflect += item.reflect;
+                    if item.armorActivation == 1 {
+                        char_armor += item.armor;
+                    }
+                    if item.regenActivation == 1 {
+                        char_regen += item.regen;
+                    }
+                    if item.reflectActivation == 1 {
+                        char_reflect += item.reflect;
+                    }
                     // debuff
-                    dummy_poison += item.poison;
+                    if item.poisonActivation == 1 {
+                        dummy_poison += item.poison;
+                    }
                 }
 
                 inventoryItemCount -= 1;
@@ -770,11 +778,19 @@ mod actions {
                     dummy_items_len += 1;
                 } else if item.cooldown == 0 {
                     // buff
-                    dummy_armor += item.armor;
-                    dummy_heal += item.heal;
-                    dummy_reflect += item.reflect;
+                    if item.armorActivation == 1 {
+                        dummy_armor += item.armor;
+                    }
+                    if item.regenActivation == 1 {
+                        dummy_regen += item.regen;
+                    }
+                    if item.reflectActivation == 1 {
+                        dummy_reflect += item.reflect;
+                    }
                     // debuff
-                    char_poison += item.poison;
+                    if item.poisonActivation == 1 {
+                        char_poison += item.poison;
+                    }
                 }
 
                 dummy_item_count -= 1;
@@ -852,7 +868,7 @@ mod actions {
                     let chance = curr_item_data.chance;
                     let cooldown = curr_item_data.cooldown;
 
-                    // each turn is treated as 1 unit of cooldown 
+                    // each second is treated as 1 unit of cooldown 
                     if seconds % cooldown == 0 {
                         let rand = random(seed2 + seconds.into() + i.into(), 100);
                         if rand < chance {
@@ -881,7 +897,7 @@ mod actions {
                                     dummy_health -= damageCaused;
                                 }
                                 // Reflect: Deals 1 damage per stack when hit with a Melee weapon (up to 100% of the damage).
-                                if item.weaponType == 1 && dummy_reflect > 0 {
+                                if item.itemType == 1 && dummy_reflect > 0 {
                                     let mut damageCaused = dummy_reflect;
                                     if damageCaused > damage {
                                         damageCaused = damage;
@@ -933,7 +949,7 @@ mod actions {
                                 }
 
                                 // Reflect: Deals 1 damage per stack when hit with a Melee weapon (up to 100% of the damage).
-                                if item.weaponType == 1 && char_reflect > 0 {
+                                if item.itemType == 1 && char_reflect > 0 {
                                     let mut damageCaused = char_reflect;
                                     if damageCaused > damage {
                                         damageCaused = damage;
