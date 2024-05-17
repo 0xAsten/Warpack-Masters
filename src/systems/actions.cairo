@@ -1148,17 +1148,10 @@ mod actions {
                     i += 1;
                 };
 
-                // buff/debuffs
-                // Poison: Deals 1 damage per stack every 2 seconds.
-                // Heal: Regenerate 1 health per stack every 2 seconds.
+                // ====== Poison effect: Deals 1 damage per stack every 2 seconds. ======
+                // ====== Heal effect: Regenerate 1 health per stack every 2 seconds. ======
                 if seconds % 2 == 0 {
                     if char_poison > 0 {
-                        if char_health <= char_poison {
-                            winner = 'dummy';
-                            break;
-                        }
-                        char_health -= char_poison;
-
                         battleLogDetailCount += 1;
                         let battleLogDetail = BattleLogDetail {
                             player: player,
@@ -1169,17 +1162,21 @@ mod actions {
                             damageCaused: char_poison,
                             isDodged: false,
                             buffType: EFFECT_POISON,
-                            heal: 0,
+                            regenHP: 0,
+                            armor_stacks: dummy_armor,
+                            regen_stacks: dummy_regen,
+                            reflect_stacks: dummy_reflect,
+                            poison_stacks: dummy_poison,
                         };
                         set!(world, (battleLogDetail));
-                    }
-                    if dummy_poison > 0 {
-                        if dummy_health <= dummy_poison {
-                            winner = 'player';
+
+                        if char_health <= char_poison {
+                            winner = 'dummy';
                             break;
                         }
-                        dummy_health -= dummy_poison;
-
+                        char_health -= char_poison;
+                    }
+                    if dummy_poison > 0 {
                         battleLogDetailCount += 1;
                         let battleLogDetail = BattleLogDetail {
                             player: player,
@@ -1190,16 +1187,21 @@ mod actions {
                             damageCaused: dummy_poison,
                             isDodged: false,
                             buffType: EFFECT_POISON,
-                            heal: 0,
+                            regenHP: 0,
+                            armor_stacks: char_armor,
+                            regen_stacks: char_regen,
+                            reflect_stacks: char_reflect,
+                            poison_stacks: char_poison,
                         };
                         set!(world, (battleLogDetail));
+
+                        if dummy_health <= dummy_poison {
+                            winner = 'player';
+                            break;
+                        }
+                        dummy_health -= dummy_poison;
                     }
                     if char_heal > 0 {
-                        char_health += char_heal;
-                        if char_health > char_health_flag {
-                            char_health = char_health_flag;
-                        }
-
                         battleLogDetailCount += 1;
                         let battleLogDetail = BattleLogDetail {
                             player: player,
@@ -1210,16 +1212,20 @@ mod actions {
                             damageCaused: 0,
                             isDodged: false,
                             buffType: EFFECT_REGEN,
-                            heal: char_heal,
+                            regenHP: char_heal,
+                            armor_stacks: char_armor,
+                            regen_stacks: char_regen,
+                            reflect_stacks: char_reflect,
+                            poison_stacks: char_poison,
                         };
                         set!(world, (battleLogDetail));
-                    }
-                    if dummy_heal > 0 {
-                        dummy_health += dummy_heal;
-                        if dummy_health > dummy_health_flag {
-                            dummy_health = dummy_health_flag;
-                        }
 
+                        char_health += char_heal;
+                        if char_health > char_health_flag {
+                            char_health = char_health_flag;
+                        }
+                    }
+                    if dummy_heal > 0 {        
                         battleLogDetailCount += 1;
                         let battleLogDetail = BattleLogDetail {
                             player: player,
@@ -1230,11 +1236,21 @@ mod actions {
                             damageCaused: 0,
                             isDodged: false,
                             buffType: EFFECT_REGEN,
-                            heal: dummy_heal,
+                            regenHP: dummy_heal,
+                            armor_stacks: dummy_armor,
+                            regen_stacks: dummy_regen,
+                            reflect_stacks: dummy_reflect,
+                            poison_stacks: dummy_poison,
                         };
                         set!(world, (battleLogDetail));
+
+                        dummy_health += dummy_heal;
+                        if dummy_health > dummy_health_flag {
+                            dummy_health = dummy_health_flag;
+                        }
                     }
                 }
+                // ====== end ======
 
                 if winner != '' {
                     break;
