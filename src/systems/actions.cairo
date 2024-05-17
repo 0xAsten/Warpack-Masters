@@ -952,8 +952,8 @@ mod actions {
                                     // ====== end ======
 
                                     // ====== Armor: used to absorb damage ======
+                                    let mut damageCaused = 0;
                                     if damage <= dummy_armor {
-                                        damageCaused = 0;
                                         dummy_armor -= damage;
                                     } else {
                                         damageCaused = damage - dummy_armor;
@@ -970,6 +970,7 @@ mod actions {
                                         whichItem: curr_item_index,
                                         damageCaused: damageCaused,
                                         isDodged: false,
+                                        buffType: EFFECT_ARMOR,
                                         regenHP: 0,
                                         armor_stacks: char_armor,
                                         regen_stacks: char_regen,
@@ -983,34 +984,39 @@ mod actions {
                                         break;
                                     }
                                     dummy_health -= damageCaused;
-                                }
 
-                                // Reflect: Deals 1 damage per stack when hit with a Melee weapon (up to 100% of the damage).
-                                if item.itemType == 1 && dummy_reflect > 0 {
-                                    let mut damageCaused = dummy_reflect;
-                                    if damageCaused > damage {
-                                        damageCaused = damage;
+                                    // ====== Reflect effect: Deals 1 damage per stack when hit with a Melee weapon (up to 100% of the damage). ======
+                                    if item.itemType == 1 && dummy_reflect > 0 {
+                                        damageCaused = dummy_reflect;
+                                        if damageCaused > damage {
+                                            damageCaused = damage;
+                                        }
+
+                                        battleLogDetailCount += 1;
+                                        let battleLogDetail = BattleLogDetail {
+                                            player: player,
+                                            battleLogId: battleLogCounterCount,
+                                            id: battleLogDetailCount,
+                                            whoTriggered: 'dummy',
+                                            whichItem: 0,
+                                            damageCaused: damageCaused,
+                                            isDodged: false,
+                                            buffType: EFFECT_REFLECT,
+                                            regenHP: 0,
+                                            armor_stacks: dummy_armor,
+                                            regen_stacks: dummy_regen,
+                                            reflect_stacks: dummy_reflect,
+                                            poison_stacks: dummy_poison,
+                                        };
+                                        set!(world, (battleLogDetail));
+
+                                        if char_health <= damageCaused {
+                                            winner = 'dummy';
+                                            break;
+                                        }
+                                        char_health -= damageCaused;
                                     }
-
-                                    battleLogDetailCount += 1;
-                                    let battleLogDetail = BattleLogDetail {
-                                        player: player,
-                                        battleLogId: battleLogCounterCount,
-                                        id: battleLogDetailCount,
-                                        whoTriggered: 'dummy',
-                                        whichItem: 0,
-                                        damageCaused: damageCaused,
-                                        isDodged: false,
-                                        buffType: EFFECT_REFLECT,
-                                        heal: 0,
-                                    };
-                                    set!(world, (battleLogDetail));
-
-                                    if char_health <= damageCaused {
-                                        winner = 'dummy';
-                                        break;
-                                    }
-                                    char_health -= damageCaused;
+                                    // ====== end ======
                                 }
                             } else {
                                 // ====== on cooldown to plus stacks, all use the same randomness ======
@@ -1055,8 +1061,8 @@ mod actions {
                                     // ====== end ======
 
                                     // ====== Armor: used to absorb damage ======
+                                    let mut damageCaused = 0;
                                     if damage <= char_armor {
-                                        damageCaused = 0;
                                         char_armor -= damage;
                                     } else {
                                         damageCaused = damage - char_armor;
@@ -1073,6 +1079,7 @@ mod actions {
                                         whichItem: curr_item_index,
                                         damageCaused: damageCaused,
                                         isDodged: false,
+                                        buffType: EFFECT_ARMOR,
                                         regenHP: 0,
                                         armor_stacks: dummy_armor,
                                         regen_stacks: dummy_regen,
@@ -1086,34 +1093,39 @@ mod actions {
                                         break;
                                     }
                                     char_health -= damageCaused;
-                                }
 
-                                // Reflect: Deals 1 damage per stack when hit with a Melee weapon (up to 100% of the damage).
-                                if item.itemType == 1 && char_reflect > 0 {
-                                    let mut damageCaused = char_reflect;
-                                    if damageCaused > damage {
-                                        damageCaused = damage;
+                                    // ====== Reflect effect: Deals 1 damage per stack when hit with a Melee weapon (up to 100% of the damage). ======
+                                    if item.itemType == 1 && char_reflect > 0 {
+                                        damageCaused = char_reflect;
+                                        if damageCaused > damage {
+                                            damageCaused = damage;
+                                        }
+
+                                        battleLogDetailCount += 1;
+                                        let battleLogDetail = BattleLogDetail {
+                                            player: player,
+                                            battleLogId: battleLogCounterCount,
+                                            id: battleLogDetailCount,
+                                            whoTriggered: 'player',
+                                            whichItem: 0,
+                                            damageCaused: damageCaused,
+                                            isDodged: false,
+                                            buffType: EFFECT_REFLECT,
+                                            regenHP: 0,
+                                            armor_stacks: char_armor,
+                                            regen_stacks: char_regen,
+                                            reflect_stacks: char_reflect,
+                                            poison_stacks: char_poison,
+                                        };
+                                        set!(world, (battleLogDetail));
+
+                                        if dummy_health <= damageCaused {
+                                            winner = 'player';
+                                            break;
+                                        }
+                                        dummy_health -= damageCaused;
                                     }
-
-                                    battleLogDetailCount += 1;
-                                    let battleLogDetail = BattleLogDetail {
-                                        player: player,
-                                        battleLogId: battleLogCounterCount,
-                                        id: battleLogDetailCount,
-                                        whoTriggered: 'player',
-                                        whichItem: 0,
-                                        damageCaused: damageCaused,
-                                        isDodged: false,
-                                        buffType: EFFECT_REFLECT,
-                                        heal: 0,
-                                    };
-                                    set!(world, (battleLogDetail));
-
-                                    if dummy_health <= damageCaused {
-                                        winner = 'player';
-                                        break;
-                                    }
-                                    dummy_health -= damageCaused;
+                                    // ====== end ======
                                 }
                             }
                         } else if rand >= chance && damage > 0 {

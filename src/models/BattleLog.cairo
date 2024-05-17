@@ -33,6 +33,7 @@ struct BattleLogDetail {
     whichItem: usize,
     damageCaused: usize,
     isDodged: bool,
+    buffType: felt252,
     regenHP: usize,
     armor_stacks: usize,
     regen_stacks: usize,
