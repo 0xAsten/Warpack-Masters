@@ -1357,6 +1357,7 @@ mod actions {
                 }
             } else {
                 char.loss += 1;
+                char.gold += 5;
             }
             set!(world, (char));
         }
