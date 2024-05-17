@@ -702,7 +702,7 @@ mod actions {
             let mut char_items_len: usize = 0;
             let mut dummy_items_len: usize = 0;
 
-            // =========  buffs/debuffs ========= 
+            // =========  buffs/debuffs stacks ========= 
             let mut char_armor: usize = 0;
             let mut dummy_armor: usize = 0;
 
@@ -714,7 +714,10 @@ mod actions {
 
             let mut char_poison: usize = 0;
             let mut dummy_poison: usize = 0;
-            // =========  buffs/debuffs =========
+
+            let mut char_on_hit_items = ArrayTrait::new();
+            let mut dummy_on_hit_items = ArrayTrait::new();
+            // =========  end =========
 
             // sort items
             let mut items: Felt252Dict<u32> = Default::default();
@@ -738,6 +741,7 @@ mod actions {
                     items_length += 1;
                     char_items_len += 1;
                 } else if cooldown == 0 {
+                    // ====== on start to plus stacks, 100% chance ======
                     // buff
                     if item.armorActivation == 1 {
                         char_armor += item.armor;
@@ -752,7 +756,23 @@ mod actions {
                     if item.poisonActivation == 1 {
                         dummy_poison += item.poison;
                     }
+                    // ====== end ======
                 }
+
+                // ====== on hit to plus stacks ======
+                if item.armorActivation == 2 {
+                    char_on_hit_items.append((EFFECT_ARMOR, item.chance, item.armor));
+                }
+                if item.regenActivation == 2 {
+                    char_on_hit_items.append((EFFECT_REGEN, item.chance, item.regen));
+                }
+                if item.reflectActivation == 2 {
+                    char_on_hit_items.append((EFFECT_REFLECT, item.chance, item.reflect));
+                }
+                if item.poisonActivation == 2 {
+                    char_on_hit_items.append((EFFECT_POISON, item.chance, item.poison));
+                }
+                // ====== end ======
 
                 inventoryItemCount -= 1;
             };
@@ -777,6 +797,7 @@ mod actions {
                     items_length += 1;
                     dummy_items_len += 1;
                 } else if item.cooldown == 0 {
+                    // ====== on start to plus stacks, 100% chance ======
                     // buff
                     if item.armorActivation == 1 {
                         dummy_armor += item.armor;
@@ -791,7 +812,23 @@ mod actions {
                     if item.poisonActivation == 1 {
                         char_poison += item.poison;
                     }
+                    // ====== end ======
                 }
+
+                // ====== on hit to plus stacks ======
+                if item.armorActivation == 2 {
+                    dummy_on_hit_items.append((EFFECT_ARMOR, item.chance, item.armor));
+                }
+                if item.regenActivation == 2 {
+                    dummy_on_hit_items.append((EFFECT_REGEN, item.chance, item.regen));
+                }
+                if item.reflectActivation == 2 {
+                    dummy_on_hit_items.append((EFFECT_REFLECT, item.chance, item.reflect));
+                }
+                if item.poisonActivation == 2 {
+                    dummy_on_hit_items.append((EFFECT_POISON, item.chance, item.poison));
+                }
+                // ====== end ======
 
                 dummy_item_count -= 1;
             };
@@ -873,8 +910,56 @@ mod actions {
                         let rand = random(seed2 + seconds.into() + i.into(), 100);
                         if rand < chance {
                             if curr_item_belongs == 'player' {
-                                if damage > 0 && damage >= dummy_armor {
-                                    let damageCaused = damage - dummy_armor;
+                                // ====== on cooldown to plus stacks, all use the same randomness ======
+                                if item.armorActivation == 3 {
+                                    char_armor += item.armor;
+                                }
+                                if item.regenActivation == 3 {
+                                    char_regen += item.regen;
+                                }
+                                if item.reflectActivation == 3 {
+                                    char_reflect += item.reflect;
+                                }
+                                if item.poisonActivation == 3 {
+                                    dummy_poison += item.poison;
+                                }
+                                // ====== end ======
+
+                                if damage > 0 {
+                                    // ====== dummy get hit, to plus stacks ======
+                                    let mut on_hit_items_len = dummy_on_hit_items.len();
+                                    loop {
+                                        if on_hit_items_len == 0 {
+                                            break;
+                                        }
+
+                                        let (on_hit_item_type, on_hit_item_chance, on_hit_item_stack) = *dummy_on_hit_items.at(on_hit_items_len - 1);
+
+                                        if rand < on_hit_item_chance {
+                                            if on_hit_item_type == EFFECT_ARMOR {
+                                                dummy_armor += on_hit_item_stack;
+                                            } else if on_hit_item_type == EFFECT_REGEN {
+                                                dummy_regen += on_hit_item_stack;
+                                            } else if on_hit_item_type == EFFECT_REFLECT {
+                                                dummy_reflect += on_hit_item_stack;
+                                            } else if on_hit_item_type == EFFECT_POISON {
+                                                char_poison += on_hit_item_stack;
+                                            }
+                                        }
+
+                                        on_hit_items_len -= 1;
+                                    }
+                                    // ====== end ======
+
+                                    // ====== Armor: used to absorb damage ======
+                                    if damage <= dummy_armor {
+                                        damageCaused = 0;
+                                        dummy_armor -= damage;
+                                    } else {
+                                        damageCaused = damage - dummy_armor;
+                                        dummy_armor = 0;
+                                    }
+                                    // ====== end ======
 
                                     battleLogDetailCount += 1;
                                     let battleLogDetail = BattleLogDetail {
@@ -885,8 +970,11 @@ mod actions {
                                         whichItem: curr_item_index,
                                         damageCaused: damageCaused,
                                         isDodged: false,
-                                        buffType: 0,
-                                        heal: 0,
+                                        regenHP: 0,
+                                        armor_stacks: char_armor,
+                                        regen_stacks: char_regen,
+                                        reflect_stacks: char_reflect,
+                                        poison_stacks: char_poison,
                                     };
                                     set!(world, (battleLogDetail));
 
@@ -896,6 +984,7 @@ mod actions {
                                     }
                                     dummy_health -= damageCaused;
                                 }
+
                                 // Reflect: Deals 1 damage per stack when hit with a Melee weapon (up to 100% of the damage).
                                 if item.itemType == 1 && dummy_reflect > 0 {
                                     let mut damageCaused = dummy_reflect;
@@ -924,8 +1013,56 @@ mod actions {
                                     char_health -= damageCaused;
                                 }
                             } else {
-                                if damage > 0 && damage >= char_armor {
-                                    let damageCaused = damage - char_armor;
+                                // ====== on cooldown to plus stacks, all use the same randomness ======
+                                if item.armorActivation == 3 {
+                                    dummy_armor += item.armor;
+                                }
+                                if item.regenActivation == 3 {
+                                    dummy_regen += item.regen;
+                                }
+                                if item.reflectActivation == 3 {
+                                    dummy_reflect += item.reflect;
+                                }
+                                if item.poisonActivation == 3 {
+                                    char_poison += item.poison;
+                                }
+                                // ====== end ======
+
+                                if damage > 0 {
+                                    // ====== dummy get hit, to plus stacks ======
+                                    let mut on_hit_items_len = char_on_hit_items.len();
+                                    loop {
+                                        if on_hit_items_len == 0 {
+                                            break;
+                                        }
+
+                                        let (on_hit_item_type, on_hit_item_chance, on_hit_item_stack) = *char_on_hit_items.at(on_hit_items_len - 1);
+
+                                        if rand < on_hit_item_chance {
+                                            if on_hit_item_type == EFFECT_ARMOR {
+                                                char_armor += on_hit_item_stack;
+                                            } else if on_hit_item_type == EFFECT_REGEN {
+                                                char_regen += on_hit_item_stack;
+                                            } else if on_hit_item_type == EFFECT_REFLECT {
+                                                char_reflect += on_hit_item_stack;
+                                            } else if on_hit_item_type == EFFECT_POISON {
+                                                dummy_poison += on_hit_item_stack;
+                                            }
+                                        }
+
+                                        on_hit_items_len -= 1;
+                                    }
+                                    // ====== end ======
+
+                                    // ====== Armor: used to absorb damage ======
+                                    if damage <= char_armor {
+                                        damageCaused = 0;
+                                        char_armor -= damage;
+                                    } else {
+                                        damageCaused = damage - char_armor;
+                                        char_armor = 0;
+                                    }
+                                    // ====== end ======
 
                                     battleLogDetailCount += 1;
                                     let battleLogDetail = BattleLogDetail {
@@ -936,8 +1073,11 @@ mod actions {
                                         whichItem: curr_item_index,
                                         damageCaused: damageCaused,
                                         isDodged: false,
-                                        buffType: 0,
-                                        heal: 0,
+                                        regenHP: 0,
+                                        armor_stacks: dummy_armor,
+                                        regen_stacks: dummy_regen,
+                                        reflect_stacks: dummy_reflect,
+                                        poison_stacks: dummy_poison,
                                     };
                                     set!(world, (battleLogDetail));
 
