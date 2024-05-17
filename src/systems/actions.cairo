@@ -9,15 +9,22 @@ trait IActions {
     fn undo_place_item(inventory_item_id: u32);
     fn add_item(
         name: felt252,
+        itemType: u8,
         width: usize,
         height: usize,
         price: usize,
         damage: usize,
-        armor: usize,
         chance: usize,
         cooldown: u8,
-        heal: usize,
         rarity: u8,
+        armor: u32,
+        armorActivation: u8,
+        regen: u32,
+        regenActivation: u8,
+        reflect: u32,
+        reflectActivation: u8,
+        poison: u32,
+        poisonActivation: u8,
     );
     fn edit_item(item_id: u32, item_key: felt252, item_value: felt252);
     fn buy_item(item_id: u32);
@@ -64,10 +71,10 @@ mod actions {
 
     const STORAGE_FLAG: usize = 999;
 
-    const EFFECT_ARMOR = 'armor';
-    const EFFECT_REGEN = 'regen';
-    const EFFECT_REFLECT = 'reflect';
-    const EFFECT_POISON = 'poison';
+    const EFFECT_ARMOR: felt252 = 'armor';
+    const EFFECT_REGEN: felt252 = 'regen';
+    const EFFECT_REFLECT: felt252 = 'reflect';
+    const EFFECT_POISON: felt252 = 'poison';
 
     #[abi(embed_v0)]
     impl ActionsImpl of IActions<ContractState> {
@@ -97,15 +104,22 @@ mod actions {
         fn add_item(
             world: IWorldDispatcher,
             name: felt252,
+            itemType: u8,
             width: usize,
             height: usize,
             price: usize,
             damage: usize,
-            armor: usize,
             chance: usize,
             cooldown: u8,
-            heal: usize,
             rarity: u8,
+            armor: u32,
+            armorActivation: u8,
+            regen: u32,
+            regenActivation: u8,
+            reflect: u32,
+            reflectActivation: u8,
+            poison: u32,
+            poisonActivation: u8,
         ) {
             let player = get_caller_address();
 
@@ -137,15 +151,22 @@ mod actions {
             let item = Item {
                 id: counter.count,
                 name,
+                itemType,
                 width,
                 height,
                 price,
                 damage,
-                armor,
                 chance,
                 cooldown,
-                heal,
                 rarity,
+                armor,
+                armorActivation,
+                regen,
+                regenActivation,
+                reflect,
+                reflectActivation,
+                poison,
+                poisonActivation,
             };
 
             set!(world, (counter, item));
@@ -213,21 +234,21 @@ mod actions {
                 },
                 // cooldown
                 7 => {
-                    let new_cooldown: usize = item_value.try_into().unwrap();
+                    let new_cooldown: u8 = item_value.try_into().unwrap();
 
                     item_data.cooldown = new_cooldown;
                     set!(world, (item_data,));
                 },
                 // heal
                 8 => {
-                    let new_heal: usize = item_value.try_into().unwrap();
+                    let new_regen: usize = item_value.try_into().unwrap();
 
-                    item_data.heal = new_heal;
+                    item_data.regen = new_regen;
                     set!(world, (item_data,));
                 },
                 // rarity
                 9 => {
-                    let new_rarity: usize = item_value.try_into().unwrap();
+                    let new_rarity: u8 = item_value.try_into().unwrap();
                     assert(
                         new_rarity == 1 || new_rarity == 2 || new_rarity == 3,
                         'new_rarity not valid'
@@ -756,7 +777,7 @@ mod actions {
                     if item.poisonActivation == 1 {
                         dummy_poison += item.poison;
                     }
-                    // ====== end ======
+                // ====== end ======
                 }
 
                 // ====== on hit to plus stacks ======
@@ -776,6 +797,7 @@ mod actions {
 
                 inventoryItemCount -= 1;
             };
+            let char_on_hit_items_span = char_on_hit_items.span();
 
             let dummyCharItemsCounter = get!(
                 world, (char.wins, random_index), (DummyCharacterItemsCounter)
@@ -812,7 +834,7 @@ mod actions {
                     if item.poisonActivation == 1 {
                         char_poison += item.poison;
                     }
-                    // ====== end ======
+                // ====== end ======
                 }
 
                 // ====== on hit to plus stacks ======
@@ -832,6 +854,7 @@ mod actions {
 
                 dummy_item_count -= 1;
             };
+            let dummy_on_hit_items_span = dummy_on_hit_items.span();
 
             // sorting items based on cooldown in ascending order
             let mut i: usize = 0;
@@ -911,29 +934,33 @@ mod actions {
                         if rand < chance {
                             if curr_item_belongs == 'player' {
                                 // ====== on cooldown to plus stacks, all use the same randomness ======
-                                if item.armorActivation == 3 {
-                                    char_armor += item.armor;
+                                if curr_item_data.armorActivation == 3 {
+                                    char_armor += curr_item_data.armor;
                                 }
-                                if item.regenActivation == 3 {
-                                    char_regen += item.regen;
+                                if curr_item_data.regenActivation == 3 {
+                                    char_regen += curr_item_data.regen;
                                 }
-                                if item.reflectActivation == 3 {
-                                    char_reflect += item.reflect;
+                                if curr_item_data.reflectActivation == 3 {
+                                    char_reflect += curr_item_data.reflect;
                                 }
-                                if item.poisonActivation == 3 {
-                                    dummy_poison += item.poison;
+                                if curr_item_data.poisonActivation == 3 {
+                                    dummy_poison += curr_item_data.poison;
                                 }
                                 // ====== end ======
 
                                 if damage > 0 {
                                     // ====== dummy get hit, to plus stacks ======
-                                    let mut on_hit_items_len = dummy_on_hit_items.len();
+                                    let mut on_hit_items_len = dummy_on_hit_items_span.len();
                                     loop {
                                         if on_hit_items_len == 0 {
                                             break;
                                         }
 
-                                        let (on_hit_item_type, on_hit_item_chance, on_hit_item_stack) = *dummy_on_hit_items.at(on_hit_items_len - 1);
+                                        let (
+                                            on_hit_item_type, on_hit_item_chance, on_hit_item_stack
+                                        ) =
+                                            *dummy_on_hit_items_span
+                                            .at(on_hit_items_len - 1);
 
                                         if rand < on_hit_item_chance {
                                             if on_hit_item_type == EFFECT_ARMOR {
@@ -948,7 +975,7 @@ mod actions {
                                         }
 
                                         on_hit_items_len -= 1;
-                                    }
+                                    };
                                     // ====== end ======
 
                                     // ====== Armor: used to absorb damage ======
@@ -986,7 +1013,7 @@ mod actions {
                                     dummy_health -= damageCaused;
 
                                     // ====== Reflect effect: Deals 1 damage per stack when hit with a Melee weapon (up to 100% of the damage). ======
-                                    if item.itemType == 1 && dummy_reflect > 0 {
+                                    if curr_item_data.itemType == 1 && dummy_reflect > 0 {
                                         damageCaused = dummy_reflect;
                                         if damageCaused > damage {
                                             damageCaused = damage;
@@ -1016,33 +1043,37 @@ mod actions {
                                         }
                                         char_health -= damageCaused;
                                     }
-                                    // ====== end ======
+                                // ====== end ======
                                 }
                             } else {
                                 // ====== on cooldown to plus stacks, all use the same randomness ======
-                                if item.armorActivation == 3 {
-                                    dummy_armor += item.armor;
+                                if curr_item_data.armorActivation == 3 {
+                                    dummy_armor += curr_item_data.armor;
                                 }
-                                if item.regenActivation == 3 {
-                                    dummy_regen += item.regen;
+                                if curr_item_data.regenActivation == 3 {
+                                    dummy_regen += curr_item_data.regen;
                                 }
-                                if item.reflectActivation == 3 {
-                                    dummy_reflect += item.reflect;
+                                if curr_item_data.reflectActivation == 3 {
+                                    dummy_reflect += curr_item_data.reflect;
                                 }
-                                if item.poisonActivation == 3 {
-                                    char_poison += item.poison;
+                                if curr_item_data.poisonActivation == 3 {
+                                    char_poison += curr_item_data.poison;
                                 }
                                 // ====== end ======
 
                                 if damage > 0 {
                                     // ====== dummy get hit, to plus stacks ======
-                                    let mut on_hit_items_len = char_on_hit_items.len();
+                                    let mut on_hit_items_len = char_on_hit_items_span.len();
                                     loop {
                                         if on_hit_items_len == 0 {
                                             break;
                                         }
 
-                                        let (on_hit_item_type, on_hit_item_chance, on_hit_item_stack) = *char_on_hit_items.at(on_hit_items_len - 1);
+                                        let (
+                                            on_hit_item_type, on_hit_item_chance, on_hit_item_stack
+                                        ) =
+                                            *char_on_hit_items_span
+                                            .at(on_hit_items_len - 1);
 
                                         if rand < on_hit_item_chance {
                                             if on_hit_item_type == EFFECT_ARMOR {
@@ -1057,7 +1088,7 @@ mod actions {
                                         }
 
                                         on_hit_items_len -= 1;
-                                    }
+                                    };
                                     // ====== end ======
 
                                     // ====== Armor: used to absorb damage ======
@@ -1095,7 +1126,7 @@ mod actions {
                                     char_health -= damageCaused;
 
                                     // ====== Reflect effect: Deals 1 damage per stack when hit with a Melee weapon (up to 100% of the damage). ======
-                                    if item.itemType == 1 && char_reflect > 0 {
+                                    if curr_item_data.itemType == 1 && char_reflect > 0 {
                                         damageCaused = char_reflect;
                                         if damageCaused > damage {
                                             damageCaused = damage;
@@ -1125,7 +1156,7 @@ mod actions {
                                         }
                                         dummy_health -= damageCaused;
                                     }
-                                    // ====== end ======
+                                // ====== end ======
                                 }
                             }
                         } else if rand >= chance && damage > 0 {
@@ -1139,7 +1170,11 @@ mod actions {
                                 damageCaused: 0,
                                 isDodged: true,
                                 buffType: 0,
-                                heal: 0,
+                                regenHP: 0,
+                                armor_stacks: 0,
+                                regen_stacks: 0,
+                                reflect_stacks: 0,
+                                poison_stacks: 0,
                             };
                             set!(world, (battleLogDetail));
                         }
@@ -1201,7 +1236,7 @@ mod actions {
                         }
                         dummy_health -= dummy_poison;
                     }
-                    if char_heal > 0 {
+                    if char_regen > 0 {
                         battleLogDetailCount += 1;
                         let battleLogDetail = BattleLogDetail {
                             player: player,
@@ -1212,7 +1247,7 @@ mod actions {
                             damageCaused: 0,
                             isDodged: false,
                             buffType: EFFECT_REGEN,
-                            regenHP: char_heal,
+                            regenHP: char_regen,
                             armor_stacks: char_armor,
                             regen_stacks: char_regen,
                             reflect_stacks: char_reflect,
@@ -1220,12 +1255,12 @@ mod actions {
                         };
                         set!(world, (battleLogDetail));
 
-                        char_health += char_heal;
+                        char_health += char_regen;
                         if char_health > char_health_flag {
                             char_health = char_health_flag;
                         }
                     }
-                    if dummy_heal > 0 {        
+                    if dummy_regen > 0 {
                         battleLogDetailCount += 1;
                         let battleLogDetail = BattleLogDetail {
                             player: player,
@@ -1236,7 +1271,7 @@ mod actions {
                             damageCaused: 0,
                             isDodged: false,
                             buffType: EFFECT_REGEN,
-                            regenHP: dummy_heal,
+                            regenHP: dummy_regen,
                             armor_stacks: dummy_armor,
                             regen_stacks: dummy_regen,
                             reflect_stacks: dummy_reflect,
@@ -1244,7 +1279,7 @@ mod actions {
                         };
                         set!(world, (battleLogDetail));
 
-                        dummy_health += dummy_heal;
+                        dummy_health += dummy_regen;
                         if dummy_health > dummy_health_flag {
                             dummy_health = dummy_health_flag;
                         }
