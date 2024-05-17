@@ -31,7 +31,6 @@ sozo auth grant --world $WORLD_ADDRESS --rpc-url $RPC_URL --wait writer \
   ItemsCounter,$ACTIONS_ADDRESS \
   Shop,$ACTIONS_ADDRESS \
   BattleLog,$ACTIONS_ADDRESS \
-  BattleLogCounter,$ACTIONS_ADDRESS \
-  BattleLogDetailCounter,$ACTIONS_ADDRESS
+  BattleLogCounter,$ACTIONS_ADDRESS
 
 echo "Default authorizations have been successfully set."

@@ -8,6 +8,7 @@ trait IActions {
     fn place_item(storage_item_id: u32, x: usize, y: usize, rotation: usize);
     fn undo_place_item(inventory_item_id: u32);
     fn add_item(
+        id: u32,
         name: felt252,
         itemType: u8,
         width: usize,
@@ -130,6 +131,7 @@ mod actions {
 
         fn add_item(
             world: IWorldDispatcher,
+            id: u32,
             name: felt252,
             itemType: u8,
             width: usize,
@@ -159,24 +161,25 @@ mod actions {
 
             assert(rarity == 1 || rarity == 2 || rarity == 3, 'rarity not valid');
 
-            let mut counter = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
-            let mut count = counter.count;
+            let counter = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
+            if id > counter.count {
+                set!(world, ItemsCounter { id: ITEMS_COUNTER_ID, count: id });
+            }
 
-            loop {
-                if count == 0 {
-                    break;
-                }
+            // let mut count = counter.count;
+            // loop {
+            //     if count == 0 {
+            //         break;
+            //     }
 
-                let item = get!(world, count, (Item));
-                assert(item.name != name, 'item name already exists');
+            //     let item = get!(world, count, (Item));
+            //     assert(item.name != name, 'item name already exists');
 
-                count -= 1;
-            };
-
-            counter.count += 1;
+            //     count -= 1;
+            // };
 
             let item = Item {
-                id: counter.count,
+                id,
                 name,
                 itemType,
                 width,
@@ -196,7 +199,7 @@ mod actions {
                 poisonActivation,
             };
 
-            set!(world, (counter, item));
+            set!(world, (item));
         }
 
         fn edit_item(
