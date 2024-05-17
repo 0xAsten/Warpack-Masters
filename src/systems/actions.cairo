@@ -60,7 +60,34 @@ mod actions {
     use warpack_masters::models::DummyCharacterItem::{
         DummyCharacterItem, DummyCharacterItemsCounter
     };
-    use warpack_masters::models::BattleLog::{BattleLog, BattleLogCounter, BattleLogDetail};
+    use warpack_masters::models::BattleLog::{BattleLog, BattleLogCounter};
+
+    #[event]
+    #[derive(Drop, starknet::Event)]
+    enum Event {
+        BattleLogs: BattleLogs,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct BattleLogs {
+        #[key]
+        player: ContractAddress,
+        #[key]
+        battleLogId: usize,
+        #[key]
+        id: usize,
+        whoTriggered: felt252,
+        whichItem: usize,
+        damageCaused: usize,
+        isDodged: bool,
+        buffType: felt252,
+        regenHP: usize,
+        armor_stacks: usize,
+        regen_stacks: usize,
+        reflect_stacks: usize,
+        poison_stacks: usize,
+    }
+
 
     const GRID_X: usize = 4;
     const GRID_Y: usize = 3;
@@ -896,7 +923,7 @@ mod actions {
             battleLogCounter.count += 1;
             let battleLogCounterCount = battleLogCounter.count;
 
-            let mut battleLogDetailCount = 0;
+            let mut battleLogsCount = 0;
 
             // battle logic
             let mut seconds = 0;
@@ -988,23 +1015,25 @@ mod actions {
                                     }
                                     // ====== end ======
 
-                                    battleLogDetailCount += 1;
-                                    let battleLogDetail = BattleLogDetail {
-                                        player: player,
-                                        battleLogId: battleLogCounterCount,
-                                        id: battleLogDetailCount,
-                                        whoTriggered: curr_item_belongs,
-                                        whichItem: curr_item_index,
-                                        damageCaused: damageCaused,
-                                        isDodged: false,
-                                        buffType: EFFECT_ARMOR,
-                                        regenHP: 0,
-                                        armor_stacks: char_armor,
-                                        regen_stacks: char_regen,
-                                        reflect_stacks: char_reflect,
-                                        poison_stacks: char_poison,
-                                    };
-                                    set!(world, (battleLogDetail));
+                                    battleLogsCount += 1;
+                                    emit!(
+                                        world,
+                                        (BattleLogs {
+                                            player,
+                                            battleLogId: battleLogCounterCount,
+                                            id: battleLogsCount,
+                                            whoTriggered: curr_item_belongs,
+                                            whichItem: curr_item_index,
+                                            damageCaused: damageCaused,
+                                            isDodged: false,
+                                            buffType: EFFECT_ARMOR,
+                                            regenHP: 0,
+                                            armor_stacks: char_armor,
+                                            regen_stacks: char_regen,
+                                            reflect_stacks: char_reflect,
+                                            poison_stacks: char_poison,
+                                        })
+                                    );
 
                                     if dummy_health <= damageCaused {
                                         winner = 'player';
@@ -1019,23 +1048,25 @@ mod actions {
                                             damageCaused = damage;
                                         }
 
-                                        battleLogDetailCount += 1;
-                                        let battleLogDetail = BattleLogDetail {
-                                            player: player,
-                                            battleLogId: battleLogCounterCount,
-                                            id: battleLogDetailCount,
-                                            whoTriggered: 'dummy',
-                                            whichItem: 0,
-                                            damageCaused: damageCaused,
-                                            isDodged: false,
-                                            buffType: EFFECT_REFLECT,
-                                            regenHP: 0,
-                                            armor_stacks: dummy_armor,
-                                            regen_stacks: dummy_regen,
-                                            reflect_stacks: dummy_reflect,
-                                            poison_stacks: dummy_poison,
-                                        };
-                                        set!(world, (battleLogDetail));
+                                        battleLogsCount += 1;
+                                        emit!(
+                                            world,
+                                            (BattleLogs {
+                                                player,
+                                                battleLogId: battleLogCounterCount,
+                                                id: battleLogsCount,
+                                                whoTriggered: 'dummy',
+                                                whichItem: 0,
+                                                damageCaused: damageCaused,
+                                                isDodged: false,
+                                                buffType: EFFECT_REFLECT,
+                                                regenHP: 0,
+                                                armor_stacks: dummy_armor,
+                                                regen_stacks: dummy_regen,
+                                                reflect_stacks: dummy_reflect,
+                                                poison_stacks: dummy_poison,
+                                            })
+                                        );
 
                                         if char_health <= damageCaused {
                                             winner = 'dummy';
@@ -1101,23 +1132,25 @@ mod actions {
                                     }
                                     // ====== end ======
 
-                                    battleLogDetailCount += 1;
-                                    let battleLogDetail = BattleLogDetail {
-                                        player: player,
-                                        battleLogId: battleLogCounterCount,
-                                        id: battleLogDetailCount,
-                                        whoTriggered: curr_item_belongs,
-                                        whichItem: curr_item_index,
-                                        damageCaused: damageCaused,
-                                        isDodged: false,
-                                        buffType: EFFECT_ARMOR,
-                                        regenHP: 0,
-                                        armor_stacks: dummy_armor,
-                                        regen_stacks: dummy_regen,
-                                        reflect_stacks: dummy_reflect,
-                                        poison_stacks: dummy_poison,
-                                    };
-                                    set!(world, (battleLogDetail));
+                                    battleLogsCount += 1;
+                                    emit!(
+                                        world,
+                                        (BattleLogs {
+                                            player,
+                                            battleLogId: battleLogCounterCount,
+                                            id: battleLogsCount,
+                                            whoTriggered: curr_item_belongs,
+                                            whichItem: curr_item_index,
+                                            damageCaused: damageCaused,
+                                            isDodged: false,
+                                            buffType: EFFECT_ARMOR,
+                                            regenHP: 0,
+                                            armor_stacks: dummy_armor,
+                                            regen_stacks: dummy_regen,
+                                            reflect_stacks: dummy_reflect,
+                                            poison_stacks: dummy_poison,
+                                        })
+                                    );
 
                                     if char_health <= damageCaused {
                                         winner = 'dummy';
@@ -1132,23 +1165,25 @@ mod actions {
                                             damageCaused = damage;
                                         }
 
-                                        battleLogDetailCount += 1;
-                                        let battleLogDetail = BattleLogDetail {
-                                            player: player,
-                                            battleLogId: battleLogCounterCount,
-                                            id: battleLogDetailCount,
-                                            whoTriggered: 'player',
-                                            whichItem: 0,
-                                            damageCaused: damageCaused,
-                                            isDodged: false,
-                                            buffType: EFFECT_REFLECT,
-                                            regenHP: 0,
-                                            armor_stacks: char_armor,
-                                            regen_stacks: char_regen,
-                                            reflect_stacks: char_reflect,
-                                            poison_stacks: char_poison,
-                                        };
-                                        set!(world, (battleLogDetail));
+                                        battleLogsCount += 1;
+                                        emit!(
+                                            world,
+                                            (BattleLogs {
+                                                player,
+                                                battleLogId: battleLogCounterCount,
+                                                id: battleLogsCount,
+                                                whoTriggered: 'player',
+                                                whichItem: 0,
+                                                damageCaused: damageCaused,
+                                                isDodged: false,
+                                                buffType: EFFECT_REFLECT,
+                                                regenHP: 0,
+                                                armor_stacks: char_armor,
+                                                regen_stacks: char_regen,
+                                                reflect_stacks: char_reflect,
+                                                poison_stacks: char_poison,
+                                            })
+                                        );
 
                                         if dummy_health <= damageCaused {
                                             winner = 'player';
@@ -1160,23 +1195,25 @@ mod actions {
                                 }
                             }
                         } else if rand >= chance && damage > 0 {
-                            battleLogDetailCount += 1;
-                            let battleLogDetail = BattleLogDetail {
-                                player: player,
-                                battleLogId: battleLogCounterCount,
-                                id: battleLogDetailCount,
-                                whoTriggered: curr_item_belongs,
-                                whichItem: curr_item_index,
-                                damageCaused: 0,
-                                isDodged: true,
-                                buffType: 0,
-                                regenHP: 0,
-                                armor_stacks: 0,
-                                regen_stacks: 0,
-                                reflect_stacks: 0,
-                                poison_stacks: 0,
-                            };
-                            set!(world, (battleLogDetail));
+                            battleLogsCount += 1;
+                            emit!(
+                                world,
+                                (BattleLogs {
+                                    player,
+                                    battleLogId: battleLogCounterCount,
+                                    id: battleLogsCount,
+                                    whoTriggered: curr_item_belongs,
+                                    whichItem: curr_item_index,
+                                    damageCaused: 0,
+                                    isDodged: true,
+                                    buffType: 0,
+                                    regenHP: 0,
+                                    armor_stacks: 0,
+                                    regen_stacks: 0,
+                                    reflect_stacks: 0,
+                                    poison_stacks: 0,
+                                })
+                            );
                         }
                     }
 
@@ -1187,23 +1224,25 @@ mod actions {
                 // ====== Heal effect: Regenerate 1 health per stack every 2 seconds. ======
                 if seconds % 2 == 0 {
                     if char_poison > 0 {
-                        battleLogDetailCount += 1;
-                        let battleLogDetail = BattleLogDetail {
-                            player: player,
-                            battleLogId: battleLogCounterCount,
-                            id: battleLogDetailCount,
-                            whoTriggered: 'dummy',
-                            whichItem: 0,
-                            damageCaused: char_poison,
-                            isDodged: false,
-                            buffType: EFFECT_POISON,
-                            regenHP: 0,
-                            armor_stacks: dummy_armor,
-                            regen_stacks: dummy_regen,
-                            reflect_stacks: dummy_reflect,
-                            poison_stacks: dummy_poison,
-                        };
-                        set!(world, (battleLogDetail));
+                        battleLogsCount += 1;
+                        emit!(
+                            world,
+                            (BattleLogs {
+                                player,
+                                battleLogId: battleLogCounterCount,
+                                id: battleLogsCount,
+                                whoTriggered: 'dummy',
+                                whichItem: 0,
+                                damageCaused: char_poison,
+                                isDodged: false,
+                                buffType: EFFECT_POISON,
+                                regenHP: 0,
+                                armor_stacks: dummy_armor,
+                                regen_stacks: dummy_regen,
+                                reflect_stacks: dummy_reflect,
+                                poison_stacks: dummy_poison,
+                            })
+                        );
 
                         if char_health <= char_poison {
                             winner = 'dummy';
@@ -1212,23 +1251,25 @@ mod actions {
                         char_health -= char_poison;
                     }
                     if dummy_poison > 0 {
-                        battleLogDetailCount += 1;
-                        let battleLogDetail = BattleLogDetail {
-                            player: player,
-                            battleLogId: battleLogCounterCount,
-                            id: battleLogDetailCount,
-                            whoTriggered: 'player',
-                            whichItem: 0,
-                            damageCaused: dummy_poison,
-                            isDodged: false,
-                            buffType: EFFECT_POISON,
-                            regenHP: 0,
-                            armor_stacks: char_armor,
-                            regen_stacks: char_regen,
-                            reflect_stacks: char_reflect,
-                            poison_stacks: char_poison,
-                        };
-                        set!(world, (battleLogDetail));
+                        battleLogsCount += 1;
+                        emit!(
+                            world,
+                            (BattleLogs {
+                                player,
+                                battleLogId: battleLogCounterCount,
+                                id: battleLogsCount,
+                                whoTriggered: 'player',
+                                whichItem: 0,
+                                damageCaused: dummy_poison,
+                                isDodged: false,
+                                buffType: EFFECT_POISON,
+                                regenHP: 0,
+                                armor_stacks: char_armor,
+                                regen_stacks: char_regen,
+                                reflect_stacks: char_reflect,
+                                poison_stacks: char_poison,
+                            })
+                        );
 
                         if dummy_health <= dummy_poison {
                             winner = 'player';
@@ -1237,23 +1278,25 @@ mod actions {
                         dummy_health -= dummy_poison;
                     }
                     if char_regen > 0 {
-                        battleLogDetailCount += 1;
-                        let battleLogDetail = BattleLogDetail {
-                            player: player,
-                            battleLogId: battleLogCounterCount,
-                            id: battleLogDetailCount,
-                            whoTriggered: 'player',
-                            whichItem: 0,
-                            damageCaused: 0,
-                            isDodged: false,
-                            buffType: EFFECT_REGEN,
-                            regenHP: char_regen,
-                            armor_stacks: char_armor,
-                            regen_stacks: char_regen,
-                            reflect_stacks: char_reflect,
-                            poison_stacks: char_poison,
-                        };
-                        set!(world, (battleLogDetail));
+                        battleLogsCount += 1;
+                        emit!(
+                            world,
+                            (BattleLogs {
+                                player,
+                                battleLogId: battleLogCounterCount,
+                                id: battleLogsCount,
+                                whoTriggered: 'player',
+                                whichItem: 0,
+                                damageCaused: 0,
+                                isDodged: false,
+                                buffType: EFFECT_REGEN,
+                                regenHP: char_regen,
+                                armor_stacks: char_armor,
+                                regen_stacks: char_regen,
+                                reflect_stacks: char_reflect,
+                                poison_stacks: char_poison,
+                            })
+                        );
 
                         char_health += char_regen;
                         if char_health > char_health_flag {
@@ -1261,23 +1304,25 @@ mod actions {
                         }
                     }
                     if dummy_regen > 0 {
-                        battleLogDetailCount += 1;
-                        let battleLogDetail = BattleLogDetail {
-                            player: player,
-                            battleLogId: battleLogCounterCount,
-                            id: battleLogDetailCount,
-                            whoTriggered: 'dummy',
-                            whichItem: 0,
-                            damageCaused: 0,
-                            isDodged: false,
-                            buffType: EFFECT_REGEN,
-                            regenHP: dummy_regen,
-                            armor_stacks: dummy_armor,
-                            regen_stacks: dummy_regen,
-                            reflect_stacks: dummy_reflect,
-                            poison_stacks: dummy_poison,
-                        };
-                        set!(world, (battleLogDetail));
+                        battleLogsCount += 1;
+                        emit!(
+                            world,
+                            (BattleLogs {
+                                player,
+                                battleLogId: battleLogCounterCount,
+                                id: battleLogsCount,
+                                whoTriggered: 'dummy',
+                                whichItem: 0,
+                                damageCaused: 0,
+                                isDodged: false,
+                                buffType: EFFECT_REGEN,
+                                regenHP: dummy_regen,
+                                armor_stacks: dummy_armor,
+                                regen_stacks: dummy_regen,
+                                reflect_stacks: dummy_reflect,
+                                poison_stacks: dummy_poison,
+                            })
+                        );
 
                         dummy_health += dummy_regen;
                         if dummy_health > dummy_health_flag {

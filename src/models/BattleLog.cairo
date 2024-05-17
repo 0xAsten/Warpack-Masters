@@ -19,24 +19,3 @@ struct BattleLogCounter {
     player: ContractAddress,
     count: usize,
 }
-
-
-#[derive(Model, Drop, Serde)]
-struct BattleLogDetail {
-    #[key]
-    player: ContractAddress,
-    #[key]
-    battleLogId: usize,
-    #[key]
-    id: usize,
-    whoTriggered: felt252,
-    whichItem: usize,
-    damageCaused: usize,
-    isDodged: bool,
-    buffType: felt252,
-    regenHP: usize,
-    armor_stacks: usize,
-    regen_stacks: usize,
-    reflect_stacks: usize,
-    poison_stacks: usize,
-}
