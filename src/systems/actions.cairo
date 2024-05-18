@@ -63,14 +63,15 @@ mod actions {
     };
     use warpack_masters::models::BattleLog::{BattleLog, BattleLogCounter};
 
-    #[event]
-    #[derive(Drop, starknet::Event)]
-    enum Event {
-        BattleLogs: BattleLogs,
-    }
+    // #[event]
+    // #[derive(Drop, starknet::Event)]
+    // enum Event {
+    //     BattleLogDetail: BattleLogDetail,
+    // }
 
-    #[derive(Drop, starknet::Event)]
-    struct BattleLogs {
+    #[derive(Model, Copy, Drop, Serde)]
+    #[dojo::event]
+    struct BattleLogDetail {
         #[key]
         player: ContractAddress,
         #[key]
@@ -1021,7 +1022,7 @@ mod actions {
                                     battleLogsCount += 1;
                                     emit!(
                                         world,
-                                        (BattleLogs {
+                                        (BattleLogDetail {
                                             player,
                                             battleLogId: battleLogCounterCount,
                                             id: battleLogsCount,
@@ -1054,7 +1055,7 @@ mod actions {
                                         battleLogsCount += 1;
                                         emit!(
                                             world,
-                                            (BattleLogs {
+                                            (BattleLogDetail {
                                                 player,
                                                 battleLogId: battleLogCounterCount,
                                                 id: battleLogsCount,
@@ -1138,7 +1139,7 @@ mod actions {
                                     battleLogsCount += 1;
                                     emit!(
                                         world,
-                                        (BattleLogs {
+                                        (BattleLogDetail {
                                             player,
                                             battleLogId: battleLogCounterCount,
                                             id: battleLogsCount,
@@ -1171,7 +1172,7 @@ mod actions {
                                         battleLogsCount += 1;
                                         emit!(
                                             world,
-                                            (BattleLogs {
+                                            (BattleLogDetail {
                                                 player,
                                                 battleLogId: battleLogCounterCount,
                                                 id: battleLogsCount,
@@ -1201,7 +1202,7 @@ mod actions {
                             battleLogsCount += 1;
                             emit!(
                                 world,
-                                (BattleLogs {
+                                (BattleLogDetail {
                                     player,
                                     battleLogId: battleLogCounterCount,
                                     id: battleLogsCount,
@@ -1230,7 +1231,7 @@ mod actions {
                         battleLogsCount += 1;
                         emit!(
                             world,
-                            (BattleLogs {
+                            (BattleLogDetail {
                                 player,
                                 battleLogId: battleLogCounterCount,
                                 id: battleLogsCount,
@@ -1257,7 +1258,7 @@ mod actions {
                         battleLogsCount += 1;
                         emit!(
                             world,
-                            (BattleLogs {
+                            (BattleLogDetail {
                                 player,
                                 battleLogId: battleLogCounterCount,
                                 id: battleLogsCount,
@@ -1284,7 +1285,7 @@ mod actions {
                         battleLogsCount += 1;
                         emit!(
                             world,
-                            (BattleLogs {
+                            (BattleLogDetail {
                                 player,
                                 battleLogId: battleLogCounterCount,
                                 id: battleLogsCount,
@@ -1310,7 +1311,7 @@ mod actions {
                         battleLogsCount += 1;
                         emit!(
                             world,
-                            (BattleLogs {
+                            (BattleLogDetail {
                                 player,
                                 battleLogId: battleLogCounterCount,
                                 id: battleLogsCount,
