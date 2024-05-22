@@ -218,8 +218,15 @@ mod actions {
                     item_data.name = item_value;
                     set!(world, (item_data,));
                 },
-                // width
+                // itemType
                 1 => {
+                    let new_itemType: u8 = item_value.try_into().unwrap();
+
+                    item_data.itemType = new_itemType;
+                    set!(world, (item_data,));
+                },
+                // width
+                2 => {
                     let new_width: usize = item_value.try_into().unwrap();
                     assert(new_width > 0 && new_width <= GRID_X, 'new_width not in range');
 
@@ -227,7 +234,7 @@ mod actions {
                     set!(world, (item_data,));
                 },
                 // height
-                2 => {
+                3 => {
                     let new_height: usize = item_value.try_into().unwrap();
                     assert(new_height > 0 && new_height <= GRID_Y, 'new_height not in range');
 
@@ -235,7 +242,7 @@ mod actions {
                     set!(world, (item_data,));
                 },
                 // price
-                3 => {
+                4 => {
                     let new_price: usize = item_value.try_into().unwrap();
                     assert(new_price > 0, 'new_price must be > 0');
 
@@ -243,17 +250,10 @@ mod actions {
                     set!(world, (item_data,));
                 },
                 // damage
-                4 => {
+                5 => {
                     let new_damage: usize = item_value.try_into().unwrap();
 
                     item_data.damage = new_damage;
-                    set!(world, (item_data,));
-                },
-                // armor
-                5 => {
-                    let new_armor: usize = item_value.try_into().unwrap();
-
-                    item_data.armor = new_armor;
                     set!(world, (item_data,));
                 },
                 // chance
@@ -270,15 +270,8 @@ mod actions {
                     item_data.cooldown = new_cooldown;
                     set!(world, (item_data,));
                 },
-                // heal
-                8 => {
-                    let new_regen: usize = item_value.try_into().unwrap();
-
-                    item_data.regen = new_regen;
-                    set!(world, (item_data,));
-                },
                 // rarity
-                9 => {
+                8 => {
                     let new_rarity: u8 = item_value.try_into().unwrap();
                     assert(
                         new_rarity == 1 || new_rarity == 2 || new_rarity == 3,
@@ -286,6 +279,62 @@ mod actions {
                     );
 
                     item_data.rarity = new_rarity;
+                    set!(world, (item_data,));
+                },
+                // armor
+                9 => {
+                    let new_armor: usize = item_value.try_into().unwrap();
+
+                    item_data.armor = new_armor;
+                    set!(world, (item_data,));
+                },
+                // armorActivation
+                10 => {
+                    let new_armorActivation: u8 = item_value.try_into().unwrap();
+
+                    item_data.armorActivation = new_armorActivation;
+                    set!(world, (item_data,));
+                },
+                // regen
+                11 => {
+                    let new_regen: usize = item_value.try_into().unwrap();
+
+                    item_data.regen = new_regen;
+                    set!(world, (item_data,));
+                },
+                // regenActivation
+                12 => {
+                    let new_regenActivation: u8 = item_value.try_into().unwrap();
+
+                    item_data.regenActivation = new_regenActivation;
+                    set!(world, (item_data,));
+                },
+                // reflect
+                13 => {
+                    let new_reflect: usize = item_value.try_into().unwrap();
+
+                    item_data.reflect = new_reflect;
+                    set!(world, (item_data,));
+                },
+                // reflectActivation
+                14 => {
+                    let new_reflectActivation: u8 = item_value.try_into().unwrap();
+
+                    item_data.reflectActivation = new_reflectActivation;
+                    set!(world, (item_data,));
+                },
+                // poison
+                15 => {
+                    let new_poison: usize = item_value.try_into().unwrap();
+
+                    item_data.poison = new_poison;
+                    set!(world, (item_data,));
+                },
+                // poisonActivation
+                16 => {
+                    let new_poisonActivation: u8 = item_value.try_into().unwrap();
+
+                    item_data.poisonActivation = new_poisonActivation;
                     set!(world, (item_data,));
                 },
                 _ => { panic!("Invalid item_key: {}", item_key); }
