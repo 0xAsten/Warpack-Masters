@@ -28,4 +28,7 @@ mod tests {
 
 mod utils {
     mod random;
+    mod test_utils;
 }
+
+mod items;
