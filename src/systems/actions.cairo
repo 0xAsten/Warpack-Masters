@@ -1096,10 +1096,20 @@ mod actions {
 
                                     // ====== Reflect effect: Deals 1 damage per stack when hit with a Melee weapon (up to 100% of the damage). ======
                                     if curr_item_data.itemType == 1 && dummy_reflect > 0 {
-                                        damageCaused = dummy_reflect;
-                                        if damageCaused > damage {
-                                            damageCaused = damage;
+                                        damageCaused = 0;
+                                        let mut reflect_damage = dummy_reflect;
+                                        if reflect_damage > damage {
+                                            reflect_damage = damage;
                                         }
+
+                                        // ====== Armor: used to absorb damage ======
+                                        if reflect_damage <= char_armor {
+                                            char_armor -= reflect_damage;
+                                        } else {
+                                            damageCaused = reflect_damage - char_armor;
+                                            char_armor = 0;
+                                        }
+                                        // ====== end ======
 
                                         battleLogsCount += 1;
                                         emit!(
@@ -1213,10 +1223,20 @@ mod actions {
 
                                     // ====== Reflect effect: Deals 1 damage per stack when hit with a Melee weapon (up to 100% of the damage). ======
                                     if curr_item_data.itemType == 1 && char_reflect > 0 {
-                                        damageCaused = char_reflect;
-                                        if damageCaused > damage {
-                                            damageCaused = damage;
+                                        damageCaused = 0;
+                                        let mut reflect_damage = char_reflect;
+                                        if reflect_damage > damage {
+                                            reflect_damage = damage;
                                         }
+
+                                        // ====== Armor: used to absorb damage ======
+                                        if reflect_damage <= dummy_armor {
+                                            dummy_armor -= reflect_damage;
+                                        } else {
+                                            damageCaused = reflect_damage - dummy_armor;
+                                            dummy_armor = 0;
+                                        }
+                                        // ====== end ======
 
                                         battleLogsCount += 1;
                                         emit!(
