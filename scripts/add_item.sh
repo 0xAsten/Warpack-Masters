@@ -44,7 +44,7 @@ sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS add_item -c 2,358486078052,
 sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS add_item -c 3,358368242533,3,1,1,2,0,100,0,1,0,0,0,0,1,1,0,0 --wait --rpc-url $RPC_URL 
 sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS add_item -c 4,91707909958756,3,2,2,3,0,100,0,1,15,1,0,0,0,0,0,0 --wait --rpc-url $RPC_URL 
 sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS add_item -c 5,79600448005492,3,1,1,3,0,50,0,1,3,2,0,0,0,0,0,0 --wait --rpc-url $RPC_URL 
-sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS add_item -c 6,1468365686984687211050012787699566,3,1,1,4,0,100,0,2,0,0,3,1,0,0,0,0 --wait --rpc-url $RPC_URL 
+sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS add_item -c 6,1468365686984687211050012787699566,3,1,1,4,0,100,0,2,0,0,2,1,0,0,0,0 --wait --rpc-url $RPC_URL 
 sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS add_item -c 7,6052716152600831465235768242034,3,2,3,5,0,100,0,2,35,1,0,0,0,0,0,0 --wait --rpc-url $RPC_URL 
 sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS add_item -c 8,6372733319570045399349322149742,3,1,1,5,0,100,0,2,0,0,0,0,0,0,2,1 --wait --rpc-url $RPC_URL 
 sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS add_item -c 9,339880532085619196269974512114561636,1,1,3,6,10,80,4,2,0,0,0,0,0,0,0,0 --wait --rpc-url $RPC_URL 
