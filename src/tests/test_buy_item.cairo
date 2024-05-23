@@ -15,10 +15,12 @@ mod tests {
         models::backpack::{Backpack, backpack, BackpackGrids, Grid, GridTrait},
         models::Item::{Item, item, ItemsCounter},
         models::CharacterItem::{CharacterItemStorage, CharacterItemsStorageCounter},
-        models::Character::{Character, character, WMClass}, models::Shop::{Shop, shop}
+        models::Character::{Character, character, WMClass}, models::Shop::{Shop, shop},
+        utils::{test_utils::{add_items}}
     };
 
     use warpack_masters::systems::actions::actions::{ITEMS_COUNTER_ID, INIT_GOLD, STORAGE_FLAG};
+    use warpack_masters::items::{item_one_price};
 
 
     #[test]
@@ -37,37 +39,18 @@ mod tests {
 
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
+        let mut actions_system = IActionsDispatcher { contract_address };
 
-        let item_one_name = 'Sword';
-        let item_one_width = 1;
-        let item_one_height = 3;
-        let item_one_price = 2;
-        let item_one_damage = 10;
-        let item_one_armor = 10;
-        let item_one_chance = 5;
-        let item_one_cooldown = 10;
-        let item_one_heal = 5;
-        let item_one_rarity = 1;
-
-        actions_system
-            .add_item(
-                item_one_name,
-                item_one_width,
-                item_one_height,
-                item_one_price,
-                item_one_damage,
-                item_one_armor,
-                item_one_chance,
-                item_one_cooldown,
-                item_one_heal,
-                item_one_rarity,
-            );
+        add_items(ref actions_system);
 
         set_contract_address(alice);
 
         actions_system.spawn('Alice', WMClass::Warrior);
         actions_system.reroll_shop();
+
+        let mut shop_data = get!(world, alice, (Shop));
+        shop_data.item1 = 1;
+        set!(world, (shop_data));
 
         actions_system.buy_item(1);
 
@@ -97,37 +80,22 @@ mod tests {
 
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
+        let mut actions_system = IActionsDispatcher { contract_address };
 
-        let item_one_name = 'Sword';
-        let item_one_width = 1;
-        let item_one_height = 3;
-        let item_one_price = INIT_GOLD + 10;
-        let item_one_damage = 10;
-        let item_one_armor = 10;
-        let item_one_chance = 5;
-        let item_one_cooldown = 10;
-        let item_one_heal = 5;
-        let item_one_rarity = 1;
-
-        actions_system
-            .add_item(
-                item_one_name,
-                item_one_width,
-                item_one_height,
-                item_one_price,
-                item_one_damage,
-                item_one_armor,
-                item_one_chance,
-                item_one_cooldown,
-                item_one_heal,
-                item_one_rarity,
-            );
+        add_items(ref actions_system);
 
         set_contract_address(alice);
 
         actions_system.spawn('Alice', WMClass::Warrior);
         actions_system.reroll_shop();
+
+        let mut shop_data = get!(world, alice, (Shop));
+        shop_data.item1 = 1;
+        set!(world, (shop_data));
+
+        let mut player_data = get!(world, alice, (Character));
+        player_data.gold = 0;
+        set!(world, (player_data));
 
         actions_system.buy_item(1);
     }
@@ -147,32 +115,9 @@ mod tests {
 
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
+        let mut actions_system = IActionsDispatcher { contract_address };
 
-        let item_one_name = 'Sword';
-        let item_one_width = 1;
-        let item_one_height = 3;
-        let item_one_price = INIT_GOLD + 10;
-        let item_one_damage = 10;
-        let item_one_armor = 10;
-        let item_one_chance = 5;
-        let item_one_cooldown = 10;
-        let item_one_heal = 5;
-        let item_one_rarity = 1;
-
-        actions_system
-            .add_item(
-                item_one_name,
-                item_one_width,
-                item_one_height,
-                item_one_price,
-                item_one_damage,
-                item_one_armor,
-                item_one_chance,
-                item_one_cooldown,
-                item_one_heal,
-                item_one_rarity,
-            );
+        add_items(ref actions_system);
 
         set_contract_address(alice);
 
@@ -195,32 +140,9 @@ mod tests {
 
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
+        let mut actions_system = IActionsDispatcher { contract_address };
 
-        let item_one_name = 'Sword';
-        let item_one_width = 1;
-        let item_one_height = 3;
-        let item_one_price = INIT_GOLD + 10;
-        let item_one_damage = 10;
-        let item_one_armor = 10;
-        let item_one_chance = 5;
-        let item_one_cooldown = 10;
-        let item_one_heal = 5;
-        let item_one_rarity = 1;
-
-        actions_system
-            .add_item(
-                item_one_name,
-                item_one_width,
-                item_one_height,
-                item_one_price,
-                item_one_damage,
-                item_one_armor,
-                item_one_chance,
-                item_one_cooldown,
-                item_one_heal,
-                item_one_rarity,
-            );
+        add_items(ref actions_system);
 
         set_contract_address(alice);
 
@@ -257,32 +179,9 @@ mod tests {
 
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
+        let mut actions_system = IActionsDispatcher { contract_address };
 
-        let item_one_name = 'Sword';
-        let item_one_width = 1;
-        let item_one_height = 3;
-        let item_one_price = INIT_GOLD + 10;
-        let item_one_damage = 10;
-        let item_one_armor = 10;
-        let item_one_chance = 5;
-        let item_one_cooldown = 10;
-        let item_one_heal = 5;
-        let item_one_rarity = 1;
-
-        actions_system
-            .add_item(
-                item_one_name,
-                item_one_width,
-                item_one_height,
-                item_one_price,
-                item_one_damage,
-                item_one_armor,
-                item_one_chance,
-                item_one_cooldown,
-                item_one_heal,
-                item_one_rarity,
-            );
+        add_items(ref actions_system);
 
         set_contract_address(alice);
 

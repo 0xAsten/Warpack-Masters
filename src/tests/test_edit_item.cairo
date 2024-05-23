@@ -13,7 +13,8 @@ mod tests {
     use warpack_masters::{
         systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait}},
         models::backpack::{Backpack, backpack, BackpackGrids, Grid, GridTrait},
-        models::Item::{Item, item, ItemsCounter}, models::CharacterItem::{Position}
+        models::Item::{Item, item, ItemsCounter}, models::CharacterItem::{Position},
+        utils::{test_utils::{add_items}}
     };
 
     use warpack_masters::systems::actions::actions::ITEMS_COUNTER_ID;
@@ -28,64 +29,76 @@ mod tests {
 
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
+        let mut actions_system = IActionsDispatcher { contract_address };
 
-        let item_one_name: felt252 = 'Sword';
-        let item_one_width = 1;
-        let item_one_height = 3;
-        let item_one_price = 100;
-        let item_one_damage = 10;
-        let item_one_armor = 10;
-        let item_one_chance = 5;
-        let item_one_cooldown = 10;
-        let item_one_heal = 5;
-        let item_one_rarity = 1;
+        add_items(ref actions_system);
 
-        let item_one_new_name: felt252 = 'Wood Sword';
-        let item_one_new_price: felt252 = 70;
-
-        actions_system
-            .add_item(
-                item_one_name,
-                item_one_width,
-                item_one_height,
-                item_one_price,
-                item_one_damage,
-                item_one_armor,
-                item_one_chance,
-                item_one_cooldown,
-                item_one_heal,
-                item_one_rarity,
-            );
+        let item_one_new_name: felt252 = 'New Dagger';
+        let item_one_new_itemType: felt252 = 2;
+        let item_one_new_width: felt252 = 2;
+        let item_one_new_height: felt252 = 1;
+        let item_one_new_price: felt252 = 4;
+        let item_one_new_damage: felt252 = 2;
+        let item_one_new_chance: felt252 = 100;
+        let item_one_new_cooldown: felt252 = 5;
+        let item_one_new_rarity: felt252 = 2;
+        let item_one_new_armor: felt252 = 1;
+        let item_one_new_armorActivation: felt252 = 1;
+        let item_one_new_regen: felt252 = 1;
+        let item_one_new_regenActivation: felt252 = 1;
+        let item_one_new_reflect: felt252 = 2;
+        let item_one_new_reflectActivation: felt252 = 2;
+        let item_one_new_poison: felt252 = 3;
+        let item_one_new_poisonActivation: felt252 = 3;
 
         actions_system.edit_item(1, 0, item_one_new_name);
+        actions_system.edit_item(1, 1, item_one_new_itemType);
+        actions_system.edit_item(1, 2, item_one_new_width);
+        actions_system.edit_item(1, 3, item_one_new_height);
+        actions_system.edit_item(1, 4, item_one_new_price);
+        actions_system.edit_item(1, 5, item_one_new_damage);
+        actions_system.edit_item(1, 6, item_one_new_chance);
+        actions_system.edit_item(1, 7, item_one_new_cooldown);
+        actions_system.edit_item(1, 8, item_one_new_rarity);
+        actions_system.edit_item(1, 9, item_one_new_armor);
+        actions_system.edit_item(1, 10, item_one_new_armorActivation);
+        actions_system.edit_item(1, 11, item_one_new_regen);
+        actions_system.edit_item(1, 12, item_one_new_regenActivation);
+        actions_system.edit_item(1, 13, item_one_new_reflect);
+        actions_system.edit_item(1, 14, item_one_new_reflectActivation);
+        actions_system.edit_item(1, 15, item_one_new_poison);
+        actions_system.edit_item(1, 16, item_one_new_poisonActivation);
 
         let item_one_data = get!(world, 1, (Item));
-        assert(item_one_data.name == item_one_new_name, 'Item 1 name mismatch');
-        assert(item_one_data.width == item_one_width, 'Item 1 width mismatch');
-        assert(item_one_data.height == item_one_height, 'Item 1 height mismatch');
-        assert(item_one_data.price == item_one_price, 'Item 1 price mismatch');
-        assert(item_one_data.damage == item_one_damage, 'Item 1 damage mismatch');
-        assert(item_one_data.armor == item_one_armor, 'Item 1 armor mismatch');
-        assert(item_one_data.chance == item_one_chance, 'Item 1 chance mismatch');
-        assert(item_one_data.heal == item_one_heal, 'Item 1 heal mismatch');
-        assert(item_one_data.cooldown == item_one_cooldown, 'Item 1 cooldown mismatch');
-        assert(item_one_data.rarity == item_one_rarity, 'Item 1 rarity mismatch');
-
-        actions_system.edit_item(1, 3, item_one_new_price);
-
-        let item_one_data = get!(world, 1, (Item));
-
-        assert(item_one_data.name == item_one_new_name, 'Item 1 name mismatch');
-        assert(item_one_data.width == item_one_width, 'Item 1 width mismatch');
-        assert(item_one_data.height == item_one_height, 'Item 1 height mismatch');
-        assert(item_one_data.price.into() == item_one_new_price, 'Item 1 price mismatch');
-        assert(item_one_data.damage == item_one_damage, 'Item 1 damage mismatch');
-        assert(item_one_data.armor == item_one_armor, 'Item 1 armor mismatch');
-        assert(item_one_data.chance == item_one_chance, 'Item 1 chance mismatch');
-        assert(item_one_data.heal == item_one_heal, 'Item 1 heal mismatch');
-        assert(item_one_data.cooldown == item_one_cooldown, 'Item 1 cooldown mismatch');
-        assert(item_one_data.rarity == item_one_rarity, 'Item 1 rarity mismatch');
+        assert(item_one_data.name == item_one_new_name, 'I1 name mismatch');
+        assert(item_one_data.itemType.into() == item_one_new_itemType, 'I1 itemType mismatch');
+        assert(item_one_data.width.into() == item_one_new_width, 'I1 width mismatch');
+        assert(item_one_data.height.into() == item_one_new_height, 'I1 height mismatch');
+        assert(item_one_data.price.into() == item_one_new_price, 'I1 price mismatch');
+        assert(item_one_data.damage.into() == item_one_new_damage, 'I1 damage mismatch');
+        assert(item_one_data.chance.into() == item_one_new_chance, 'I1 chance mismatch');
+        assert(item_one_data.cooldown.into() == item_one_new_cooldown, 'I1 cooldown mismatch');
+        assert(item_one_data.rarity.into() == item_one_new_rarity, 'I1 rarity mismatch');
+        assert(item_one_data.armor.into() == item_one_new_armor, 'I1 armor mismatch');
+        assert(
+            item_one_data.armorActivation.into() == item_one_new_armorActivation,
+            'I1 armorActivation mismatch'
+        );
+        assert(item_one_data.regen.into() == item_one_new_regen, 'I1 regen mismatch');
+        assert(
+            item_one_data.regenActivation.into() == item_one_new_regenActivation,
+            'I1 regenActivation mismatch'
+        );
+        assert(item_one_data.reflect.into() == item_one_new_reflect, 'I1 reflect mismatch');
+        assert(
+            item_one_data.reflectActivation.into() == item_one_new_reflectActivation,
+            'I1 reflectActivation mismatch'
+        );
+        assert(item_one_data.poison.into() == item_one_new_poison, 'I1 poison mismatch');
+        assert(
+            item_one_data.poisonActivation.into() == item_one_new_poisonActivation,
+            'I1 poisonActivation mismatch'
+        );
     }
 
     #[test]
@@ -100,7 +113,9 @@ mod tests {
 
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
+        let mut actions_system = IActionsDispatcher { contract_address };
+
+        add_items(ref actions_system);
 
         set_contract_address(alice);
 
@@ -117,9 +132,11 @@ mod tests {
 
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
+        let mut actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.edit_item(1, 1, 10);
+        add_items(ref actions_system);
+
+        actions_system.edit_item(1, 2, 10);
     }
 
     #[test]
@@ -132,9 +149,11 @@ mod tests {
 
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
+        let mut actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.edit_item(1, 2, 10);
+        add_items(ref actions_system);
+
+        actions_system.edit_item(1, 3, 10);
     }
 
     #[test]
@@ -147,9 +166,11 @@ mod tests {
 
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
+        let mut actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.edit_item(1, 3, 0);
+        add_items(ref actions_system);
+
+        actions_system.edit_item(1, 4, 0);
     }
 
 
@@ -163,9 +184,11 @@ mod tests {
 
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
+        let mut actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.edit_item(1, 9, 9);
+        add_items(ref actions_system);
+
+        actions_system.edit_item(1, 8, 9);
     }
 }
 

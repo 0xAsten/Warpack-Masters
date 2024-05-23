@@ -18,7 +18,8 @@ mod tests {
             Position, CharacterItemStorage, CharacterItemsStorageCounter, CharacterItemInventory,
             CharacterItemsInventoryCounter
         },
-        models::Character::{Character, character, WMClass}, models::Shop::{Shop, shop}
+        models::Character::{Character, character, WMClass}, models::Shop::{Shop, shop},
+        utils::{test_utils::{add_items}}
     };
 
     use warpack_masters::systems::actions::actions::ITEMS_COUNTER_ID;
@@ -39,14 +40,12 @@ mod tests {
 
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
+        let mut actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.add_item('Sword', 1, 3, 2, 10, 10, 5, 10, 5, 1);
-        actions_system.add_item('Shield', 2, 2, 2, 0, 5, 5, 10, 5, 1);
-        actions_system.add_item('Potion', 1, 1, 2, 0, 0, 5, 10, 15, 2);
+        add_items(ref actions_system);
 
         let item = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
-        assert(item.count == 3, 'total item count mismatch');
+        assert(item.count == 13, 'total item count mismatch');
 
         set_contract_address(alice);
         actions_system.spawn('Alice', WMClass::Warlock);
@@ -58,14 +57,14 @@ mod tests {
         set!(world, (player_data));
         // mock shop for testing
         let mut shop_data = get!(world, alice, (Shop));
-        shop_data.item1 = 1;
-        shop_data.item2 = 2;
-        shop_data.item3 = 3;
+        shop_data.item1 = 2;
+        shop_data.item2 = 4;
+        shop_data.item3 = 6;
         shop_data.item4 = 1;
         set!(world, (shop_data));
 
-        actions_system.buy_item(1);
-        // place a sword on (0,4)
+        actions_system.buy_item(2);
+        // place a sword on (0,0)
         actions_system.place_item(1, 0, 0, 0);
         // (0,4) (0,5) (0,6) should be occupied
         let mut backpack_grid_data = get!(world, (alice, 0, 2), BackpackGrids);
@@ -87,13 +86,13 @@ mod tests {
         assert(inventoryItemCounter.count == 1, 'inventory item count mismatch');
 
         let invetoryItem = get!(world, (alice, 1), CharacterItemInventory);
-        assert(invetoryItem.itemId == 1, 'item id should equal 0');
+        assert(invetoryItem.itemId == 2, 'item id should equal 2');
         assert(invetoryItem.position.x == 0, 'x position mismatch');
         assert(invetoryItem.position.y == 0, 'y position mismatch');
         assert(invetoryItem.rotation == 0, 'rotation mismatch');
 
-        actions_system.buy_item(2);
-        // place a shield on (1,5)
+        actions_system.buy_item(4);
+        // place a shield on (1,0)
         actions_system.place_item(1, 1, 0, 0);
         // (1,5) (1,6) (2,5) (2,6) should be occupied
         let mut backpack_grid_data = get!(world, (alice, 1, 0), BackpackGrids);
@@ -118,13 +117,13 @@ mod tests {
         assert(inventoryItemCounter.count == 2, 'inventory item count mismatch');
 
         let invetoryItem = get!(world, (alice, 2), CharacterItemInventory);
-        assert(invetoryItem.itemId == 2, 'item id should equal 0');
+        assert(invetoryItem.itemId == 4, 'item id should equal 4');
         assert(invetoryItem.position.x == 1, 'x position mismatch');
         assert(invetoryItem.position.y == 0, 'y position mismatch');
         assert(invetoryItem.rotation == 0, 'rotation mismatch');
 
-        actions_system.buy_item(3);
-        // place a potion on (1,4)
+        actions_system.buy_item(6);
+        // place a potion on (1,2)
         actions_system.place_item(1, 1, 2, 0);
         // (1,4) should be occupied
         let mut backpack_grid_data = get!(world, (alice, 1, 2), BackpackGrids);
@@ -140,7 +139,7 @@ mod tests {
         assert(inventoryItemCounter.count == 3, 'inventory item count mismatch');
 
         let invetoryItem = get!(world, (alice, 3), CharacterItemInventory);
-        assert(invetoryItem.itemId == 3, 'item id should equal 0');
+        assert(invetoryItem.itemId == 6, 'item id should equal 6');
         assert(invetoryItem.position.x == 1, 'x position mismatch');
         assert(invetoryItem.position.y == 2, 'y position mismatch');
         assert(invetoryItem.rotation == 0, 'rotation mismatch');
@@ -160,16 +159,20 @@ mod tests {
 
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
+        let mut actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.add_item('Sword', 1, 3, 2, 10, 10, 5, 10, 5, 1);
+        add_items(ref actions_system);
 
         set_contract_address(alice);
         actions_system.spawn('Alice', WMClass::Warlock);
         actions_system.reroll_shop();
+        // mock shop for testing
+        let mut shop_data = get!(world, alice, (Shop));
+        shop_data.item1 = 2;
+        set!(world, (shop_data));
 
-        actions_system.buy_item(1);
-        // place a sword on (10,0)
+        actions_system.buy_item(2);
+        // place a sword on (4,0)
         actions_system.place_item(1, 4, 0, 0);
     }
 
@@ -187,16 +190,21 @@ mod tests {
 
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
+        let mut actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.add_item('Sword', 1, 3, 2, 10, 10, 5, 10, 5, 1);
+        add_items(ref actions_system);
 
         set_contract_address(alice);
         actions_system.spawn('Alice', WMClass::Warlock);
         actions_system.reroll_shop();
 
-        actions_system.buy_item(1);
-        // place a sword on (0,10)
+        // mock shop for testing
+        let mut shop_data = get!(world, alice, (Shop));
+        shop_data.item1 = 2;
+        set!(world, (shop_data));
+
+        actions_system.buy_item(2);
+        // place a sword on (0,3)
         actions_system.place_item(1, 0, 3, 0);
     }
 
@@ -214,15 +222,20 @@ mod tests {
 
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
+        let mut actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.add_item('Sword', 1, 3, 2, 10, 10, 5, 10, 5, 1);
+        add_items(ref actions_system);
 
         set_contract_address(alice);
         actions_system.spawn('Alice', WMClass::Warlock);
         actions_system.reroll_shop();
 
-        actions_system.buy_item(1);
+        // mock shop for testing
+        let mut shop_data = get!(world, alice, (Shop));
+        shop_data.item1 = 2;
+        set!(world, (shop_data));
+
+        actions_system.buy_item(2);
         // place a sword on (0,0) with rotation 30
         actions_system.place_item(1, 0, 0, 30);
     }
@@ -241,16 +254,21 @@ mod tests {
 
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
+        let mut actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.add_item('Sword', 1, 3, 2, 10, 10, 5, 10, 5, 1);
+        add_items(ref actions_system);
 
         set_contract_address(alice);
         actions_system.spawn('Alice', WMClass::Warlock);
         actions_system.reroll_shop();
 
-        actions_system.buy_item(1);
-        // place a sword on (8,6) with rotation 90
+        // mock shop for testing
+        let mut shop_data = get!(world, alice, (Shop));
+        shop_data.item1 = 2;
+        set!(world, (shop_data));
+
+        actions_system.buy_item(2);
+        // place a sword on (2,0) with rotation 90
         actions_system.place_item(1, 2, 0, 90);
     }
     #[test]
@@ -267,16 +285,21 @@ mod tests {
 
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
+        let mut actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.add_item('Sword', 1, 3, 2, 10, 10, 5, 10, 5, 1);
+        add_items(ref actions_system);
 
         set_contract_address(alice);
         actions_system.spawn('Alice', WMClass::Warlock);
         actions_system.reroll_shop();
 
-        actions_system.buy_item(1);
-        // place a sword on (0,6)
+        // mock shop for testing
+        let mut shop_data = get!(world, alice, (Shop));
+        shop_data.item1 = 2;
+        set!(world, (shop_data));
+
+        actions_system.buy_item(2);
+        // place a sword on (0,1)
         actions_system.place_item(1, 0, 1, 0);
     }
 
@@ -294,10 +317,9 @@ mod tests {
 
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
+        let mut actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.add_item('Sword', 1, 3, 2, 10, 10, 5, 10, 5, 1);
-        actions_system.add_item('Shield', 2, 2, 2, 0, 5, 5, 10, 5, 1);
+        add_items(ref actions_system);
 
         set_contract_address(alice);
         actions_system.spawn('Alice', WMClass::Warlock);
@@ -305,19 +327,17 @@ mod tests {
 
         // mock shop for testing
         let mut shop_data = get!(world, alice, (Shop));
-        shop_data.item1 = 1;
-        shop_data.item2 = 2;
-        shop_data.item3 = 1;
-        shop_data.item4 = 2;
+        shop_data.item1 = 2;
+        shop_data.item2 = 4;
         set!(world, (shop_data));
 
-        actions_system.buy_item(1);
-        // place a sword on (0,4)
+        actions_system.buy_item(2);
+        // place a sword on (0,0)
         actions_system.place_item(1, 0, 0, 0);
 
-        actions_system.buy_item(2);
+        actions_system.buy_item(4);
         // try to place the shield on of the occupied grids
-        // this will collide with grid (0,4)
+        // this will collide with grid (0,1)
         actions_system.place_item(1, 0, 1, 0);
     }
 
@@ -335,15 +355,14 @@ mod tests {
 
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
+        let mut actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.add_item('Sword', 1, 3, 2, 10, 10, 5, 10, 5, 1);
-        actions_system.add_item('Shield', 2, 2, 2, 0, 5, 5, 10, 5, 1);
+        add_items(ref actions_system);
 
         set_contract_address(alice);
         actions_system.spawn('Alice', WMClass::Warlock);
 
-        // place a sword on (0,4)
+        // place a sword on (0,0)
         actions_system.place_item(1, 0, 0, 0);
     }
 
@@ -361,19 +380,24 @@ mod tests {
 
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
+        let mut actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.add_item('Sword', 1, 3, 2, 10, 10, 5, 10, 5, 1);
+        add_items(ref actions_system);
 
         set_contract_address(alice);
         actions_system.spawn('Alice', WMClass::Warlock);
         actions_system.reroll_shop();
 
-        actions_system.buy_item(1);
+        // mock shop for testing
+        let mut shop_data = get!(world, alice, (Shop));
+        shop_data.item1 = 2;
+        set!(world, (shop_data));
 
-        // place a sword on (0,4)
+        actions_system.buy_item(2);
+
+        // place a sword on (0,0)
         actions_system.place_item(1, 0, 0, 0);
-        // try to place the same sword on (1,4)
+        // try to place the same sword on (1,0)
         actions_system.place_item(1, 1, 0, 0);
     }
 
@@ -393,11 +417,9 @@ mod tests {
 
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
+        let mut actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.add_item('Sword', 1, 3, 2, 10, 10, 5, 10, 5, 1);
-        actions_system.add_item('Shield', 2, 2, 2, 0, 5, 5, 10, 5, 1);
-        actions_system.add_item('Potion', 1, 1, 2, 0, 0, 5, 10, 15, 2);
+        add_items(ref actions_system);
 
         set_contract_address(alice);
         actions_system.spawn('Alice', WMClass::Warlock);
@@ -414,10 +436,10 @@ mod tests {
         shop_data.item4 = 1;
         set!(world, (shop_data));
 
-        actions_system.buy_item(1);
-        // place a sword on (0,4)
+        actions_system.buy_item(2);
+        // place a sword on (2,0)
         actions_system.place_item(1, 0, 0, 270);
-        // (0,4) (0,5) (0,6) should be occupied
+        // (0,0) (1,0) (2,0) should be occupied
         let mut backpack_grid_data = get!(world, (alice, 2, 0), BackpackGrids);
         assert(backpack_grid_data.occupied == true, '(2,0) should be occupied');
 
