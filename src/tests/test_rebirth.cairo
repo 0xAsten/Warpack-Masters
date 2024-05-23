@@ -9,7 +9,6 @@ mod tests {
     // import test utils
     use dojo::test_utils::{spawn_test_world, deploy_contract};
 
-    // import test utils
     use warpack_masters::{
         systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait, WMClass}},
         models::backpack::{Backpack, backpack, BackpackGrids, Grid, GridTrait},
@@ -20,7 +19,7 @@ mod tests {
         },
         models::DummyCharacter::{DummyCharacter, DummyCharacterCounter},
         models::DummyCharacterItem::{DummyCharacterItem, DummyCharacterItemsCounter},
-        models::Shop::Shop,
+        models::Shop::Shop, utils::{test_utils::{add_items}}
     };
 
     use warpack_masters::systems::actions::actions::{ITEMS_COUNTER_ID, INIT_HEALTH, INIT_GOLD};
@@ -40,9 +39,7 @@ mod tests {
 
         actions_system.spawn('alice', WMClass::Warlock);
 
-        actions_system.add_item('Sword', 1, 3, 2, 10, 10, 5, 10, 5, 1);
-        actions_system.add_item('Shield', 2, 2, 2, 0, 5, 5, 10, 5, 1);
-        actions_system.add_item('Potion', 1, 1, 2, 0, 0, 5, 10, 15, 2);
+        add_items(ref actions_system);
 
         // mock shop for testing
         let mut shop_data = get!(world, alice, (Shop));
@@ -55,7 +52,7 @@ mod tests {
         actions_system.buy_item(1);
         actions_system.buy_item(2);
         actions_system.buy_item(3);
-        // place a sword on (0,4)
+
         actions_system.place_item(1, 0, 0, 0);
         actions_system.place_item(2, 1, 0, 0);
         actions_system.place_item(3, 3, 0, 0);

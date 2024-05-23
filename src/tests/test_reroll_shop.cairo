@@ -12,6 +12,7 @@ mod tests {
         models::backpack::{Backpack, backpack, BackpackGrids, Grid, GridTrait},
         models::Item::{Item, item, ItemsCounter},
         models::Character::{Character, character, WMClass}, models::Shop::{Shop, shop},
+        utils::{test_utils::{add_items}}
     };
 
     use warpack_masters::systems::actions::actions::{ITEMS_COUNTER_ID, INIT_GOLD, STORAGE_FLAG};
@@ -49,32 +50,9 @@ mod tests {
 
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
+        let mut actions_system = IActionsDispatcher { contract_address };
 
-        let item_one_name = 'Sword';
-        let item_one_width = 1;
-        let item_one_height = 3;
-        let item_one_price = INIT_GOLD + 10;
-        let item_one_damage = 10;
-        let item_one_armor = 10;
-        let item_one_chance = 5;
-        let item_one_cooldown = 10;
-        let item_one_heal = 5;
-        let item_one_rarity = 1;
-
-        actions_system
-            .add_item(
-                item_one_name,
-                item_one_width,
-                item_one_height,
-                item_one_price,
-                item_one_damage,
-                item_one_armor,
-                item_one_chance,
-                item_one_cooldown,
-                item_one_heal,
-                item_one_rarity,
-            );
+        add_items(ref actions_system);
 
         actions_system.spawn('Alice', WMClass::Warrior);
 
@@ -84,7 +62,7 @@ mod tests {
         actions_system.reroll_shop();
 
         let shop = get!(world, owner, (Shop));
-        assert(shop.item1 == 1, 'item1 should not be 0');
+        assert(shop.item1 != 0, 'item1 should not be 0');
     }
 
     #[test]
@@ -101,32 +79,9 @@ mod tests {
 
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
+        let mut actions_system = IActionsDispatcher { contract_address };
 
-        let item_one_name = 'Sword';
-        let item_one_width = 1;
-        let item_one_height = 3;
-        let item_one_price = INIT_GOLD + 10;
-        let item_one_damage = 10;
-        let item_one_armor = 10;
-        let item_one_chance = 5;
-        let item_one_cooldown = 10;
-        let item_one_heal = 5;
-        let item_one_rarity = 1;
-
-        actions_system
-            .add_item(
-                item_one_name,
-                item_one_width,
-                item_one_height,
-                item_one_price,
-                item_one_damage,
-                item_one_armor,
-                item_one_chance,
-                item_one_cooldown,
-                item_one_heal,
-                item_one_rarity,
-            );
+        add_items(ref actions_system);
 
         actions_system.spawn('Alice', WMClass::Warrior);
 
@@ -140,7 +95,7 @@ mod tests {
         actions_system.reroll_shop();
 
         let shop = get!(world, owner, (Shop));
-        assert(shop.item1 == 1, 'item1 should not be 0');
+        assert(shop.item1 != 0, 'item1 should not be 0');
     }
 }
 
