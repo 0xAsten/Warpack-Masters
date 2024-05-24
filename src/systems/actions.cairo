@@ -84,10 +84,14 @@ mod actions {
         isDodged: bool,
         buffType: felt252,
         regenHP: usize,
-        armor_stacks: usize,
-        regen_stacks: usize,
-        reflect_stacks: usize,
-        poison_stacks: usize,
+        player_armor_stacks: usize,
+        player_regen_stacks: usize,
+        player_reflect_stacks: usize,
+        player_poison_stacks: usize,
+        dummy_armor_stacks: usize,
+        dummy_regen_stacks: usize,
+        dummy_reflect_stacks: usize,
+        dummy_poison_stacks: usize,
     }
 
 
@@ -1081,10 +1085,14 @@ mod actions {
                                             isDodged: false,
                                             buffType: EFFECT_ARMOR,
                                             regenHP: 0,
-                                            armor_stacks: char_armor,
-                                            regen_stacks: char_regen,
-                                            reflect_stacks: char_reflect,
-                                            poison_stacks: char_poison,
+                                            player_armor_stacks: char_armor,
+                                            player_regen_stacks: char_regen,
+                                            player_reflect_stacks: char_reflect,
+                                            player_poison_stacks: char_poison,
+                                            dummy_armor_stacks: dummy_armor,
+                                            dummy_regen_stacks: dummy_regen,
+                                            dummy_reflect_stacks: dummy_reflect,
+                                            dummy_poison_stacks: dummy_poison,
                                         })
                                     );
 
@@ -1124,10 +1132,14 @@ mod actions {
                                                 isDodged: false,
                                                 buffType: EFFECT_REFLECT,
                                                 regenHP: 0,
-                                                armor_stacks: dummy_armor,
-                                                regen_stacks: dummy_regen,
-                                                reflect_stacks: dummy_reflect,
-                                                poison_stacks: dummy_poison,
+                                                player_armor_stacks: char_armor,
+                                                player_regen_stacks: char_regen,
+                                                player_reflect_stacks: char_reflect,
+                                                player_poison_stacks: char_poison,
+                                                dummy_armor_stacks: dummy_armor,
+                                                dummy_regen_stacks: dummy_regen,
+                                                dummy_reflect_stacks: dummy_reflect,
+                                                dummy_poison_stacks: dummy_poison,
                                             })
                                         );
 
@@ -1208,10 +1220,14 @@ mod actions {
                                             isDodged: false,
                                             buffType: EFFECT_ARMOR,
                                             regenHP: 0,
-                                            armor_stacks: dummy_armor,
-                                            regen_stacks: dummy_regen,
-                                            reflect_stacks: dummy_reflect,
-                                            poison_stacks: dummy_poison,
+                                            player_armor_stacks: char_armor,
+                                            player_regen_stacks: char_regen,
+                                            player_reflect_stacks: char_reflect,
+                                            player_poison_stacks: char_poison,
+                                            dummy_armor_stacks: dummy_armor,
+                                            dummy_regen_stacks: dummy_regen,
+                                            dummy_reflect_stacks: dummy_reflect,
+                                            dummy_poison_stacks: dummy_poison,
                                         })
                                     );
 
@@ -1251,10 +1267,14 @@ mod actions {
                                                 isDodged: false,
                                                 buffType: EFFECT_REFLECT,
                                                 regenHP: 0,
-                                                armor_stacks: char_armor,
-                                                regen_stacks: char_regen,
-                                                reflect_stacks: char_reflect,
-                                                poison_stacks: char_poison,
+                                                player_armor_stacks: char_armor,
+                                                player_regen_stacks: char_regen,
+                                                player_reflect_stacks: char_reflect,
+                                                player_poison_stacks: char_poison,
+                                                dummy_armor_stacks: dummy_armor,
+                                                dummy_regen_stacks: dummy_regen,
+                                                dummy_reflect_stacks: dummy_reflect,
+                                                dummy_poison_stacks: dummy_poison,
                                             })
                                         );
 
@@ -1281,10 +1301,14 @@ mod actions {
                                     isDodged: true,
                                     buffType: 0,
                                     regenHP: 0,
-                                    armor_stacks: 0,
-                                    regen_stacks: 0,
-                                    reflect_stacks: 0,
-                                    poison_stacks: 0,
+                                    player_armor_stacks: char_armor,
+                                    player_regen_stacks: char_regen,
+                                    player_reflect_stacks: char_reflect,
+                                    player_poison_stacks: char_poison,
+                                    dummy_armor_stacks: dummy_armor,
+                                    dummy_regen_stacks: dummy_regen,
+                                    dummy_reflect_stacks: dummy_reflect,
+                                    dummy_poison_stacks: dummy_poison,
                                 })
                             );
                         }
@@ -1310,10 +1334,14 @@ mod actions {
                                 isDodged: false,
                                 buffType: EFFECT_POISON,
                                 regenHP: 0,
-                                armor_stacks: dummy_armor,
-                                regen_stacks: dummy_regen,
-                                reflect_stacks: dummy_reflect,
-                                poison_stacks: dummy_poison,
+                                player_armor_stacks: char_armor,
+                                player_regen_stacks: char_regen,
+                                player_reflect_stacks: char_reflect,
+                                player_poison_stacks: char_poison,
+                                dummy_armor_stacks: dummy_armor,
+                                dummy_regen_stacks: dummy_regen,
+                                dummy_reflect_stacks: dummy_reflect,
+                                dummy_poison_stacks: dummy_poison,
                             })
                         );
 
@@ -1337,10 +1365,14 @@ mod actions {
                                 isDodged: false,
                                 buffType: EFFECT_POISON,
                                 regenHP: 0,
-                                armor_stacks: char_armor,
-                                regen_stacks: char_regen,
-                                reflect_stacks: char_reflect,
-                                poison_stacks: char_poison,
+                                player_armor_stacks: char_armor,
+                                player_regen_stacks: char_regen,
+                                player_reflect_stacks: char_reflect,
+                                player_poison_stacks: char_poison,
+                                dummy_armor_stacks: dummy_armor,
+                                dummy_regen_stacks: dummy_regen,
+                                dummy_reflect_stacks: dummy_reflect,
+                                dummy_poison_stacks: dummy_poison,
                             })
                         );
 
@@ -1364,10 +1396,14 @@ mod actions {
                                 isDodged: false,
                                 buffType: EFFECT_REGEN,
                                 regenHP: char_regen,
-                                armor_stacks: char_armor,
-                                regen_stacks: char_regen,
-                                reflect_stacks: char_reflect,
-                                poison_stacks: char_poison,
+                                player_armor_stacks: char_armor,
+                                player_regen_stacks: char_regen,
+                                player_reflect_stacks: char_reflect,
+                                player_poison_stacks: char_poison,
+                                dummy_armor_stacks: dummy_armor,
+                                dummy_regen_stacks: dummy_regen,
+                                dummy_reflect_stacks: dummy_reflect,
+                                dummy_poison_stacks: dummy_poison,
                             })
                         );
 
@@ -1390,10 +1426,14 @@ mod actions {
                                 isDodged: false,
                                 buffType: EFFECT_REGEN,
                                 regenHP: dummy_regen,
-                                armor_stacks: dummy_armor,
-                                regen_stacks: dummy_regen,
-                                reflect_stacks: dummy_reflect,
-                                poison_stacks: dummy_poison,
+                                player_armor_stacks: char_armor,
+                                player_regen_stacks: char_regen,
+                                player_reflect_stacks: char_reflect,
+                                player_poison_stacks: char_poison,
+                                dummy_armor_stacks: dummy_armor,
+                                dummy_regen_stacks: dummy_regen,
+                                dummy_reflect_stacks: dummy_reflect,
+                                dummy_poison_stacks: dummy_poison,
                             })
                         );
 
