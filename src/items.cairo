@@ -38,7 +38,7 @@ mod Backpack2 {
     const reflectActivation: u8 = 0;
     const poison: usize = 0;
     const poisonActivation: u8 = 0;
-
+}
 
 mod Dagger {
     const id: usize = 3;

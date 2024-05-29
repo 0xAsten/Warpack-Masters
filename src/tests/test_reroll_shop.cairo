@@ -9,8 +9,7 @@ mod tests {
 
     use warpack_masters::{
         systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait}},
-        models::backpack::{Backpack, backpack, BackpackGrids, Grid, GridTrait},
-        models::Item::{Item, item, ItemsCounter},
+        models::backpack::{BackpackGrids}, models::Item::{Item, item, ItemsCounter},
         models::Character::{Character, character, WMClass}, models::Shop::{Shop, shop},
         utils::{test_utils::{add_items}}
     };
@@ -22,9 +21,7 @@ mod tests {
     #[should_panic(expected: ('No items found', 'ENTRYPOINT_FAILED'))]
     #[available_gas(3000000000000000)]
     fn test_reroll_shop_no_items() {
-        let mut models = array![
-            backpack::TEST_CLASS_HASH, character::TEST_CLASS_HASH, item::TEST_CLASS_HASH,
-        ];
+        let mut models = array![];
 
         let world = spawn_test_world(models);
 
@@ -42,9 +39,7 @@ mod tests {
     fn test_reroll_shop() {
         let owner = starknet::contract_address_const::<0x0>();
 
-        let mut models = array![
-            backpack::TEST_CLASS_HASH, character::TEST_CLASS_HASH, item::TEST_CLASS_HASH
-        ];
+        let mut models = array![];
 
         let world = spawn_test_world(models);
 
@@ -71,9 +66,7 @@ mod tests {
     fn test_reroll_shop_not_enouth_gold() {
         let owner = starknet::contract_address_const::<0x0>();
 
-        let mut models = array![
-            backpack::TEST_CLASS_HASH, character::TEST_CLASS_HASH, item::TEST_CLASS_HASH
-        ];
+        let mut models = array![];
 
         let world = spawn_test_world(models);
 

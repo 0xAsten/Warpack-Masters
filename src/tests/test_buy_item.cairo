@@ -12,15 +12,14 @@ mod tests {
     // import test utils
     use warpack_masters::{
         systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait}},
-        models::backpack::{Backpack, backpack, BackpackGrids, Grid, GridTrait},
-        models::Item::{Item, item, ItemsCounter},
+        models::backpack::{BackpackGrids}, models::Item::{Item, item, ItemsCounter},
         models::CharacterItem::{CharacterItemStorage, CharacterItemsStorageCounter},
         models::Character::{Character, character, WMClass}, models::Shop::{Shop, shop},
         utils::{test_utils::{add_items}}
     };
 
     use warpack_masters::systems::actions::actions::{ITEMS_COUNTER_ID, INIT_GOLD, STORAGE_FLAG};
-    use warpack_masters::items::{item_one_price};
+    use warpack_masters::items;
 
 
     #[test]
@@ -28,12 +27,7 @@ mod tests {
     fn test_buy_item() {
         let alice = starknet::contract_address_const::<0x1337>();
 
-        let mut models = array![
-            backpack::TEST_CLASS_HASH,
-            character::TEST_CLASS_HASH,
-            item::TEST_CLASS_HASH,
-            shop::TEST_CLASS_HASH
-        ];
+        let mut models = array![];
 
         let world = spawn_test_world(models);
 
@@ -55,7 +49,7 @@ mod tests {
         actions_system.buy_item(1);
 
         let char_data = get!(world, alice, (Character));
-        assert(char_data.gold == INIT_GOLD - item_one_price, 'gold value mismatch');
+        assert(char_data.gold == INIT_GOLD - items::Backpack1::price, 'gold value mismatch');
 
         let storageItemCount = get!(world, alice, (CharacterItemsStorageCounter));
         assert(storageItemCount.count == 1, 'total item count mismatch');
@@ -72,9 +66,7 @@ mod tests {
     fn test_buy_item_revert_not_enough_gold() {
         let alice = starknet::contract_address_const::<0x1337>();
 
-        let mut models = array![
-            backpack::TEST_CLASS_HASH, character::TEST_CLASS_HASH, item::TEST_CLASS_HASH,
-        ];
+        let mut models = array![];
 
         let world = spawn_test_world(models);
 
@@ -107,9 +99,7 @@ mod tests {
     fn test_buy_item_revert_not_on_sale() {
         let alice = starknet::contract_address_const::<0x1337>();
 
-        let mut models = array![
-            backpack::TEST_CLASS_HASH, character::TEST_CLASS_HASH, item::TEST_CLASS_HASH,
-        ];
+        let mut models = array![];
 
         let world = spawn_test_world(models);
 
@@ -132,9 +122,7 @@ mod tests {
     fn test_buy_item_revert_cannot_buy_multiple() {
         let alice = starknet::contract_address_const::<0x1337>();
 
-        let mut models = array![
-            backpack::TEST_CLASS_HASH, character::TEST_CLASS_HASH, item::TEST_CLASS_HASH,
-        ];
+        let mut models = array![];
 
         let world = spawn_test_world(models);
 
@@ -171,9 +159,7 @@ mod tests {
     fn test_buy_item_revert_invalid_item_id() {
         let alice = starknet::contract_address_const::<0x1337>();
 
-        let mut models = array![
-            backpack::TEST_CLASS_HASH, character::TEST_CLASS_HASH, item::TEST_CLASS_HASH,
-        ];
+        let mut models = array![];
 
         let world = spawn_test_world(models);
 

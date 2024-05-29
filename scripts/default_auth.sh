@@ -17,7 +17,6 @@ echo "--------------------------------------------------------------------------
 
 # enable system -> models authorizations
 sozo auth grant --world $WORLD_ADDRESS --rpc-url $RPC_URL --wait writer \
-  Backpack,$ACTIONS_ADDRESS \
   BackpackGrids,$ACTIONS_ADDRESS \
   Character,$ACTIONS_ADDRESS \
   CharacterItemStorage,$ACTIONS_ADDRESS \

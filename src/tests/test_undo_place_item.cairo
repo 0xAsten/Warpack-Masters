@@ -12,8 +12,7 @@ mod tests {
     // import test utils
     use warpack_masters::{
         systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait}},
-        models::backpack::{Backpack, backpack, BackpackGrids, Grid, GridTrait},
-        models::Item::{Item, item, ItemsCounter},
+        models::backpack::{BackpackGrids}, models::Item::{Item, item, ItemsCounter},
         models::CharacterItem::{
             Position, CharacterItemStorage, CharacterItemsStorageCounter, CharacterItemInventory,
             CharacterItemsInventoryCounter
@@ -30,12 +29,7 @@ mod tests {
     fn test_undo_place_item() {
         let alice = starknet::contract_address_const::<0x1337>();
 
-        let mut models = array![
-            backpack::TEST_CLASS_HASH,
-            item::TEST_CLASS_HASH,
-            character::TEST_CLASS_HASH,
-            shop::TEST_CLASS_HASH
-        ];
+        let mut models = array![];
 
         let world = spawn_test_world(models);
 
@@ -179,9 +173,7 @@ mod tests {
     fn test_place_item_revert_not_in_inventory() {
         let alice = starknet::contract_address_const::<0x1337>();
 
-        let mut models = array![
-            backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH, character::TEST_CLASS_HASH
-        ];
+        let mut models = array![];
 
         let world = spawn_test_world(models);
 

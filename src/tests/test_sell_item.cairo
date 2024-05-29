@@ -12,15 +12,14 @@ mod tests {
     // import test utils
     use warpack_masters::{
         systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait}},
-        models::backpack::{Backpack, backpack, BackpackGrids, Grid, GridTrait},
-        models::Item::{Item, item, ItemsCounter},
+        models::backpack::{BackpackGrids}, models::Item::{Item, item, ItemsCounter},
         models::CharacterItem::{CharacterItemStorage, CharacterItemsStorageCounter},
         models::Character::{Character, character, WMClass}, models::Shop::{Shop, shop},
         utils::{test_utils::{add_items}}
     };
 
     use warpack_masters::systems::actions::actions::{ITEMS_COUNTER_ID, INIT_GOLD, STORAGE_FLAG};
-    use warpack_masters::items::{item_one_price, item_two_price};
+    use warpack_masters::items;
 
 
     #[test]
@@ -28,12 +27,7 @@ mod tests {
     fn test_sell_item() {
         let alice = starknet::contract_address_const::<0x1337>();
 
-        let mut models = array![
-            backpack::TEST_CLASS_HASH,
-            character::TEST_CLASS_HASH,
-            item::TEST_CLASS_HASH,
-            shop::TEST_CLASS_HASH
-        ];
+        let mut models = array![];
 
         let world = spawn_test_world(models);
 
@@ -71,7 +65,7 @@ mod tests {
 
         let char_data = get!(world, alice, (Character));
         assert(
-            char_data.gold == prev_char_data.gold + (item_one_price / 2),
+            char_data.gold == prev_char_data.gold + (items::Backpack1::price / 2),
             'sell one: gold value mismatch'
         );
 
@@ -90,7 +84,7 @@ mod tests {
 
         let char_data = get!(world, alice, (Character));
         assert(
-            char_data.gold == prev_char_data.gold + (item_two_price / 2),
+            char_data.gold == prev_char_data.gold + (items::Backpack2::price / 2),
             'sell two: gold value mismatch'
         );
 
@@ -148,9 +142,7 @@ mod tests {
     fn test_sell_item_with_item_id_0() {
         let alice = starknet::contract_address_const::<0x1337>();
 
-        let mut models = array![
-            backpack::TEST_CLASS_HASH, character::TEST_CLASS_HASH, item::TEST_CLASS_HASH,
-        ];
+        let mut models = array![];
 
         let world = spawn_test_world(models);
 
@@ -179,9 +171,7 @@ mod tests {
     fn test_sell_item_invalid_item_id() {
         let alice = starknet::contract_address_const::<0x1337>();
 
-        let mut models = array![
-            backpack::TEST_CLASS_HASH, character::TEST_CLASS_HASH, item::TEST_CLASS_HASH,
-        ];
+        let mut models = array![];
 
         let world = spawn_test_world(models);
 

@@ -119,26 +119,24 @@ mod actions {
             let player_exists = get!(world, player, (Character));
             assert(player_exists.name == '', 'player already exists');
 
-            set!(world, (Backpack { player, grid: Grid { x: GRID_X, y: GRID_Y } },));
-
             // Default the player has 2 Backpacks
             // Must add two backpack items when setup the game
-            let item = get!(world, Backpack1.id, (Item));
+            let item = get!(world, Backpack1::id, (Item));
             assert(item.itemType == 4, 'Invalid item type');
-            let item = get!(world, Backpack2.id, (Item));
+            let item = get!(world, Backpack2::id, (Item));
             assert(item.itemType == 4, 'Invalid item type');
 
             set!(
                 world,
                 (
-                    CharacterItemStorage { player, id: 1, itemId: Backpack1.id },
-                    CharacterItemStorage { player, id: 2, itemId: Backpack2.id },
+                    CharacterItemStorage { player, id: 1, itemId: Backpack1::id },
+                    CharacterItemStorage { player, id: 2, itemId: Backpack2::id },
                     CharacterItemsStorageCounter { player, count: 2 },
                 )
             );
 
-            place_item(world, 1, 4, 2, 0);
-            place_item(world, 2, 2, 2, 0);
+            self.place_item(1, 4, 2, 0);
+            self.place_item(2, 2, 2, 0);
 
             // add one gold for reroll shop
             set!(
@@ -192,18 +190,6 @@ mod actions {
             if id > counter.count {
                 set!(world, ItemsCounter { id: ITEMS_COUNTER_ID, count: id });
             }
-
-            // let mut count = counter.count;
-            // loop {
-            //     if count == 0 {
-            //         break;
-            //     }
-
-            //     let item = get!(world, count, (Item));
-            //     assert(item.name != name, 'item name already exists');
-
-            //     count -= 1;
-            // };
 
             let item = Item {
                 id,
@@ -391,11 +377,27 @@ mod actions {
             let itemWidth = item.width;
 
             let playerBackpackGrids = get!(world, (player, x, y), (BackpackGrids));
-            assert(!playerBackpackGrids.occupied, 'Already occupied');
 
             // if the item is 1x1, occupy the empty grid
             if itemHeight == 1 && itemWidth == 1 {
-                set!(world, (BackpackGrids { player: player, x: x, y: y, occupied: true }));
+                if item.itemType == 4 {
+                    assert(!playerBackpackGrids.enabled, 'Already enabled');
+                    set!(
+                        world,
+                        (BackpackGrids {
+                            player: player, x: x, y: y, enabled: true, occupied: false
+                        })
+                    );
+                } else {
+                    assert(playerBackpackGrids.enabled, 'Grid not enabled');
+                    assert(!playerBackpackGrids.occupied, 'Already occupied');
+                    set!(
+                        world,
+                        (BackpackGrids {
+                            player: player, x: x, y: y, enabled: true, occupied: true
+                        })
+                    );
+                }
             } else {
                 let mut xMax = 0;
                 let mut yMax = 0;
@@ -428,9 +430,25 @@ mod actions {
                         }
 
                         let playerBackpackGrids = get!(world, (player, i, j), (BackpackGrids));
-                        assert(!playerBackpackGrids.occupied, 'Already occupied');
+                        if item.itemType == 4 {
+                            assert(!playerBackpackGrids.enabled, 'Already enabled');
+                            set!(
+                                world,
+                                (BackpackGrids {
+                                    player: player, x: i, y: j, enabled: true, occupied: false
+                                })
+                            );
+                        } else {
+                            assert(playerBackpackGrids.enabled, 'Grid not enabled');
+                            assert(!playerBackpackGrids.occupied, 'Already occupied');
+                            set!(
+                                world,
+                                (BackpackGrids {
+                                    player: player, x: i, y: j, enabled: true, occupied: true
+                                })
+                            );
+                        }
 
-                        set!(world, (BackpackGrids { player: player, x: i, y: j, occupied: true }));
                         j += 1;
                     };
                     j = y;
@@ -496,8 +514,24 @@ mod actions {
             let itemHeight = item.height;
             let itemWidth = item.width;
 
+            let playerBackpackGrids = get!(world, (player, x, y), (BackpackGrids));
             if itemHeight == 1 && itemWidth == 1 {
-                set!(world, (BackpackGrids { player: player, x: x, y: y, occupied: false }));
+                if item.itemType == 4 {
+                    assert(!playerBackpackGrids.occupied, 'Already occupied');
+                    set!(
+                        world,
+                        (BackpackGrids {
+                            player: player, x: x, y: y, enabled: false, occupied: false
+                        })
+                    );
+                } else {
+                    set!(
+                        world,
+                        (BackpackGrids {
+                            player: player, x: x, y: y, enabled: true, occupied: false
+                        })
+                    );
+                }
             } else {
                 let mut xMax = 0;
                 let mut yMax = 0;
@@ -526,9 +560,24 @@ mod actions {
                             break;
                         }
 
-                        set!(
-                            world, (BackpackGrids { player: player, x: i, y: j, occupied: false })
-                        );
+                        let playerBackpackGrids = get!(world, (player, i, j), (BackpackGrids));
+                        if item.itemType == 4 {
+                            assert(!playerBackpackGrids.occupied, 'Already occupied');
+                            set!(
+                                world,
+                                (BackpackGrids {
+                                    player: player, x: i, y: j, enabled: false, occupied: false
+                                })
+                            );
+                        } else {
+                            set!(
+                                world,
+                                (BackpackGrids {
+                                    player: player, x: i, y: j, enabled: true, occupied: false
+                                })
+                            );
+                        }
+
                         j += 1;
                     };
                     j = y;
@@ -1616,7 +1665,10 @@ mod actions {
 
                     if player_backpack_grid_data.occupied {
                         set!(
-                            world, (BackpackGrids { player: player, x: i, y: j, occupied: false })
+                            world,
+                            (BackpackGrids {
+                                player: player, x: i, y: j, enabled: false, occupied: false
+                            })
                         );
                     }
                     j += 1;

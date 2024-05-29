@@ -12,8 +12,8 @@ mod tests {
     // import test utils
     use warpack_masters::{
         systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait, WMClass}},
-        models::backpack::{Backpack, backpack, BackpackGrids, Grid, GridTrait},
-        models::Item::{Item, item, ItemsCounter}, models::Character::{Character, character},
+        models::backpack::{BackpackGrids}, models::Item::{Item, item, ItemsCounter},
+        models::Character::{Character, character},
         models::CharacterItem::{
             Position, CharacterItemStorage, CharacterItemsStorageCounter, CharacterItemInventory,
             CharacterItemsInventoryCounter
@@ -29,7 +29,7 @@ mod tests {
     #[available_gas(3000000000000000)]
     fn test_dummy() {
         let alice = starknet::contract_address_const::<0x0>();
-        let mut models = array![backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH];
+        let mut models = array![];
 
         let world = spawn_test_world(models);
 
@@ -63,7 +63,7 @@ mod tests {
     #[available_gas(3000000000000000)]
     fn test_sort_array() {
         let alice = starknet::contract_address_const::<0x0>();
-        let mut models = array![backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH];
+        let mut models = array![];
 
         let world = spawn_test_world(models);
 
@@ -99,7 +99,7 @@ mod tests {
     #[should_panic(expected: ('dummy not created', 'ENTRYPOINT_FAILED'))]
     fn test_revert_dummy_not_created() {
         let alice = starknet::contract_address_const::<0x0>();
-        let mut models = array![backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH];
+        let mut models = array![];
 
         let world = spawn_test_world(models);
 
@@ -118,7 +118,7 @@ mod tests {
     #[should_panic(expected: ('dummy already created', 'ENTRYPOINT_FAILED'))]
     fn test_revert_dummy_already_created() {
         let alice = starknet::contract_address_const::<0x0>();
-        let mut models = array![backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH];
+        let mut models = array![];
 
         let world = spawn_test_world(models);
 
@@ -138,7 +138,7 @@ mod tests {
     #[should_panic(expected: ('dummy not created', 'ENTRYPOINT_FAILED'))]
     fn test_dummy_not_created() {
         starknet::contract_address_const::<0x0>();
-        let mut models = array![backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH];
+        let mut models = array![];
 
         let world = spawn_test_world(models);
 
@@ -156,7 +156,7 @@ mod tests {
     #[should_panic(expected: ('max loss reached', 'ENTRYPOINT_FAILED'))]
     fn test_max_loss_reached() {
         let alice = starknet::contract_address_const::<0x0>();
-        let mut models = array![backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH];
+        let mut models = array![];
 
         let world = spawn_test_world(models);
 

@@ -26,55 +26,53 @@ mod tests {
 
     #[test]
     #[available_gas(3000000000000000)]
-    fn test_rebirth() {
+    fn test_spawn() {
         let alice = starknet::contract_address_const::<0x0>();
         set_contract_address(alice);
-        let mut models = array![];
 
+        let mut models = array![];
         let world = spawn_test_world(models);
 
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let mut actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.spawn('alice', WMClass::Warlock);
-
         add_items(ref actions_system);
 
-        // mock shop for testing
-        let mut shop_data = get!(world, alice, (Shop));
-        shop_data.item1 = 1;
-        shop_data.item2 = 2;
-        shop_data.item3 = 1;
-        shop_data.item4 = 3;
-        set!(world, (shop_data));
-
-        actions_system.buy_item(1);
-        actions_system.buy_item(2);
-        actions_system.buy_item(3);
-
-        actions_system.place_item(1, 0, 0, 0);
-        actions_system.place_item(2, 1, 0, 0);
-        actions_system.place_item(3, 3, 0, 0);
-
-        let mut char = get!(world, (alice), Character);
-        char.loss = 5;
-        set!(world, (char));
-        actions_system.rebirth('bob', WMClass::Warrior);
+        actions_system.spawn('alice', WMClass::Warlock);
 
         let char = get!(world, (alice), Character);
-        let inventoryItemsCounter = get!(world, (alice), CharacterItemsInventoryCounter);
-        let storageItemsCounter = get!(world, (alice), CharacterItemsStorageCounter);
-        let playerShopData = get!(world, (alice), Shop);
         assert(!char.dummied, 'Should be false');
         assert(char.wins == 0, 'wins count should be 0');
         assert(char.loss == 0, 'loss count should be 0');
-        assert(char.wmClass == WMClass::Warrior, 'class should be Warrior');
-        assert(char.name == 'bob', 'name should be bob');
+        assert(char.wmClass == WMClass::Warlock, 'class should be Warlock');
+        assert(char.name == 'alice', 'name should be bob');
         assert(char.gold == INIT_GOLD + 1, 'gold should be init');
         assert(char.health == INIT_HEALTH, 'health should be init');
-        assert(inventoryItemsCounter.count == 0, 'item count should be 0');
-        assert(storageItemsCounter.count == 0, 'item count should be 0');
+
+        let storageItemsCounter = get!(world, (alice), CharacterItemsStorageCounter);
+        assert(storageItemsCounter.count == 2, 'Storage item count should be 2');
+
+        let storageItem = get!(world, (alice, 1), CharacterItemStorage);
+        assert(storageItem.itemId == 0, 'item 1 should be 0');
+
+        let storageItem = get!(world, (alice, 2), CharacterItemStorage);
+        assert(storageItem.itemId == 0, 'item 2 should be 0');
+
+        let inventoryItemsCounter = get!(world, (alice), CharacterItemsInventoryCounter);
+        assert(inventoryItemsCounter.count == 2, 'item count should be 2');
+
+        let inventoryItem = get!(world, (alice, 1), CharacterItemInventory);
+        assert(inventoryItem.itemId == 1, 'item 1 should be 1');
+        assert(inventoryItem.position.x == 4, 'item 1 x should be 4');
+        assert(inventoryItem.position.y == 2, 'item 1 y should be 2');
+
+        let inventoryItem = get!(world, (alice, 2), CharacterItemInventory);
+        assert(inventoryItem.itemId == 2, 'item 2 should be 2');
+        assert(inventoryItem.position.x == 2, 'item 2 x should be 4');
+        assert(inventoryItem.position.y == 2, 'item 2 y should be 3');
+
+        let playerShopData = get!(world, (alice), Shop);
         assert(playerShopData.item1 == 0, 'item 1 should be 0');
         assert(playerShopData.item2 == 0, 'item 2 should be 0');
         assert(playerShopData.item3 == 0, 'item 3 should be 0');
@@ -83,24 +81,32 @@ mod tests {
 
     #[test]
     #[available_gas(3000000000000000)]
-    #[should_panic(expected: ('loss not reached', 'ENTRYPOINT_FAILED'))]
-    fn test_loss_not_reached() {
-        let alice = starknet::contract_address_const::<0x0>();
+    #[should_panic(expected: ('name cannot be empty', 'ENTRYPOINT_FAILED'))]
+    fn test_name_is_empty() {
         let mut models = array![];
-        
         let world = spawn_test_world(models);
 
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let mut actions_system = IActionsDispatcher { contract_address };
 
+        actions_system.spawn('', WMClass::Warlock);
+    }
+
+    #[test]
+    #[available_gas(3000000000000000)]
+    #[should_panic(expected: ('player already exists', 'ENTRYPOINT_FAILED'))]
+    fn test_player_already_exists() {
+        let mut models = array![];
+        let world = spawn_test_world(models);
+
+        let contract_address = world
+            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
+        let mut actions_system = IActionsDispatcher { contract_address };
+        add_items(ref actions_system);
+
         actions_system.spawn('alice', WMClass::Warlock);
-
-        let mut char = get!(world, (alice), Character);
-        char.loss = 4;
-        set!(world, (char));
-
-        actions_system.rebirth('bob', WMClass::Warlock);
+        actions_system.spawn('bob', WMClass::Warlock);
     }
 }
 
