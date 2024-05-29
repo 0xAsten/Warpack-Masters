@@ -46,7 +46,7 @@ mod actions {
     use super::IActions;
 
     use starknet::{ContractAddress, get_caller_address};
-    use warpack_masters::models::{backpack::{Backpack, BackpackGrids, Grid, GridTrait}};
+    use warpack_masters::models::{backpack::{BackpackGrids}};
     use warpack_masters::models::{
         CharacterItem::{
             Position, CharacterItemsStorageCounter, CharacterItemStorage, CharacterItemInventory,
@@ -62,6 +62,7 @@ mod actions {
         DummyCharacterItem, DummyCharacterItemsCounter
     };
     use warpack_masters::models::BattleLog::{BattleLog, BattleLogCounter};
+    use warpack_masters::items::{Backpack1, Backpack2};
 
     // #[event]
     // #[derive(Drop, starknet::Event)]
@@ -94,9 +95,8 @@ mod actions {
         dummy_poison_stacks: usize,
     }
 
-
-    const GRID_X: usize = 4;
-    const GRID_Y: usize = 3;
+    const GRID_X: usize = 9;
+    const GRID_Y: usize = 7;
     const INIT_GOLD: usize = 8;
     const INIT_HEALTH: usize = 25;
 
@@ -114,10 +114,32 @@ mod actions {
         fn spawn(world: IWorldDispatcher, name: felt252, wmClass: WMClass) {
             let player = get_caller_address();
 
-            let player_exists = get!(world, player, (Backpack));
-            assert(player_exists.grid.is_zero(), 'Player already exists');
+            assert(name != '', 'name cannot be empty');
+
+            let player_exists = get!(world, player, (Character));
+            assert(player_exists.name == '', 'player already exists');
 
             set!(world, (Backpack { player, grid: Grid { x: GRID_X, y: GRID_Y } },));
+
+            // Default the player has 2 Backpacks
+            // Must add two backpack items when setup the game
+            let item = get!(world, Backpack1.id, (Item));
+            assert(item.itemType == 4, 'Invalid item type');
+            let item = get!(world, Backpack2.id, (Item));
+            assert(item.itemType == 4, 'Invalid item type');
+
+            set!(
+                world,
+                (
+                    CharacterItemStorage { player, id: 1, itemId: Backpack1.id },
+                    CharacterItemStorage { player, id: 2, itemId: Backpack2.id },
+                    CharacterItemsStorageCounter { player, count: 2 },
+                )
+            );
+
+            place_item(world, 1, 4, 2, 0);
+            place_item(world, 2, 2, 2, 0);
+
             // add one gold for reroll shop
             set!(
                 world,

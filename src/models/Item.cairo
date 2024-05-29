@@ -6,7 +6,7 @@ struct Item {
     #[key]
     id: usize,
     name: felt252,
-    // 1 - Melee Weapon, 2 - Ranged Weapon, 3 - Gear
+    // 1 - Melee Weapon, 2 - Ranged Weapon, 3 - Gear, 4 - Backpack
     itemType: u8,
     width: usize,
     height: usize,
