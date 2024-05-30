@@ -77,6 +77,50 @@ mod tests {
         assert(playerShopData.item2 == 0, 'item 2 should be 0');
         assert(playerShopData.item3 == 0, 'item 3 should be 0');
         assert(playerShopData.item4 == 0, 'item 4 should be 0');
+
+        // During spawn backpacks are added at (4,2) and (2,2) with h and w of 
+        // 2 and 3 & 2 and 2 respectively
+        // The following grids will be enabled but not occupied
+        // (4,2), (4,3), (4,4), (5,2), (5,3), (5,4), (2,2), (2,3), (3,2), (3,3)
+        let playerGridData = get!(world, (alice, 4, 2), BackpackGrids);
+        assert(playerGridData.enabled == true, '(4,2) should be enabled');
+        assert(playerGridData.occupied == false, '(4,2) should not be occupied');
+
+        let playerGridData = get!(world, (alice, 4, 3), BackpackGrids);
+        assert(playerGridData.enabled == true, '(4,3) should be enabled');
+        assert(playerGridData.occupied == false, '(4,3) should not be occupied');
+
+        let playerGridData = get!(world, (alice, 4, 4), BackpackGrids);
+        assert(playerGridData.enabled == true, '(4,4) should be enabled');
+        assert(playerGridData.occupied == false, '(4,4) should not be occupied');
+
+        let playerGridData = get!(world, (alice, 5, 2), BackpackGrids);
+        assert(playerGridData.enabled == true, '(5,2) should be enabled');
+        assert(playerGridData.occupied == false, '(5,2) should not be occupied');
+
+        let playerGridData = get!(world, (alice, 5, 3), BackpackGrids);
+        assert(playerGridData.enabled == true, '(5,3) should be enabled');
+        assert(playerGridData.occupied == false, '(5,3) should not be occupied');
+
+        let playerGridData = get!(world, (alice, 5, 4), BackpackGrids);
+        assert(playerGridData.enabled == true, '(5,4) should be enabled');
+        assert(playerGridData.occupied == false, '(5,4) should not be occupied');
+
+        let playerGridData = get!(world, (alice, 2, 2), BackpackGrids);
+        assert(playerGridData.enabled == true, '(2,2) should be enabled');
+        assert(playerGridData.occupied == false, '(2,2) should not be occupied');
+
+        let playerGridData = get!(world, (alice, 2, 3), BackpackGrids);
+        assert(playerGridData.enabled == true, '(2,3) should be enabled');
+        assert(playerGridData.occupied == false, '(2,3) should not be occupied');
+
+        let playerGridData = get!(world, (alice, 3, 2), BackpackGrids);
+        assert(playerGridData.enabled == true, '(3,2) should be enabled');
+        assert(playerGridData.occupied == false, '(3,2) should not be occupied');
+
+        let playerGridData = get!(world, (alice, 3, 3), BackpackGrids);
+        assert(playerGridData.enabled == true, '(3,3) should be enabled');
+        assert(playerGridData.occupied == false, '(3,3) should not be occupied');
     }
 
     #[test]
