@@ -35,7 +35,9 @@ mod tests {
 
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
+        let mut actions_system = IActionsDispatcher { contract_address };
+
+        add_items(ref actions_system);
 
         actions_system.spawn('alice', WMClass::Warlock);
         actions_system.create_dummy();
@@ -56,7 +58,7 @@ mod tests {
         assert(dummyChar.name == 'alice', 'name should be alice');
         assert(dummyChar.wmClass == WMClass::Warlock, 'class should be Warlock');
         assert(dummyChar.health == char.health, 'health should be equal');
-        assert(dummyCharItemsCounter.count == 0, 'Should be 0');
+        assert(dummyCharItemsCounter.count == 2, 'Should be 2');
     }
 
     #[test]
@@ -76,19 +78,20 @@ mod tests {
         actions_system.spawn('alice', WMClass::Warlock);
 
         let mut shop = get!(world, alice, (Shop));
-        shop.item1 = 1;
-        shop.item2 = 2;
-        shop.item3 = 3;
+        shop.item1 = 4;
+        shop.item2 = 6;
+        shop.item3 = 8;
+        shop.item4 = 1;
         let mut char = get!(world, alice, (Character));
         char.gold = 100;
         set!(world, (shop, char));
 
-        actions_system.buy_item(1);
-        actions_system.place_item(1, 0, 0, 0);
-        actions_system.buy_item(2);
-        actions_system.place_item(1, 1, 0, 0);
-        actions_system.buy_item(3);
-        actions_system.place_item(1, 2, 0, 0);
+        actions_system.buy_item(4);
+        actions_system.place_item(2, 4, 2, 0);
+        actions_system.buy_item(6);
+        actions_system.place_item(2, 2, 2, 0);
+        actions_system.buy_item(8);
+        actions_system.place_item(2, 5, 2, 0);
         // actions_system.
         actions_system.create_dummy();
         actions_system.fight();
@@ -105,7 +108,9 @@ mod tests {
 
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
+        let mut actions_system = IActionsDispatcher { contract_address };
+
+        add_items(ref actions_system);
 
         set_contract_address(alice);
 
@@ -124,7 +129,9 @@ mod tests {
 
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
+        let mut actions_system = IActionsDispatcher { contract_address };
+
+        add_items(ref actions_system);
 
         set_contract_address(alice);
 
@@ -146,6 +153,8 @@ mod tests {
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let mut actions_system = IActionsDispatcher { contract_address };
 
+        add_items(ref actions_system);
+
         actions_system.spawn('alice', WMClass::Warlock);
 
         actions_system.fight();
@@ -163,6 +172,8 @@ mod tests {
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let mut actions_system = IActionsDispatcher { contract_address };
+
+        add_items(ref actions_system);
 
         actions_system.spawn('alice', WMClass::Warlock);
 
