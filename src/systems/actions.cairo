@@ -1663,7 +1663,7 @@ mod actions {
 
                     let player_backpack_grid_data = get!(world, (player, i, j), (BackpackGrids));
 
-                    if player_backpack_grid_data.occupied {
+                    if player_backpack_grid_data.occupied || player_backpack_grid_data.enabled {
                         set!(
                             world,
                             (BackpackGrids {
