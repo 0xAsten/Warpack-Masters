@@ -37,29 +37,30 @@ mod tests {
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let mut actions_system = IActionsDispatcher { contract_address };
 
-        actions_system.spawn('alice', WMClass::Warlock);
-
         add_items(ref actions_system);
+
+        actions_system.spawn('alice', WMClass::Warlock);
 
         // mock shop for testing
         let mut shop_data = get!(world, alice, (Shop));
-        shop_data.item1 = 1;
-        shop_data.item2 = 2;
-        shop_data.item3 = 1;
-        shop_data.item4 = 3;
+        shop_data.item1 = 4;
+        shop_data.item2 = 6;
+        shop_data.item3 = 8;
+        shop_data.item4 = 1;
         set!(world, (shop_data));
 
-        actions_system.buy_item(1);
-        actions_system.buy_item(2);
-        actions_system.buy_item(3);
+        actions_system.buy_item(4);
+        actions_system.buy_item(6);
+        actions_system.buy_item(8);
 
-        actions_system.place_item(1, 0, 0, 0);
-        actions_system.place_item(2, 1, 0, 0);
-        actions_system.place_item(3, 3, 0, 0);
+        actions_system.place_item(2, 4, 2, 0);
+        actions_system.place_item(1, 2, 2, 0);
+        actions_system.place_item(3, 5, 2, 0);
 
         let mut char = get!(world, (alice), Character);
         char.loss = 5;
         set!(world, (char));
+
         actions_system.rebirth('bob', WMClass::Warrior);
 
         let char = get!(world, (alice), Character);
@@ -79,6 +80,46 @@ mod tests {
         assert(playerShopData.item2 == 0, 'item 2 should be 0');
         assert(playerShopData.item3 == 0, 'item 3 should be 0');
         assert(playerShopData.item4 == 0, 'item 4 should be 0');
+
+        let playerGridData = get!(world, (alice, 4, 2), BackpackGrids);
+        assert(playerGridData.enabled == false, '(4,2) should not be enabled');
+        assert(playerGridData.occupied == false, '(4,2) should not be occupied');
+
+        let playerGridData = get!(world, (alice, 4, 3), BackpackGrids);
+        assert(playerGridData.enabled == false, '(4,3) should not be enabled');
+        assert(playerGridData.occupied == false, '(4,3) should not be occupied');
+
+        let playerGridData = get!(world, (alice, 4, 4), BackpackGrids);
+        assert(playerGridData.enabled == false, '(4,4) should not be enabled');
+        assert(playerGridData.occupied == false, '(4,4) should not be occupied');
+
+        let playerGridData = get!(world, (alice, 5, 2), BackpackGrids);
+        assert(playerGridData.enabled == false, '(5,2) should not be enabled');
+        assert(playerGridData.occupied == false, '(5,2) should not be occupied');
+
+        let playerGridData = get!(world, (alice, 5, 3), BackpackGrids);
+        assert(playerGridData.enabled == false, '(5,3) should not be enabled');
+        assert(playerGridData.occupied == false, '(5,3) should not be occupied');
+
+        let playerGridData = get!(world, (alice, 5, 4), BackpackGrids);
+        assert(playerGridData.enabled == false, '(5,4) should not be enabled');
+        assert(playerGridData.occupied == false, '(5,4) should not be occupied');
+
+        let playerGridData = get!(world, (alice, 2, 2), BackpackGrids);
+        assert(playerGridData.enabled == false, '(2,2) should not be enabled');
+        assert(playerGridData.occupied == false, '(2,2) should not be occupied');
+
+        let playerGridData = get!(world, (alice, 2, 3), BackpackGrids);
+        assert(playerGridData.enabled == false, '(2,3) should not be enabled');
+        assert(playerGridData.occupied == false, '(2,3) should not be occupied');
+
+        let playerGridData = get!(world, (alice, 3, 2), BackpackGrids);
+        assert(playerGridData.enabled == false, '(3,2) should not be enabled');
+        assert(playerGridData.occupied == false, '(3,2) should not be occupied');
+
+        let playerGridData = get!(world, (alice, 3, 3), BackpackGrids);
+        assert(playerGridData.enabled == false, '(3,3) should not be enabled');
+        assert(playerGridData.occupied == false, '(3,3) should not be occupied');
     }
 
     #[test]
@@ -87,12 +128,14 @@ mod tests {
     fn test_loss_not_reached() {
         let alice = starknet::contract_address_const::<0x0>();
         let mut models = array![];
-        
+
         let world = spawn_test_world(models);
 
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let mut actions_system = IActionsDispatcher { contract_address };
+
+        add_items(ref actions_system);
 
         actions_system.spawn('alice', WMClass::Warlock);
 
