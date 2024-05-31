@@ -12,8 +12,8 @@ mod tests {
     // import test utils
     use warpack_masters::{
         systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait, WMClass}},
-        models::backpack::{Backpack, backpack, BackpackGrids, Grid, GridTrait},
-        models::Item::{Item, item, ItemsCounter}, models::Character::{Character, character},
+        models::backpack::{BackpackGrids}, models::Item::{Item, item, ItemsCounter},
+        models::Character::{Character, character},
         models::CharacterItem::{
             Position, CharacterItemStorage, CharacterItemsStorageCounter, CharacterItemInventory,
             CharacterItemsInventoryCounter
@@ -29,13 +29,15 @@ mod tests {
     #[available_gas(3000000000000000)]
     fn test_dummy() {
         let alice = starknet::contract_address_const::<0x0>();
-        let mut models = array![backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH];
+        let mut models = array![];
 
         let world = spawn_test_world(models);
 
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
+        let mut actions_system = IActionsDispatcher { contract_address };
+
+        add_items(ref actions_system);
 
         actions_system.spawn('alice', WMClass::Warlock);
         actions_system.create_dummy();
@@ -56,14 +58,14 @@ mod tests {
         assert(dummyChar.name == 'alice', 'name should be alice');
         assert(dummyChar.wmClass == WMClass::Warlock, 'class should be Warlock');
         assert(dummyChar.health == char.health, 'health should be equal');
-        assert(dummyCharItemsCounter.count == 0, 'Should be 0');
+        assert(dummyCharItemsCounter.count == 2, 'Should be 2');
     }
 
     #[test]
     #[available_gas(3000000000000000)]
     fn test_sort_array() {
         let alice = starknet::contract_address_const::<0x0>();
-        let mut models = array![backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH];
+        let mut models = array![];
 
         let world = spawn_test_world(models);
 
@@ -76,19 +78,20 @@ mod tests {
         actions_system.spawn('alice', WMClass::Warlock);
 
         let mut shop = get!(world, alice, (Shop));
-        shop.item1 = 1;
-        shop.item2 = 2;
-        shop.item3 = 3;
+        shop.item1 = 4;
+        shop.item2 = 6;
+        shop.item3 = 8;
+        shop.item4 = 1;
         let mut char = get!(world, alice, (Character));
         char.gold = 100;
         set!(world, (shop, char));
 
-        actions_system.buy_item(1);
-        actions_system.place_item(1, 0, 0, 0);
-        actions_system.buy_item(2);
-        actions_system.place_item(1, 1, 0, 0);
-        actions_system.buy_item(3);
-        actions_system.place_item(1, 2, 0, 0);
+        actions_system.buy_item(4);
+        actions_system.place_item(2, 4, 2, 0);
+        actions_system.buy_item(6);
+        actions_system.place_item(2, 2, 2, 0);
+        actions_system.buy_item(8);
+        actions_system.place_item(2, 5, 2, 0);
         // actions_system.
         actions_system.create_dummy();
         actions_system.fight();
@@ -99,13 +102,15 @@ mod tests {
     #[should_panic(expected: ('dummy not created', 'ENTRYPOINT_FAILED'))]
     fn test_revert_dummy_not_created() {
         let alice = starknet::contract_address_const::<0x0>();
-        let mut models = array![backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH];
+        let mut models = array![];
 
         let world = spawn_test_world(models);
 
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
+        let mut actions_system = IActionsDispatcher { contract_address };
+
+        add_items(ref actions_system);
 
         set_contract_address(alice);
 
@@ -118,13 +123,15 @@ mod tests {
     #[should_panic(expected: ('dummy already created', 'ENTRYPOINT_FAILED'))]
     fn test_revert_dummy_already_created() {
         let alice = starknet::contract_address_const::<0x0>();
-        let mut models = array![backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH];
+        let mut models = array![];
 
         let world = spawn_test_world(models);
 
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
+        let mut actions_system = IActionsDispatcher { contract_address };
+
+        add_items(ref actions_system);
 
         set_contract_address(alice);
 
@@ -138,13 +145,15 @@ mod tests {
     #[should_panic(expected: ('dummy not created', 'ENTRYPOINT_FAILED'))]
     fn test_dummy_not_created() {
         starknet::contract_address_const::<0x0>();
-        let mut models = array![backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH];
+        let mut models = array![];
 
         let world = spawn_test_world(models);
 
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let mut actions_system = IActionsDispatcher { contract_address };
+
+        add_items(ref actions_system);
 
         actions_system.spawn('alice', WMClass::Warlock);
 
@@ -156,13 +165,15 @@ mod tests {
     #[should_panic(expected: ('max loss reached', 'ENTRYPOINT_FAILED'))]
     fn test_max_loss_reached() {
         let alice = starknet::contract_address_const::<0x0>();
-        let mut models = array![backpack::TEST_CLASS_HASH, item::TEST_CLASS_HASH];
+        let mut models = array![];
 
         let world = spawn_test_world(models);
 
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let mut actions_system = IActionsDispatcher { contract_address };
+
+        add_items(ref actions_system);
 
         actions_system.spawn('alice', WMClass::Warlock);
 

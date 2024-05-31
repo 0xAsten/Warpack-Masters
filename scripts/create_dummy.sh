@@ -4,9 +4,10 @@ pushd $(dirname "$0")/..
 
 : "${RPC_URL:?Environment variable RPC_URL must be set}"
 
-export WORLD_ADDRESS=$(cat ./manifests/deployments/KATANA.json | jq -r '.world.address')
+export WORLD_ADDRESS=$(cat ./manifests/dev/manifest.json | jq -r '.world.address')
 
-export ACTIONS_ADDRESS=$(cat ./manifests/deployments/KATANA.json | jq -r '.contracts[] | select(.name == "warpack_masters::systems::actions::actions" ).address')
+# export ACTIONS_ADDRESS=$(cat ./manifests/deployments/KATANA.json | jq -r '.contracts[] | select(.name == "warpack_masters::systems::actions::actions" ).address')
+export ACTIONS_ADDRESS='0x591fe4c5c0987dfd20e14e82875494699eda1e47c68c98801df329424e1bb03'
 
 
 echo "---------------------------------------------------------------------------"

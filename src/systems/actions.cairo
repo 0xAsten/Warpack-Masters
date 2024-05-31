@@ -15,6 +15,7 @@ trait IActions {
         height: usize,
         price: usize,
         damage: usize,
+        cleansePoison: usize,
         chance: usize,
         cooldown: u8,
         rarity: u8,
@@ -46,7 +47,7 @@ mod actions {
     use super::IActions;
 
     use starknet::{ContractAddress, get_caller_address};
-    use warpack_masters::models::{backpack::{Backpack, BackpackGrids, Grid, GridTrait}};
+    use warpack_masters::models::{backpack::{BackpackGrids}};
     use warpack_masters::models::{
         CharacterItem::{
             Position, CharacterItemsStorageCounter, CharacterItemStorage, CharacterItemInventory,
@@ -62,6 +63,7 @@ mod actions {
         DummyCharacterItem, DummyCharacterItemsCounter
     };
     use warpack_masters::models::BattleLog::{BattleLog, BattleLogCounter};
+    use warpack_masters::items::{Backpack1, Backpack2};
 
     // #[event]
     // #[derive(Drop, starknet::Event)]
@@ -82,6 +84,7 @@ mod actions {
         whichItem: usize,
         damageCaused: usize,
         isDodged: bool,
+        cleansePoison: usize,
         buffType: felt252,
         regenHP: usize,
         player_armor_stacks: usize,
@@ -94,9 +97,8 @@ mod actions {
         dummy_poison_stacks: usize,
     }
 
-
-    const GRID_X: usize = 4;
-    const GRID_Y: usize = 3;
+    const GRID_X: usize = 9;
+    const GRID_Y: usize = 7;
     const INIT_GOLD: usize = 8;
     const INIT_HEALTH: usize = 25;
 
@@ -108,16 +110,37 @@ mod actions {
     const EFFECT_REGEN: felt252 = 'regen';
     const EFFECT_REFLECT: felt252 = 'reflect';
     const EFFECT_POISON: felt252 = 'poison';
+    const EFFECT_CLEANSE_POISON: felt252 = 'cleanse_poison';
 
     #[abi(embed_v0)]
     impl ActionsImpl of IActions<ContractState> {
         fn spawn(world: IWorldDispatcher, name: felt252, wmClass: WMClass) {
             let player = get_caller_address();
 
-            let player_exists = get!(world, player, (Backpack));
-            assert(player_exists.grid.is_zero(), 'Player already exists');
+            assert(name != '', 'name cannot be empty');
 
-            set!(world, (Backpack { player, grid: Grid { x: GRID_X, y: GRID_Y } },));
+            let player_exists = get!(world, player, (Character));
+            assert(player_exists.name == '', 'player already exists');
+
+            // Default the player has 2 Backpacks
+            // Must add two backpack items when setup the game
+            let item = get!(world, Backpack1::id, (Item));
+            assert(item.itemType == 4, 'Invalid item type');
+            let item = get!(world, Backpack2::id, (Item));
+            assert(item.itemType == 4, 'Invalid item type');
+
+            set!(
+                world,
+                (
+                    CharacterItemStorage { player, id: 1, itemId: Backpack1::id },
+                    CharacterItemStorage { player, id: 2, itemId: Backpack2::id },
+                    CharacterItemsStorageCounter { player, count: 2 },
+                )
+            );
+
+            self.place_item(1, 4, 2, 0);
+            self.place_item(2, 2, 2, 0);
+
             // add one gold for reroll shop
             set!(
                 world,
@@ -143,6 +166,7 @@ mod actions {
             height: usize,
             price: usize,
             damage: usize,
+            cleansePoison: usize,
             chance: usize,
             cooldown: u8,
             rarity: u8,
@@ -164,24 +188,15 @@ mod actions {
 
             assert(price > 0, 'price must be greater than 0');
 
-            assert(rarity == 1 || rarity == 2 || rarity == 3, 'rarity not valid');
+            assert(
+                rarity == 1 || rarity == 2 || rarity == 3 || (rarity == 0 && itemType == 4),
+                'rarity not valid'
+            );
 
             let counter = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
             if id > counter.count {
                 set!(world, ItemsCounter { id: ITEMS_COUNTER_ID, count: id });
             }
-
-            // let mut count = counter.count;
-            // loop {
-            //     if count == 0 {
-            //         break;
-            //     }
-
-            //     let item = get!(world, count, (Item));
-            //     assert(item.name != name, 'item name already exists');
-
-            //     count -= 1;
-            // };
 
             let item = Item {
                 id,
@@ -191,6 +206,7 @@ mod actions {
                 height,
                 price,
                 damage,
+                cleansePoison,
                 chance,
                 cooldown,
                 rarity,
@@ -260,22 +276,29 @@ mod actions {
                     item_data.damage = new_damage;
                     set!(world, (item_data,));
                 },
-                // chance
+                // cleansePoison
                 6 => {
+                    let new_cleansePoison: usize = item_value.try_into().unwrap();
+
+                    item_data.cleansePoison = new_cleansePoison;
+                    set!(world, (item_data,));
+                },
+                // chance
+                7 => {
                     let new_chance: usize = item_value.try_into().unwrap();
 
                     item_data.chance = new_chance;
                     set!(world, (item_data,));
                 },
                 // cooldown
-                7 => {
+                8 => {
                     let new_cooldown: u8 = item_value.try_into().unwrap();
 
                     item_data.cooldown = new_cooldown;
                     set!(world, (item_data,));
                 },
                 // rarity
-                8 => {
+                9 => {
                     let new_rarity: u8 = item_value.try_into().unwrap();
                     assert(
                         new_rarity == 1 || new_rarity == 2 || new_rarity == 3,
@@ -286,56 +309,56 @@ mod actions {
                     set!(world, (item_data,));
                 },
                 // armor
-                9 => {
+                10 => {
                     let new_armor: usize = item_value.try_into().unwrap();
 
                     item_data.armor = new_armor;
                     set!(world, (item_data,));
                 },
                 // armorActivation
-                10 => {
+                11 => {
                     let new_armorActivation: u8 = item_value.try_into().unwrap();
 
                     item_data.armorActivation = new_armorActivation;
                     set!(world, (item_data,));
                 },
                 // regen
-                11 => {
+                12 => {
                     let new_regen: usize = item_value.try_into().unwrap();
 
                     item_data.regen = new_regen;
                     set!(world, (item_data,));
                 },
                 // regenActivation
-                12 => {
+                13 => {
                     let new_regenActivation: u8 = item_value.try_into().unwrap();
 
                     item_data.regenActivation = new_regenActivation;
                     set!(world, (item_data,));
                 },
                 // reflect
-                13 => {
+                14 => {
                     let new_reflect: usize = item_value.try_into().unwrap();
 
                     item_data.reflect = new_reflect;
                     set!(world, (item_data,));
                 },
                 // reflectActivation
-                14 => {
+                15 => {
                     let new_reflectActivation: u8 = item_value.try_into().unwrap();
 
                     item_data.reflectActivation = new_reflectActivation;
                     set!(world, (item_data,));
                 },
                 // poison
-                15 => {
+                16 => {
                     let new_poison: usize = item_value.try_into().unwrap();
 
                     item_data.poison = new_poison;
                     set!(world, (item_data,));
                 },
                 // poisonActivation
-                16 => {
+                17 => {
                     let new_poisonActivation: u8 = item_value.try_into().unwrap();
 
                     item_data.poisonActivation = new_poisonActivation;
@@ -369,11 +392,27 @@ mod actions {
             let itemWidth = item.width;
 
             let playerBackpackGrids = get!(world, (player, x, y), (BackpackGrids));
-            assert(!playerBackpackGrids.occupied, 'Already occupied');
 
             // if the item is 1x1, occupy the empty grid
             if itemHeight == 1 && itemWidth == 1 {
-                set!(world, (BackpackGrids { player: player, x: x, y: y, occupied: true }));
+                if item.itemType == 4 {
+                    assert(!playerBackpackGrids.enabled, 'Already enabled');
+                    set!(
+                        world,
+                        (BackpackGrids {
+                            player: player, x: x, y: y, enabled: true, occupied: false
+                        })
+                    );
+                } else {
+                    assert(playerBackpackGrids.enabled, 'Grid not enabled');
+                    assert(!playerBackpackGrids.occupied, 'Already occupied');
+                    set!(
+                        world,
+                        (BackpackGrids {
+                            player: player, x: x, y: y, enabled: true, occupied: true
+                        })
+                    );
+                }
             } else {
                 let mut xMax = 0;
                 let mut yMax = 0;
@@ -406,9 +445,25 @@ mod actions {
                         }
 
                         let playerBackpackGrids = get!(world, (player, i, j), (BackpackGrids));
-                        assert(!playerBackpackGrids.occupied, 'Already occupied');
+                        if item.itemType == 4 {
+                            assert(!playerBackpackGrids.enabled, 'Already enabled');
+                            set!(
+                                world,
+                                (BackpackGrids {
+                                    player: player, x: i, y: j, enabled: true, occupied: false
+                                })
+                            );
+                        } else {
+                            assert(playerBackpackGrids.enabled, 'Grid not enabled');
+                            assert(!playerBackpackGrids.occupied, 'Already occupied');
+                            set!(
+                                world,
+                                (BackpackGrids {
+                                    player: player, x: i, y: j, enabled: true, occupied: true
+                                })
+                            );
+                        }
 
-                        set!(world, (BackpackGrids { player: player, x: i, y: j, occupied: true }));
                         j += 1;
                     };
                     j = y;
@@ -474,8 +529,24 @@ mod actions {
             let itemHeight = item.height;
             let itemWidth = item.width;
 
+            let playerBackpackGrids = get!(world, (player, x, y), (BackpackGrids));
             if itemHeight == 1 && itemWidth == 1 {
-                set!(world, (BackpackGrids { player: player, x: x, y: y, occupied: false }));
+                if item.itemType == 4 {
+                    assert(!playerBackpackGrids.occupied, 'Already occupied');
+                    set!(
+                        world,
+                        (BackpackGrids {
+                            player: player, x: x, y: y, enabled: false, occupied: false
+                        })
+                    );
+                } else {
+                    set!(
+                        world,
+                        (BackpackGrids {
+                            player: player, x: x, y: y, enabled: true, occupied: false
+                        })
+                    );
+                }
             } else {
                 let mut xMax = 0;
                 let mut yMax = 0;
@@ -504,9 +575,24 @@ mod actions {
                             break;
                         }
 
-                        set!(
-                            world, (BackpackGrids { player: player, x: i, y: j, occupied: false })
-                        );
+                        let playerBackpackGrids = get!(world, (player, i, j), (BackpackGrids));
+                        if item.itemType == 4 {
+                            assert(!playerBackpackGrids.occupied, 'Already occupied');
+                            set!(
+                                world,
+                                (BackpackGrids {
+                                    player: player, x: i, y: j, enabled: false, occupied: false
+                                })
+                            );
+                        } else {
+                            set!(
+                                world,
+                                (BackpackGrids {
+                                    player: player, x: i, y: j, enabled: true, occupied: false
+                                })
+                            );
+                        }
+
                         j += 1;
                     };
                     j = y;
@@ -654,8 +740,6 @@ mod actions {
 
             let itemsCounter = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
             let mut count = itemsCounter.count;
-
-            assert(count > 0, 'No items found');
 
             loop {
                 if count == 0 {
@@ -1009,6 +1093,7 @@ mod actions {
 
                     let curr_item_data = get!(world, curr_item_index, (Item));
                     let damage = curr_item_data.damage;
+                    let cleansePoison = curr_item_data.cleansePoison;
                     let chance = curr_item_data.chance;
                     let cooldown = curr_item_data.cooldown;
 
@@ -1083,6 +1168,7 @@ mod actions {
                                             whichItem: curr_item_index,
                                             damageCaused: damageCaused,
                                             isDodged: false,
+                                            cleansePoison: 0,
                                             buffType: EFFECT_ARMOR,
                                             regenHP: 0,
                                             player_armor_stacks: char_armor,
@@ -1130,6 +1216,7 @@ mod actions {
                                                 whichItem: 0,
                                                 damageCaused: damageCaused,
                                                 isDodged: false,
+                                                cleansePoison: 0,
                                                 buffType: EFFECT_REFLECT,
                                                 regenHP: 0,
                                                 player_armor_stacks: char_armor,
@@ -1150,6 +1237,38 @@ mod actions {
                                         char_health -= damageCaused;
                                     }
                                 // ====== end ======
+                                } else {
+                                    if cleansePoison > 0 {
+                                        if char_poison > cleansePoison {
+                                            char_poison -= cleansePoison;
+                                        } else {
+                                            char_poison = 0;
+                                        }
+                                        battleLogsCount += 1;
+                                        emit!(
+                                            world,
+                                            (BattleLogDetail {
+                                                player,
+                                                battleLogId: battleLogCounterCount,
+                                                id: battleLogsCount,
+                                                whoTriggered: curr_item_belongs,
+                                                whichItem: curr_item_index,
+                                                damageCaused: 0,
+                                                cleansePoison: cleansePoison,
+                                                isDodged: false,
+                                                buffType: EFFECT_CLEANSE_POISON,
+                                                regenHP: 0,
+                                                player_armor_stacks: char_armor,
+                                                player_regen_stacks: char_regen,
+                                                player_reflect_stacks: char_reflect,
+                                                player_poison_stacks: char_poison,
+                                                dummy_armor_stacks: dummy_armor,
+                                                dummy_regen_stacks: dummy_regen,
+                                                dummy_reflect_stacks: dummy_reflect,
+                                                dummy_poison_stacks: dummy_poison,
+                                            })
+                                        );
+                                    }
                                 }
                             } else {
                                 // ====== on cooldown to plus stacks, all use the same randomness ======
@@ -1218,6 +1337,7 @@ mod actions {
                                             whichItem: curr_item_index,
                                             damageCaused: damageCaused,
                                             isDodged: false,
+                                            cleansePoison: 0,
                                             buffType: EFFECT_ARMOR,
                                             regenHP: 0,
                                             player_armor_stacks: char_armor,
@@ -1265,6 +1385,7 @@ mod actions {
                                                 whichItem: 0,
                                                 damageCaused: damageCaused,
                                                 isDodged: false,
+                                                cleansePoison: 0,
                                                 buffType: EFFECT_REFLECT,
                                                 regenHP: 0,
                                                 player_armor_stacks: char_armor,
@@ -1285,6 +1406,38 @@ mod actions {
                                         dummy_health -= damageCaused;
                                     }
                                 // ====== end ======
+                                } else {
+                                    if cleansePoison > 0 {
+                                        if dummy_poison > cleansePoison {
+                                            dummy_poison -= cleansePoison;
+                                        } else {
+                                            dummy_poison = 0;
+                                        }
+                                        battleLogsCount += 1;
+                                        emit!(
+                                            world,
+                                            (BattleLogDetail {
+                                                player,
+                                                battleLogId: battleLogCounterCount,
+                                                id: battleLogsCount,
+                                                whoTriggered: curr_item_belongs,
+                                                whichItem: curr_item_index,
+                                                damageCaused: 0,
+                                                isDodged: false,
+                                                cleansePoison: cleansePoison,
+                                                buffType: EFFECT_CLEANSE_POISON,
+                                                regenHP: 0,
+                                                player_armor_stacks: char_armor,
+                                                player_regen_stacks: char_regen,
+                                                player_reflect_stacks: char_reflect,
+                                                player_poison_stacks: char_poison,
+                                                dummy_armor_stacks: dummy_armor,
+                                                dummy_regen_stacks: dummy_regen,
+                                                dummy_reflect_stacks: dummy_reflect,
+                                                dummy_poison_stacks: dummy_poison,
+                                            })
+                                        );
+                                    }
                                 }
                             }
                         } else if rand >= chance && damage > 0 {
@@ -1299,6 +1452,7 @@ mod actions {
                                     whichItem: curr_item_index,
                                     damageCaused: 0,
                                     isDodged: true,
+                                    cleansePoison: 0,
                                     buffType: 0,
                                     regenHP: 0,
                                     player_armor_stacks: char_armor,
@@ -1332,6 +1486,7 @@ mod actions {
                                 whichItem: 0,
                                 damageCaused: char_poison,
                                 isDodged: false,
+                                cleansePoison: 0,
                                 buffType: EFFECT_POISON,
                                 regenHP: 0,
                                 player_armor_stacks: char_armor,
@@ -1363,6 +1518,7 @@ mod actions {
                                 whichItem: 0,
                                 damageCaused: dummy_poison,
                                 isDodged: false,
+                                cleansePoison: 0,
                                 buffType: EFFECT_POISON,
                                 regenHP: 0,
                                 player_armor_stacks: char_armor,
@@ -1394,6 +1550,7 @@ mod actions {
                                 whichItem: 0,
                                 damageCaused: 0,
                                 isDodged: false,
+                                cleansePoison: 0,
                                 buffType: EFFECT_REGEN,
                                 regenHP: char_regen,
                                 player_armor_stacks: char_armor,
@@ -1424,6 +1581,7 @@ mod actions {
                                 whichItem: 0,
                                 damageCaused: 0,
                                 isDodged: false,
+                                cleansePoison: 0,
                                 buffType: EFFECT_REGEN,
                                 regenHP: dummy_regen,
                                 player_armor_stacks: char_armor,
@@ -1592,9 +1750,12 @@ mod actions {
 
                     let player_backpack_grid_data = get!(world, (player, i, j), (BackpackGrids));
 
-                    if player_backpack_grid_data.occupied {
+                    if player_backpack_grid_data.occupied || player_backpack_grid_data.enabled {
                         set!(
-                            world, (BackpackGrids { player: player, x: i, y: j, occupied: false })
+                            world,
+                            (BackpackGrids {
+                                player: player, x: i, y: j, enabled: false, occupied: false
+                            })
                         );
                     }
                     j += 1;

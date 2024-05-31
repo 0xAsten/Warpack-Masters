@@ -6,13 +6,14 @@ struct Item {
     #[key]
     id: usize,
     name: felt252,
-    // 1 - Melee Weapon, 2 - Ranged Weapon, 3 - Gear
+    // 1 - Melee Weapon, 2 - Ranged Weapon, 3 - Gear, 4 - Backpack
     itemType: u8,
     width: usize,
     height: usize,
     price: usize,
     // Base damage
     damage: usize,
+    cleansePoison: usize,
     // Accuracy to trigger
     chance: usize,
     // item reuse time
