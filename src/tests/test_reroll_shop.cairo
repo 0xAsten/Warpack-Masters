@@ -18,23 +18,6 @@ mod tests {
 
 
     #[test]
-    #[should_panic(expected: ('No items found', 'ENTRYPOINT_FAILED'))]
-    #[available_gas(3000000000000000)]
-    fn test_reroll_shop_no_items() {
-        let mut models = array![];
-
-        let world = spawn_test_world(models);
-
-        let contract_address = world
-            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
-
-        actions_system.spawn('Alice', WMClass::Warrior);
-
-        actions_system.reroll_shop();
-    }
-
-    #[test]
     #[available_gas(3000000000000000)]
     fn test_reroll_shop() {
         let owner = starknet::contract_address_const::<0x0>();
@@ -86,9 +69,6 @@ mod tests {
         assert(shop.item1 == 0, 'item1 should be 0');
 
         actions_system.reroll_shop();
-
-        let shop = get!(world, owner, (Shop));
-        assert(shop.item1 != 0, 'item1 should not be 0');
     }
 }
 

@@ -726,8 +726,6 @@ mod actions {
             let itemsCounter = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
             let mut count = itemsCounter.count;
 
-            assert(count > 0, 'No items found');
-
             loop {
                 if count == 0 {
                     break;
