@@ -273,22 +273,29 @@ mod actions {
                     item_data.damage = new_damage;
                     set!(world, (item_data,));
                 },
-                // chance
+                // cleansePoison
                 6 => {
+                    let new_cleansePoison: usize = item_value.try_into().unwrap();
+
+                    item_data.cleansePoison = new_cleansePoison;
+                    set!(world, (item_data,));
+                },
+                // chance
+                7 => {
                     let new_chance: usize = item_value.try_into().unwrap();
 
                     item_data.chance = new_chance;
                     set!(world, (item_data,));
                 },
                 // cooldown
-                7 => {
+                8 => {
                     let new_cooldown: u8 = item_value.try_into().unwrap();
 
                     item_data.cooldown = new_cooldown;
                     set!(world, (item_data,));
                 },
                 // rarity
-                8 => {
+                9 => {
                     let new_rarity: u8 = item_value.try_into().unwrap();
                     assert(
                         new_rarity == 1 || new_rarity == 2 || new_rarity == 3,
@@ -299,56 +306,56 @@ mod actions {
                     set!(world, (item_data,));
                 },
                 // armor
-                9 => {
+                10 => {
                     let new_armor: usize = item_value.try_into().unwrap();
 
                     item_data.armor = new_armor;
                     set!(world, (item_data,));
                 },
                 // armorActivation
-                10 => {
+                11 => {
                     let new_armorActivation: u8 = item_value.try_into().unwrap();
 
                     item_data.armorActivation = new_armorActivation;
                     set!(world, (item_data,));
                 },
                 // regen
-                11 => {
+                12 => {
                     let new_regen: usize = item_value.try_into().unwrap();
 
                     item_data.regen = new_regen;
                     set!(world, (item_data,));
                 },
                 // regenActivation
-                12 => {
+                13 => {
                     let new_regenActivation: u8 = item_value.try_into().unwrap();
 
                     item_data.regenActivation = new_regenActivation;
                     set!(world, (item_data,));
                 },
                 // reflect
-                13 => {
+                14 => {
                     let new_reflect: usize = item_value.try_into().unwrap();
 
                     item_data.reflect = new_reflect;
                     set!(world, (item_data,));
                 },
                 // reflectActivation
-                14 => {
+                15 => {
                     let new_reflectActivation: u8 = item_value.try_into().unwrap();
 
                     item_data.reflectActivation = new_reflectActivation;
                     set!(world, (item_data,));
                 },
                 // poison
-                15 => {
+                16 => {
                     let new_poison: usize = item_value.try_into().unwrap();
 
                     item_data.poison = new_poison;
                     set!(world, (item_data,));
                 },
                 // poisonActivation
-                16 => {
+                17 => {
                     let new_poisonActivation: u8 = item_value.try_into().unwrap();
 
                     item_data.poisonActivation = new_poisonActivation;
