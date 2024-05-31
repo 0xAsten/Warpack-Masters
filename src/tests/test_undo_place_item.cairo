@@ -169,8 +169,6 @@ mod tests {
         let storageItem = get!(world, (alice, 3), CharacterItemStorage);
         assert(storageItem.itemId == 6, 'item id should equal 6');
 
-        println!("storagedone");
-
         let inventoryItemCounter = get!(world, alice, CharacterItemsInventoryCounter);
         assert(inventoryItemCounter.count == 5, 'inventory item count mismatch');
 
