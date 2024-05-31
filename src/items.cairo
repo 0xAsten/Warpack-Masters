@@ -6,6 +6,7 @@ mod Backpack1 {
     const height: usize = 3;
     const price: usize = 5;
     const damage: usize = 0;
+    const cleansePoison: usize = 0;
     const chance: usize = 0;
     const cooldown: u8 = 0;
     const rarity: u8 = 3;
@@ -27,6 +28,7 @@ mod Backpack2 {
     const height: usize = 2;
     const price: usize = 4;
     const damage: usize = 0;
+    const cleansePoison: usize = 0;
     const chance: usize = 0;
     const cooldown: u8 = 0;
     const rarity: u8 = 3;
@@ -48,6 +50,7 @@ mod Dagger {
     const height: usize = 2;
     const price: usize = 2;
     const damage: usize = 3;
+    const cleansePoison: usize = 0;
     const chance: usize = 90;
     const cooldown: u8 = 4;
     const rarity: u8 = 1;
@@ -69,6 +72,7 @@ mod Sword {
     const height: usize = 3;
     const price: usize = 2;
     const damage: usize = 5;
+    const cleansePoison: usize = 0;
     const chance: usize = 80;
     const cooldown: u8 = 5;
     const rarity: u8 = 1;
@@ -90,6 +94,7 @@ mod Spike {
     const height: usize = 1;
     const price: usize = 2;
     const damage: usize = 0;
+    const cleansePoison: usize = 0;
     const chance: usize = 100;
     const cooldown: u8 = 0;
     const rarity: u8 = 1;
@@ -111,6 +116,7 @@ mod Shield {
     const height: usize = 2;
     const price: usize = 3;
     const damage: usize = 0;
+    const cleansePoison: usize = 0;
     const chance: usize = 100;
     const cooldown: u8 = 0;
     const rarity: u8 = 1;
@@ -132,6 +138,7 @@ mod Helmet {
     const height: usize = 1;
     const price: usize = 3;
     const damage: usize = 0;
+    const cleansePoison: usize = 0;
     const chance: usize = 50;
     const cooldown: u8 = 0;
     const rarity: u8 = 1;
@@ -153,6 +160,7 @@ mod HealingPotion {
     const height: usize = 1;
     const price: usize = 4;
     const damage: usize = 0;
+    const cleansePoison: usize = 0;
     const chance: usize = 100;
     const cooldown: u8 = 0;
     const rarity: u8 = 2;
@@ -174,6 +182,7 @@ mod LeatherArmor {
     const height: usize = 3;
     const price: usize = 5;
     const damage: usize = 0;
+    const cleansePoison: usize = 0;
     const chance: usize = 100;
     const cooldown: u8 = 0;
     const rarity: u8 = 2;
@@ -195,6 +204,7 @@ mod PoisonPotion {
     const height: usize = 1;
     const price: usize = 5;
     const damage: usize = 0;
+    const cleansePoison: usize = 0;
     const chance: usize = 100;
     const cooldown: u8 = 0;
     const rarity: u8 = 2;
@@ -216,6 +226,7 @@ mod AugmentedSword {
     const height: usize = 3;
     const price: usize = 6;
     const damage: usize = 10;
+    const cleansePoison: usize = 0;
     const chance: usize = 180;
     const cooldown: u8 = 4;
     const rarity: u8 = 2;
@@ -237,6 +248,7 @@ mod AugmentedDagger {
     const height: usize = 2;
     const price: usize = 6;
     const damage: usize = 6;
+    const cleansePoison: usize = 0;
     const chance: usize = 90;
     const cooldown: u8 = 3;
     const rarity: u8 = 2;
@@ -258,6 +270,7 @@ mod SpikeShield {
     const height: usize = 2;
     const price: usize = 7;
     const damage: usize = 0;
+    const cleansePoison: usize = 0;
     const chance: usize = 50;
     const cooldown: u8 = 0;
     const rarity: u8 = 2;
@@ -279,6 +292,7 @@ mod PlagueFlower {
     const height: usize = 2;
     const price: usize = 12;
     const damage: usize = 0;
+    const cleansePoison: usize = 0;
     const chance: usize = 80;
     const cooldown: u8 = 4;
     const rarity: u8 = 3;
@@ -300,6 +314,7 @@ mod BladeArmor {
     const height: usize = 3;
     const price: usize = 12;
     const damage: usize = 0;
+    const cleansePoison: usize = 0;
     const chance: usize = 100;
     const cooldown: u8 = 0;
     const rarity: u8 = 3;

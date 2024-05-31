@@ -13,6 +13,7 @@ struct Item {
     price: usize,
     // Base damage
     damage: usize,
+    cleansePoison: usize,
     // Accuracy to trigger
     chance: usize,
     // item reuse time
