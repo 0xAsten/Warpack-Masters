@@ -38,6 +38,7 @@ mod tests {
         let item_one_new_height: felt252 = 1;
         let item_one_new_price: felt252 = 4;
         let item_one_new_damage: felt252 = 2;
+        let item_one_new_cleansePoison: felt252 = 2;
         let item_one_new_chance: felt252 = 100;
         let item_one_new_cooldown: felt252 = 5;
         let item_one_new_rarity: felt252 = 2;
@@ -56,17 +57,18 @@ mod tests {
         actions_system.edit_item(1, 3, item_one_new_height);
         actions_system.edit_item(1, 4, item_one_new_price);
         actions_system.edit_item(1, 5, item_one_new_damage);
-        actions_system.edit_item(1, 6, item_one_new_chance);
-        actions_system.edit_item(1, 7, item_one_new_cooldown);
-        actions_system.edit_item(1, 8, item_one_new_rarity);
-        actions_system.edit_item(1, 9, item_one_new_armor);
-        actions_system.edit_item(1, 10, item_one_new_armorActivation);
-        actions_system.edit_item(1, 11, item_one_new_regen);
-        actions_system.edit_item(1, 12, item_one_new_regenActivation);
-        actions_system.edit_item(1, 13, item_one_new_reflect);
-        actions_system.edit_item(1, 14, item_one_new_reflectActivation);
-        actions_system.edit_item(1, 15, item_one_new_poison);
-        actions_system.edit_item(1, 16, item_one_new_poisonActivation);
+        actions_system.edit_item(1, 6, item_one_new_cleansePoison);
+        actions_system.edit_item(1, 7, item_one_new_chance);
+        actions_system.edit_item(1, 8, item_one_new_cooldown);
+        actions_system.edit_item(1, 9, item_one_new_rarity);
+        actions_system.edit_item(1, 10, item_one_new_armor);
+        actions_system.edit_item(1, 11, item_one_new_armorActivation);
+        actions_system.edit_item(1, 12, item_one_new_regen);
+        actions_system.edit_item(1, 13, item_one_new_regenActivation);
+        actions_system.edit_item(1, 14, item_one_new_reflect);
+        actions_system.edit_item(1, 15, item_one_new_reflectActivation);
+        actions_system.edit_item(1, 16, item_one_new_poison);
+        actions_system.edit_item(1, 17, item_one_new_poisonActivation);
 
         let item_one_data = get!(world, 1, (Item));
         assert(item_one_data.name == item_one_new_name, 'I1 name mismatch');
@@ -75,6 +77,10 @@ mod tests {
         assert(item_one_data.height.into() == item_one_new_height, 'I1 height mismatch');
         assert(item_one_data.price.into() == item_one_new_price, 'I1 price mismatch');
         assert(item_one_data.damage.into() == item_one_new_damage, 'I1 damage mismatch');
+        assert(
+            item_one_data.cleansePoison.into() == item_one_new_cleansePoison,
+            'I1 cleansePoison mismatch'
+        );
         assert(item_one_data.chance.into() == item_one_new_chance, 'I1 chance mismatch');
         assert(item_one_data.cooldown.into() == item_one_new_cooldown, 'I1 cooldown mismatch');
         assert(item_one_data.rarity.into() == item_one_new_rarity, 'I1 rarity mismatch');
@@ -187,7 +193,7 @@ mod tests {
 
         add_items(ref actions_system);
 
-        actions_system.edit_item(1, 8, 9);
+        actions_system.edit_item(1, 9, 9);
     }
 }
 
