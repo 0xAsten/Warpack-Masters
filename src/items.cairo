@@ -9,7 +9,7 @@ mod Backpack1 {
     const cleansePoison: usize = 0;
     const chance: usize = 0;
     const cooldown: u8 = 0;
-    const rarity: u8 = 3;
+    const rarity: u8 = 0;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
     const regen: usize = 0;

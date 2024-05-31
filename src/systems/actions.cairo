@@ -188,7 +188,10 @@ mod actions {
 
             assert(price > 0, 'price must be greater than 0');
 
-            assert(rarity == 1 || rarity == 2 || rarity == 3, 'rarity not valid');
+            assert(
+                rarity == 1 || rarity == 2 || rarity == 3 || (rarity == 0 && itemType == 4),
+                'rarity not valid'
+            );
 
             let counter = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
             if id > counter.count {
