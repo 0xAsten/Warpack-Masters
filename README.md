@@ -34,3 +34,16 @@ Exxcuro - artist;
 In autobattles and other fastpace games, providing instant feedback to a player is crucial. 
 We're creating dummy characters within the world contract, and use mirror images for instant matchmaking.
 
+
+# Version Updates
+
+## V3
+
+- Add buffs/debuffs (Regen, Armor, Reflect, Posion)
+- Add new items
+
+## V4
+
+- Add Backpack Expansion feature
+- Add new items include bags
+- Add new effect `cleanse Poison`
