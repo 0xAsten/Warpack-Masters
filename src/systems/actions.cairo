@@ -922,6 +922,10 @@ mod actions {
                 }
                 let charItem = get!(world, (player, inventoryItemCount), (CharacterItemInventory));
                 let item = get!(world, charItem.itemId, (Item));
+                if item.itemType == 4 {
+                    inventoryItemCount -= 1;
+                    continue;
+                }
                 let cooldown = item.cooldown;
                 if cooldown > 0 {
                     items.insert(items_length.into(), charItem.itemId);
@@ -980,6 +984,10 @@ mod actions {
                     world, (char.wins, random_index, dummy_item_count), (DummyCharacterItem)
                 );
                 let item = get!(world, dummy_item.itemId, (Item));
+                if item.itemType == 4 {
+                    dummy_item_count -= 1;
+                    continue;
+                }
                 if item.cooldown > 0 {
                     items.insert(items_length.into(), dummy_item.itemId);
                     item_belongs.insert(items_length.into(), 'dummy');
