@@ -748,6 +748,11 @@ mod actions {
 
                 let item = get!(world, count, (Item));
 
+                if item.id == 14 || item.id == 18 || item.id == 19 {
+                    count -= 1;
+                    continue;
+                }
+
                 let rarity: felt252 = item.rarity.into();
                 match rarity {
                     0 => {},
