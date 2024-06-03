@@ -1704,13 +1704,8 @@ mod actions {
 
             assert(char.loss >= 5, 'loss not reached');
 
-            char.name = name;
-            char.wmClass = wmClass;
-            char.loss = 0;
-            char.wins = 0;
-            char.health = INIT_HEALTH;
-            char.gold = INIT_GOLD + 1;
-            char.dummied = false;
+            // required to calling spawn doesn't fail
+            char.name = '';
 
             let mut inventoryItemsCounter = get!(world, player, (CharacterItemsInventoryCounter));
             let mut count = inventoryItemsCounter.count;
@@ -1787,6 +1782,8 @@ mod actions {
             inventoryItemsCounter.count = 0;
             storageItemsCounter.count = 0;
             set!(world, (char, shop, inventoryItemsCounter, storageItemsCounter));
+
+            self.spawn(name, wmClass);
         }
     }
 }
