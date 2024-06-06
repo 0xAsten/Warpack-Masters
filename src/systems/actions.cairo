@@ -55,7 +55,7 @@ mod actions {
         },
         Item::{Item, ItemsCounter}
     };
-    use warpack_masters::models::Character::{Character, WMClass};
+    use warpack_masters::models::Character::{Character, WMClass, NameRecord};
     use warpack_masters::models::Shop::Shop;
     use warpack_masters::utils::random::{pseudo_seed, random};
     use warpack_masters::models::DummyCharacter::{DummyCharacter, DummyCharacterCounter};
@@ -119,6 +119,13 @@ mod actions {
 
             assert(name != '', 'name cannot be empty');
 
+            let nameRecord = get!(world, name, NameRecord);
+            assert(
+                nameRecord.player == starknet::contract_address_const::<0>()
+                    || nameRecord.player == player,
+                'name already exists'
+            );
+
             let player_exists = get!(world, player, (Character));
             assert(player_exists.name == '', 'player already exists');
 
@@ -147,17 +154,20 @@ mod actions {
             // add one gold for reroll shop
             set!(
                 world,
-                (Character {
-                    player,
-                    name,
-                    wmClass,
-                    gold: INIT_GOLD + 1,
-                    health: INIT_HEALTH,
-                    wins: 0,
-                    loss: 0,
-                    dummied: false,
-                    rating: prev_rating,
-                })
+                (
+                    Character {
+                        player,
+                        name,
+                        wmClass,
+                        gold: INIT_GOLD + 1,
+                        health: INIT_HEALTH,
+                        wins: 0,
+                        loss: 0,
+                        dummied: false,
+                        rating: prev_rating,
+                    },
+                    NameRecord { name, player }
+                )
             );
         }
 
@@ -1714,6 +1724,13 @@ mod actions {
             let mut char = get!(world, player, (Character));
 
             assert(char.loss >= 5, 'loss not reached');
+
+            // To allow others to use the player's privous name
+            if char.name != name {
+                let mut nameRecord = get!(world, char.name, NameRecord);
+                nameRecord.player = starknet::contract_address_const::<0>();
+                set!(world, (nameRecord));
+            }
 
             // required to calling spawn doesn't fail
             char.name = '';

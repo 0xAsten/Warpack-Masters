@@ -12,7 +12,7 @@ mod tests {
     use warpack_masters::{
         systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait, WMClass}},
         models::backpack::{BackpackGrids}, models::Item::{Item, item, ItemsCounter},
-        models::Character::{Character, character},
+        models::Character::{Character, character, NameRecord},
         models::CharacterItem::{
             Position, CharacterItemStorage, CharacterItemsStorageCounter, CharacterItemInventory,
             CharacterItemsInventoryCounter
@@ -165,6 +165,94 @@ mod tests {
         set!(world, (char));
 
         actions_system.rebirth('bob', WMClass::Warlock);
+    }
+
+    #[test]
+    #[available_gas(3000000000000000)]
+    #[should_panic(expected: ('name already exists', 'ENTRYPOINT_FAILED'))]
+    fn test_name_already_exists() {
+        let mut models = array![];
+        let world = spawn_test_world(models);
+
+        let contract_address = world
+            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
+        let mut actions_system = IActionsDispatcher { contract_address };
+        add_items(ref actions_system);
+
+        let alice = starknet::contract_address_const::<0x1>();
+        set_contract_address(alice);
+        actions_system.spawn('alice', WMClass::Warlock);
+
+        let bob = starknet::contract_address_const::<0x2>();
+        set_contract_address(bob);
+        actions_system.spawn('bob', WMClass::Warlock);
+
+        let mut char = get!(world, (bob), Character);
+        char.loss = 5;
+        set!(world, (char));
+
+        actions_system.rebirth('alice', WMClass::Warlock);
+    }
+
+    #[test]
+    #[available_gas(3000000000000000)]
+    fn test_rebirth_with_same_name() {
+        let mut models = array![];
+        let world = spawn_test_world(models);
+
+        let contract_address = world
+            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
+        let mut actions_system = IActionsDispatcher { contract_address };
+        add_items(ref actions_system);
+
+        let bob = starknet::contract_address_const::<0x2>();
+        set_contract_address(bob);
+        actions_system.spawn('bob', WMClass::Warlock);
+
+        let nameRecord = get!(world, 'bob', NameRecord);
+        assert(nameRecord.player == bob, 'player should be bob');
+
+        let mut char = get!(world, (bob), Character);
+        char.loss = 5;
+        set!(world, (char));
+
+        actions_system.rebirth('bob', WMClass::Warlock);
+
+        let nameRecord = get!(world, 'bob', NameRecord);
+        assert(nameRecord.player == bob, 'player should be bob');
+    }
+
+    #[test]
+    #[available_gas(3000000000000000)]
+    fn test_rebirth_with_different_name() {
+        let mut models = array![];
+        let world = spawn_test_world(models);
+
+        let contract_address = world
+            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
+        let mut actions_system = IActionsDispatcher { contract_address };
+        add_items(ref actions_system);
+
+        let bob = starknet::contract_address_const::<0x2>();
+        set_contract_address(bob);
+        actions_system.spawn('bob', WMClass::Warlock);
+
+        let nameRecord = get!(world, 'bob', NameRecord);
+        assert(nameRecord.player == bob, 'player should be bob');
+
+        let mut char = get!(world, (bob), Character);
+        char.loss = 5;
+        set!(world, (char));
+
+        actions_system.rebirth('Alice', WMClass::Warlock);
+
+        let nameRecord = get!(world, 'Alice', NameRecord);
+        assert(nameRecord.player == bob, 'player should be bob');
+
+        let nameRecord = get!(world, 'bob', NameRecord);
+        assert(
+            nameRecord.player == starknet::contract_address_const::<0x0>(), 'player should be 0x0'
+        );
     }
 }
 

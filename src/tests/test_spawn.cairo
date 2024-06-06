@@ -153,5 +153,26 @@ mod tests {
         actions_system.spawn('alice', WMClass::Warlock);
         actions_system.spawn('bob', WMClass::Warlock);
     }
+
+    #[test]
+    #[available_gas(3000000000000000)]
+    #[should_panic(expected: ('name already exists', 'ENTRYPOINT_FAILED'))]
+    fn test_name_already_exists() {
+        let mut models = array![];
+        let world = spawn_test_world(models);
+
+        let contract_address = world
+            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
+        let mut actions_system = IActionsDispatcher { contract_address };
+        add_items(ref actions_system);
+
+        let alice = starknet::contract_address_const::<0x1>();
+        set_contract_address(alice);
+        actions_system.spawn('alice', WMClass::Warlock);
+
+        let bob = starknet::contract_address_const::<0x2>();
+        set_contract_address(bob);
+        actions_system.spawn('alice', WMClass::Warlock);
+    }
 }
 
