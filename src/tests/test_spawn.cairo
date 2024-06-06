@@ -49,6 +49,7 @@ mod tests {
         assert(char.name == 'alice', 'name should be bob');
         assert(char.gold == INIT_GOLD + 1, 'gold should be init');
         assert(char.health == INIT_HEALTH, 'health should be init');
+        assert(char.rating == 0, 'Rating mismatch');
 
         let storageItemsCounter = get!(world, (alice), CharacterItemsStorageCounter);
         assert(storageItemsCounter.count == 2, 'Storage item count should be 2');

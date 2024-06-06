@@ -59,6 +59,7 @@ mod tests {
 
         let mut char = get!(world, (alice), Character);
         char.loss = 5;
+        char.rating = 300;
         set!(world, (char));
 
         actions_system.rebirth('bob', WMClass::Warrior);
@@ -75,6 +76,7 @@ mod tests {
         assert(char.name == 'bob', 'name should be bob');
         assert(char.gold == INIT_GOLD + 1, 'gold should be init');
         assert(char.health == INIT_HEALTH, 'health should be init');
+        assert(char.rating == 300, 'Rating mismatch');
 
         assert(inventoryItemsCounter.count == 2, 'item count should be 0');
         assert(storageItemsCounter.count == 2, 'item count should be 0');

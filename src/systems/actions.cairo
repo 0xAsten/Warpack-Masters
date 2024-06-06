@@ -141,6 +141,9 @@ mod actions {
             self.place_item(1, 4, 2, 0);
             self.place_item(2, 2, 2, 0);
 
+            // keep the previous rating during rebirth
+            let prev_rating = player_exists.rating;
+
             // add one gold for reroll shop
             set!(
                 world,
@@ -153,6 +156,7 @@ mod actions {
                     wins: 0,
                     loss: 0,
                     dummied: false,
+                    rating: prev_rating,
                 })
             );
         }
@@ -1639,9 +1643,16 @@ mod actions {
                 } else if char.wins == 5 {
                     char.health += 15;
                 }
+                char.rating += 25;
             } else {
                 char.loss += 1;
                 char.gold += 5;
+
+                if (char.rating < 10) {
+                    char.rating = 0;
+                } else {
+                    char.rating -= 10;
+                }
             }
             set!(world, (char));
         }

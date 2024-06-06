@@ -12,6 +12,7 @@ struct Character {
     wins: usize,
     loss: usize,
     dummied: bool,
+    rating: usize,
 }
 
 #[derive(Serde, Copy, Drop, Introspect, PartialEq)]
