@@ -49,6 +49,7 @@ mod tests {
         assert(char.name == 'alice', 'name should be bob');
         assert(char.gold == INIT_GOLD + 1, 'gold should be init');
         assert(char.health == INIT_HEALTH, 'health should be init');
+        assert(char.rating == 0, 'Rating mismatch');
 
         let storageItemsCounter = get!(world, (alice), CharacterItemsStorageCounter);
         assert(storageItemsCounter.count == 2, 'Storage item count should be 2');
@@ -151,6 +152,27 @@ mod tests {
 
         actions_system.spawn('alice', WMClass::Warlock);
         actions_system.spawn('bob', WMClass::Warlock);
+    }
+
+    #[test]
+    #[available_gas(3000000000000000)]
+    #[should_panic(expected: ('name already exists', 'ENTRYPOINT_FAILED'))]
+    fn test_name_already_exists() {
+        let mut models = array![];
+        let world = spawn_test_world(models);
+
+        let contract_address = world
+            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
+        let mut actions_system = IActionsDispatcher { contract_address };
+        add_items(ref actions_system);
+
+        let alice = starknet::contract_address_const::<0x1>();
+        set_contract_address(alice);
+        actions_system.spawn('alice', WMClass::Warlock);
+
+        let bob = starknet::contract_address_const::<0x2>();
+        set_contract_address(bob);
+        actions_system.spawn('alice', WMClass::Warlock);
     }
 }
 

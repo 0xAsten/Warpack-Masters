@@ -12,6 +12,7 @@ struct Character {
     wins: usize,
     loss: usize,
     dummied: bool,
+    rating: usize,
 }
 
 #[derive(Serde, Copy, Drop, Introspect, PartialEq)]
@@ -20,3 +21,9 @@ enum WMClass {
     Warlock,
 }
 
+#[derive(Model, Drop, Serde)]
+struct NameRecord {
+    #[key]
+    name: felt252,
+    player: ContractAddress,
+}
