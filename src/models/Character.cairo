@@ -13,6 +13,10 @@ struct Character {
     loss: usize,
     dummied: bool,
     rating: usize,
+    total_wins: usize,
+    total_loss: usize,
+    win_streak: usize,
+    updatedAt: u64
 }
 
 #[derive(Serde, Copy, Drop, Introspect, PartialEq)]

@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
     use starknet::class_hash::Felt252TryIntoClassHash;
-    use starknet::testing::set_contract_address;
+    use starknet::testing::{set_contract_address, set_block_timestamp};
 
     // import world dispatcher
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
@@ -23,6 +23,8 @@ mod tests {
     };
 
     use warpack_masters::systems::actions::actions::{ITEMS_COUNTER_ID, INIT_HEALTH, INIT_GOLD};
+    use debug::PrintTrait;
+
 
     #[test]
     #[available_gas(3000000000000000)]
@@ -39,6 +41,9 @@ mod tests {
 
         add_items(ref actions_system);
 
+        // mocking timestamp for testing
+        let timestamp = 1716770021;
+        set_block_timestamp(timestamp);
         actions_system.spawn('alice', WMClass::Warlock);
 
         let char = get!(world, (alice), Character);
@@ -50,6 +55,10 @@ mod tests {
         assert(char.gold == INIT_GOLD + 1, 'gold should be init');
         assert(char.health == INIT_HEALTH, 'health should be init');
         assert(char.rating == 0, 'Rating mismatch');
+        assert(char.total_wins == 0, 'total_wins should be 0');
+        assert(char.total_loss == 0, 'total_loss should be 0');
+        assert(char.win_streak == 0, 'win_streak should be 0');
+        assert(char.updatedAt == timestamp, 'updatedAt mismatch');
 
         let storageItemsCounter = get!(world, (alice), CharacterItemsStorageCounter);
         assert(storageItemsCounter.count == 2, 'Storage item count should be 2');

@@ -46,7 +46,7 @@ trait IActions {
 mod actions {
     use super::IActions;
 
-    use starknet::{ContractAddress, get_caller_address};
+    use starknet::{ContractAddress, get_caller_address, get_block_timestamp};
     use warpack_masters::models::{backpack::{BackpackGrids}};
     use warpack_masters::models::{
         CharacterItem::{
@@ -148,8 +148,11 @@ mod actions {
             self.place_item(1, 4, 2, 0);
             self.place_item(2, 2, 2, 0);
 
-            // keep the previous rating during rebirth
+            // keep the previous rating, total_wins and total_loss during rebirth
             let prev_rating = player_exists.rating;
+            let prev_total_wins = player_exists.total_wins;
+            let prev_total_loss = player_exists.total_loss;
+            let updatedAt = get_block_timestamp();
 
             // add one gold for reroll shop
             set!(
@@ -165,6 +168,10 @@ mod actions {
                         loss: 0,
                         dummied: false,
                         rating: prev_rating,
+                        total_wins: prev_total_wins,
+                        total_loss: prev_total_loss,
+                        win_streak: 0,
+                        updatedAt,
                     },
                     NameRecord { name, player }
                 )
@@ -1646,6 +1653,7 @@ mod actions {
 
             if winner == 'player' {
                 char.wins += 1;
+                char.total_wins += 1;
                 char.dummied = false;
                 char.gold += 5;
                 if char.wins < 5 {
@@ -1656,6 +1664,7 @@ mod actions {
                 char.rating += 25;
             } else {
                 char.loss += 1;
+                char.total_loss += 1;
                 char.gold += 5;
 
                 if (char.rating < 10) {
@@ -1664,6 +1673,7 @@ mod actions {
                     char.rating -= 10;
                 }
             }
+            char.updatedAt = get_block_timestamp();
             set!(world, (char));
         }
 
