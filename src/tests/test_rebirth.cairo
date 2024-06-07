@@ -60,9 +60,9 @@ mod tests {
         let mut char = get!(world, (alice), Character);
         char.loss = 5;
         char.rating = 300;
-        char.total_wins = 10;
-        char.total_loss = 4;
-        char.win_streak = 3;
+        char.totalWins = 10;
+        char.totalLoss = 4;
+        char.winStreak = 3;
         set!(world, (char));
 
         // mocking timestamp for testing
@@ -83,9 +83,10 @@ mod tests {
         assert(char.gold == INIT_GOLD + 1, 'gold should be init');
         assert(char.health == INIT_HEALTH, 'health should be init');
         assert(char.rating == 300, 'Rating mismatch');
-        assert(char.total_wins == 10, 'total_wins should be 10');
-        assert(char.total_loss == 4, 'total_loss should be 4');
-        assert(char.win_streak == 0, 'win_streak should be 0');
+        assert(char.totalWins == 10, 'total wins should be 10');
+        assert(char.totalLoss == 4, 'total loss should be 4');
+        assert(char.winStreak == 0, 'win streak should be 0');
+        assert(char.birthCount == 2, 'birth count should be 2');
         assert(char.updatedAt == timestamp, 'updatedAt mismatch');
 
         assert(inventoryItemsCounter.count == 2, 'item count should be 0');

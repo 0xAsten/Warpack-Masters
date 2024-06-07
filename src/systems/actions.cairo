@@ -148,10 +148,11 @@ mod actions {
             self.place_item(1, 4, 2, 0);
             self.place_item(2, 2, 2, 0);
 
-            // keep the previous rating, total_wins and total_loss during rebirth
+            // keep the previous rating, totalWins and totalLoss during rebirth
             let prev_rating = player_exists.rating;
-            let prev_total_wins = player_exists.total_wins;
-            let prev_total_loss = player_exists.total_loss;
+            let prev_total_wins = player_exists.totalWins;
+            let prev_total_loss = player_exists.totalLoss;
+            let prev_birth_count = player_exists.birthCount;
             let updatedAt = get_block_timestamp();
 
             // add one gold for reroll shop
@@ -168,9 +169,10 @@ mod actions {
                         loss: 0,
                         dummied: false,
                         rating: prev_rating,
-                        total_wins: prev_total_wins,
-                        total_loss: prev_total_loss,
-                        win_streak: 0,
+                        totalWins: prev_total_wins,
+                        totalLoss: prev_total_loss,
+                        winStreak: 0,
+                        birthCount: prev_birth_count + 1,
                         updatedAt,
                     },
                     NameRecord { name, player }
@@ -1653,7 +1655,8 @@ mod actions {
 
             if winner == 'player' {
                 char.wins += 1;
-                char.total_wins += 1;
+                char.totalWins += 1;
+                char.winStreak += 1;
                 char.dummied = false;
                 char.gold += 5;
                 if char.wins < 5 {
@@ -1664,7 +1667,8 @@ mod actions {
                 char.rating += 25;
             } else {
                 char.loss += 1;
-                char.total_loss += 1;
+                char.totalLoss += 1;
+                char.winStreak = 0;
                 char.gold += 5;
 
                 if (char.rating < 10) {

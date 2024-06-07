@@ -55,9 +55,10 @@ mod tests {
         assert(char.gold == INIT_GOLD + 1, 'gold should be init');
         assert(char.health == INIT_HEALTH, 'health should be init');
         assert(char.rating == 0, 'Rating mismatch');
-        assert(char.total_wins == 0, 'total_wins should be 0');
-        assert(char.total_loss == 0, 'total_loss should be 0');
-        assert(char.win_streak == 0, 'win_streak should be 0');
+        assert(char.totalWins == 0, 'total wins should be 0');
+        assert(char.totalLoss == 0, 'total loss should be 0');
+        assert(char.winStreak == 0, 'win streak should be 0');
+        assert(char.birthCount == 1, 'birth count should be 1');
         assert(char.updatedAt == timestamp, 'updatedAt mismatch');
 
         let storageItemsCounter = get!(world, (alice), CharacterItemsStorageCounter);
