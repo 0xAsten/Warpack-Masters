@@ -52,7 +52,7 @@ echo "--------------------------------------------------------------------------
 sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS add_item -c 1,4783213592342258539,4,2,3,10,0,0,0,0,0,0,0,0,0,0,0,0,0 --wait --rpc-url $RPC_URL
 sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS add_item -c 2,1348559723,4,2,2,4,0,0,0,0,2,0,0,0,0,0,0,0,0 --wait --rpc-url $RPC_URL
 sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS add_item -c 3,23469575578871148,4,2,1,3,0,0,0,0,2,0,0,0,0,0,0,0,0 --wait --rpc-url $RPC_URL
-sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS add_item -c 4,345467347816,4,1,1,3,0,0,0,0,2,0,0,0,0,0,0,0,0 --wait --rpc-url $RPC_URL
+sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS add_item -c 4,345467347816,4,1,1,2,0,0,0,0,2,0,0,0,0,0,0,0,0 --wait --rpc-url $RPC_URL
 sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS add_item -c 5,1214607970,3,1,1,1,0,0,100,0,1,0,0,1,1,0,0,0,0 --wait --rpc-url $RPC_URL
 sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS add_item -c 6,75185137345906,1,1,2,2,3,0,90,4,1,0,0,0,0,0,0,0,0 --wait --rpc-url $RPC_URL
 sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS add_item -c 7,358486078052,1,1,3,2,5,0,80,5,1,0,0,0,0,0,0,0,0 --wait --rpc-url $RPC_URL

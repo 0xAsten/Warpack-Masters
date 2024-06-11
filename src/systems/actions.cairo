@@ -771,7 +771,7 @@ mod actions {
 
                 let item = get!(world, count, (Item));
 
-                if item.id == 14 || item.id == 18 || item.id == 19 {
+                if item.id == 14 || item.id == 18 || item.id == 19 || item.id == 22 {
                     count -= 1;
                     continue;
                 }
