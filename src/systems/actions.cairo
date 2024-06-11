@@ -1119,6 +1119,8 @@ mod actions {
 
                 let mut i: usize = 0;
 
+                let mut rand = 0;
+                let mut v = 0;
                 loop {
                     if i == items_length {
                         break;
@@ -1135,7 +1137,8 @@ mod actions {
 
                     // each second is treated as 1 unit of cooldown 
                     if seconds % cooldown == 0 {
-                        let rand = random(seed2 + seconds.into() + 17, 100);
+                        v += seconds.into() + 17;
+                        rand = random(seed2 + seconds.into() + 17, 100);
                         if rand < chance {
                             if curr_item_belongs == 'player' {
                                 // ====== on cooldown to plus stacks, all use the same randomness ======
