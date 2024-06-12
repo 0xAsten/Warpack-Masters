@@ -1,22 +1,20 @@
 use core::traits::Into;
 use core::box::BoxTrait;
 
-fn pseudo_seed() -> (felt252, felt252, felt252, felt252) {
+fn pseudo_seed() -> (u128, u128, u128, u128) {
     let txinfo = starknet::get_tx_info().unbox();
-    let tx = txinfo.transaction_hash;
-    let nonce = txinfo.nonce;
+    let tx: u256 = txinfo.transaction_hash.into();
 
     let blockInfo = starknet::get_block_info().unbox();
-    let blockTimestamp: felt252 = blockInfo.block_timestamp.into();
-    let blockNumber: felt252 = blockInfo.block_number.into();
+    let blockTimestamp: u128 = blockInfo.block_timestamp.into();
+    let blockNumber: u128 = blockInfo.block_number.into();
 
-    (tx, nonce, blockTimestamp, blockNumber)
+    (tx.low, blockTimestamp + blockNumber, blockTimestamp, blockNumber)
 }
 
 
-fn random(seed: felt252, num: usize) -> usize {
-    let seed: u256 = seed.into();
-    let result = seed.low % num.into();
+fn random(seed: u128, num: usize) -> usize {
+    let result = seed % num.into();
     result.try_into().unwrap()
 }
 
