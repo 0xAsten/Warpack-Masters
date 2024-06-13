@@ -801,6 +801,7 @@ mod actions {
 
             let (seed1, seed2, seed3, seed4) = pseudo_seed();
 
+            let mut rareFlag = false;
             // common: 70%, uncommon: 30%, rare: 10%
             let mut random_index = random(seed1, 100);
             if uncommonSize == 0 {
@@ -816,10 +817,14 @@ mod actions {
                 // uncommonSize is always greater than 0
                 random_index = random(seed1, uncommonSize);
                 shop.item1 = *uncommon.at(random_index);
+
+                rareFlag = true;
             } else {
                 // rareSize is always greater than 0
                 random_index = random(seed1, rareSize);
                 shop.item1 = *rare.at(random_index);
+
+                rareFlag = true;
             }
 
             random_index = random(seed2, 100);
@@ -828,15 +833,19 @@ mod actions {
             } else if rareSize == 0 && uncommonSize > 0 {
                 random_index = random(seed2, 90);
             }
-            if random_index < 70 {
+            if random_index < 70 || rareFlag {
                 random_index = random(seed2, commonSize);
                 shop.item2 = *common.at(random_index);
             } else if random_index < 90 {
                 random_index = random(seed2, uncommonSize);
                 shop.item2 = *uncommon.at(random_index);
+
+                rareFlag = true;
             } else {
                 random_index = random(seed2, rareSize);
                 shop.item2 = *rare.at(random_index);
+
+                rareFlag = true;
             }
 
             random_index = random(seed3, 100);
@@ -845,15 +854,19 @@ mod actions {
             } else if rareSize == 0 && uncommonSize > 0 {
                 random_index = random(seed3, 90);
             }
-            if random_index < 70 {
+            if random_index < 70 || rareFlag {
                 random_index = random(seed3, commonSize);
                 shop.item3 = *common.at(random_index);
             } else if random_index < 90 {
                 random_index = random(seed3, uncommonSize);
                 shop.item3 = *uncommon.at(random_index);
+
+                rareFlag = true;
             } else {
                 random_index = random(seed3, rareSize);
                 shop.item3 = *rare.at(random_index);
+
+                rareFlag = true;
             }
 
             random_index = random(seed4, 100);
@@ -862,7 +875,7 @@ mod actions {
             } else if rareSize == 0 && uncommonSize > 0 {
                 random_index = random(seed4, 90);
             }
-            if random_index < 70 {
+            if random_index < 70 || rareFlag {
                 random_index = random(seed4, commonSize);
                 shop.item4 = *common.at(random_index);
             } else if random_index < 90 {
@@ -1106,6 +1119,8 @@ mod actions {
             let mut seconds = 0;
             let mut winner = '';
 
+            let mut rand = 0;
+            let mut v = 0;
             loop {
                 seconds += 1;
                 if seconds >= 25_u8 {
@@ -1119,8 +1134,6 @@ mod actions {
 
                 let mut i: usize = 0;
 
-                let mut rand = 0;
-                let mut v = 0;
                 loop {
                     if i == items_length {
                         break;
@@ -1137,7 +1150,7 @@ mod actions {
 
                     // each second is treated as 1 unit of cooldown 
                     if seconds % cooldown == 0 {
-                        v += seconds.into() + 17;
+                        v += seconds.into();
                         rand = random(seed2 + v, 100);
                         if rand < chance {
                             if curr_item_belongs == 'player' {

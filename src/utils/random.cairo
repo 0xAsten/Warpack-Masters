@@ -9,7 +9,7 @@ fn pseudo_seed() -> (u128, u128, u128, u128) {
     let blockTimestamp: u128 = blockInfo.block_timestamp.into();
     let blockNumber: u128 = blockInfo.block_number.into();
 
-    (tx.low, blockTimestamp + blockNumber, blockTimestamp, blockNumber)
+    (tx.low, blockTimestamp / 2 + blockNumber, blockTimestamp, tx.low / 2 + blockNumber)
 }
 
 
