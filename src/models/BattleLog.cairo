@@ -10,6 +10,7 @@ struct BattleLog {
     dummyCharId: usize,
     // dummy or player
     winner: felt252,
+    seconds: u8
 }
 
 

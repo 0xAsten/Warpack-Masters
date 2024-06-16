@@ -87,6 +87,8 @@ mod actions {
         cleansePoison: usize,
         buffType: felt252,
         regenHP: usize,
+        player_remaining_health: usize,
+        dummy_remaining_health: usize,
         player_armor_stacks: usize,
         player_regen_stacks: usize,
         player_reflect_stacks: usize,
@@ -1209,6 +1211,12 @@ mod actions {
                                     }
                                     // ====== end ======
 
+                                    if dummy_health <= damageCaused {
+                                        dummy_health = 0;
+                                    } else {
+                                        dummy_health -= damageCaused;
+                                    }
+
                                     battleLogsCount += 1;
                                     emit!(
                                         world,
@@ -1223,6 +1231,8 @@ mod actions {
                                             cleansePoison: 0,
                                             buffType: EFFECT_ARMOR,
                                             regenHP: 0,
+                                            player_remaining_health: char_health,
+                                            dummy_remaining_health: dummy_health,
                                             player_armor_stacks: char_armor,
                                             player_regen_stacks: char_regen,
                                             player_reflect_stacks: char_reflect,
@@ -1234,11 +1244,10 @@ mod actions {
                                         })
                                     );
 
-                                    if dummy_health <= damageCaused {
+                                    if dummy_health == 0 {
                                         winner = 'player';
                                         break;
                                     }
-                                    dummy_health -= damageCaused;
 
                                     // ====== Reflect effect: Deals 1 damage per stack when hit with a Melee weapon (up to 100% of the damage). ======
                                     if curr_item_data.itemType == 1 && dummy_reflect > 0 {
@@ -1257,6 +1266,12 @@ mod actions {
                                         }
                                         // ====== end ======
 
+                                        if char_health <= damageCaused {
+                                            char_health = 0;
+                                        } else {
+                                            char_health -= damageCaused;
+                                        }
+
                                         battleLogsCount += 1;
                                         emit!(
                                             world,
@@ -1271,6 +1286,8 @@ mod actions {
                                                 cleansePoison: 0,
                                                 buffType: EFFECT_REFLECT,
                                                 regenHP: 0,
+                                                player_remaining_health: char_health,
+                                                dummy_remaining_health: dummy_health,
                                                 player_armor_stacks: char_armor,
                                                 player_regen_stacks: char_regen,
                                                 player_reflect_stacks: char_reflect,
@@ -1282,11 +1299,10 @@ mod actions {
                                             })
                                         );
 
-                                        if char_health <= damageCaused {
+                                        if char_health == 0 {
                                             winner = 'dummy';
                                             break;
                                         }
-                                        char_health -= damageCaused;
                                     }
                                 // ====== end ======
                                 } else {
@@ -1310,6 +1326,8 @@ mod actions {
                                                 isDodged: false,
                                                 buffType: EFFECT_CLEANSE_POISON,
                                                 regenHP: 0,
+                                                player_remaining_health: char_health,
+                                                dummy_remaining_health: dummy_health,
                                                 player_armor_stacks: char_armor,
                                                 player_regen_stacks: char_regen,
                                                 player_reflect_stacks: char_reflect,
@@ -1339,7 +1357,7 @@ mod actions {
                                 // ====== end ======
 
                                 if damage > 0 {
-                                    // ====== dummy get hit, to plus stacks ======
+                                    // ====== char get hit, to plus stacks ======
                                     let mut on_hit_items_len = char_on_hit_items_span.len();
                                     loop {
                                         if on_hit_items_len == 0 {
@@ -1378,6 +1396,12 @@ mod actions {
                                     }
                                     // ====== end ======
 
+                                    if char_health <= damageCaused {
+                                        char_health = 0;
+                                    } else {
+                                        char_health -= damageCaused;
+                                    }
+
                                     battleLogsCount += 1;
                                     emit!(
                                         world,
@@ -1392,6 +1416,8 @@ mod actions {
                                             cleansePoison: 0,
                                             buffType: EFFECT_ARMOR,
                                             regenHP: 0,
+                                            player_remaining_health: char_health,
+                                            dummy_remaining_health: dummy_health,
                                             player_armor_stacks: char_armor,
                                             player_regen_stacks: char_regen,
                                             player_reflect_stacks: char_reflect,
@@ -1403,11 +1429,10 @@ mod actions {
                                         })
                                     );
 
-                                    if char_health <= damageCaused {
+                                    if char_health == 0 {
                                         winner = 'dummy';
                                         break;
                                     }
-                                    char_health -= damageCaused;
 
                                     // ====== Reflect effect: Deals 1 damage per stack when hit with a Melee weapon (up to 100% of the damage). ======
                                     if curr_item_data.itemType == 1 && char_reflect > 0 {
@@ -1426,6 +1451,12 @@ mod actions {
                                         }
                                         // ====== end ======
 
+                                        if dummy_health <= damageCaused {
+                                            dummy_health = 0;
+                                        } else {
+                                            dummy_health -= damageCaused;
+                                        }
+
                                         battleLogsCount += 1;
                                         emit!(
                                             world,
@@ -1440,6 +1471,8 @@ mod actions {
                                                 cleansePoison: 0,
                                                 buffType: EFFECT_REFLECT,
                                                 regenHP: 0,
+                                                player_remaining_health: char_health,
+                                                dummy_remaining_health: dummy_health,
                                                 player_armor_stacks: char_armor,
                                                 player_regen_stacks: char_regen,
                                                 player_reflect_stacks: char_reflect,
@@ -1451,11 +1484,10 @@ mod actions {
                                             })
                                         );
 
-                                        if dummy_health <= damageCaused {
+                                        if dummy_health == 0 {
                                             winner = 'player';
                                             break;
                                         }
-                                        dummy_health -= damageCaused;
                                     }
                                 // ====== end ======
                                 } else {
@@ -1479,6 +1511,8 @@ mod actions {
                                                 cleansePoison: cleansePoison,
                                                 buffType: EFFECT_CLEANSE_POISON,
                                                 regenHP: 0,
+                                                player_remaining_health: char_health,
+                                                dummy_remaining_health: dummy_health,
                                                 player_armor_stacks: char_armor,
                                                 player_regen_stacks: char_regen,
                                                 player_reflect_stacks: char_reflect,
@@ -1507,6 +1541,8 @@ mod actions {
                                     cleansePoison: 0,
                                     buffType: 0,
                                     regenHP: 0,
+                                    player_remaining_health: char_health,
+                                    dummy_remaining_health: dummy_health,
                                     player_armor_stacks: char_armor,
                                     player_regen_stacks: char_regen,
                                     player_reflect_stacks: char_reflect,
@@ -1527,6 +1563,12 @@ mod actions {
                 // ====== Heal effect: Regenerate 1 health per stack every 2 seconds. ======
                 if seconds % 2 == 0 {
                     if char_poison > 0 {
+                        if char_health <= char_poison {
+                            char_health = 0;
+                        } else {
+                            char_health -= char_poison;
+                        }
+
                         battleLogsCount += 1;
                         emit!(
                             world,
@@ -1541,6 +1583,8 @@ mod actions {
                                 cleansePoison: 0,
                                 buffType: EFFECT_POISON,
                                 regenHP: 0,
+                                player_remaining_health: char_health,
+                                dummy_remaining_health: dummy_health,
                                 player_armor_stacks: char_armor,
                                 player_regen_stacks: char_regen,
                                 player_reflect_stacks: char_reflect,
@@ -1552,13 +1596,18 @@ mod actions {
                             })
                         );
 
-                        if char_health <= char_poison {
+                        if char_health == 0 {
                             winner = 'dummy';
                             break;
                         }
-                        char_health -= char_poison;
                     }
                     if dummy_poison > 0 {
+                        if dummy_health <= dummy_poison {
+                            dummy_health = 0;
+                        } else {
+                            dummy_health -= dummy_poison;
+                        }
+
                         battleLogsCount += 1;
                         emit!(
                             world,
@@ -1573,6 +1622,8 @@ mod actions {
                                 cleansePoison: 0,
                                 buffType: EFFECT_POISON,
                                 regenHP: 0,
+                                player_remaining_health: char_health,
+                                dummy_remaining_health: dummy_health,
                                 player_armor_stacks: char_armor,
                                 player_regen_stacks: char_regen,
                                 player_reflect_stacks: char_reflect,
@@ -1584,13 +1635,17 @@ mod actions {
                             })
                         );
 
-                        if dummy_health <= dummy_poison {
+                        if dummy_health == 0 {
                             winner = 'player';
                             break;
                         }
-                        dummy_health -= dummy_poison;
                     }
                     if char_regen > 0 {
+                        char_health += char_regen;
+                        if char_health > char_health_flag {
+                            char_health = char_health_flag;
+                        }
+
                         battleLogsCount += 1;
                         emit!(
                             world,
@@ -1605,6 +1660,8 @@ mod actions {
                                 cleansePoison: 0,
                                 buffType: EFFECT_REGEN,
                                 regenHP: char_regen,
+                                player_remaining_health: char_health,
+                                dummy_remaining_health: dummy_health,
                                 player_armor_stacks: char_armor,
                                 player_regen_stacks: char_regen,
                                 player_reflect_stacks: char_reflect,
@@ -1615,13 +1672,13 @@ mod actions {
                                 dummy_poison_stacks: dummy_poison,
                             })
                         );
-
-                        char_health += char_regen;
-                        if char_health > char_health_flag {
-                            char_health = char_health_flag;
-                        }
                     }
                     if dummy_regen > 0 {
+                        dummy_health += dummy_regen;
+                        if dummy_health > dummy_health_flag {
+                            dummy_health = dummy_health_flag;
+                        }
+
                         battleLogsCount += 1;
                         emit!(
                             world,
@@ -1636,6 +1693,8 @@ mod actions {
                                 cleansePoison: 0,
                                 buffType: EFFECT_REGEN,
                                 regenHP: dummy_regen,
+                                player_remaining_health: char_health,
+                                dummy_remaining_health: dummy_health,
                                 player_armor_stacks: char_armor,
                                 player_regen_stacks: char_regen,
                                 player_reflect_stacks: char_reflect,
@@ -1646,11 +1705,6 @@ mod actions {
                                 dummy_poison_stacks: dummy_poison,
                             })
                         );
-
-                        dummy_health += dummy_regen;
-                        if dummy_health > dummy_health_flag {
-                            dummy_health = dummy_health_flag;
-                        }
                     }
                 }
                 // ====== end ======
@@ -1666,6 +1720,7 @@ mod actions {
                 dummyCharLevel: char.wins,
                 dummyCharId: random_index,
                 winner: winner,
+                seconds: seconds,
             };
             set!(world, (battleLogCounter, battleLog));
 
