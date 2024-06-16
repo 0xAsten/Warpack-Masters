@@ -73,4 +73,4 @@ sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS add_item -c 21,365419149838
 sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS add_item -c 22,1131181410,1,1,4,7,15,0,65,6,2,0,0,0,0,0,0,0,0 --wait --rpc-url $RPC_URL
 sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS add_item -c 23,18706418327381362,3,2,2,8,0,0,60,0,2,10,2,0,0,0,0,0,0 --wait --rpc-url $RPC_URL
 sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS add_item -c 24,93547265267753350467970418,3,1,1,5,0,2,90,5,2,0,0,0,0,0,0,0,0 --wait --rpc-url $RPC_URL
-sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS add_item -c 25,1752006227441648624131573719854962,3,2,3,8,0,0,60,0,3,0,0,0,0,2,2,0,0 --wait --rpc-url $RPC_URL
+sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS add_item -c 25,1752006227441648624131573719854962,3,2,3,8,0,0,60,0,3,0,0,2,2,0,0,0,0 --wait --rpc-url $RPC_URL
