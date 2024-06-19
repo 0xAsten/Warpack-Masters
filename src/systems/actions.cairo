@@ -1123,6 +1123,33 @@ mod actions {
 
             let mut rand = 0;
             let mut v = 0;
+
+            emit!(
+                world,
+                (BattleLogDetail {
+                    player,
+                    battleLogId: battleLogCounterCount,
+                    id: battleLogsCount,
+                    whoTriggered: 0,
+                    whichItem: 0,
+                    damageCaused: 0,
+                    isDodged: false,
+                    cleansePoison: 0,
+                    buffType: 0,
+                    regenHP: 0,
+                    player_remaining_health: char_health,
+                    dummy_remaining_health: dummy_health,
+                    player_armor_stacks: char_armor,
+                    player_regen_stacks: char_regen,
+                    player_reflect_stacks: char_reflect,
+                    player_poison_stacks: char_poison,
+                    dummy_armor_stacks: dummy_armor,
+                    dummy_regen_stacks: dummy_regen,
+                    dummy_reflect_stacks: dummy_reflect,
+                    dummy_poison_stacks: dummy_poison,
+                })
+            );
+
             loop {
                 seconds += 1;
                 if seconds >= 25_u8 {
