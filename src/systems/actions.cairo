@@ -99,6 +99,17 @@ mod actions {
         dummy_poison_stacks: usize,
     }
 
+    #[derive(Model, Copy, Drop, Serde)]
+    #[dojo::event]
+    struct BuyItem {
+        #[key]
+        player: ContractAddress,
+        itemId: usize,
+        cost: usize,
+        itemRarity: u8,
+        birthCount: u32,
+    }
+
     const GRID_X: usize = 9;
     const GRID_Y: usize = 7;
     const INIT_GOLD: usize = 8;
@@ -722,6 +733,17 @@ mod actions {
                     )
                 );
             }
+
+            emit!(
+                world,
+                (BuyItem {
+                    player,
+                    itemId: item_id,
+                    cost: item.price,
+                    itemRarity: item.rarity,
+                    birthCount: player_char.birthCount
+                })
+            );
 
             set!(world, (player_char, shop_data));
         }
