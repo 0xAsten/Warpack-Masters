@@ -110,6 +110,17 @@ mod actions {
         birthCount: u32,
     }
 
+    #[derive(Model, Copy, Drop, Serde)]
+    #[dojo::event]
+    struct SellItem {
+        #[key]
+        player: ContractAddress,
+        itemId: usize,
+        price: usize,
+        itemRarity: u8,
+        birthCount: u32,
+    }
+
     const GRID_X: usize = 9;
     const GRID_Y: usize = 7;
     const INIT_GOLD: usize = 8;
@@ -765,6 +776,17 @@ mod actions {
             storageItem.itemId = 0;
 
             playerChar.gold += sellPrice;
+
+            emit!(
+                world,
+                (SellItem {
+                    player,
+                    itemId: itemId,
+                    price: sellPrice,
+                    itemRarity: item.rarity,
+                    birthCount: playerChar.birthCount
+                })
+            );
 
             set!(world, (storageItem, playerChar));
         }
