@@ -47,3 +47,12 @@ We're creating dummy characters within the world contract, and use mirror images
 - Add Backpack Expansion feature
 - Add new items include bags
 - Add new effect `cleanse Poison`
+
+## Alpha
+
+- Add player_remaining_health and dummy_remaining_health to event BattleLogDetail
+- Add seconds property to BattleLog, record the duration of a battle
+- Add log detail 0 with init value (like hp) of player and dummy
+- Add two envents buyItem and seeItem
+- Skip mirro dummy when battle
+- Legendary items appear only for players with 3+ wins 
