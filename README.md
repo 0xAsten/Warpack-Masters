@@ -53,6 +53,8 @@ We're creating dummy characters within the world contract, and use mirror images
 - Add player_remaining_health and dummy_remaining_health to event BattleLogDetail
 - Add seconds property to BattleLog, record the duration of a battle
 - Add log detail 0 with init value (like hp) of player and dummy
-- Add two envents buyItem and seeItem
+- Add two envents buyItem and sellItem
 - Skip mirro dummy when battle
 - Legendary items appear only for players with 3+ wins 
+- Add Empower buff
+- Mutable dummy rating
