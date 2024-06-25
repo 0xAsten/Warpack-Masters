@@ -29,6 +29,8 @@ struct Item {
     reflectActivation: u8,
     poison: usize,
     poisonActivation: u8,
+    empower: usize,
+    empowerActivation: u8,
 }
 
 #[derive(Model, Drop, Serde)]

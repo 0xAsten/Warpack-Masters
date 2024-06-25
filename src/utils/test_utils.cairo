@@ -24,6 +24,8 @@ fn add_items(ref actions_system: IActionsDispatcher) {
             items::Backpack1::reflectActivation,
             items::Backpack1::poison,
             items::Backpack1::poisonActivation,
+            items::Backpack1::empower,
+            items::Backpack1::empowerActivation,
         );
 
     actions_system
@@ -47,6 +49,8 @@ fn add_items(ref actions_system: IActionsDispatcher) {
             items::Backpack2::reflectActivation,
             items::Backpack2::poison,
             items::Backpack2::poisonActivation,
+            items::Backpack2::empower,
+            items::Backpack2::empowerActivation,
         );
 
     actions_system
@@ -70,6 +74,8 @@ fn add_items(ref actions_system: IActionsDispatcher) {
             items::Dagger::reflectActivation,
             items::Dagger::poison,
             items::Dagger::poisonActivation,
+            items::Dagger::empower,
+            items::Dagger::empowerActivation,
         );
 
     actions_system
@@ -93,6 +99,8 @@ fn add_items(ref actions_system: IActionsDispatcher) {
             items::Sword::reflectActivation,
             items::Sword::poison,
             items::Sword::poisonActivation,
+            items::Sword::empower,
+            items::Sword::empowerActivation,
         );
 
     actions_system
@@ -116,6 +124,8 @@ fn add_items(ref actions_system: IActionsDispatcher) {
             items::Spike::reflectActivation,
             items::Spike::poison,
             items::Spike::poisonActivation,
+            items::Spike::empower,
+            items::Spike::empowerActivation,
         );
 
     actions_system
@@ -139,6 +149,8 @@ fn add_items(ref actions_system: IActionsDispatcher) {
             items::Shield::reflectActivation,
             items::Shield::poison,
             items::Shield::poisonActivation,
+            items::Shield::empower,
+            items::Shield::empowerActivation,
         );
 
     actions_system
@@ -162,6 +174,8 @@ fn add_items(ref actions_system: IActionsDispatcher) {
             items::Helmet::reflectActivation,
             items::Helmet::poison,
             items::Helmet::poisonActivation,
+            items::Helmet::empower,
+            items::Helmet::empowerActivation,
         );
 
     actions_system
@@ -185,6 +199,8 @@ fn add_items(ref actions_system: IActionsDispatcher) {
             items::HealingPotion::reflectActivation,
             items::HealingPotion::poison,
             items::HealingPotion::poisonActivation,
+            items::HealingPotion::empower,
+            items::HealingPotion::empowerActivation,
         );
 
     actions_system
@@ -208,6 +224,8 @@ fn add_items(ref actions_system: IActionsDispatcher) {
             items::LeatherArmor::reflectActivation,
             items::LeatherArmor::poison,
             items::LeatherArmor::poisonActivation,
+            items::LeatherArmor::empower,
+            items::LeatherArmor::empowerActivation,
         );
 
     actions_system
@@ -231,6 +249,8 @@ fn add_items(ref actions_system: IActionsDispatcher) {
             items::PoisonPotion::reflectActivation,
             items::PoisonPotion::poison,
             items::PoisonPotion::poisonActivation,
+            items::PoisonPotion::empower,
+            items::PoisonPotion::empowerActivation,
         );
 
     actions_system
@@ -254,6 +274,8 @@ fn add_items(ref actions_system: IActionsDispatcher) {
             items::AugmentedSword::reflectActivation,
             items::AugmentedSword::poison,
             items::AugmentedSword::poisonActivation,
+            items::AugmentedSword::empower,
+            items::AugmentedSword::empowerActivation,
         );
 
     actions_system
@@ -277,6 +299,8 @@ fn add_items(ref actions_system: IActionsDispatcher) {
             items::AugmentedDagger::reflectActivation,
             items::AugmentedDagger::poison,
             items::AugmentedDagger::poisonActivation,
+            items::AugmentedDagger::empower,
+            items::AugmentedDagger::empowerActivation,
         );
 
     actions_system
@@ -300,6 +324,8 @@ fn add_items(ref actions_system: IActionsDispatcher) {
             items::SpikeShield::reflectActivation,
             items::SpikeShield::poison,
             items::SpikeShield::poisonActivation,
+            items::SpikeShield::empower,
+            items::SpikeShield::empowerActivation,
         );
 }
 
