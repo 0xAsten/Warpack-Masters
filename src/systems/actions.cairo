@@ -135,6 +135,7 @@ mod actions {
     const EFFECT_ARMOR: felt252 = 'armor';
     const EFFECT_REGEN: felt252 = 'regen';
     const EFFECT_REFLECT: felt252 = 'reflect';
+    const EFFECT_EMPOWER: felt252 = 'empower';
     const EFFECT_POISON: felt252 = 'poison';
     const EFFECT_CLEANSE_POISON: felt252 = 'cleanse_poison';
 
@@ -227,6 +228,8 @@ mod actions {
             reflectActivation: u8,
             poison: u32,
             poisonActivation: u8,
+            empower: u32,
+            empowerActivation: u8,
         ) {
             let player = get_caller_address();
 
@@ -267,6 +270,8 @@ mod actions {
                 reflectActivation,
                 poison,
                 poisonActivation,
+                empower,
+                empowerActivation,
             };
 
             set!(world, (item));
@@ -1266,7 +1271,7 @@ mod actions {
 
                     let curr_item_data = get!(world, curr_item_index, (Item));
                     
-                    let damage = curr_item_data.damage;
+                    let mut damage = curr_item_data.damage;
                     if curr_item_data.itemType == 1 {
                         if curr_item_belongs == 'player' && char_empower > 0 {
                             damage += char_empower;
