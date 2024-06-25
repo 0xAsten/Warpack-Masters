@@ -92,10 +92,12 @@ mod actions {
         player_armor_stacks: usize,
         player_regen_stacks: usize,
         player_reflect_stacks: usize,
+        player_empower_stacks: usize,
         player_poison_stacks: usize,
         dummy_armor_stacks: usize,
         dummy_regen_stacks: usize,
         dummy_reflect_stacks: usize,
+        dummy_empower_stacks: usize,
         dummy_poison_stacks: usize,
     }
 
@@ -1018,6 +1020,9 @@ mod actions {
             let mut char_reflect: usize = 0;
             let mut dummy_reflect: usize = 0;
 
+            let mut char_empower: usize = 0;
+            let mut dummy_empower: usize = 0;
+
             let mut char_poison: usize = 0;
             let mut dummy_poison: usize = 0;
 
@@ -1062,6 +1067,9 @@ mod actions {
                     if item.reflectActivation == 1 {
                         char_reflect += item.reflect;
                     }
+                    if item.empowerActivation == 1 {
+                        char_empower += item.empower;
+                    }
                     // debuff
                     if item.poisonActivation == 1 {
                         dummy_poison += item.poison;
@@ -1078,6 +1086,9 @@ mod actions {
                 }
                 if item.reflectActivation == 2 {
                     char_on_hit_items.append((EFFECT_REFLECT, item.chance, item.reflect));
+                }
+                if item.empowerActivation == 2 {
+                    char_on_hit_items.append((EFFECT_EMPOWER, item.chance, item.empower));
                 }
                 if item.poisonActivation == 2 {
                     char_on_hit_items.append((EFFECT_POISON, item.chance, item.poison));
@@ -1123,6 +1134,9 @@ mod actions {
                     if item.reflectActivation == 1 {
                         dummy_reflect += item.reflect;
                     }
+                    if item.empowerActivation == 1 {
+                        dummy_empower += item.empower;
+                    }
                     // debuff
                     if item.poisonActivation == 1 {
                         char_poison += item.poison;
@@ -1139,6 +1153,9 @@ mod actions {
                 }
                 if item.reflectActivation == 2 {
                     dummy_on_hit_items.append((EFFECT_REFLECT, item.chance, item.reflect));
+                }
+                if item.empowerActivation == 2 {
+                    dummy_on_hit_items.append((EFFECT_EMPOWER, item.chance, item.empower));
                 }
                 if item.poisonActivation == 2 {
                     dummy_on_hit_items.append((EFFECT_POISON, item.chance, item.poison));
@@ -1216,10 +1233,12 @@ mod actions {
                     player_armor_stacks: char_armor,
                     player_regen_stacks: char_regen,
                     player_reflect_stacks: char_reflect,
+                    player_empower_stacks: char_empower,
                     player_poison_stacks: char_poison,
                     dummy_armor_stacks: dummy_armor,
                     dummy_regen_stacks: dummy_regen,
                     dummy_reflect_stacks: dummy_reflect,
+                    dummy_empower_stacks: dummy_empower,
                     dummy_poison_stacks: dummy_poison,
                 })
             );
@@ -1246,7 +1265,16 @@ mod actions {
                     let curr_item_belongs = item_belongs.get(i.into());
 
                     let curr_item_data = get!(world, curr_item_index, (Item));
+                    
                     let damage = curr_item_data.damage;
+                    if curr_item_data.itemType == 1 {
+                        if curr_item_belongs == 'player' && char_empower > 0 {
+                            damage += char_empower;
+                        } else if curr_item_belongs == 'dummy' && dummy_empower > 0{
+                            damage += dummy_empower;
+                        }
+                    }
+
                     let cleansePoison = curr_item_data.cleansePoison;
                     let chance = curr_item_data.chance;
                     let cooldown = curr_item_data.cooldown;
@@ -1266,6 +1294,9 @@ mod actions {
                                 }
                                 if curr_item_data.reflectActivation == 3 {
                                     char_reflect += curr_item_data.reflect;
+                                }
+                                if curr_item_data.empowerActivation == 3 {
+                                    char_empower += curr_item_data.empower;
                                 }
                                 if curr_item_data.poisonActivation == 3 {
                                     dummy_poison += curr_item_data.poison;
@@ -1293,6 +1324,8 @@ mod actions {
                                                 dummy_regen += on_hit_item_stack;
                                             } else if on_hit_item_type == EFFECT_REFLECT {
                                                 dummy_reflect += on_hit_item_stack;
+                                            } else if on_hit_item_type == EFFECT_EMPOWER {
+                                                dummy_empower += on_hit_item_stack;
                                             } else if on_hit_item_type == EFFECT_POISON {
                                                 char_poison += on_hit_item_stack;
                                             }
@@ -1337,10 +1370,12 @@ mod actions {
                                             player_armor_stacks: char_armor,
                                             player_regen_stacks: char_regen,
                                             player_reflect_stacks: char_reflect,
+                                            player_empower_stacks: char_empower,
                                             player_poison_stacks: char_poison,
                                             dummy_armor_stacks: dummy_armor,
                                             dummy_regen_stacks: dummy_regen,
                                             dummy_reflect_stacks: dummy_reflect,
+                                            dummy_empower_stacks: dummy_empower,
                                             dummy_poison_stacks: dummy_poison,
                                         })
                                     );
@@ -1392,10 +1427,12 @@ mod actions {
                                                 player_armor_stacks: char_armor,
                                                 player_regen_stacks: char_regen,
                                                 player_reflect_stacks: char_reflect,
+                                                player_empower_stacks: char_empower,
                                                 player_poison_stacks: char_poison,
                                                 dummy_armor_stacks: dummy_armor,
                                                 dummy_regen_stacks: dummy_regen,
                                                 dummy_reflect_stacks: dummy_reflect,
+                                                dummy_empower_stacks: dummy_empower,
                                                 dummy_poison_stacks: dummy_poison,
                                             })
                                         );
@@ -1432,10 +1469,12 @@ mod actions {
                                                 player_armor_stacks: char_armor,
                                                 player_regen_stacks: char_regen,
                                                 player_reflect_stacks: char_reflect,
+                                                player_empower_stacks: char_empower,
                                                 player_poison_stacks: char_poison,
                                                 dummy_armor_stacks: dummy_armor,
                                                 dummy_regen_stacks: dummy_regen,
                                                 dummy_reflect_stacks: dummy_reflect,
+                                                dummy_empower_stacks: dummy_empower,
                                                 dummy_poison_stacks: dummy_poison,
                                             })
                                         );
@@ -1451,6 +1490,9 @@ mod actions {
                                 }
                                 if curr_item_data.reflectActivation == 3 {
                                     dummy_reflect += curr_item_data.reflect;
+                                }
+                                if curr_item_data.empowerActivation == 3 {
+                                    dummy_empower += curr_item_data.empower;
                                 }
                                 if curr_item_data.poisonActivation == 3 {
                                     char_poison += curr_item_data.poison;
@@ -1478,6 +1520,8 @@ mod actions {
                                                 char_regen += on_hit_item_stack;
                                             } else if on_hit_item_type == EFFECT_REFLECT {
                                                 char_reflect += on_hit_item_stack;
+                                            } else if on_hit_item_type == EFFECT_EMPOWER {
+                                                char_empower += on_hit_item_stack;
                                             } else if on_hit_item_type == EFFECT_POISON {
                                                 dummy_poison += on_hit_item_stack;
                                             }
@@ -1522,10 +1566,12 @@ mod actions {
                                             player_armor_stacks: char_armor,
                                             player_regen_stacks: char_regen,
                                             player_reflect_stacks: char_reflect,
+                                            player_empower_stacks: char_empower,
                                             player_poison_stacks: char_poison,
                                             dummy_armor_stacks: dummy_armor,
                                             dummy_regen_stacks: dummy_regen,
                                             dummy_reflect_stacks: dummy_reflect,
+                                            dummy_empower_stacks: dummy_empower,
                                             dummy_poison_stacks: dummy_poison,
                                         })
                                     );
@@ -1577,10 +1623,12 @@ mod actions {
                                                 player_armor_stacks: char_armor,
                                                 player_regen_stacks: char_regen,
                                                 player_reflect_stacks: char_reflect,
+                                                player_empower_stacks: char_empower,
                                                 player_poison_stacks: char_poison,
                                                 dummy_armor_stacks: dummy_armor,
                                                 dummy_regen_stacks: dummy_regen,
                                                 dummy_reflect_stacks: dummy_reflect,
+                                                dummy_empower_stacks: dummy_empower,
                                                 dummy_poison_stacks: dummy_poison,
                                             })
                                         );
@@ -1617,10 +1665,12 @@ mod actions {
                                                 player_armor_stacks: char_armor,
                                                 player_regen_stacks: char_regen,
                                                 player_reflect_stacks: char_reflect,
+                                                player_empower_stacks: char_empower,
                                                 player_poison_stacks: char_poison,
                                                 dummy_armor_stacks: dummy_armor,
                                                 dummy_regen_stacks: dummy_regen,
                                                 dummy_reflect_stacks: dummy_reflect,
+                                                dummy_empower_stacks: dummy_empower,
                                                 dummy_poison_stacks: dummy_poison,
                                             })
                                         );
@@ -1647,10 +1697,12 @@ mod actions {
                                     player_armor_stacks: char_armor,
                                     player_regen_stacks: char_regen,
                                     player_reflect_stacks: char_reflect,
+                                    player_empower_stacks: char_empower,
                                     player_poison_stacks: char_poison,
                                     dummy_armor_stacks: dummy_armor,
                                     dummy_regen_stacks: dummy_regen,
                                     dummy_reflect_stacks: dummy_reflect,
+                                    dummy_empower_stacks: dummy_empower,
                                     dummy_poison_stacks: dummy_poison,
                                 })
                             );
@@ -1689,10 +1741,12 @@ mod actions {
                                 player_armor_stacks: char_armor,
                                 player_regen_stacks: char_regen,
                                 player_reflect_stacks: char_reflect,
+                                player_empower_stacks: char_empower,
                                 player_poison_stacks: char_poison,
                                 dummy_armor_stacks: dummy_armor,
                                 dummy_regen_stacks: dummy_regen,
                                 dummy_reflect_stacks: dummy_reflect,
+                                dummy_empower_stacks: dummy_empower,
                                 dummy_poison_stacks: dummy_poison,
                             })
                         );
@@ -1728,10 +1782,12 @@ mod actions {
                                 player_armor_stacks: char_armor,
                                 player_regen_stacks: char_regen,
                                 player_reflect_stacks: char_reflect,
+                                player_empower_stacks: char_empower,
                                 player_poison_stacks: char_poison,
                                 dummy_armor_stacks: dummy_armor,
                                 dummy_regen_stacks: dummy_regen,
                                 dummy_reflect_stacks: dummy_reflect,
+                                dummy_empower_stacks: dummy_empower,
                                 dummy_poison_stacks: dummy_poison,
                             })
                         );
@@ -1766,10 +1822,12 @@ mod actions {
                                 player_armor_stacks: char_armor,
                                 player_regen_stacks: char_regen,
                                 player_reflect_stacks: char_reflect,
+                                player_empower_stacks: char_empower,
                                 player_poison_stacks: char_poison,
                                 dummy_armor_stacks: dummy_armor,
                                 dummy_regen_stacks: dummy_regen,
                                 dummy_reflect_stacks: dummy_reflect,
+                                dummy_empower_stacks: dummy_empower,
                                 dummy_poison_stacks: dummy_poison,
                             })
                         );
@@ -1799,10 +1857,12 @@ mod actions {
                                 player_armor_stacks: char_armor,
                                 player_regen_stacks: char_regen,
                                 player_reflect_stacks: char_reflect,
+                                player_empower_stacks: char_empower,
                                 player_poison_stacks: char_poison,
                                 dummy_armor_stacks: dummy_armor,
                                 dummy_regen_stacks: dummy_regen,
                                 dummy_reflect_stacks: dummy_reflect,
+                                dummy_empower_stacks: dummy_empower,
                                 dummy_poison_stacks: dummy_poison,
                             })
                         );
