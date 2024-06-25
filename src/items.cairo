@@ -18,6 +18,8 @@ mod Backpack1 {
     const reflectActivation: u8 = 0;
     const poison: usize = 0;
     const poisonActivation: u8 = 0;
+    const empower: usize = 0;
+    const empowerActivation: u8 = 0;
 }
 
 mod Backpack2 {
@@ -40,6 +42,8 @@ mod Backpack2 {
     const reflectActivation: u8 = 0;
     const poison: usize = 0;
     const poisonActivation: u8 = 0;
+    const empower: usize = 0;
+    const empowerActivation: u8 = 0;
 }
 
 mod Dagger {
@@ -62,6 +66,8 @@ mod Dagger {
     const reflectActivation: u8 = 0;
     const poison: usize = 0;
     const poisonActivation: u8 = 0;
+    const empower: usize = 0;
+    const empowerActivation: u8 = 0;
 }
 
 mod Sword {
@@ -84,6 +90,8 @@ mod Sword {
     const reflectActivation: u8 = 0;
     const poison: usize = 0;
     const poisonActivation: u8 = 0;
+    const empower: usize = 0;
+    const empowerActivation: u8 = 0;
 }
 
 mod Spike {
@@ -106,6 +114,8 @@ mod Spike {
     const reflectActivation: u8 = 1;
     const poison: usize = 0;
     const poisonActivation: u8 = 0;
+    const empower: usize = 0;
+    const empowerActivation: u8 = 0;
 }
 
 mod Shield {
@@ -128,6 +138,8 @@ mod Shield {
     const reflectActivation: u8 = 0;
     const poison: usize = 0;
     const poisonActivation: u8 = 0;
+    const empower: usize = 0;
+    const empowerActivation: u8 = 0;
 }
 
 mod Helmet {
@@ -150,6 +162,8 @@ mod Helmet {
     const reflectActivation: u8 = 0;
     const poison: usize = 0;
     const poisonActivation: u8 = 0;
+    const empower: usize = 0;
+    const empowerActivation: u8 = 0;
 }
 
 mod HealingPotion {
@@ -172,6 +186,8 @@ mod HealingPotion {
     const reflectActivation: u8 = 0;
     const poison: usize = 0;
     const poisonActivation: u8 = 0;
+    const empower: usize = 0;
+    const empowerActivation: u8 = 0;
 }
 
 mod LeatherArmor {
@@ -194,6 +210,8 @@ mod LeatherArmor {
     const reflectActivation: u8 = 0;
     const poison: usize = 0;
     const poisonActivation: u8 = 0;
+    const empower: usize = 0;
+    const empowerActivation: u8 = 0;
 }
 
 mod PoisonPotion {
@@ -216,6 +234,8 @@ mod PoisonPotion {
     const reflectActivation: u8 = 0;
     const poison: usize = 2;
     const poisonActivation: u8 = 1;
+    const empower: usize = 0;
+    const empowerActivation: u8 = 0;
 }
 
 mod AugmentedSword {
@@ -238,6 +258,8 @@ mod AugmentedSword {
     const reflectActivation: u8 = 0;
     const poison: usize = 0;
     const poisonActivation: u8 = 0;
+    const empower: usize = 0;
+    const empowerActivation: u8 = 0;
 }
 
 mod AugmentedDagger {
@@ -260,6 +282,8 @@ mod AugmentedDagger {
     const reflectActivation: u8 = 0;
     const poison: usize = 0;
     const poisonActivation: u8 = 0;
+    const empower: usize = 0;
+    const empowerActivation: u8 = 0;
 }
 
 mod SpikeShield {
@@ -282,6 +306,8 @@ mod SpikeShield {
     const reflectActivation: u8 = 2;
     const poison: usize = 0;
     const poisonActivation: u8 = 0;
+    const empower: usize = 0;
+    const empowerActivation: u8 = 0;
 }
 
 mod PlagueFlower {
@@ -304,6 +330,8 @@ mod PlagueFlower {
     const reflectActivation: u8 = 0;
     const poison: usize = 3;
     const poisonActivation: u8 = 3;
+    const empower: usize = 0;
+    const empowerActivation: u8 = 0;
 }
 
 mod BladeArmor {
@@ -326,4 +354,6 @@ mod BladeArmor {
     const reflectActivation: u8 = 0;
     const poison: usize = 0;
     const poisonActivation: u8 = 0;
+    const empower: usize = 0;
+    const empowerActivation: u8 = 0;
 }

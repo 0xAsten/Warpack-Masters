@@ -27,6 +27,8 @@ trait IActions {
         reflectActivation: u8,
         poison: u32,
         poisonActivation: u8,
+        empower: u32,
+        empowerActivation: u8,
     );
     fn edit_item(item_id: u32, item_key: felt252, item_value: felt252);
     fn buy_item(item_id: u32);

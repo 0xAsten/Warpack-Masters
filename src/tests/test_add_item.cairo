@@ -212,6 +212,8 @@ mod tests {
                 items::Backpack1::reflectActivation,
                 items::Backpack1::poison,
                 items::Backpack1::poisonActivation,
+                items::Backpack1::empower,
+                items::Backpack1::empowerActivation,
             );
     }
 
@@ -248,6 +250,8 @@ mod tests {
                 items::Backpack1::reflectActivation,
                 items::Backpack1::poison,
                 items::Backpack1::poisonActivation,
+                items::Backpack1::empower,
+                items::Backpack1::empowerActivation,
             );
     }
 
@@ -284,6 +288,8 @@ mod tests {
                 items::Backpack1::reflectActivation,
                 items::Backpack1::poison,
                 items::Backpack1::poisonActivation,
+                items::Backpack1::empower,
+                items::Backpack1::empowerActivation,
             );
     }
 
@@ -320,6 +326,8 @@ mod tests {
                 items::Backpack1::reflectActivation,
                 items::Backpack1::poison,
                 items::Backpack1::poisonActivation,
+                items::Backpack1::empower,
+                items::Backpack1::empowerActivation,
             );
     }
 
@@ -357,6 +365,8 @@ mod tests {
                 items::Backpack1::reflectActivation,
                 items::Backpack1::poison,
                 items::Backpack1::poisonActivation,
+                items::Backpack1::empower,
+                items::Backpack1::empowerActivation,
             );
     }
 }
