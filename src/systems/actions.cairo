@@ -849,12 +849,18 @@ mod actions {
 
             let mut rareFlag = false;
             // common: 70%, uncommon: 30%, rare: 10%
-            let mut random_index = random(seed1, 100);
+            let mut random_index = 0;
+            if char.wins < 3 {
+                random_index = random(seed1, 90);
+            } else {
+                random_index = random(seed1, 100);
+            }
             if uncommonSize == 0 {
                 random_index = random(seed1, 70);
             } else if rareSize == 0 && uncommonSize > 0 {
                 random_index = random(seed1, 90);
             }
+
             if random_index < 70 {
                 // commonSize is always greater than 0
                 random_index = random(seed1, commonSize);
@@ -873,12 +879,17 @@ mod actions {
                 rareFlag = true;
             }
 
-            random_index = random(seed2, 100);
+            if char.wins < 3 {
+                random_index = random(seed2, 90);
+            } else {
+                random_index = random(seed2, 100);
+            }
             if uncommonSize == 0 {
                 random_index = random(seed2, 70);
             } else if rareSize == 0 && uncommonSize > 0 {
                 random_index = random(seed2, 90);
             }
+
             if random_index < 70 || rareFlag {
                 random_index = random(seed2, commonSize);
                 shop.item2 = *common.at(random_index);
@@ -894,12 +905,17 @@ mod actions {
                 rareFlag = true;
             }
 
-            random_index = random(seed3, 100);
+            if char.wins < 3 {
+                random_index = random(seed3, 90);
+            } else {
+                random_index = random(seed3, 100);
+            }
             if uncommonSize == 0 {
                 random_index = random(seed3, 70);
             } else if rareSize == 0 && uncommonSize > 0 {
                 random_index = random(seed3, 90);
             }
+
             if random_index < 70 || rareFlag {
                 random_index = random(seed3, commonSize);
                 shop.item3 = *common.at(random_index);
@@ -915,12 +931,17 @@ mod actions {
                 rareFlag = true;
             }
 
-            random_index = random(seed4, 100);
+            if char.wins < 3 {
+                random_index = random(seed4, 90);
+            } else {
+                random_index = random(seed4, 100);
+            }
             if uncommonSize == 0 {
                 random_index = random(seed4, 70);
             } else if rareSize == 0 && uncommonSize > 0 {
                 random_index = random(seed4, 90);
             }
+
             if random_index < 70 || rareFlag {
                 random_index = random(seed4, commonSize);
                 shop.item4 = *common.at(random_index);
