@@ -24,7 +24,7 @@ mod tests {
     };
 
     use warpack_masters::systems::actions::actions::ITEMS_COUNTER_ID;
-
+    
     #[test]
     #[available_gas(3000000000000000)]
     fn test_dummy() {
@@ -41,6 +41,12 @@ mod tests {
 
         actions_system.spawn('alice', WMClass::Warlock);
         actions_system.create_dummy();
+
+        let bob = starknet::contract_address_const::<0x1>();
+        set_contract_address(bob);
+        actions_system.spawn('bob', WMClass::Warlock);
+        actions_system.create_dummy();
+
         actions_system.fight();
 
         let char = get!(world, (alice), Character);
@@ -52,13 +58,33 @@ mod tests {
 
         assert(char.dummied, 'dummied should be true');
         assert(char.wins == 0, 'wins count should be 0');
-        assert(dummyCharCounter.count == 1, 'Should be 1');
+        assert(dummyCharCounter.count == 2, 'Should be 2');
         assert(dummyChar.level == char.wins, 'Should be equal');
         assert(dummyChar.id == dummyCharCounter.count, '');
-        assert(dummyChar.name == 'alice', 'name should be alice');
+        assert(dummyChar.name == 'bob', 'name should be bob');
         assert(dummyChar.wmClass == WMClass::Warlock, 'class should be Warlock');
         assert(dummyChar.health == char.health, 'health should be equal');
         assert(dummyCharItemsCounter.count == 2, 'Should be 2');
+    }
+
+
+    #[test]
+    #[available_gas(3000000000000000)]
+    #[should_panic(expected: ('only self dummy created', 'ENTRYPOINT_FAILED'))]
+    fn test_only_self_dummy_created() {
+        let mut models = array![];
+
+        let world = spawn_test_world(models);
+
+        let contract_address = world
+            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
+        let mut actions_system = IActionsDispatcher { contract_address };
+
+        add_items(ref actions_system);
+
+        actions_system.spawn('alice', WMClass::Warlock);
+        actions_system.create_dummy();
+        actions_system.fight();
     }
 
     #[test]
@@ -93,6 +119,11 @@ mod tests {
         actions_system.buy_item(8);
         actions_system.place_item(2, 5, 2, 0);
         // actions_system.
+        actions_system.create_dummy();
+
+        let bob = starknet::contract_address_const::<0x1>();
+        set_contract_address(bob);
+        actions_system.spawn('bob', WMClass::Warlock);
         actions_system.create_dummy();
         actions_system.fight();
     }

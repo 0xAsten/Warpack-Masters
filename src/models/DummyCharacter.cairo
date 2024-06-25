@@ -11,6 +11,7 @@ struct DummyCharacter {
     name: felt252,
     wmClass: WMClass,
     health: usize,
+    player: ContractAddress,
 }
 
 #[derive(Model, Drop, Serde)]

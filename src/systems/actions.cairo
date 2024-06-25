@@ -965,10 +965,19 @@ mod actions {
 
             let (seed1, seed2, _, _) = pseudo_seed();
             let dummyCharCounter = get!(world, char.wins, (DummyCharacterCounter));
-            let mut random_index = random(seed1, dummyCharCounter.count) + 1;
+            assert(dummyCharCounter.count > 1, 'only self dummy created');
 
-            let dummyChar = get!(world, (char.wins, random_index), DummyCharacter);
+            let random_index = random(seed1, dummyCharCounter.count) + 1;
+            let mut dummy_index = random_index;
+            let mut dummyChar = get!(world, (char.wins, dummy_index), DummyCharacter);
 
+            while dummyChar.player == player {
+                dummy_index = dummy_index % dummyCharCounter.count + 1;
+                assert(dummy_index != random_index, 'no others dummy found');
+
+                dummyChar = get!(world, (char.wins, dummy_index), DummyCharacter);
+            };
+            
             // start the battle
             let mut char_health: usize = char.health;
             let char_health_flag: usize = char.health;
@@ -1059,7 +1068,7 @@ mod actions {
             let char_on_hit_items_span = char_on_hit_items.span();
 
             let dummyCharItemsCounter = get!(
-                world, (char.wins, random_index), (DummyCharacterItemsCounter)
+                world, (char.wins, dummy_index), (DummyCharacterItemsCounter)
             );
             let mut dummy_item_count = dummyCharItemsCounter.count;
             loop {
@@ -1068,7 +1077,7 @@ mod actions {
                 }
 
                 let dummy_item = get!(
-                    world, (char.wins, random_index, dummy_item_count), (DummyCharacterItem)
+                    world, (char.wins, dummy_index, dummy_item_count), (DummyCharacterItem)
                 );
                 let item = get!(world, dummy_item.itemId, (Item));
                 if item.itemType == 4 {
@@ -1789,7 +1798,7 @@ mod actions {
                 player: player,
                 id: battleLogCounter.count,
                 dummyCharLevel: char.wins,
-                dummyCharId: random_index,
+                dummyCharId: dummy_index,
                 winner: winner,
                 seconds: seconds,
             };
@@ -1829,6 +1838,7 @@ mod actions {
             let mut char = get!(world, player, (Character));
 
             assert(char.dummied == false, 'dummy already created');
+            assert(char.loss < 5, 'max loss reached');
 
             let mut dummyCharCounter = get!(world, char.wins, (DummyCharacterCounter));
             dummyCharCounter.count += 1;
@@ -1839,6 +1849,7 @@ mod actions {
                 name: char.name,
                 wmClass: char.wmClass,
                 health: char.health,
+                player: player,
             };
             char.dummied = true;
 
