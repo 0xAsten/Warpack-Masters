@@ -42,6 +42,16 @@ mod tests {
         actions_system.spawn('alice', WMClass::Warlock);
         actions_system.create_dummy();
 
+        let char = get!(world, (alice), Character);
+        let dummyChar = get!(world, (char.wins, 1), DummyCharacter);
+        assert(dummyChar.level == char.wins, 'Should be equal');
+        assert(dummyChar.name == 'alice', 'name should be alice');
+        assert(dummyChar.wmClass == WMClass::Warlock, 'class should be Warlock');
+        assert(dummyChar.health == char.health, 'health should be equal');
+        assert(dummyChar.player == alice, 'player should be alice');
+        assert(dummyChar.rating == char.rating, 'rating should be equal');
+        assert(dummyChar.rating == 0, 'rating should be 0');
+
         let bob = starknet::contract_address_const::<0x1>();
         set_contract_address(bob);
         actions_system.spawn('bob', WMClass::Warlock);
@@ -49,22 +59,15 @@ mod tests {
 
         actions_system.fight();
 
-        let char = get!(world, (alice), Character);
-        let dummyCharCounter = get!(world, (char.wins), DummyCharacterCounter);
-        let dummyChar = get!(world, (char.wins, dummyCharCounter.count), DummyCharacter);
-        let dummyCharItemsCounter = get!(
-            world, (char.wins, dummyCharCounter.count), DummyCharacterItemsCounter
-        );
-
-        assert(char.dummied, 'dummied should be true');
-        assert(char.wins == 0, 'wins count should be 0');
-        assert(dummyCharCounter.count == 2, 'Should be 2');
-        assert(dummyChar.level == char.wins, 'Should be equal');
-        assert(dummyChar.id == dummyCharCounter.count, '');
-        assert(dummyChar.name == 'bob', 'name should be bob');
-        assert(dummyChar.wmClass == WMClass::Warlock, 'class should be Warlock');
-        assert(dummyChar.health == char.health, 'health should be equal');
-        assert(dummyCharItemsCounter.count == 2, 'Should be 2');
+        let char = get!(world, (bob), Character);
+        let dummyChar = get!(world, (0, 1), DummyCharacter);
+        if char.wins == 1 {
+            assert(dummyChar.rating == 0, 'rating should be 0');
+            assert(char.rating == 25, 'rating should be 25')
+        } else {
+            assert(dummyChar.rating == 25, 'rating should be 25');
+            assert(char.rating == 0, 'rating should be 0')
+        }
     }
 
 

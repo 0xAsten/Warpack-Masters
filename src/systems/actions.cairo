@@ -1859,7 +1859,7 @@ mod actions {
                 }
             }
             char.updatedAt = get_block_timestamp();
-            set!(world, (char));
+            set!(world, (char, dummyChar));
         }
 
         fn create_dummy(world: IWorldDispatcher) {
