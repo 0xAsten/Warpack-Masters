@@ -1836,12 +1836,21 @@ mod actions {
                 } else if char.wins == 5 {
                     char.health += 15;
                 }
+
                 char.rating += 25;
+                
+                if (dummyChar.rating < 10) {
+                    dummyChar.rating = 0;
+                } else {
+                    dummyChar.rating -= 10;
+                }
             } else {
                 char.loss += 1;
                 char.totalLoss += 1;
                 char.winStreak = 0;
                 char.gold += 5;
+
+                dummyChar.rating += 25;
 
                 if (char.rating < 10) {
                     char.rating = 0;
@@ -1850,7 +1859,7 @@ mod actions {
                 }
             }
             char.updatedAt = get_block_timestamp();
-            set!(world, (char));
+            set!(world, (char, dummyChar));
         }
 
         fn create_dummy(world: IWorldDispatcher) {
@@ -1871,6 +1880,7 @@ mod actions {
                 wmClass: char.wmClass,
                 health: char.health,
                 player: player,
+                rating: char.rating,
             };
             char.dummied = true;
 
