@@ -1016,11 +1016,10 @@ mod actions {
             let mut dummyChar = get!(world, (char.wins, dummy_index), DummyCharacter);
 
             while dummyChar.player == player {
-                    dummy_index = dummy_index % dummyCharCounter.count + 1;
-                    assert(dummy_index != random_index, 'no others dummy found');
-
-                    dummyChar = get!(world, (char.wins, dummy_index), DummyCharacter);
-                };
+                dummy_index = dummy_index % dummyCharCounter.count + 1;
+                assert(dummy_index != random_index, 'no others dummy found');
+                dummyChar = get!(world, (char.wins, dummy_index), DummyCharacter);
+            };
 
             // start the battle
             let mut char_health: usize = char.health;
