@@ -1015,8 +1015,7 @@ mod actions {
             let mut dummy_index = random_index;
             let mut dummyChar = get!(world, (char.wins, dummy_index), DummyCharacter);
 
-            while dummyChar
-                .player == player {
+            while dummyChar.player == player {
                     dummy_index = dummy_index % dummyCharCounter.count + 1;
                     assert(dummy_index != random_index, 'no others dummy found');
 
