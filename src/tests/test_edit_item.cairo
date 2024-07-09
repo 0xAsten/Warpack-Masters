@@ -50,6 +50,8 @@ mod tests {
         let item_one_new_reflectActivation: felt252 = 2;
         let item_one_new_poison: felt252 = 3;
         let item_one_new_poisonActivation: felt252 = 3;
+        let item_one_new_empower: felt252 = 1;
+        let item_one_new_empowerActivation: felt252 = 1;
 
         actions_system.edit_item(1, 0, item_one_new_name);
         actions_system.edit_item(1, 1, item_one_new_itemType);
@@ -69,6 +71,8 @@ mod tests {
         actions_system.edit_item(1, 15, item_one_new_reflectActivation);
         actions_system.edit_item(1, 16, item_one_new_poison);
         actions_system.edit_item(1, 17, item_one_new_poisonActivation);
+        actions_system.edit_item(1, 18, item_one_new_empower);
+        actions_system.edit_item(1, 19, item_one_new_empowerActivation);
 
         let item_one_data = get!(world, 1, (Item));
         assert(item_one_data.name == item_one_new_name, 'I1 name mismatch');
@@ -103,6 +107,11 @@ mod tests {
         assert(
             item_one_data.poisonActivation.into() == item_one_new_poisonActivation,
             'I1 poisonActivation mismatch'
+        );
+        assert(item_one_data.empower.into() == item_one_new_empower, 'I1 empower mismatch');
+        assert(
+            item_one_data.empowerActivation.into() == item_one_new_empowerActivation,
+            'I1 empowerActivation mismatch'
         );
     }
 

@@ -420,6 +420,20 @@ mod actions {
                     item_data.poisonActivation = new_poisonActivation;
                     set!(world, (item_data,));
                 },
+                // empower
+                18 => {
+                    let new_empower: usize = item_value.try_into().unwrap();
+
+                    item_data.empower = new_empower;
+                    set!(world, (item_data,));
+                },
+                // empowerActivation
+                19 => {
+                    let new_empowerActivation: u8 = item_value.try_into().unwrap();
+
+                    item_data.empowerActivation = new_empowerActivation;
+                    set!(world, (item_data,));
+                },
                 _ => { panic!("Invalid item_key: {}", item_key); }
             }
         }
@@ -1004,10 +1018,9 @@ mod actions {
             while dummyChar.player == player {
                 dummy_index = dummy_index % dummyCharCounter.count + 1;
                 assert(dummy_index != random_index, 'no others dummy found');
-
                 dummyChar = get!(world, (char.wins, dummy_index), DummyCharacter);
             };
-            
+
             // start the battle
             let mut char_health: usize = char.health;
             let char_health_flag: usize = char.health;
@@ -1272,12 +1285,12 @@ mod actions {
                     let curr_item_belongs = item_belongs.get(i.into());
 
                     let curr_item_data = get!(world, curr_item_index, (Item));
-                    
+
                     let mut damage = curr_item_data.damage;
                     if curr_item_data.itemType == 1 {
                         if curr_item_belongs == 'player' && char_empower > 0 {
                             damage += char_empower;
-                        } else if curr_item_belongs == 'dummy' && dummy_empower > 0{
+                        } else if curr_item_belongs == 'dummy' && dummy_empower > 0 {
                             damage += dummy_empower;
                         }
                     }
@@ -1905,7 +1918,7 @@ mod actions {
                 }
 
                 char.rating += 25;
-                
+
                 if (dummyChar.rating < 10) {
                     dummyChar.rating = 0;
                 } else {
