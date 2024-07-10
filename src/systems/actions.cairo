@@ -1324,37 +1324,6 @@ mod actions {
                                 // ====== end ======
 
                                 if damage > 0 {
-                                    // ====== dummy get hit, to plus stacks ======
-                                    let mut on_hit_items_len = dummy_on_hit_items_span.len();
-                                    loop {
-                                        if on_hit_items_len == 0 {
-                                            break;
-                                        }
-
-                                        let (
-                                            on_hit_item_type, on_hit_item_chance, on_hit_item_stack
-                                        ) =
-                                            *dummy_on_hit_items_span
-                                            .at(on_hit_items_len - 1);
-
-                                        if rand < on_hit_item_chance {
-                                            if on_hit_item_type == EFFECT_ARMOR {
-                                                dummy_armor += on_hit_item_stack;
-                                            } else if on_hit_item_type == EFFECT_REGEN {
-                                                dummy_regen += on_hit_item_stack;
-                                            } else if on_hit_item_type == EFFECT_REFLECT {
-                                                dummy_reflect += on_hit_item_stack;
-                                            } else if on_hit_item_type == EFFECT_EMPOWER {
-                                                dummy_empower += on_hit_item_stack;
-                                            } else if on_hit_item_type == EFFECT_POISON {
-                                                char_poison += on_hit_item_stack;
-                                            }
-                                        }
-
-                                        on_hit_items_len -= 1;
-                                    };
-                                    // ====== end ======
-
                                     // ====== Armor: used to absorb damage ======
                                     let mut damageCaused = 0;
                                     if damage <= dummy_armor {
@@ -1404,6 +1373,37 @@ mod actions {
                                         winner = 'player';
                                         break;
                                     }
+
+                                    // ====== dummy get hit, to plus stacks ======
+                                    let mut on_hit_items_len = dummy_on_hit_items_span.len();
+                                    loop {
+                                        if on_hit_items_len == 0 {
+                                            break;
+                                        }
+
+                                        let (
+                                            on_hit_item_type, on_hit_item_chance, on_hit_item_stack
+                                        ) =
+                                            *dummy_on_hit_items_span
+                                            .at(on_hit_items_len - 1);
+
+                                        if rand < on_hit_item_chance {
+                                            if on_hit_item_type == EFFECT_ARMOR {
+                                                dummy_armor += on_hit_item_stack;
+                                            } else if on_hit_item_type == EFFECT_REGEN {
+                                                dummy_regen += on_hit_item_stack;
+                                            } else if on_hit_item_type == EFFECT_REFLECT {
+                                                dummy_reflect += on_hit_item_stack;
+                                            } else if on_hit_item_type == EFFECT_EMPOWER {
+                                                dummy_empower += on_hit_item_stack;
+                                            } else if on_hit_item_type == EFFECT_POISON {
+                                                char_poison += on_hit_item_stack;
+                                            }
+                                        }
+
+                                        on_hit_items_len -= 1;
+                                    };
+                                    // ====== end ======
 
                                     // ====== Reflect effect: Deals 1 damage per stack when hit with a Melee weapon (up to 100% of the damage). ======
                                     if curr_item_data.itemType == 1 && dummy_reflect > 0 {
@@ -1520,37 +1520,6 @@ mod actions {
                                 // ====== end ======
 
                                 if damage > 0 {
-                                    // ====== char get hit, to plus stacks ======
-                                    let mut on_hit_items_len = char_on_hit_items_span.len();
-                                    loop {
-                                        if on_hit_items_len == 0 {
-                                            break;
-                                        }
-
-                                        let (
-                                            on_hit_item_type, on_hit_item_chance, on_hit_item_stack
-                                        ) =
-                                            *char_on_hit_items_span
-                                            .at(on_hit_items_len - 1);
-
-                                        if rand < on_hit_item_chance {
-                                            if on_hit_item_type == EFFECT_ARMOR {
-                                                char_armor += on_hit_item_stack;
-                                            } else if on_hit_item_type == EFFECT_REGEN {
-                                                char_regen += on_hit_item_stack;
-                                            } else if on_hit_item_type == EFFECT_REFLECT {
-                                                char_reflect += on_hit_item_stack;
-                                            } else if on_hit_item_type == EFFECT_EMPOWER {
-                                                char_empower += on_hit_item_stack;
-                                            } else if on_hit_item_type == EFFECT_POISON {
-                                                dummy_poison += on_hit_item_stack;
-                                            }
-                                        }
-
-                                        on_hit_items_len -= 1;
-                                    };
-                                    // ====== end ======
-
                                     // ====== Armor: used to absorb damage ======
                                     let mut damageCaused = 0;
                                     if damage <= char_armor {
@@ -1600,6 +1569,37 @@ mod actions {
                                         winner = 'dummy';
                                         break;
                                     }
+
+                                    // ====== char get hit, to plus stacks ======
+                                    let mut on_hit_items_len = char_on_hit_items_span.len();
+                                    loop {
+                                        if on_hit_items_len == 0 {
+                                            break;
+                                        }
+
+                                        let (
+                                            on_hit_item_type, on_hit_item_chance, on_hit_item_stack
+                                        ) =
+                                            *char_on_hit_items_span
+                                            .at(on_hit_items_len - 1);
+
+                                        if rand < on_hit_item_chance {
+                                            if on_hit_item_type == EFFECT_ARMOR {
+                                                char_armor += on_hit_item_stack;
+                                            } else if on_hit_item_type == EFFECT_REGEN {
+                                                char_regen += on_hit_item_stack;
+                                            } else if on_hit_item_type == EFFECT_REFLECT {
+                                                char_reflect += on_hit_item_stack;
+                                            } else if on_hit_item_type == EFFECT_EMPOWER {
+                                                char_empower += on_hit_item_stack;
+                                            } else if on_hit_item_type == EFFECT_POISON {
+                                                dummy_poison += on_hit_item_stack;
+                                            }
+                                        }
+
+                                        on_hit_items_len -= 1;
+                                    };
+                                    // ====== end ======
 
                                     // ====== Reflect effect: Deals 1 damage per stack when hit with a Melee weapon (up to 100% of the damage). ======
                                     if curr_item_data.itemType == 1 && char_reflect > 0 {
