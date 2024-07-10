@@ -20,7 +20,7 @@ struct Item {
     cooldown: u8,
     rarity: u8,
     // Effects
-    // activation 0 - passive, 1 - on start, 2 - on hit, 3 - on cooldown
+    // activation 0 - passive, 1 - on start, 2 - on hit, 3 - on cooldown, 4 - on attack
     armor: usize,
     armorActivation: u8,
     regen: usize,
