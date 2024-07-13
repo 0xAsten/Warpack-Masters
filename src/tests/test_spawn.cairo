@@ -184,5 +184,40 @@ mod tests {
         set_contract_address(bob);
         actions_system.spawn('alice', WMClass::Warlock);
     }
+
+    #[test]
+    #[available_gas(3000000000000000)]
+    fn test_spawn_a_Archer() {
+        let mut models = array![];
+        let world = spawn_test_world(models);
+
+        let contract_address = world
+            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
+        let mut actions_system = IActionsDispatcher { contract_address };
+        add_items(ref actions_system);
+
+        let alice = starknet::contract_address_const::<0x1>();
+        set_contract_address(alice);
+        actions_system.spawn('alice', WMClass::Archer);
+        
+        // mocking timestamp for testing
+        let timestamp = 1716770021;
+        set_block_timestamp(timestamp);
+        
+        let char = get!(world, (alice), Character);
+        assert(!char.dummied, 'Should be false');
+        assert(char.wins == 0, 'wins count should be 0');
+        assert(char.loss == 0, 'loss count should be 0');
+        assert(char.wmClass == WMClass::Archer, 'class should be Warlock');
+        assert(char.name == 'alice', 'name should be bob');
+        assert(char.gold == INIT_GOLD + 1, 'gold should be init');
+        assert(char.health == INIT_HEALTH, 'health should be init');
+        assert(char.rating == 0, 'Rating mismatch');
+        assert(char.totalWins == 0, 'total wins should be 0');
+        assert(char.totalLoss == 0, 'total loss should be 0');
+        assert(char.winStreak == 0, 'win streak should be 0');
+        assert(char.birthCount == 1, 'birth count should be 1');
+        assert(char.updatedAt == timestamp, 'updatedAt mismatch');
+    }
 }
 

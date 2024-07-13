@@ -69,6 +69,9 @@ use starknet::class_hash::Felt252TryIntoClassHash;
             WMClass::Warlock => {
                 dummyClassNo = 1;
             },
+            WMClass::Archer => {
+                dummyClassNo = 2;
+            }
         }
         assert(dummyClassNo == Dummy0::wmClass, 'Should be equal Dummy0::wmClass');
         assert(dummyChar.health == Dummy0::health, 'Should be equal Dummy0::health');

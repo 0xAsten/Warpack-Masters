@@ -24,6 +24,7 @@ struct Character {
 enum WMClass {
     Warrior,
     Warlock,
+    Archer,
 }
 
 #[derive(Model, Drop, Serde)]
