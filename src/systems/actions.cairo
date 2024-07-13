@@ -39,6 +39,7 @@ trait IActions {
     fn fight();
     fn create_dummy();
     fn rebirth(name: felt252, wmClass: WMClass);
+    fn prefine_dummy(level: usize);
 }
 
 // TODO: rename the count filed in counter model
@@ -66,6 +67,8 @@ mod actions {
     };
     use warpack_masters::models::BattleLog::{BattleLog, BattleLogCounter};
     use warpack_masters::items::{Backpack1, Backpack2};
+    use warpack_masters::prdefined_dummies::{PredefinedItem, Dummy0, Dummy1};
+
 
     // #[event]
     // #[derive(Drop, starknet::Event)]
@@ -2090,6 +2093,89 @@ mod actions {
             set!(world, (char, shop, inventoryItemsCounter, storageItemsCounter));
 
             self.spawn(name, wmClass);
+        }
+
+        fn prefine_dummy(world: IWorldDispatcher, level: usize) {
+            let player = get_caller_address();
+            assert(self.is_world_owner(player), 'player not world owner');
+
+            let mut name: felt252 = '';
+            let mut wmClassNo: u8 = 0;
+            let mut wmClass: WMClass = WMClass::Warrior;
+            let mut health: usize = 0;
+
+            let mut items: Array<PredefinedItem> = array![];
+
+            match level {
+                0 => {
+                    name = Dummy0::name;
+                    wmClassNo = Dummy0::wmClass;
+                    health = Dummy0::health;
+                    items = Dummy0::get_items();
+                },
+                1 => {
+                    name = Dummy1::name;
+                    wmClassNo = Dummy1::wmClass;
+                    health = Dummy1::health;
+                    items = Dummy1::get_items();
+                },
+                _ => {
+                    assert(false, 'invalid level');
+                }
+            }
+
+            match wmClassNo {
+                0 => {
+                    wmClass = WMClass::Warrior;
+                },
+                1 => {
+                    wmClass = WMClass::Warlock;
+                },
+                _ => {
+                    assert(false, 'invalid wmClass');
+                }
+            }
+
+
+            let mut dummyCharCounter = get!(world, level, (DummyCharacterCounter));
+            dummyCharCounter.count += 1;
+
+            let dummyChar = DummyCharacter {
+                level: level,
+                id: dummyCharCounter.count,
+                name: name,
+                wmClass: wmClass,
+                health: health,
+                player: starknet::contract_address_const::<0x0>(),
+                rating: 0,
+            };
+
+            let mut dummyCharItemsCounter = get!(
+                world, (level, dummyCharCounter.count), (DummyCharacterItemsCounter)
+            );
+
+            loop {
+                if items.len() == 0 {
+                    break;
+                }
+
+                let item = items.pop_front().unwrap();
+
+                dummyCharItemsCounter.count += 1;
+
+                let dummyCharItem = DummyCharacterItem {
+                    level: level,
+                    dummyCharId: dummyCharCounter.count,
+                    counterId: dummyCharItemsCounter.count,
+                    itemId: item.itemId,
+                    position: item.position,
+                    rotation: item.rotation,
+                };
+
+                set!(world, (dummyCharItem));
+            };
+
+            set!(world, (dummyCharCounter, dummyChar, dummyCharItemsCounter));
         }
     }
 }
