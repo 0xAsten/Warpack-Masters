@@ -24,6 +24,7 @@ mod tests {
     mod test_fight;
     mod test_rebirth;
     mod test_spawn;
+    mod test_prefine_dummy;
 }
 
 mod utils {
@@ -32,3 +33,4 @@ mod utils {
 }
 
 mod items;
+mod prdefined_dummies;
