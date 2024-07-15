@@ -2,6 +2,7 @@ use starknet::ContractAddress;
 
 
 #[derive(Model, Drop, Serde)]
+#[dojo::model]
 struct Item {
     #[key]
     id: usize,
@@ -34,6 +35,7 @@ struct Item {
 }
 
 #[derive(Model, Drop, Serde)]
+#[dojo::model]
 struct ItemsCounter {
     #[key]
     id: felt252,

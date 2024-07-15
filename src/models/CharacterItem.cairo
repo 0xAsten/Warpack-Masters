@@ -7,6 +7,7 @@ struct Position {
 }
 
 #[derive(Model, Drop, Serde)]
+#[dojo::model]
 struct CharacterItemStorage {
     #[key]
     player: ContractAddress,
@@ -16,6 +17,7 @@ struct CharacterItemStorage {
 }
 
 #[derive(Model, Drop, Serde)]
+#[dojo::model]
 struct CharacterItemsStorageCounter {
     #[key]
     player: ContractAddress,
@@ -23,6 +25,7 @@ struct CharacterItemsStorageCounter {
 }
 
 #[derive(Model, Drop, Serde)]
+#[dojo::model]
 struct CharacterItemInventory {
     #[key]
     player: ContractAddress,
@@ -35,6 +38,7 @@ struct CharacterItemInventory {
 }
 
 #[derive(Model, Drop, Serde)]
+#[dojo::model]
 struct CharacterItemsInventoryCounter {
     #[key]
     player: ContractAddress,

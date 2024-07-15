@@ -4,10 +4,11 @@ use starknet::ContractAddress;
 
 #[dojo::interface]
 trait IActions {
-    fn spawn(name: felt252, wmClass: WMClass);
-    fn place_item(storage_item_id: u32, x: usize, y: usize, rotation: usize);
-    fn undo_place_item(inventory_item_id: u32);
+    fn spawn(ref world: IWorldDispatcher, name: felt252, wmClass: WMClass);
+    fn place_item(ref world: IWorldDispatcher, storage_item_id: u32, x: usize, y: usize, rotation: usize);
+    fn undo_place_item(ref world: IWorldDispatcher, inventory_item_id: u32);
     fn add_item(
+        ref world: IWorldDispatcher, 
         id: u32,
         name: felt252,
         itemType: u8,
@@ -30,16 +31,16 @@ trait IActions {
         empower: u32,
         empowerActivation: u8,
     );
-    fn edit_item(item_id: u32, item_key: felt252, item_value: felt252);
-    fn buy_item(item_id: u32);
-    fn sell_item(storage_item_id: u32);
-    fn is_world_owner(player: ContractAddress) -> bool;
-    fn is_item_owned(player: ContractAddress, id: usize) -> bool;
-    fn reroll_shop();
-    fn fight();
-    fn create_dummy();
-    fn rebirth(name: felt252, wmClass: WMClass);
-    fn prefine_dummy(level: usize);
+    fn edit_item(ref world: IWorldDispatcher, item_id: u32, item_key: felt252, item_value: felt252);
+    fn buy_item(ref world: IWorldDispatcher, item_id: u32);
+    fn sell_item(ref world: IWorldDispatcher, storage_item_id: u32);
+    fn is_world_owner(ref world: IWorldDispatcher, player: ContractAddress) -> bool;
+    fn is_item_owned(ref world: IWorldDispatcher, player: ContractAddress, id: usize) -> bool;
+    fn reroll_shop(ref world: IWorldDispatcher, );
+    fn fight(ref world: IWorldDispatcher, );
+    fn create_dummy(ref world: IWorldDispatcher, );
+    fn rebirth(ref world: IWorldDispatcher, name: felt252, wmClass: WMClass);
+    fn prefine_dummy(ref world: IWorldDispatcher, level: usize);
 }
 
 // TODO: rename the count filed in counter model
@@ -146,7 +147,7 @@ mod actions {
 
     #[abi(embed_v0)]
     impl ActionsImpl of IActions<ContractState> {
-        fn spawn(world: IWorldDispatcher, name: felt252, wmClass: WMClass) {
+        fn spawn(ref world: IWorldDispatcher, name: felt252, wmClass: WMClass) {
             let player = get_caller_address();
 
             assert(name != '', 'name cannot be empty');
@@ -213,7 +214,7 @@ mod actions {
         }
 
         fn add_item(
-            world: IWorldDispatcher,
+            ref world: IWorldDispatcher,
             id: u32,
             name: felt252,
             itemType: u8,
@@ -283,7 +284,7 @@ mod actions {
         }
 
         fn edit_item(
-            world: IWorldDispatcher, item_id: u32, item_key: felt252, item_value: felt252
+            ref world: IWorldDispatcher, item_id: u32, item_key: felt252, item_value: felt252
         ) {
             let player = get_caller_address();
 
@@ -443,7 +444,7 @@ mod actions {
 
 
         fn place_item(
-            world: IWorldDispatcher, storage_item_id: u32, x: usize, y: usize, rotation: usize
+            ref world: IWorldDispatcher, storage_item_id: u32, x: usize, y: usize, rotation: usize
         ) {
             let player = get_caller_address();
 
@@ -586,7 +587,7 @@ mod actions {
             set!(world, (storageItem));
         }
 
-        fn undo_place_item(world: IWorldDispatcher, inventory_item_id: u32) {
+        fn undo_place_item(ref world: IWorldDispatcher, inventory_item_id: u32) {
             let player = get_caller_address();
 
             let mut inventoryItem = get!(
@@ -710,7 +711,7 @@ mod actions {
             set!(world, (inventoryItem));
         }
 
-        fn buy_item(world: IWorldDispatcher, item_id: u32) {
+        fn buy_item(ref world: IWorldDispatcher, item_id: u32) {
             let player = get_caller_address();
 
             assert(item_id != 0, 'invalid item_id');
@@ -786,7 +787,7 @@ mod actions {
         }
 
 
-        fn sell_item(world: IWorldDispatcher, storage_item_id: u32) {
+        fn sell_item(ref world: IWorldDispatcher, storage_item_id: u32) {
             let player = get_caller_address();
 
             let mut storageItem = get!(world, (player, storage_item_id), (CharacterItemStorage));
@@ -817,7 +818,7 @@ mod actions {
             set!(world, (storageItem, playerChar));
         }
 
-        fn reroll_shop(world: IWorldDispatcher) {
+        fn reroll_shop(ref world: IWorldDispatcher) {
             let player = get_caller_address();
 
             let mut char = get!(world, player, (Character));
@@ -985,14 +986,14 @@ mod actions {
         }
 
 
-        fn is_world_owner(world: IWorldDispatcher, player: ContractAddress) -> bool {
+        fn is_world_owner(ref world: IWorldDispatcher, player: ContractAddress) -> bool {
             // resource id of world is 0
             let is_owner = world.is_owner(player, 0);
 
             is_owner
         }
 
-        fn is_item_owned(world: IWorldDispatcher, player: ContractAddress, id: usize) -> bool {
+        fn is_item_owned(ref world: IWorldDispatcher, player: ContractAddress, id: usize) -> bool {
             let storageItem = get!(world, (player, id), (CharacterItemStorage));
 
             if storageItem.itemId == 0 {
@@ -1002,7 +1003,7 @@ mod actions {
             true
         }
 
-        fn fight(world: IWorldDispatcher) {
+        fn fight(ref world: IWorldDispatcher) {
             let player = get_caller_address();
 
             let mut char = get!(world, player, (Character));
@@ -1945,7 +1946,7 @@ mod actions {
             set!(world, (char, dummyChar));
         }
 
-        fn create_dummy(world: IWorldDispatcher) {
+        fn create_dummy(ref world: IWorldDispatcher) {
             let player = get_caller_address();
 
             let mut char = get!(world, player, (Character));
@@ -1999,7 +2000,7 @@ mod actions {
             set!(world, (char, dummyCharCounter, dummyChar));
         }
 
-        fn rebirth(world: IWorldDispatcher, name: felt252, wmClass: WMClass) {
+        fn rebirth(ref world: IWorldDispatcher, name: felt252, wmClass: WMClass) {
             let player = get_caller_address();
 
             let mut char = get!(world, player, (Character));
@@ -2095,7 +2096,7 @@ mod actions {
             self.spawn(name, wmClass);
         }
 
-        fn prefine_dummy(world: IWorldDispatcher, level: usize) {
+        fn prefine_dummy(ref world: IWorldDispatcher, level: usize) {
             let player = get_caller_address();
             assert(self.is_world_owner(player), 'player not world owner');
 

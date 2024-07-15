@@ -36,7 +36,7 @@ mod tests {
         let world = spawn_test_world(models);
 
         let contract_address = world
-            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
+            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut actions_system = IActionsDispatcher { contract_address };
 
         add_items(ref actions_system);
@@ -59,6 +59,7 @@ mod tests {
         assert(char.totalLoss == 0, 'total loss should be 0');
         assert(char.winStreak == 0, 'win streak should be 0');
         assert(char.birthCount == 1, 'birth count should be 1');
+        char.updatedAt.print();
         assert(char.updatedAt == timestamp, 'updatedAt mismatch');
 
         let storageItemsCounter = get!(world, (alice), CharacterItemsStorageCounter);
@@ -142,7 +143,7 @@ mod tests {
         let world = spawn_test_world(models);
 
         let contract_address = world
-            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
+            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut actions_system = IActionsDispatcher { contract_address };
 
         actions_system.spawn('', WMClass::Warlock);
@@ -156,7 +157,7 @@ mod tests {
         let world = spawn_test_world(models);
 
         let contract_address = world
-            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
+            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut actions_system = IActionsDispatcher { contract_address };
         add_items(ref actions_system);
 
@@ -172,7 +173,7 @@ mod tests {
         let world = spawn_test_world(models);
 
         let contract_address = world
-            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
+            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut actions_system = IActionsDispatcher { contract_address };
         add_items(ref actions_system);
 
@@ -192,19 +193,20 @@ mod tests {
         let world = spawn_test_world(models);
 
         let contract_address = world
-            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
+            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut actions_system = IActionsDispatcher { contract_address };
         add_items(ref actions_system);
 
         let alice = starknet::contract_address_const::<0x1>();
-        set_contract_address(alice);
-        actions_system.spawn('alice', WMClass::Archer);
-        
         // mocking timestamp for testing
         let timestamp = 1716770021;
         set_block_timestamp(timestamp);
+        set_contract_address(alice);
+        actions_system.spawn('alice', WMClass::Archer);
+        
         
         let char = get!(world, (alice), Character);
+
         assert(!char.dummied, 'Should be false');
         assert(char.wins == 0, 'wins count should be 0');
         assert(char.loss == 0, 'loss count should be 0');
@@ -217,6 +219,8 @@ mod tests {
         assert(char.totalLoss == 0, 'total loss should be 0');
         assert(char.winStreak == 0, 'win streak should be 0');
         assert(char.birthCount == 1, 'birth count should be 1');
+        char.updatedAt.print();
+        timestamp.print();
         assert(char.updatedAt == timestamp, 'updatedAt mismatch');
     }
 }

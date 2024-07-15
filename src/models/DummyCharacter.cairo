@@ -3,6 +3,7 @@ use starknet::ContractAddress;
 use warpack_masters::models::Character::WMClass;
 
 #[derive(Model, Drop, Serde)]
+#[dojo::model]
 struct DummyCharacter {
     #[key]
     level: usize,
@@ -16,6 +17,7 @@ struct DummyCharacter {
 }
 
 #[derive(Model, Drop, Serde)]
+#[dojo::model]
 struct DummyCharacterCounter {
     #[key]
     level: usize,
