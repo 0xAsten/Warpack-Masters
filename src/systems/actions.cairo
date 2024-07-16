@@ -34,8 +34,8 @@ trait IActions {
     fn edit_item(ref world: IWorldDispatcher, item_id: u32, item_key: felt252, item_value: felt252);
     fn buy_item(ref world: IWorldDispatcher, item_id: u32);
     fn sell_item(ref world: IWorldDispatcher, storage_item_id: u32);
-    fn is_world_owner(ref world: IWorldDispatcher, player: ContractAddress) -> bool;
-    fn is_item_owned(ref world: IWorldDispatcher, player: ContractAddress, id: usize) -> bool;
+    fn is_world_owner(world: @IWorldDispatcher, player: ContractAddress) -> bool;
+    fn is_item_owned(world: @IWorldDispatcher, player: ContractAddress, id: usize) -> bool;
     fn reroll_shop(ref world: IWorldDispatcher, );
     fn fight(ref world: IWorldDispatcher, );
     fn create_dummy(ref world: IWorldDispatcher, );
@@ -986,14 +986,14 @@ mod actions {
         }
 
 
-        fn is_world_owner(ref world: IWorldDispatcher, player: ContractAddress) -> bool {
+        fn is_world_owner(world: @IWorldDispatcher, player: ContractAddress) -> bool {
             // resource id of world is 0
             let is_owner = world.is_owner(player, 0);
 
             is_owner
         }
 
-        fn is_item_owned(ref world: IWorldDispatcher, player: ContractAddress, id: usize) -> bool {
+        fn is_item_owned(world: @IWorldDispatcher, player: ContractAddress, id: usize) -> bool {
             let storageItem = get!(world, (player, id), (CharacterItemStorage));
 
             if storageItem.itemId == 0 {
