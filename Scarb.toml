@@ -1,5 +1,5 @@
 [package]
-cairo-version = "2.5.4"
+cairo-version = "2.6.3"
 name = "warpack_masters"
 version = "0.6.0"
 
