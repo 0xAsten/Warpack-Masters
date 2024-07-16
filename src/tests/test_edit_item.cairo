@@ -27,7 +27,7 @@ mod tests {
         let world = spawn_test_world(models);
 
         let contract_address = world
-            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
+            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut actions_system = IActionsDispatcher { contract_address };
 
         add_items(ref actions_system);
@@ -126,7 +126,7 @@ mod tests {
         let world = spawn_test_world(models);
 
         let contract_address = world
-            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
+            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut actions_system = IActionsDispatcher { contract_address };
 
         add_items(ref actions_system);
@@ -145,7 +145,7 @@ mod tests {
         let world = spawn_test_world(models);
 
         let contract_address = world
-            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
+            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut actions_system = IActionsDispatcher { contract_address };
 
         add_items(ref actions_system);
@@ -162,7 +162,7 @@ mod tests {
         let world = spawn_test_world(models);
 
         let contract_address = world
-            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
+            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut actions_system = IActionsDispatcher { contract_address };
 
         add_items(ref actions_system);
@@ -179,7 +179,7 @@ mod tests {
         let world = spawn_test_world(models);
 
         let contract_address = world
-            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
+            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut actions_system = IActionsDispatcher { contract_address };
 
         add_items(ref actions_system);
@@ -197,7 +197,7 @@ mod tests {
         let world = spawn_test_world(models);
 
         let contract_address = world
-            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
+            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut actions_system = IActionsDispatcher { contract_address };
 
         add_items(ref actions_system);
