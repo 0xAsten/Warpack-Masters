@@ -661,7 +661,7 @@ mod Dummy10 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Satchel, Greatsword, Buckler, KnightHelmet, MagicWater, HealingPotion};
 
-    const name: felt252 = 'Goobie';
+    const name: felt252 = 'Goodie';
     const wmClass: u8 = 0;
     const health: usize = 80;
 
