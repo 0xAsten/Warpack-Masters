@@ -2007,11 +2007,11 @@ mod actions {
             assert(char.loss >= 5, 'loss not reached');
 
             // To allow others to use the player's privous name
-            if char.name != name {
-                let mut nameRecord = get!(world, char.name, NameRecord);
-                nameRecord.player = starknet::contract_address_const::<0>();
-                set!(world, (nameRecord));
-            }
+            // if char.name != name {
+            //     let mut nameRecord = get!(world, char.name, NameRecord);
+            //     nameRecord.player = starknet::contract_address_const::<0>();
+            //     set!(world, (nameRecord));
+            // }
 
             // required to calling spawn doesn't fail
             char.name = '';
@@ -2136,17 +2136,23 @@ mod actions {
                 }
             }
 
+            let nameRecord = get!(world, name, NameRecord);
+            assert(
+                nameRecord.player == starknet::contract_address_const::<0>(),
+                'name already exists'
+            );
 
             let mut dummyCharCounter = get!(world, level, (DummyCharacterCounter));
             dummyCharCounter.count += 1;
-
+            
+            let player = starknet::contract_address_const::<0x1>();
             let dummyChar = DummyCharacter {
                 level: level,
                 id: dummyCharCounter.count,
                 name: name,
                 wmClass: wmClass,
                 health: health,
-                player: starknet::contract_address_const::<0x0>(),
+                player: player,
                 rating: 0,
             };
 
@@ -2175,7 +2181,7 @@ mod actions {
                 set!(world, (dummyCharItem));
             };
 
-            set!(world, (dummyCharCounter, dummyChar, dummyCharItemsCounter));
+            set!(world, (dummyCharCounter, dummyChar, dummyCharItemsCounter, NameRecord { name, player }));
         }
     }
 }
