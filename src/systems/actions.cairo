@@ -67,7 +67,7 @@ mod actions {
     };
     use warpack_masters::models::BattleLog::{BattleLog, BattleLogCounter};
     use warpack_masters::items::{Backpack, Pack};
-    use warpack_masters::prdefined_dummies::{PredefinedItem, Dummy0, Dummy1};
+    use warpack_masters::prdefined_dummies::{PredefinedItem, Dummy0, Dummy1, Dummy2, Dummy3, Dummy4, Dummy5, Dummy6, Dummy7, Dummy8, Dummy9, Dummy10};
 
 
     // #[event]
@@ -2119,6 +2119,60 @@ mod actions {
                     health = Dummy1::health;
                     items = Dummy1::get_items();
                 },
+                2 => {
+                    name = Dummy2::name;
+                    wmClassNo = Dummy2::wmClass;
+                    health = Dummy2::health;
+                    items = Dummy2::get_items();
+                },
+                3 => {
+                    name = Dummy3::name;
+                    wmClassNo = Dummy3::wmClass;
+                    health = Dummy3::health;
+                    items = Dummy3::get_items();
+                },
+                4 => {
+                    name = Dummy4::name;
+                    wmClassNo = Dummy4::wmClass;
+                    health = Dummy4::health;
+                    items = Dummy4::get_items();
+                },
+                5 => {
+                    name = Dummy5::name;
+                    wmClassNo = Dummy5::wmClass;
+                    health = Dummy5::health;
+                    items = Dummy5::get_items();
+                },
+                6 => {
+                    name = Dummy6::name;
+                    wmClassNo = Dummy6::wmClass;
+                    health = Dummy6::health;
+                    items = Dummy6::get_items();
+                },
+                7 => {
+                    name = Dummy7::name;
+                    wmClassNo = Dummy7::wmClass;
+                    health = Dummy7::health;
+                    items = Dummy7::get_items();
+                },
+                8 => {
+                    name = Dummy8::name;
+                    wmClassNo = Dummy8::wmClass;
+                    health = Dummy8::health;
+                    items = Dummy8::get_items();
+                },
+                9 => {
+                    name = Dummy9::name;
+                    wmClassNo = Dummy9::wmClass;
+                    health = Dummy9::health;
+                    items = Dummy9::get_items();
+                },
+                10 => {
+                    name = Dummy10::name;
+                    wmClassNo = Dummy10::wmClass;
+                    health = Dummy10::health;
+                    items = Dummy10::get_items();
+                },
                 _ => {
                     assert(false, 'invalid level');
                 }
@@ -2130,6 +2184,9 @@ mod actions {
                 },
                 1 => {
                     wmClass = WMClass::Warlock;
+                },
+                2 => {
+                    wmClass = WMClass::Archer;
                 },
                 _ => {
                     assert(false, 'invalid wmClass');
