@@ -15,12 +15,6 @@ dojo = { git = "https://github.com/dojoengine/dojo", tag = "v0.6.0" }
 initializer_class_hash = "0xbeef"
 
 [tool.dojo.env]
-rpc_url = "http://0.0.0.0:5050"
-
-# Madara
-#rpc_url = "http://madara-warpack.karnot.xyz"
-#account_address = "0x4"
-#private_key = "0x123"
 
 [tool.dojo.world]
 name = "Warpack Masters"

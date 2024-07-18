@@ -2,8 +2,8 @@
 set -euo pipefail
 pushd $(dirname "$0")/..
 
-# export RPC_URL="https://api.cartridge.gg/x/warpack-masters-v3/katana";
-: "${RPC_URL:?Environment variable RPC_URL must be set}"
+# export STARKNET_RPC_URL="https://api.cartridge.gg/x/warpack-masters-v3/katana";
+: "${STARKNET_RPC_URL:?Environment variable STARKNET_RPC_URL must be set}"
 
 export WORLD_ADDRESS=$(cat ./manifests/dev/manifest.json | jq -r '.world.address')
 
@@ -17,7 +17,7 @@ echo actions : $ACTIONS_ADDRESS
 echo "---------------------------------------------------------------------------"
 
 # enable system -> models authorizations
-sozo auth grant --world $WORLD_ADDRESS --rpc-url $RPC_URL --wait writer \
+sozo auth grant --world $WORLD_ADDRESS --rpc-url $STARKNET_RPC_URL --wait writer \
   BackpackGrids,$ACTIONS_ADDRESS \
   Character,$ACTIONS_ADDRESS \
   CharacterItemStorage,$ACTIONS_ADDRESS \

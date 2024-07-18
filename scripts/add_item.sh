@@ -2,7 +2,7 @@
 set -euo pipefail
 pushd $(dirname "$0")/..
 
-: "${RPC_URL:?Environment variable RPC_URL must be set}"
+: "${STARKNET_RPC_URL:?Environment variable STARKNET_RPC_URL must be set}"
 
 export WORLD_ADDRESS=$(cat ./manifests/dev/manifest.json | jq -r '.world.address')
 
