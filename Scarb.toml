@@ -15,10 +15,7 @@ dojo = { git = "https://github.com/dojoengine/dojo", tag = "v0.6.0" }
 initializer_class_hash = "0xbeef"
 
 [tool.dojo.env]
-rpc_url = "https://katana.impulsedao.xyz"
-#rpc_url = "http://0.0.0.0:5050"
-account_address = "0x4765f4411c5451ca54aa3c5cd84989afd825f96165830f0569f684772e008ad"
-private_key = "0x2fd6286d86cda07a4be276b98fd19a434a870449a708c75b49845a0d39ad38e"
+rpc_url = "http://0.0.0.0:5050"
 
 # Madara
 #rpc_url = "http://madara-warpack.karnot.xyz"

@@ -47,13 +47,13 @@ mod tests {
         set!(world, (player_data));
         // mock shop for testing
         let mut shop_data = get!(world, alice, (Shop));
-        shop_data.item1 = 4;
+        shop_data.item1 = 5;
         shop_data.item2 = 6;
         shop_data.item3 = 8;
         shop_data.item4 = 1;
         set!(world, (shop_data));
 
-        actions_system.buy_item(4);
+        actions_system.buy_item(5);
         // place a sword on (4,2)
         actions_system.place_item(2, 4, 2, 0);
 
@@ -63,7 +63,7 @@ mod tests {
         assert(storageItemCounter.count == 2, 'storage item count mismatch');
 
         let storageItem = get!(world, (alice, 2), CharacterItemStorage);
-        assert(storageItem.itemId == 4, 'item id should equal 2');
+        assert(storageItem.itemId == 5, 'item id should equal 5');
 
         let inventoryItemCounter = get!(world, alice, CharacterItemsInventoryCounter);
         assert(inventoryItemCounter.count == 3, 'inventory item count mismatch');
@@ -96,7 +96,7 @@ mod tests {
         assert(storageItemCounter.count == 2, 'storage item count mismatch');
 
         let storageItem = get!(world, (alice, 2), CharacterItemStorage);
-        assert(storageItem.itemId == 4, 'item id should equal 4');
+        assert(storageItem.itemId == 5, 'item id should equal 5');
         let storageItem = get!(world, (alice, 1), CharacterItemStorage);
         assert(storageItem.itemId == 6, 'item id should equal 6');
 
@@ -137,7 +137,7 @@ mod tests {
         let storageItem = get!(world, (alice, 3), CharacterItemStorage);
         assert(storageItem.itemId == 8, 'item id should equal 2');
         let storageItem = get!(world, (alice, 2), CharacterItemStorage);
-        assert(storageItem.itemId == 4, 'item id should equal 4');
+        assert(storageItem.itemId == 5, 'item id should equal 4');
         let storageItem = get!(world, (alice, 1), CharacterItemStorage);
         assert(storageItem.itemId == 6, 'item id should equal 6');
         let inventoryItemCounter = get!(world, alice, CharacterItemsInventoryCounter);
@@ -173,7 +173,7 @@ mod tests {
         assert(inventoryItemCounter.count == 5, 'inventory item count mismatch');
 
         let invetoryItem = get!(world, (alice, 3), CharacterItemInventory);
-        assert(invetoryItem.itemId == 4, 'item id should equal 2');
+        assert(invetoryItem.itemId == 5, 'item id should equal 5');
         assert(invetoryItem.position.x == 4, 'x position mismatch');
         assert(invetoryItem.position.y == 2, 'y position mismatch');
         assert(invetoryItem.rotation == 0, 'rotation mismatch');

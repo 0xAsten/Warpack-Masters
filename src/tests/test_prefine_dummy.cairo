@@ -75,7 +75,7 @@ use starknet::class_hash::Felt252TryIntoClassHash;
         }
         assert(dummyClassNo == Dummy0::wmClass, 'Should be equal Dummy0::wmClass');
         assert(dummyChar.health == Dummy0::health, 'Should be equal Dummy0::health');
-        assert(dummyChar.player == starknet::contract_address_const::<0x0>(), 'Should be equal 0x0');
+        assert(dummyChar.player == starknet::contract_address_const::<0x1>(), 'Should be equal 0x0');
         assert(dummyChar.rating == 0, 'Should be equal 0');
 
         let dummyCharItemsCounter = get!(world, (level, dummyChar.id), DummyCharacterItemsCounter);

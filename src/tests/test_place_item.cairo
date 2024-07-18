@@ -39,7 +39,7 @@ mod tests {
         add_items(ref actions_system);
 
         let item = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
-        assert(item.count == 13, 'total item count mismatch');
+        assert(item.count == 16, 'total item count mismatch');
 
         set_contract_address(alice);
         actions_system.spawn('Alice', WMClass::Warlock);
@@ -51,13 +51,13 @@ mod tests {
         set!(world, (player_data));
         // mock shop for testing
         let mut shop_data = get!(world, alice, (Shop));
-        shop_data.item1 = 4;
-        shop_data.item2 = 6;
+        shop_data.item1 = 7;
+        shop_data.item2 = 9;
         shop_data.item3 = 8;
         shop_data.item4 = 1;
         set!(world, (shop_data));
 
-        actions_system.buy_item(4);
+        actions_system.buy_item(7);
         // place a sword on (4,2)
         actions_system.place_item(2, 4, 2, 0);
         // (4,2) (4,3) (4,4) should be occupied
@@ -80,12 +80,12 @@ mod tests {
         assert(inventoryItemCounter.count == 3, 'inventory item count mismatch');
 
         let invetoryItem = get!(world, (alice, 3), CharacterItemInventory);
-        assert(invetoryItem.itemId == 4, 'item id should equal 2');
+        assert(invetoryItem.itemId == 7, 'item id should equal 7');
         assert(invetoryItem.position.x == 4, 'x position mismatch');
         assert(invetoryItem.position.y == 2, 'y position mismatch');
         assert(invetoryItem.rotation == 0, 'rotation mismatch');
 
-        actions_system.buy_item(6);
+        actions_system.buy_item(9);
         // place a shield on (2,2)
         actions_system.place_item(2, 2, 2, 0);
         // (2,2) (3,2) (2,3) (3,3) should be occupied
@@ -111,7 +111,7 @@ mod tests {
         assert(inventoryItemCounter.count == 4, 'inventory item count mismatch');
 
         let invetoryItem = get!(world, (alice, 4), CharacterItemInventory);
-        assert(invetoryItem.itemId == 6, 'item id should equal 4');
+        assert(invetoryItem.itemId == 9, 'item id should equal 4');
         assert(invetoryItem.position.x == 2, 'x position mismatch');
         assert(invetoryItem.position.y == 2, 'y position mismatch');
         assert(invetoryItem.rotation == 0, 'rotation mismatch');
@@ -250,10 +250,10 @@ mod tests {
 
         // mock shop for testing
         let mut shop_data = get!(world, alice, (Shop));
-        shop_data.item1 = 4;
+        shop_data.item1 = 6;
         set!(world, (shop_data));
 
-        actions_system.buy_item(4);
+        actions_system.buy_item(6);
         // place a sword on (8,6) with rotation 90
         actions_system.place_item(2, 8, 6, 90);
     }
@@ -279,10 +279,10 @@ mod tests {
 
         // mock shop for testing
         let mut shop_data = get!(world, alice, (Shop));
-        shop_data.item1 = 4;
+        shop_data.item1 = 7;
         set!(world, (shop_data));
 
-        actions_system.buy_item(4);
+        actions_system.buy_item(7);
         // place a sword on (0,5)
         actions_system.place_item(2, 0, 5, 0);
     }
@@ -309,18 +309,18 @@ mod tests {
 
         // mock shop for testing
         let mut shop_data = get!(world, alice, (Shop));
-        shop_data.item1 = 4;
+        shop_data.item1 = 5;
         shop_data.item2 = 6;
         set!(world, (shop_data));
 
-        actions_system.buy_item(4);
+        actions_system.buy_item(5);
         // place a sword on (4,2)
         actions_system.place_item(2, 4, 2, 0);
 
         actions_system.buy_item(6);
         // try to place the shield on of the occupied grids
         // this will collide with grid (4,2)
-        actions_system.place_item(2, 3, 2, 0);
+        actions_system.place_item(2, 3, 2, 90);
     }
 
     #[test]
@@ -368,10 +368,10 @@ mod tests {
 
         // mock shop for testing
         let mut shop_data = get!(world, alice, (Shop));
-        shop_data.item1 = 4;
+        shop_data.item1 = 5;
         set!(world, (shop_data));
 
-        actions_system.buy_item(4);
+        actions_system.buy_item(5);
 
         // place a sword on (4,2)
         actions_system.place_item(2, 4, 2, 0);
@@ -409,7 +409,7 @@ mod tests {
         shop_data.item4 = 1;
         set!(world, (shop_data));
 
-        actions_system.buy_item(4);
+        actions_system.buy_item(6);
         // place a sword on (3,3)
         actions_system.place_item(2, 3, 3, 270);
         // (3,3) (4,3) (5,3) should be occupied
@@ -419,11 +419,8 @@ mod tests {
         let mut backpack_grid_data = get!(world, (alice, 4, 3), BackpackGrids);
         assert(backpack_grid_data.occupied == true, '(4,3) should be occupied');
 
-        let mut backpack_grid_data = get!(world, (alice, 4, 3), BackpackGrids);
-        assert(backpack_grid_data.occupied == true, '(5,3) should be occupied');
-
         let invetoryItem = get!(world, (alice, 3), CharacterItemInventory);
-        assert(invetoryItem.itemId == 4, 'item id should equal 6');
+        assert(invetoryItem.itemId == 6, 'item id should equal 6');
         assert(invetoryItem.position.x == 3, 'x position mismatch');
         assert(invetoryItem.position.y == 3, 'y position mismatch');
         assert(invetoryItem.rotation == 270, 'rotation mismatch');

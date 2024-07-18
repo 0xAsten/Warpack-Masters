@@ -43,13 +43,13 @@ mod tests {
 
         // mock shop for testing
         let mut shop_data = get!(world, alice, (Shop));
-        shop_data.item1 = 4;
+        shop_data.item1 = 5;
         shop_data.item2 = 6;
         shop_data.item3 = 8;
         shop_data.item4 = 1;
         set!(world, (shop_data));
 
-        actions_system.buy_item(4);
+        actions_system.buy_item(5);
         actions_system.buy_item(6);
         actions_system.buy_item(8);
 
@@ -262,7 +262,7 @@ mod tests {
 
         let nameRecord = get!(world, 'bob', NameRecord);
         assert(
-            nameRecord.player == starknet::contract_address_const::<0x0>(), 'player should be 0x0'
+            nameRecord.player == starknet::contract_address_const::<0x2>(), 'player should be 0x2'
         );
     }
 }

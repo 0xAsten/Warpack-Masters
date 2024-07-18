@@ -116,7 +116,7 @@ mod tests {
         set!(world, (shop, char));
 
         actions_system.buy_item(4);
-        actions_system.place_item(2, 4, 2, 0);
+        actions_system.place_item(2, 2, 4, 0);
         actions_system.buy_item(6);
         actions_system.place_item(2, 2, 2, 0);
         actions_system.buy_item(8);

@@ -34,9 +34,9 @@ mod tests {
         add_items(ref actions_system);
 
         let item = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
-        assert(item.count == 13, 'total item count mismatch');
+        assert(item.count == 16, 'total item count mismatch');
 
-        let item_three_data = get!(world, 3, (Item));
+        let item_three_data = get!(world, 6, (Item));
         assert(item_three_data.id == items::Dagger::id, 'I3 id mismatch');
         assert(item_three_data.name == items::Dagger::name, 'I3 name mismatch');
         assert(item_three_data.itemType == items::Dagger::itemType, 'I3 itemType mismatch');
@@ -69,38 +69,38 @@ mod tests {
         );
 
         let item_six_data = get!(world, 6, (Item));
-        assert(item_six_data.id == items::Shield::id, 'I6 id mismatch');
-        assert(item_six_data.name == items::Shield::name, 'I6 name mismatch');
-        assert(item_six_data.itemType == items::Shield::itemType, 'I6 itemType mismatch');
-        assert(item_six_data.width == items::Shield::width, 'I6 width mismatch');
-        assert(item_six_data.height == items::Shield::height, 'I6 height mismatch');
-        assert(item_six_data.price == items::Shield::price, 'I6 price mismatch');
-        assert(item_six_data.damage == items::Shield::damage, 'I6 damage mismatch');
-        assert(item_six_data.chance == items::Shield::chance, 'I6 chance mismatch');
-        assert(item_six_data.cooldown == items::Shield::cooldown, 'I6 cooldown mismatch');
-        assert(item_six_data.rarity == items::Shield::rarity, 'I6 rarity mismatch');
-        assert(item_six_data.armor == items::Shield::armor, 'I6 armor mismatch');
+        assert(item_six_data.id == items::Dagger::id, 'I6 id mismatch');
+        assert(item_six_data.name == items::Dagger::name, 'I6 name mismatch');
+        assert(item_six_data.itemType == items::Dagger::itemType, 'I6 itemType mismatch');
+        assert(item_six_data.width == items::Dagger::width, 'I6 width mismatch');
+        assert(item_six_data.height == items::Dagger::height, 'I6 height mismatch');
+        assert(item_six_data.price == items::Dagger::price, 'I6 price mismatch');
+        assert(item_six_data.damage == items::Dagger::damage, 'I6 damage mismatch');
+        assert(item_six_data.chance == items::Dagger::chance, 'I6 chance mismatch');
+        assert(item_six_data.cooldown == items::Dagger::cooldown, 'I6 cooldown mismatch');
+        assert(item_six_data.rarity == items::Dagger::rarity, 'I6 rarity mismatch');
+        assert(item_six_data.armor == items::Dagger::armor, 'I6 armor mismatch');
         assert(
-            item_six_data.armorActivation == items::Shield::armorActivation,
+            item_six_data.armorActivation == items::Dagger::armorActivation,
             'I6 armorActivation mismatch'
         );
-        assert(item_six_data.regen == items::Shield::regen, 'I6 regen mismatch');
+        assert(item_six_data.regen == items::Dagger::regen, 'I6 regen mismatch');
         assert(
-            item_six_data.regenActivation == items::Shield::regenActivation,
+            item_six_data.regenActivation == items::Dagger::regenActivation,
             'I6 regenActivation mismatch'
         );
-        assert(item_six_data.reflect == items::Shield::reflect, 'I6 reflect mismatch');
+        assert(item_six_data.reflect == items::Dagger::reflect, 'I6 reflect mismatch');
         assert(
-            item_six_data.reflectActivation == items::Shield::reflectActivation,
+            item_six_data.reflectActivation == items::Dagger::reflectActivation,
             'I6 reflectActivation mismatch'
         );
-        assert(item_six_data.poison == items::Shield::poison, 'I6 poison mismatch');
+        assert(item_six_data.poison == items::Dagger::poison, 'I6 poison mismatch');
         assert(
-            item_six_data.poisonActivation == items::Shield::poisonActivation,
+            item_six_data.poisonActivation == items::Dagger::poisonActivation,
             'I6 poisonActivation mismatch'
         );
 
-        let item_eleven_data = get!(world, 11, (Item));
+        let item_eleven_data = get!(world, 14, (Item));
         assert(item_eleven_data.id == items::AugmentedSword::id, 'I11 id mismatch');
         assert(item_eleven_data.name == items::AugmentedSword::name, 'I11 name mismatch');
         assert(
@@ -136,7 +136,7 @@ mod tests {
             'I11 poisonActivation mismatch'
         );
 
-        let item_twelve_data = get!(world, 12, (Item));
+        let item_twelve_data = get!(world, 15, (Item));
         assert(item_twelve_data.id == items::AugmentedDagger::id, 'I12 id mismatch');
         assert(item_twelve_data.name == items::AugmentedDagger::name, 'I12 name mismatch');
         assert(

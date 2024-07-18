@@ -65,7 +65,7 @@ mod tests {
 
         let char_data = get!(world, alice, (Character));
         assert(
-            char_data.gold == prev_char_data.gold + (items::Sword::price / 2),
+            char_data.gold == prev_char_data.gold + (items::Shield::price / 2),
             'sell one: gold value mismatch'
         );
 

@@ -55,6 +55,81 @@ fn add_items(ref actions_system: IActionsDispatcher) {
 
     actions_system
         .add_item(
+            items::Satchel::id,
+            items::Satchel::name,
+            items::Satchel::itemType,
+            items::Satchel::width,
+            items::Satchel::height,
+            items::Satchel::price,
+            items::Satchel::damage,
+            items::Satchel::cleansePoison,
+            items::Satchel::chance,
+            items::Satchel::cooldown,
+            items::Satchel::rarity,
+            items::Satchel::armor,
+            items::Satchel::armorActivation,
+            items::Satchel::regen,
+            items::Satchel::regenActivation,
+            items::Satchel::reflect,
+            items::Satchel::reflectActivation,
+            items::Satchel::poison,
+            items::Satchel::poisonActivation,
+            items::Satchel::empower,
+            items::Satchel::empowerActivation,
+        );
+
+    actions_system
+        .add_item(
+            items::Pouch::id,
+            items::Pouch::name,
+            items::Pouch::itemType,
+            items::Pouch::width,
+            items::Pouch::height,
+            items::Pouch::price,
+            items::Pouch::damage,
+            items::Pouch::cleansePoison,
+            items::Pouch::chance,
+            items::Pouch::cooldown,
+            items::Pouch::rarity,
+            items::Pouch::armor,
+            items::Pouch::armorActivation,
+            items::Pouch::regen,
+            items::Pouch::regenActivation,
+            items::Pouch::reflect,
+            items::Pouch::reflectActivation,
+            items::Pouch::poison,
+            items::Pouch::poisonActivation,
+            items::Pouch::empower,
+            items::Pouch::empowerActivation,
+        );
+
+    actions_system
+        .add_item(
+            items::Herb::id,
+            items::Herb::name,
+            items::Herb::itemType,
+            items::Herb::width,
+            items::Herb::height,
+            items::Herb::price,
+            items::Herb::damage,
+            items::Herb::cleansePoison,
+            items::Herb::chance,
+            items::Herb::cooldown,
+            items::Herb::rarity,
+            items::Herb::armor,
+            items::Herb::armorActivation,
+            items::Herb::regen,
+            items::Herb::regenActivation,
+            items::Herb::reflect,
+            items::Herb::reflectActivation,
+            items::Herb::poison,
+            items::Herb::poisonActivation,
+            items::Herb::empower,
+            items::Herb::empowerActivation,
+        );
+    
+    actions_system
+        .add_item(
             items::Dagger::id,
             items::Dagger::name,
             items::Dagger::itemType,

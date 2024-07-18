@@ -198,11 +198,12 @@ mod tests {
 
         let alice = starknet::contract_address_const::<0x1>();
         set_contract_address(alice);
-        actions_system.spawn('alice', WMClass::Archer);
         
         // mocking timestamp for testing
         let timestamp = 1716770021;
         set_block_timestamp(timestamp);
+
+        actions_system.spawn('alice', WMClass::Archer);
         
         let char = get!(world, (alice), Character);
         assert(!char.dummied, 'Should be false');
