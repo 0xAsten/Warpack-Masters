@@ -66,7 +66,7 @@ mod actions {
         DummyCharacterItem, DummyCharacterItemsCounter
     };
     use warpack_masters::models::BattleLog::{BattleLog, BattleLogCounter};
-    use warpack_masters::items::{Backpack1, Backpack2};
+    use warpack_masters::items::{Backpack, Pack};
     use warpack_masters::prdefined_dummies::{PredefinedItem, Dummy0, Dummy1};
 
 
@@ -163,16 +163,16 @@ mod actions {
 
             // Default the player has 2 Backpacks
             // Must add two backpack items when setup the game
-            let item = get!(world, Backpack1::id, (Item));
+            let item = get!(world, Backpack::id, (Item));
             assert(item.itemType == 4, 'Invalid item type');
-            let item = get!(world, Backpack2::id, (Item));
+            let item = get!(world, Pack::id, (Item));
             assert(item.itemType == 4, 'Invalid item type');
 
             set!(
                 world,
                 (
-                    CharacterItemStorage { player, id: 1, itemId: Backpack1::id },
-                    CharacterItemStorage { player, id: 2, itemId: Backpack2::id },
+                    CharacterItemStorage { player, id: 1, itemId: Backpack::id },
+                    CharacterItemStorage { player, id: 2, itemId: Pack::id },
                     CharacterItemsStorageCounter { player, count: 2 },
                 )
             );
