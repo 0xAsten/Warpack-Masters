@@ -28,7 +28,7 @@ mod Dummy0 {
 
         items.append(PredefinedItem {
             itemId: Pack::id,
-            position: Position{ x:4, y:2 },
+            position: Position{ x:2, y:2 },
             rotation: 0,
         });
 

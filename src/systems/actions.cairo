@@ -40,6 +40,7 @@ trait IActions {
     fn create_dummy();
     fn rebirth(name: felt252, wmClass: WMClass);
     fn prefine_dummy(level: usize);
+    fn update_prefine_dummy(level: usize, dummyCharId: usize);
 }
 
 // TODO: rename the count filed in counter model
@@ -2239,6 +2240,144 @@ mod actions {
             };
 
             set!(world, (dummyCharCounter, dummyChar, dummyCharItemsCounter, NameRecord { name, player }));
+        }
+
+        fn update_prefine_dummy(world: IWorldDispatcher, level: usize, dummyCharId: usize) {
+            let player = get_caller_address();
+            assert(self.is_world_owner(player), 'player not world owner');
+    
+            let mut name: felt252 = '';
+            let mut wmClassNo: u8 = 0;
+            let mut wmClass: WMClass = WMClass::Warrior;
+            let mut health: usize = 0;
+    
+            let mut items: Array<PredefinedItem> = array![];
+    
+            match level {
+                0 => {
+                    name = Dummy0::name;
+                    wmClassNo = Dummy0::wmClass;
+                    health = Dummy0::health;
+                    items = Dummy0::get_items();
+                },
+                1 => {
+                    name = Dummy1::name;
+                    wmClassNo = Dummy1::wmClass;
+                    health = Dummy1::health;
+                    items = Dummy1::get_items();
+                },
+                2 => {
+                    name = Dummy2::name;
+                    wmClassNo = Dummy2::wmClass;
+                    health = Dummy2::health;
+                    items = Dummy2::get_items();
+                },
+                3 => {
+                    name = Dummy3::name;
+                    wmClassNo = Dummy3::wmClass;
+                    health = Dummy3::health;
+                    items = Dummy3::get_items();
+                },
+                4 => {
+                    name = Dummy4::name;
+                    wmClassNo = Dummy4::wmClass;
+                    health = Dummy4::health;
+                    items = Dummy4::get_items();
+                },
+                5 => {
+                    name = Dummy5::name;
+                    wmClassNo = Dummy5::wmClass;
+                    health = Dummy5::health;
+                    items = Dummy5::get_items();
+                },
+                6 => {
+                    name = Dummy6::name;
+                    wmClassNo = Dummy6::wmClass;
+                    health = Dummy6::health;
+                    items = Dummy6::get_items();
+                },
+                7 => {
+                    name = Dummy7::name;
+                    wmClassNo = Dummy7::wmClass;
+                    health = Dummy7::health;
+                    items = Dummy7::get_items();
+                },
+                8 => {
+                    name = Dummy8::name;
+                    wmClassNo = Dummy8::wmClass;
+                    health = Dummy8::health;
+                    items = Dummy8::get_items();
+                },
+                9 => {
+                    name = Dummy9::name;
+                    wmClassNo = Dummy9::wmClass;
+                    health = Dummy9::health;
+                    items = Dummy9::get_items();
+                },
+                10 => {
+                    name = Dummy10::name;
+                    wmClassNo = Dummy10::wmClass;
+                    health = Dummy10::health;
+                    items = Dummy10::get_items();
+                },
+                _ => {
+                    assert(false, 'invalid level');
+                }
+            }
+    
+            match wmClassNo {
+                0 => {
+                    wmClass = WMClass::Warrior;
+                },
+                1 => {
+                    wmClass = WMClass::Warlock;
+                },
+                2 => {
+                    wmClass = WMClass::Archer;
+                },
+                _ => {
+                    assert(false, 'invalid wmClass');
+                }
+            }
+            
+            let player = starknet::contract_address_const::<0x1>();
+            let dummyChar = DummyCharacter {
+                level: level,
+                id: dummyCharId,
+                name: name,
+                wmClass: wmClass,
+                health: health,
+                player: player,
+                rating: 0,
+            };
+    
+            let mut dummyCharItemsCounter = get!(
+                world, (level, dummyCharId), (DummyCharacterItemsCounter)
+            );
+            assert(dummyCharItemsCounter.count == items.len(), 'invalid items length');
+    
+            let mut i = 0;
+            loop {
+                if items.len() == 0 {
+                    break;
+                }
+    
+                let item = items.pop_front().unwrap();
+    
+                i += 1;
+                let dummyCharItem = DummyCharacterItem {
+                    level: level,
+                    dummyCharId: dummyCharId,
+                    counterId: i,
+                    itemId: item.itemId,
+                    position: item.position,
+                    rotation: item.rotation,
+                };
+    
+                set!(world, (dummyCharItem));
+            };
+    
+            set!(world, (dummyChar));
         }
     }
 }
