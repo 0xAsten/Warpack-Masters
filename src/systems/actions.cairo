@@ -1052,6 +1052,9 @@ mod actions {
 
             let mut char_on_hit_items = ArrayTrait::new();
             let mut dummy_on_hit_items = ArrayTrait::new();
+
+            let mut char_on_attack_items = ArrayTrait::new();
+            let mut dummy_on_attack_items = ArrayTrait::new();
             // =========  end =========
 
             // sort items
@@ -1080,48 +1083,54 @@ mod actions {
                     items_length += 1;
                     char_items_len += 1;
                 } else if cooldown == 0 {
-                    // ====== on start to plus stacks, 100% chance ======
+                    // ====== `on start / on hit / on attack` to plus stacks ======
                     // buff
                     if item.armorActivation == 1 {
                         char_armor += item.armor;
+                    } else if item.armorActivation == 2 {
+                        char_on_hit_items.append((EFFECT_ARMOR, item.chance, item.armor));
+                    } else if item.armorActivation == 4 {
+                        char_on_attack_items.append((EFFECT_ARMOR, item.chance, item.armor));
                     }
+
                     if item.regenActivation == 1 {
                         char_regen += item.regen;
+                    } else if item.regenActivation == 2 {
+                        char_on_hit_items.append((EFFECT_REGEN, item.chance, item.regen));
+                    } else if item.regenActivation == 4 {
+                        char_on_attack_items.append((EFFECT_REGEN, item.chance, item.regen));
                     }
+
                     if item.reflectActivation == 1 {
                         char_reflect += item.reflect;
+                    } else if item.reflectActivation == 2 {
+                        char_on_hit_items.append((EFFECT_REFLECT, item.chance, item.reflect));
+                    } else if item.reflectActivation == 4 {
+                        char_on_attack_items.append((EFFECT_REFLECT, item.chance, item.reflect));
                     }
+
                     if item.empowerActivation == 1 {
                         char_empower += item.empower;
+                    } else if item.empowerActivation == 2 {
+                        char_on_hit_items.append((EFFECT_EMPOWER, item.chance, item.empower));
+                    } else if item.empowerActivation == 4 {
+                        char_on_attack_items.append((EFFECT_EMPOWER, item.chance, item.empower));
                     }
                     // debuff
                     if item.poisonActivation == 1 {
                         dummy_poison += item.poison;
+                    } else if item.poisonActivation == 2 {
+                        char_on_hit_items.append((EFFECT_POISON, item.chance, item.poison));
+                    } else if item.poisonActivation == 4 {
+                        char_on_attack_items.append((EFFECT_POISON, item.chance, item.poison));
                     }
                 // ====== end ======
                 }
 
-                // ====== on hit to plus stacks ======
-                if item.armorActivation == 2 {
-                    char_on_hit_items.append((EFFECT_ARMOR, item.chance, item.armor));
-                }
-                if item.regenActivation == 2 {
-                    char_on_hit_items.append((EFFECT_REGEN, item.chance, item.regen));
-                }
-                if item.reflectActivation == 2 {
-                    char_on_hit_items.append((EFFECT_REFLECT, item.chance, item.reflect));
-                }
-                if item.empowerActivation == 2 {
-                    char_on_hit_items.append((EFFECT_EMPOWER, item.chance, item.empower));
-                }
-                if item.poisonActivation == 2 {
-                    char_on_hit_items.append((EFFECT_POISON, item.chance, item.poison));
-                }
-                // ====== end ======
-
                 inventoryItemCount -= 1;
             };
             let char_on_hit_items_span = char_on_hit_items.span();
+            let char_on_attack_items_span = char_on_attack_items.span();
 
             let dummyCharItemsCounter = get!(
                 world, (char.wins, dummy_index), (DummyCharacterItemsCounter)
@@ -1147,48 +1156,55 @@ mod actions {
                     items_length += 1;
                     dummy_items_len += 1;
                 } else if item.cooldown == 0 {
-                    // ====== on start to plus stacks, 100% chance ======
+                    // ====== `on start / on hit / on attack` to plus stacks ======
                     // buff
                     if item.armorActivation == 1 {
                         dummy_armor += item.armor;
+                    } else if item.armorActivation == 2 {
+                        dummy_on_hit_items.append((EFFECT_ARMOR, item.chance, item.armor));
+                    } else if item.armorActivation == 4 {
+                        dummy_on_attack_items.append((EFFECT_ARMOR, item.chance, item.armor));
                     }
+
                     if item.regenActivation == 1 {
                         dummy_regen += item.regen;
+                    } else if item.regenActivation == 2 {
+                        dummy_on_hit_items.append((EFFECT_REGEN, item.chance, item.regen));
+                    } else if item.regenActivation == 4 {
+                        dummy_on_attack_items.append((EFFECT_REGEN, item.chance, item.regen));
                     }
+
                     if item.reflectActivation == 1 {
                         dummy_reflect += item.reflect;
+                    } else if item.reflectActivation == 2 {
+                        dummy_on_hit_items.append((EFFECT_REFLECT, item.chance, item.reflect));
+                    } else if item.reflectActivation == 4 {
+                        dummy_on_attack_items.append((EFFECT_REFLECT, item.chance, item.reflect));
                     }
+
                     if item.empowerActivation == 1 {
                         dummy_empower += item.empower;
+                    } else if item.empowerActivation == 2 {
+                        dummy_on_hit_items.append((EFFECT_EMPOWER, item.chance, item.empower));
+                    } else if item.empowerActivation == 4 {
+                        dummy_on_attack_items.append((EFFECT_EMPOWER, item.chance, item.empower));
                     }
+
                     // debuff
                     if item.poisonActivation == 1 {
                         char_poison += item.poison;
+                    } else if item.poisonActivation == 2 {
+                        dummy_on_hit_items.append((EFFECT_POISON, item.chance, item.poison));
+                    } else if item.poisonActivation == 4 {
+                        dummy_on_attack_items.append((EFFECT_POISON, item.chance, item.poison));
                     }
                 // ====== end ======
                 }
-
-                // ====== on hit to plus stacks ======
-                if item.armorActivation == 2 {
-                    dummy_on_hit_items.append((EFFECT_ARMOR, item.chance, item.armor));
-                }
-                if item.regenActivation == 2 {
-                    dummy_on_hit_items.append((EFFECT_REGEN, item.chance, item.regen));
-                }
-                if item.reflectActivation == 2 {
-                    dummy_on_hit_items.append((EFFECT_REFLECT, item.chance, item.reflect));
-                }
-                if item.empowerActivation == 2 {
-                    dummy_on_hit_items.append((EFFECT_EMPOWER, item.chance, item.empower));
-                }
-                if item.poisonActivation == 2 {
-                    dummy_on_hit_items.append((EFFECT_POISON, item.chance, item.poison));
-                }
-                // ====== end ======
 
                 dummy_item_count -= 1;
             };
             let dummy_on_hit_items_span = dummy_on_hit_items.span();
+            let dummy_on_attack_items_span = dummy_on_attack_items.span();
 
             // sorting items based on cooldown in ascending order
             let mut i: usize = 0;
@@ -1466,7 +1482,38 @@ mod actions {
                                             break;
                                         }
                                     }
-                                // ====== end ======
+                                    // ====== end ======
+
+                                    // ====== char attack, to plus stacks ======
+                                    let mut on_attack_items_len = char_on_attack_items_span.len();
+                                    loop {
+                                        if on_attack_items_len == 0 {
+                                            break;
+                                        }
+
+                                        let (
+                                            on_attack_item_type, on_attack_item_chance, on_attack_item_stack
+                                        ) =
+                                            *char_on_attack_items_span.at(on_attack_items_len - 1);
+
+                                        if rand < on_attack_item_chance {
+                                            if on_attack_item_type == EFFECT_ARMOR {
+                                                char_armor += on_attack_item_stack;
+                                            } else if on_attack_item_type == EFFECT_REGEN {
+                                                char_regen += on_attack_item_stack;
+                                            } else if on_attack_item_type == EFFECT_REFLECT {
+                                                char_reflect += on_attack_item_stack;
+                                            } else if on_attack_item_type == EFFECT_EMPOWER {
+                                                char_empower += on_attack_item_stack;
+                                            } else if on_attack_item_type == EFFECT_POISON {
+                                                dummy_poison += on_attack_item_stack;
+                                            }
+                                        }
+
+                                        on_attack_items_len -= 1;
+                                    };
+                                    // ====== end ======
+
                                 } else {
                                     if cleansePoison > 0 {
                                         if char_poison > cleansePoison {
@@ -1662,7 +1709,37 @@ mod actions {
                                             break;
                                         }
                                     }
-                                // ====== end ======
+                                    // ====== end ======
+
+                                    // ====== char attack, to plus stacks ======
+                                    let mut on_attack_items_len = dummy_on_attack_items_span.len();
+                                    loop {
+                                        if on_attack_items_len == 0 {
+                                            break;
+                                        }
+
+                                        let (
+                                            on_attack_item_type, on_attack_item_chance, on_attack_item_stack
+                                        ) =
+                                            *dummy_on_attack_items_span.at(on_attack_items_len - 1);
+
+                                        if rand < on_attack_item_chance {
+                                            if on_attack_item_type == EFFECT_ARMOR {
+                                                dummy_armor += on_attack_item_stack;
+                                            } else if on_attack_item_type == EFFECT_REGEN {
+                                                dummy_regen += on_attack_item_stack;
+                                            } else if on_attack_item_type == EFFECT_REFLECT {
+                                                dummy_reflect += on_attack_item_stack;
+                                            } else if on_attack_item_type == EFFECT_EMPOWER {
+                                                dummy_empower += on_attack_item_stack;
+                                            } else if on_attack_item_type == EFFECT_POISON {
+                                                char_poison += on_attack_item_stack;
+                                            }
+                                        }
+
+                                        on_attack_items_len -= 1;
+                                    };
+                                    // ====== end ======
                                 } else {
                                     if cleansePoison > 0 {
                                         if dummy_poison > cleansePoison {
