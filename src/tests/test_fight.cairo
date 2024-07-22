@@ -12,6 +12,7 @@ mod tests {
     // import test utils
     use warpack_masters::{
         systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait, WMClass}},
+        systems::{fight::{fight, IFightDispatcher, IFightDispatcherTrait}},
         models::backpack::{BackpackGrids}, models::Item::{Item, item, ItemsCounter},
         models::Character::{Character, character},
         models::CharacterItem::{
@@ -24,7 +25,7 @@ mod tests {
     };
 
     use warpack_masters::systems::actions::actions::ITEMS_COUNTER_ID;
-    
+
     #[test]
     #[available_gas(3000000000000000)]
     fn test_dummy() {
@@ -36,6 +37,10 @@ mod tests {
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let mut actions_system = IActionsDispatcher { contract_address };
+
+        let fight_contract_address = world
+            .deploy_contract('salt2', fight::TEST_CLASS_HASH.try_into().unwrap());
+        let mut fight_system = IFightDispatcher { contract_address: fight_contract_address };
 
         add_items(ref actions_system);
 
@@ -57,7 +62,7 @@ mod tests {
         actions_system.spawn('bob', WMClass::Warlock);
         actions_system.create_dummy();
 
-        actions_system.fight();
+        fight_system.fight();
 
         let char = get!(world, (bob), Character);
         let dummyChar = get!(world, (0, 1), DummyCharacter);
@@ -83,11 +88,15 @@ mod tests {
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let mut actions_system = IActionsDispatcher { contract_address };
 
+        let fight_contract_address = world
+            .deploy_contract('salt2', fight::TEST_CLASS_HASH.try_into().unwrap());
+        let mut fight_system = IFightDispatcher { contract_address: fight_contract_address };
+
         add_items(ref actions_system);
 
         actions_system.spawn('alice', WMClass::Warlock);
         actions_system.create_dummy();
-        actions_system.fight();
+        fight_system.fight();
     }
 
     #[test]
@@ -101,6 +110,10 @@ mod tests {
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let mut actions_system = IActionsDispatcher { contract_address };
+
+        let fight_contract_address = world
+            .deploy_contract('salt2', fight::TEST_CLASS_HASH.try_into().unwrap());
+        let mut fight_system = IFightDispatcher { contract_address: fight_contract_address };
 
         add_items(ref actions_system);
 
@@ -128,7 +141,7 @@ mod tests {
         set_contract_address(bob);
         actions_system.spawn('bob', WMClass::Warlock);
         actions_system.create_dummy();
-        actions_system.fight();
+        fight_system.fight();
     }
 
     #[test]
@@ -144,12 +157,16 @@ mod tests {
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let mut actions_system = IActionsDispatcher { contract_address };
 
+        let fight_contract_address = world
+            .deploy_contract('salt2', fight::TEST_CLASS_HASH.try_into().unwrap());
+        let mut fight_system = IFightDispatcher { contract_address: fight_contract_address };
+
         add_items(ref actions_system);
 
         set_contract_address(alice);
 
         actions_system.spawn('alice', WMClass::Warlock);
-        actions_system.fight();
+        fight_system.fight();
     }
 
     #[test]
@@ -187,11 +204,15 @@ mod tests {
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let mut actions_system = IActionsDispatcher { contract_address };
 
+        let fight_contract_address = world
+            .deploy_contract('salt2', fight::TEST_CLASS_HASH.try_into().unwrap());
+        let mut fight_system = IFightDispatcher { contract_address: fight_contract_address };
+
         add_items(ref actions_system);
 
         actions_system.spawn('alice', WMClass::Warlock);
 
-        actions_system.fight();
+        fight_system.fight();
     }
 
     #[test]
@@ -207,6 +228,10 @@ mod tests {
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let mut actions_system = IActionsDispatcher { contract_address };
 
+        let fight_contract_address = world
+            .deploy_contract('salt2', fight::TEST_CLASS_HASH.try_into().unwrap());
+        let mut fight_system = IFightDispatcher { contract_address: fight_contract_address };
+
         add_items(ref actions_system);
 
         actions_system.spawn('alice', WMClass::Warlock);
@@ -216,7 +241,7 @@ mod tests {
         set!(world, (char));
 
         actions_system.create_dummy();
-        actions_system.fight();
+        fight_system.fight();
     }
 }
 
