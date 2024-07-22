@@ -1,5 +1,6 @@
 mod systems {
     mod actions;
+    mod fight;
 }
 
 mod models {
@@ -16,7 +17,6 @@ mod models {
 mod tests {
     mod test_place_item;
     mod test_add_item;
-    mod test_edit_item;
     mod test_buy_item;
     mod test_undo_place_item;
     mod test_sell_item;
