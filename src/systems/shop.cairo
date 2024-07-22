@@ -8,7 +8,7 @@ trait IShop {
 }
 
 #[dojo::contract]
-mod shop_system {
+mod shop {
     use super::{IShop, ContractAddress};
 
     use starknet::{get_caller_address};

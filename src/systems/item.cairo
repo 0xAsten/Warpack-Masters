@@ -27,7 +27,7 @@ trait IItem {
 }
 
 #[dojo::contract]
-mod item_system {
+mod item {
     use super::IItem;
 
     use starknet::{get_caller_address};

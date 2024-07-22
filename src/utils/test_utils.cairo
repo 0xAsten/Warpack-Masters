@@ -1,8 +1,8 @@
-use warpack_masters::{systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait}}};
+use warpack_masters::{systems::{item::{item, IItemDispatcher, IItemDispatcherTrait}}};
 use warpack_masters::{items};
 
 
-fn add_items(ref actions_system: IActionsDispatcher) {
+fn add_items(ref actions_system: IItemDispatcher) {
     actions_system
         .add_item(
             items::Backpack::id,

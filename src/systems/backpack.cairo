@@ -7,9 +7,10 @@ trait IBackpack {
 }
 
 #[dojo::contract]
-mod backpack_system {
+mod backpack {
     use super::IBackpack;
 
+    use starknet::{get_caller_address};
     use warpack_masters::models::{backpack::{BackpackGrids}};
     use warpack_masters::models::{
         CharacterItem::{

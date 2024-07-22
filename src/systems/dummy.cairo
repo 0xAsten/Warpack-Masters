@@ -6,11 +6,14 @@ trait IDummy {
 }
 
 #[dojo::contract]
-mod dummy_system {
+mod dummy {
     use super::IDummy;
 
     use starknet::{get_caller_address};
     use warpack_masters::models::Character::{Character, WMClass, NameRecord};
+    use warpack_masters::models::CharacterItem::{
+        CharacterItemsInventoryCounter, CharacterItemInventory
+    };
     use warpack_masters::models::DummyCharacter::{DummyCharacter, DummyCharacterCounter};
     use warpack_masters::models::DummyCharacterItem::{
         DummyCharacterItem, DummyCharacterItemsCounter

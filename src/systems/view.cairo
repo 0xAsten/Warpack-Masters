@@ -7,7 +7,7 @@ trait IView {
 }
 
 #[dojo::contract]
-mod view_system {
+mod view {
     use super::{IView, ContractAddress};
 
     use warpack_masters::models::{CharacterItem::{CharacterItemStorage}};

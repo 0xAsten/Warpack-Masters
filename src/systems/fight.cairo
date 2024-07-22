@@ -10,10 +10,10 @@ mod fight {
     use starknet::{ContractAddress, get_caller_address, get_block_timestamp};
     use warpack_masters::models::{
         CharacterItem::{
-            Position, CharacterItemsStorageCounter, CharacterItemStorage, CharacterItemInventory,
+            Position, CharacterItemInventory,
             CharacterItemsInventoryCounter
         },
-        Item::{Item, ItemsCounter}
+        Item::Item
     };
     use warpack_masters::models::Character::{Character, WMClass};
     use warpack_masters::utils::random::{pseudo_seed, random};

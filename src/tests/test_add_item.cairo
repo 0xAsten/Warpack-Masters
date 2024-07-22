@@ -12,6 +12,7 @@ mod tests {
     // import test utils
     use warpack_masters::{
         systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait}},
+        systems::item::{item, IItemDispatcher, IItemDispatcherTrait},
         models::backpack::{BackpackGrids}, models::Item::{Item, item, ItemsCounter},
         models::CharacterItem::{Position}, utils::{test_utils::{add_items}}
     };
@@ -28,7 +29,7 @@ mod tests {
         let world = spawn_test_world(models);
 
         let contract_address = world
-            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
+            .deploy_contract('salt', item::TEST_CLASS_HASH.try_into().unwrap());
         let mut actions_system = IActionsDispatcher { contract_address };
 
         add_items(ref actions_system);
