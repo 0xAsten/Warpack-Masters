@@ -1,6 +1,11 @@
 mod systems {
     mod actions;
+    mod backpack;
+    mod dummy;
     mod fight;
+    mod item;
+    mod shop;
+    mod view;
 }
 
 mod models {
@@ -34,3 +39,4 @@ mod utils {
 
 mod items;
 mod prdefined_dummies;
+mod constants;

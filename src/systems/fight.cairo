@@ -1,7 +1,6 @@
-
 #[dojo::interface]
 trait IFight {
-    fn fight();
+    fn fight(ref world: IWorldDispatcher);
 }
 
 #[dojo::contract]
@@ -63,7 +62,7 @@ mod fight {
 
     #[abi(embed_v0)]
     impl FightImpl of IFight<ContractState> {
-        fn fight(world: IWorldDispatcher) {
+        fn fight(ref world: IWorldDispatcher) {
             let player = get_caller_address();
 
             let mut char = get!(world, player, (Character));

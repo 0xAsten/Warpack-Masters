@@ -1,5 +1,5 @@
 [package]
-cairo-version = "2.5.4"
+cairo-version = "2.6.3"
 name = "warpack_masters"
 version = "0.6.0"
 
@@ -7,12 +7,15 @@ version = "0.6.0"
 sierra-replace-ids = true
 
 [dependencies]
-dojo = { git = "https://github.com/dojoengine/dojo", tag = "v0.6.0" }
+dojo = { git = "https://github.com/dojoengine/dojo", tag = "v0.7.2" }
 
 [[target.dojo]]
 
 [tool.dojo]
 initializer_class_hash = "0xbeef"
+
+[tool.dojo.world.namespace]
+default = "warpack_masters"
 
 [tool.dojo.env]
 
