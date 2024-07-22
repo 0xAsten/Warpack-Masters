@@ -488,12 +488,12 @@ mod VampiricArmor {
     const price: usize = 10;
     const damage: usize = 0;
     const cleansePoison: usize = 0;
-    const chance: usize = 75;
+    const chance: usize = 70;
     const cooldown: u8 = 0;
     const rarity: u8 = 3;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
-    const regen: usize = 2;
+    const regen: usize = 3;
     const regenActivation: u8 = 4;
     const reflect: usize = 0;
     const reflectActivation: u8 = 0;
@@ -632,7 +632,7 @@ mod RageGauntlet {
     const price: usize = 4;
     const damage: usize = 0;
     const cleansePoison: usize = 0;
-    const chance: usize = 85;
+    const chance: usize = 65;
     const cooldown: u8 = 0;
     const rarity: u8 = 1;
     const armor: usize = 0;
@@ -657,7 +657,7 @@ mod KnightHelmet {
     const damage: usize = 0;
     const cleansePoison: usize = 0;
     const chance: usize = 100;
-    const cooldown: u8 = 0;
+    const cooldown: u8 = 5;
     const rarity: u8 = 3;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
@@ -667,8 +667,8 @@ mod KnightHelmet {
     const reflectActivation: u8 = 0;
     const poison: usize = 0;
     const poisonActivation: u8 = 0;
-    const empower: usize = 5;
-    const empowerActivation: u8 = 1;
+    const empower: usize = 3;
+    const empowerActivation: u8 = 3;
 }
 
 mod BladeArmor {
