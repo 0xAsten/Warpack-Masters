@@ -6,7 +6,7 @@ struct Position {
     y: usize
 }
 
-#[derive(Model, Drop, Serde)]
+#[derive(Drop, Serde)]
 #[dojo::model]
 struct CharacterItemStorage {
     #[key]
@@ -16,7 +16,7 @@ struct CharacterItemStorage {
     itemId: usize,
 }
 
-#[derive(Model, Drop, Serde)]
+#[derive(Drop, Serde)]
 #[dojo::model]
 struct CharacterItemsStorageCounter {
     #[key]
@@ -24,7 +24,7 @@ struct CharacterItemsStorageCounter {
     count: usize,
 }
 
-#[derive(Model, Drop, Serde)]
+#[derive(Drop, Serde)]
 #[dojo::model]
 struct CharacterItemInventory {
     #[key]
@@ -37,7 +37,7 @@ struct CharacterItemInventory {
     rotation: usize,
 }
 
-#[derive(Model, Drop, Serde)]
+#[derive(Drop, Serde)]
 #[dojo::model]
 struct CharacterItemsInventoryCounter {
     #[key]

@@ -22,7 +22,7 @@ mod shop {
     use warpack_masters::constants::constants::{ITEMS_COUNTER_ID};
 
 
-    #[derive(Model, Copy, Drop, Serde)]
+    #[derive(Copy, Drop, Serde)]
     #[dojo::event]
     #[dojo::model]
     struct BuyItem {
@@ -34,7 +34,7 @@ mod shop {
         birthCount: u32,
     }
 
-    #[derive(Model, Copy, Drop, Serde)]
+    #[derive(Copy, Drop, Serde)]
     #[dojo::event]
     #[dojo::model]
     struct SellItem {

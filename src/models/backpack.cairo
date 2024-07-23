@@ -1,7 +1,7 @@
 use starknet::ContractAddress;
 
 
-#[derive(Model, Drop, Serde)]
+#[derive(Drop, Serde)]
 #[dojo::model]
 struct BackpackGrids {
     #[key]

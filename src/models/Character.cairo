@@ -1,6 +1,6 @@
 use starknet::ContractAddress;
 
-#[derive(Model, Drop, Serde)]
+#[derive(Drop, Serde)]
 #[dojo::model]
 struct Character {
     #[key]
@@ -28,7 +28,7 @@ enum WMClass {
     Archer,
 }
 
-#[derive(Model, Drop, Serde)]
+#[derive(Drop, Serde)]
 #[dojo::model]
 struct NameRecord {
     #[key]

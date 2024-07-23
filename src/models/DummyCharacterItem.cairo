@@ -1,7 +1,7 @@
 use starknet::ContractAddress;
 use warpack_masters::models::CharacterItem::Position;
 
-#[derive(Model, Drop, Serde)]
+#[derive(Drop, Serde)]
 #[dojo::model]
 struct DummyCharacterItem {
     #[key]
@@ -16,7 +16,7 @@ struct DummyCharacterItem {
     rotation: usize,
 }
 
-#[derive(Model, Drop, Serde)]
+#[derive(Drop, Serde)]
 #[dojo::model]
 struct DummyCharacterItemsCounter {
     #[key]

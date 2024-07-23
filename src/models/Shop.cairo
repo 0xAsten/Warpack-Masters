@@ -1,6 +1,6 @@
 use starknet::ContractAddress;
 
-#[derive(Model, Drop, Serde)]
+#[derive(Drop, Serde)]
 #[dojo::model]
 struct Shop {
     #[key]
