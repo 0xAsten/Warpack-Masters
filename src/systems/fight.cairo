@@ -23,7 +23,7 @@ mod fight {
     };
     use warpack_masters::models::BattleLog::{BattleLog, BattleLogCounter};
 
-    #[derive(Model, Copy, Drop, Serde)]
+    #[derive(Copy, Drop, Serde)]
     #[dojo::event]
     struct BattleLogDetail {
         #[key]
