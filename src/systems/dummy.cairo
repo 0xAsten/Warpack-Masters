@@ -23,6 +23,8 @@ mod dummy {
         Dummy9, Dummy10
     };
 
+    use warpack_masters::systems::view::view::ViewImpl;
+
     #[abi(embed_v0)]
     impl DummyImpl of IDummy<ContractState> {
         fn create_dummy(ref world: IWorldDispatcher) {
@@ -81,8 +83,8 @@ mod dummy {
 
         fn prefine_dummy(ref world: IWorldDispatcher, level: usize) {
             let player = get_caller_address();
-            // @todo ref view_system
-            // assert(self.is_world_owner(world, player), 'player not world owner');
+
+            assert(ViewImpl::is_world_owner(world, player), 'player not world owner');
 
             let mut name: felt252 = '';
             let mut wmClassNo: u8 = 0;
@@ -220,8 +222,8 @@ mod dummy {
 
         fn update_prefine_dummy(ref world: IWorldDispatcher, level: usize, dummyCharId: usize) {
             let player = get_caller_address();
-            // @todo ref view_system
-            // assert(self.is_world_owner(world, player), 'player not world owner');
+
+            assert(ViewImpl::is_world_owner(world, player), 'player not world owner');
 
             let mut name: felt252 = '';
             let mut wmClassNo: u8 = 0;

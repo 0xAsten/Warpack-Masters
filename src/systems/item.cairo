@@ -32,10 +32,10 @@ mod item {
 
     use starknet::{get_caller_address};
     use warpack_masters::models::{Item::{Item, ItemsCounter}};
-    // @todo ref view_system
-    // use warpack_masters::systems::view::view_system::{ViewImpl};
+
     use warpack_masters::constants::constants::{GRID_X, GRID_Y, ITEMS_COUNTER_ID};
 
+    use warpack_masters::systems::view::view::ViewImpl;
 
     #[abi(embed_v0)]
     impl ItemImpl of IItem<ContractState> {
@@ -65,8 +65,7 @@ mod item {
         ) {
             let player = get_caller_address();
 
-            // @todo ref view_system
-            // assert(ViewImpl::is_owner(world, player), 'player not world owner');
+            assert(ViewImpl::is_world_owner(world, player), 'player not world owner');
 
             assert(width > 0 && width <= GRID_X, 'width not in range');
             assert(height > 0 && height <= GRID_Y, 'height not in range');
