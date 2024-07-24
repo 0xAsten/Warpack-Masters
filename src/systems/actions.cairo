@@ -1,17 +1,27 @@
+use starknet::ContractAddress;
 use warpack_masters::models::Character::WMClass;
 
 #[dojo::interface]
 trait IActions {
-    fn spawn(ref world: IWorldDispatcher, name: felt252, wmClass: WMClass);
-    fn rebirth(ref world: IWorldDispatcher, name: felt252, wmClass: WMClass);
+    fn spawn(
+        ref world: IWorldDispatcher,
+        name: felt252,
+        wmClass: WMClass,
+        backpack_address: ContractAddress
+    );
+    fn rebirth(
+        ref world: IWorldDispatcher,
+        name: felt252,
+        wmClass: WMClass,
+        backpack_address: ContractAddress
+    );
 }
 
 // TODO: rename the count filed in counter model
-// TODO: consider restruct inventory items in case too much items owned by player increasing the loop time
 
 #[dojo::contract]
 mod actions {
-    use super::{IActions, WMClass};
+    use super::{IActions, ContractAddress, WMClass};
 
     use starknet::{get_caller_address, get_block_timestamp};
     use warpack_masters::models::{backpack::{BackpackGrids}};
@@ -27,9 +37,18 @@ mod actions {
     use warpack_masters::items::{Backpack, Pack};
     use warpack_masters::constants::constants::{GRID_X, GRID_Y, INIT_GOLD, INIT_HEALTH};
 
+    use warpack_masters::systems::backpack::{
+        backpack, IBackpackDispatcher, IBackpackDispatcherTrait
+    };
+
     #[abi(embed_v0)]
     impl ActionsImpl of IActions<ContractState> {
-        fn spawn(ref world: IWorldDispatcher, name: felt252, wmClass: WMClass) {
+        fn spawn(
+            ref world: IWorldDispatcher,
+            name: felt252,
+            wmClass: WMClass,
+            backpack_address: ContractAddress
+        ) {
             let player = get_caller_address();
 
             assert(name != '', 'name cannot be empty');
@@ -60,9 +79,10 @@ mod actions {
                 )
             );
 
-            // @todo reference backpack_system
-            // self.place_item(1, 4, 2, 0);
-            // self.place_item(2, 2, 2, 0);
+            let backpack_system = IBackpackDispatcher { contract_address: backpack_address };
+
+            backpack_system.place_item(1, 4, 2, 0);
+            backpack_system.place_item(2, 2, 2, 0);
 
             // keep the previous rating, totalWins and totalLoss during rebirth
             let prev_rating = player_exists.rating;
@@ -97,7 +117,12 @@ mod actions {
         }
 
 
-        fn rebirth(ref world: IWorldDispatcher, name: felt252, wmClass: WMClass) {
+        fn rebirth(
+            ref world: IWorldDispatcher,
+            name: felt252,
+            wmClass: WMClass,
+            backpack_address: ContractAddress
+        ) {
             let player = get_caller_address();
 
             let mut char = get!(world, player, (Character));
@@ -190,7 +215,7 @@ mod actions {
             storageItemsCounter.count = 0;
             set!(world, (char, shop, inventoryItemsCounter, storageItemsCounter));
 
-            self.spawn(name, wmClass);
+            self.spawn(name, wmClass, backpack_address);
         }
     }
 }
