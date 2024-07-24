@@ -1,9 +1,9 @@
-use warpack_masters::{systems::{item::{item, IItemDispatcher, IItemDispatcherTrait}}};
+use warpack_masters::systems::item::{item, IItemDispatcher, IItemDispatcherTrait};
 use warpack_masters::{items};
 
 
-fn add_items(ref actions_system: IItemDispatcher) {
-    actions_system
+fn add_items(ref item_system: IItemDispatcher) {
+    item_system
         .add_item(
             items::Backpack::id,
             items::Backpack::name,
@@ -28,7 +28,7 @@ fn add_items(ref actions_system: IItemDispatcher) {
             items::Backpack::empowerActivation,
         );
 
-    actions_system
+    item_system
         .add_item(
             items::Pack::id,
             items::Pack::name,
@@ -53,7 +53,7 @@ fn add_items(ref actions_system: IItemDispatcher) {
             items::Pack::empowerActivation,
         );
 
-    actions_system
+    item_system
         .add_item(
             items::Satchel::id,
             items::Satchel::name,
@@ -78,7 +78,7 @@ fn add_items(ref actions_system: IItemDispatcher) {
             items::Satchel::empowerActivation,
         );
 
-    actions_system
+    item_system
         .add_item(
             items::Pouch::id,
             items::Pouch::name,
@@ -103,7 +103,7 @@ fn add_items(ref actions_system: IItemDispatcher) {
             items::Pouch::empowerActivation,
         );
 
-    actions_system
+    item_system
         .add_item(
             items::Herb::id,
             items::Herb::name,
@@ -127,8 +127,8 @@ fn add_items(ref actions_system: IItemDispatcher) {
             items::Herb::empower,
             items::Herb::empowerActivation,
         );
-    
-    actions_system
+
+    item_system
         .add_item(
             items::Dagger::id,
             items::Dagger::name,
@@ -153,7 +153,7 @@ fn add_items(ref actions_system: IItemDispatcher) {
             items::Dagger::empowerActivation,
         );
 
-    actions_system
+    item_system
         .add_item(
             items::Sword::id,
             items::Sword::name,
@@ -178,7 +178,7 @@ fn add_items(ref actions_system: IItemDispatcher) {
             items::Sword::empowerActivation,
         );
 
-    actions_system
+    item_system
         .add_item(
             items::Spike::id,
             items::Spike::name,
@@ -203,7 +203,7 @@ fn add_items(ref actions_system: IItemDispatcher) {
             items::Spike::empowerActivation,
         );
 
-    actions_system
+    item_system
         .add_item(
             items::Shield::id,
             items::Shield::name,
@@ -228,7 +228,7 @@ fn add_items(ref actions_system: IItemDispatcher) {
             items::Shield::empowerActivation,
         );
 
-    actions_system
+    item_system
         .add_item(
             items::Helmet::id,
             items::Helmet::name,
@@ -253,7 +253,7 @@ fn add_items(ref actions_system: IItemDispatcher) {
             items::Helmet::empowerActivation,
         );
 
-    actions_system
+    item_system
         .add_item(
             items::HealingPotion::id,
             items::HealingPotion::name,
@@ -278,7 +278,7 @@ fn add_items(ref actions_system: IItemDispatcher) {
             items::HealingPotion::empowerActivation,
         );
 
-    actions_system
+    item_system
         .add_item(
             items::LeatherArmor::id,
             items::LeatherArmor::name,
@@ -303,7 +303,7 @@ fn add_items(ref actions_system: IItemDispatcher) {
             items::LeatherArmor::empowerActivation,
         );
 
-    actions_system
+    item_system
         .add_item(
             items::Poison::id,
             items::Poison::name,
@@ -328,7 +328,7 @@ fn add_items(ref actions_system: IItemDispatcher) {
             items::Poison::empowerActivation,
         );
 
-    actions_system
+    item_system
         .add_item(
             items::AugmentedSword::id,
             items::AugmentedSword::name,
@@ -353,7 +353,7 @@ fn add_items(ref actions_system: IItemDispatcher) {
             items::AugmentedSword::empowerActivation,
         );
 
-    actions_system
+    item_system
         .add_item(
             items::AugmentedDagger::id,
             items::AugmentedDagger::name,
@@ -378,7 +378,7 @@ fn add_items(ref actions_system: IItemDispatcher) {
             items::AugmentedDagger::empowerActivation,
         );
 
-    actions_system
+    item_system
         .add_item(
             items::SpikeShield::id,
             items::SpikeShield::name,

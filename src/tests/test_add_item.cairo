@@ -11,28 +11,26 @@ mod tests {
 
     // import test utils
     use warpack_masters::{
-        systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait}},
         systems::item::{item, IItemDispatcher, IItemDispatcherTrait},
-        models::backpack::{BackpackGrids}, models::Item::{Item, item, ItemsCounter},
-        models::CharacterItem::{Position}, utils::{test_utils::{add_items}}
+        models::Item::{Item, ItemsCounter}, utils::{test_utils::{add_items}}
     };
 
-    use warpack_masters::systems::actions::actions::ITEMS_COUNTER_ID;
+    use warpack_masters::constants::constants::ITEMS_COUNTER_ID;
     use warpack_masters::{items};
 
 
     #[test]
     #[available_gas(3000000000000000)]
     fn test_add_item() {
-        let mut models = array![];
+        let mut models = array![item::TEST_CLASS_HASH];
 
-        let world = spawn_test_world(models);
+        let world = spawn_test_world("warpack_masters", models);
 
         let contract_address = world
-            .deploy_contract('salt', item::TEST_CLASS_HASH.try_into().unwrap());
-        let mut actions_system = IActionsDispatcher { contract_address };
+            .deploy_contract('salt', item::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+        let mut item_system = IItemDispatcher { contract_address };
 
-        add_items(ref actions_system);
+        add_items(ref item_system);
 
         let item = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
         assert(item.count == 16, 'total item count mismatch');
@@ -180,19 +178,19 @@ mod tests {
     fn test_add_item_revert_not_world_owner() {
         let alice = starknet::contract_address_const::<0x1337>();
 
-        let mut models = array![];
+        let mut models = array![item::TEST_CLASS_HASH];
 
-        let world = spawn_test_world(models);
+        let world = spawn_test_world("warpack_masters", models);
 
         let contract_address = world
-            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let mut actions_system = IActionsDispatcher { contract_address };
+            .deploy_contract('salt', item::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+        let mut item_system = IItemDispatcher { contract_address };
+
+        add_items(ref item_system);
 
         set_contract_address(alice);
 
-        add_items(ref actions_system);
-
-        actions_system
+        item_system
             .add_item(
                 items::Backpack::id,
                 items::Backpack::name,
@@ -224,13 +222,13 @@ mod tests {
     fn test_add_item_revert_width_not_in_range() {
         let mut models = array![];
 
-        let world = spawn_test_world(models);
+        let world = spawn_test_world("warpack_masters", models);
 
         let contract_address = world
-            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
+            .deploy_contract('salt', item::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+        let item_system = IItemDispatcher { contract_address };
 
-        actions_system
+        item_system
             .add_item(
                 items::Backpack::id,
                 items::Backpack::name,
@@ -262,13 +260,13 @@ mod tests {
     fn test_add_item_revert_height_not_in_range() {
         let mut models = array![];
 
-        let world = spawn_test_world(models);
+        let world = spawn_test_world("warpack_masters", models);
 
         let contract_address = world
-            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
+            .deploy_contract('salt', item::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+        let item_system = IItemDispatcher { contract_address };
 
-        actions_system
+        item_system
             .add_item(
                 items::Backpack::id,
                 items::Backpack::name,
@@ -300,13 +298,13 @@ mod tests {
     fn test_add_item_revert_price_not_valid() {
         let mut models = array![];
 
-        let world = spawn_test_world(models);
+        let world = spawn_test_world("warpack_masters", models);
 
         let contract_address = world
-            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
+            .deploy_contract('salt', item::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+        let item_system = IItemDispatcher { contract_address };
 
-        actions_system
+        item_system
             .add_item(
                 items::Backpack::id,
                 items::Backpack::name,
@@ -332,20 +330,19 @@ mod tests {
             );
     }
 
-
     #[test]
     #[available_gas(3000000000000000)]
     #[should_panic(expected: ('rarity not valid', 'ENTRYPOINT_FAILED'))]
     fn test_add_item_revert_invalid_rarity() {
         let mut models = array![];
 
-        let world = spawn_test_world(models);
+        let world = spawn_test_world("warpack_masters", models);
 
         let contract_address = world
-            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let actions_system = IActionsDispatcher { contract_address };
+            .deploy_contract('salt', item::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+        let item_system = IItemDispatcher { contract_address };
 
-        actions_system
+        item_system
             .add_item(
                 items::Backpack::id,
                 items::Backpack::name,
