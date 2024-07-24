@@ -38,7 +38,7 @@ mod actions {
     use warpack_masters::constants::constants::{GRID_X, GRID_Y, INIT_GOLD, INIT_HEALTH};
 
     use warpack_masters::systems::backpack::{
-        backpack, IBackpackDispatcher, IBackpackDispatcherTrait
+        backpack_system, IBackpackDispatcher, IBackpackDispatcherTrait
     };
 
     #[abi(embed_v0)]

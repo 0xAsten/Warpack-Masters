@@ -6,7 +6,7 @@ trait IDummy {
 }
 
 #[dojo::contract]
-mod dummy {
+mod dummy_system {
     use super::IDummy;
 
     use starknet::{get_caller_address};

@@ -7,7 +7,7 @@ trait IBackpack {
 }
 
 #[dojo::contract]
-mod backpack {
+mod backpack_system {
     use super::IBackpack;
 
     use starknet::{get_caller_address};

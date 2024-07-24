@@ -4,7 +4,7 @@ trait IFight {
 }
 
 #[dojo::contract]
-mod fight {
+mod fight_system {
     use super::IFight;
 
     use starknet::{ContractAddress, get_caller_address, get_block_timestamp};

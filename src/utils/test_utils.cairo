@@ -1,4 +1,4 @@
-use warpack_masters::systems::item::{item, IItemDispatcher, IItemDispatcherTrait};
+use warpack_masters::systems::item::{item_system, IItemDispatcher, IItemDispatcherTrait};
 use warpack_masters::{items};
 
 
