@@ -14,9 +14,6 @@ dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.0.0-alpha.2" }
 [tool.dojo]
 initializer_class_hash = "0xbeef"
 
-[tool.dojo.world.namespace]
-default = "warpack_masters"
-
 [tool.dojo.env]
 
 [tool.dojo.world]
@@ -26,6 +23,8 @@ cover_uri = "file://assets/cover.png"
 icon_uri = "file://assets/icon.png"
 website = "https://twitter.com/WarpackMasters"
 seed = "warpack_masters"
+namespace = { default = "warpack_masters" }
+
 
 [tool.dojo.world.socials]
 x = "https://x.com/ohayo_dojo"

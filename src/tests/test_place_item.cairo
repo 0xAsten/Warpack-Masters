@@ -35,28 +35,28 @@ mod tests {
     fn test_place_item() {
         let alice = starknet::contract_address_const::<0x1337>();
 
-        let mut models = array![backpack_grids::TEST_CLASS_HASH, 
+        let mut models = array![backpack_grids::TEST_CLASS_HASH,
             item::TEST_CLASS_HASH, items_counter::TEST_CLASS_HASH,
             character_item_storage::TEST_CLASS_HASH, character_items_storage_counter::TEST_CLASS_HASH,
             character_item_inventory::TEST_CLASS_HASH, character_items_inventory_counter::TEST_CLASS_HASH,
             character::TEST_CLASS_HASH, shop::TEST_CLASS_HASH];
 
-        let world = spawn_test_world("Warpacks", models);
+        let world = spawn_test_world("warpack_masters", models);
 
         let action_system_address = world
-            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+            .deploy_contract('salt1', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut action_system = IActionsDispatcher { contract_address: action_system_address };
 
         let item_system_address = world
-            .deploy_contract('salt', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+            .deploy_contract('salt2', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut item_system = IItemDispatcher { contract_address: item_system_address };
 
         let shop_system_address = world
-            .deploy_contract('salt', shop_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+            .deploy_contract('salt3', shop_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut shop_system = IShopDispatcher { contract_address: shop_system_address };
 
         let backpack_system_address = world
-            .deploy_contract('salt', backpack_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+            .deploy_contract('salt4', backpack_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut backpack_system = IBackpackDispatcher { contract_address: backpack_system_address };
 
         add_items(ref item_system);
