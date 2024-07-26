@@ -7,14 +7,13 @@ mod tests {
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
     // import test utils
-    use dojo::test_utils::{spawn_test_world, deploy_contract};
+    use dojo::utils::test::{spawn_test_world, deploy_contract};
 
     // import test utils
     use warpack_masters::{
         systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait}},
         systems::{item::{item_system, IItemDispatcher, IItemDispatcherTrait}},
         systems::{shop::{shop_system, IShopDispatcher, IShopDispatcherTrait}},
-        systems::{backpack::{backpack_system, IBackpackDispatcher, IBackpackDispatcherTrait}},
         models::backpack::{BackpackGrids, backpack_grids}, 
         models::Item::{Item, item, ItemsCounter, items_counter},
         models::CharacterItem::{
@@ -23,7 +22,7 @@ mod tests {
             CharacterItemInventory, character_item_inventory,
             CharacterItemsInventoryCounter, character_items_inventory_counter
         },
-        models::Character::{Character, character, WMClass}, 
+        models::Character::{Character, character, NameRecord, name_record, WMClass}, 
         models::Shop::{Shop, shop},
         utils::{test_utils::{add_items}}
     };
@@ -39,9 +38,9 @@ mod tests {
             item::TEST_CLASS_HASH, items_counter::TEST_CLASS_HASH,
             character_item_storage::TEST_CLASS_HASH, character_items_storage_counter::TEST_CLASS_HASH,
             character_item_inventory::TEST_CLASS_HASH, character_items_inventory_counter::TEST_CLASS_HASH,
-            character::TEST_CLASS_HASH, shop::TEST_CLASS_HASH];
+            character::TEST_CLASS_HASH, name_record::TEST_CLASS_HASH, shop::TEST_CLASS_HASH];
 
-        let world = spawn_test_world("warpack_masters", models);
+        let world = spawn_test_world("Warpacks", models);
 
         let action_system_address = world
             .deploy_contract('salt1', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
@@ -55,17 +54,13 @@ mod tests {
             .deploy_contract('salt3', shop_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut shop_system = IShopDispatcher { contract_address: shop_system_address };
 
-        let backpack_system_address = world
-            .deploy_contract('salt4', backpack_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
-        let mut backpack_system = IBackpackDispatcher { contract_address: backpack_system_address };
-
         add_items(ref item_system);
 
+        set_contract_address(alice);
         let item = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
         assert(item.count == 16, 'total item count mismatch');
 
-        set_contract_address(alice);
-        action_system.spawn('Alice', WMClass::Warlock, backpack_system_address);
+        action_system.spawn('Alice', WMClass::Warlock);
         shop_system.reroll_shop();
 
         // mock player gold for testing
@@ -82,7 +77,7 @@ mod tests {
 
         shop_system.buy_item(7);
         // place a sword on (4,2)
-        backpack_system.place_item(2, 4, 2, 0);
+        action_system.place_item(2, 4, 2, 0);
         // (4,2) (4,3) (4,4) should be occupied
         let mut backpack_grid_data = get!(world, (alice, 4, 2), BackpackGrids);
         assert(backpack_grid_data.occupied == true, '(4,2) should be occupied');
@@ -110,7 +105,7 @@ mod tests {
 
         shop_system.buy_item(9);
         // place a shield on (2,2)
-        backpack_system.place_item(2, 2, 2, 0);
+        action_system.place_item(2, 2, 2, 0);
         // (2,2) (3,2) (2,3) (3,3) should be occupied
         let mut backpack_grid_data = get!(world, (alice, 2, 2), BackpackGrids);
         assert(backpack_grid_data.occupied == true, '(2,2) should be occupied');
@@ -141,7 +136,7 @@ mod tests {
 
         shop_system.buy_item(8);
         // place a potion on (5,2)
-        backpack_system.place_item(2, 5, 2, 0);
+        action_system.place_item(2, 5, 2, 0);
         // (5,2) should be occupied
         let mut backpack_grid_data = get!(world, (alice, 5, 2), BackpackGrids);
         assert(backpack_grid_data.occupied == true, '(5,2) should be occupied');
@@ -168,30 +163,30 @@ mod tests {
     fn test_place_item_revert_x_out_of_range() {
         let alice = starknet::contract_address_const::<0x1337>();
 
-        let mut models = array![];
+        let mut models = array![backpack_grids::TEST_CLASS_HASH,
+            item::TEST_CLASS_HASH, items_counter::TEST_CLASS_HASH,
+            character_item_storage::TEST_CLASS_HASH, character_items_storage_counter::TEST_CLASS_HASH,
+            character_item_inventory::TEST_CLASS_HASH, character_items_inventory_counter::TEST_CLASS_HASH,
+            character::TEST_CLASS_HASH, name_record::TEST_CLASS_HASH, shop::TEST_CLASS_HASH];
 
         let world = spawn_test_world("Warpacks", models);
 
         let action_system_address = world
-            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+            .deploy_contract('salt1', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut action_system = IActionsDispatcher { contract_address: action_system_address };
 
         let item_system_address = world
-            .deploy_contract('salt', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+            .deploy_contract('salt2', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut item_system = IItemDispatcher { contract_address: item_system_address };
 
         let shop_system_address = world
-            .deploy_contract('salt', shop_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+            .deploy_contract('salt3', shop_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut shop_system = IShopDispatcher { contract_address: shop_system_address };
-
-        let backpack_system_address = world
-            .deploy_contract('salt', backpack_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
-        let mut backpack_system = IBackpackDispatcher { contract_address: backpack_system_address };
 
         add_items(ref item_system);
 
         set_contract_address(alice);
-        action_system.spawn('Alice', WMClass::Warlock, backpack_system_address);
+        action_system.spawn('Alice', WMClass::Warlock);
 
         shop_system.reroll_shop();
         // mock shop for testing
@@ -201,7 +196,7 @@ mod tests {
 
         shop_system.buy_item(4);
         // place a sword on (10,0)
-        backpack_system.place_item(2, 10, 0, 0);
+        action_system.place_item(2, 10, 0, 0);
     }
 
     #[test]
@@ -210,30 +205,30 @@ mod tests {
     fn test_place_item_revert_y_out_of_range() {
         let alice = starknet::contract_address_const::<0x1337>();
 
-        let mut models = array![];
+        let mut models = array![backpack_grids::TEST_CLASS_HASH,
+            item::TEST_CLASS_HASH, items_counter::TEST_CLASS_HASH,
+            character_item_storage::TEST_CLASS_HASH, character_items_storage_counter::TEST_CLASS_HASH,
+            character_item_inventory::TEST_CLASS_HASH, character_items_inventory_counter::TEST_CLASS_HASH,
+            character::TEST_CLASS_HASH, name_record::TEST_CLASS_HASH, shop::TEST_CLASS_HASH];
 
         let world = spawn_test_world("Warpacks", models);
 
         let action_system_address = world
-            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+            .deploy_contract('salt1', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut action_system = IActionsDispatcher { contract_address: action_system_address };
 
         let item_system_address = world
-            .deploy_contract('salt', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+            .deploy_contract('salt2', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut item_system = IItemDispatcher { contract_address: item_system_address };
 
         let shop_system_address = world
-            .deploy_contract('salt', shop_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+            .deploy_contract('salt3', shop_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut shop_system = IShopDispatcher { contract_address: shop_system_address };
-
-        let backpack_system_address = world
-            .deploy_contract('salt', backpack_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
-        let mut backpack_system = IBackpackDispatcher { contract_address: backpack_system_address };
 
         add_items(ref item_system);
 
         set_contract_address(alice);
-        action_system.spawn('Alice', WMClass::Warlock, backpack_system_address);
+        action_system.spawn('Alice', WMClass::Warlock);
         shop_system.reroll_shop();
 
         // mock shop for testing
@@ -243,7 +238,7 @@ mod tests {
 
         shop_system.buy_item(4);
         // place a sword on (0,12)
-        backpack_system.place_item(2, 0, 12, 0);
+        action_system.place_item(2, 0, 12, 0);
     }
 
     #[test]
@@ -252,30 +247,30 @@ mod tests {
     fn test_place_item_revert_invalid_rotation() {
         let alice = starknet::contract_address_const::<0x1337>();
 
-        let mut models = array![];
+        let mut models = array![backpack_grids::TEST_CLASS_HASH,
+            item::TEST_CLASS_HASH, items_counter::TEST_CLASS_HASH,
+            character_item_storage::TEST_CLASS_HASH, character_items_storage_counter::TEST_CLASS_HASH,
+            character_item_inventory::TEST_CLASS_HASH, character_items_inventory_counter::TEST_CLASS_HASH,
+            character::TEST_CLASS_HASH, name_record::TEST_CLASS_HASH, shop::TEST_CLASS_HASH];
 
         let world = spawn_test_world("Warpacks", models);
 
         let action_system_address = world
-            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+            .deploy_contract('salt1', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut action_system = IActionsDispatcher { contract_address: action_system_address };
 
         let item_system_address = world
-            .deploy_contract('salt', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+            .deploy_contract('salt2', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut item_system = IItemDispatcher { contract_address: item_system_address };
 
         let shop_system_address = world
-            .deploy_contract('salt', shop_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+            .deploy_contract('salt3', shop_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut shop_system = IShopDispatcher { contract_address: shop_system_address };
-
-        let backpack_system_address = world
-            .deploy_contract('salt', backpack_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
-        let mut backpack_system = IBackpackDispatcher { contract_address: backpack_system_address };
 
         add_items(ref item_system);
 
         set_contract_address(alice);
-        action_system.spawn('Alice', WMClass::Warlock, backpack_system_address);
+        action_system.spawn('Alice', WMClass::Warlock);
         shop_system.reroll_shop();
 
         // mock shop for testing
@@ -285,7 +280,7 @@ mod tests {
 
         shop_system.buy_item(4);
         // place a sword on (2,2) with rotation 30
-        backpack_system.place_item(2, 0, 0, 30);
+        action_system.place_item(2, 0, 0, 30);
     }
 
     #[test]
@@ -294,30 +289,30 @@ mod tests {
     fn test_place_item_revert_x_OOB() {
         let alice = starknet::contract_address_const::<0x1337>();
 
-        let mut models = array![];
+        let mut models = array![backpack_grids::TEST_CLASS_HASH,
+            item::TEST_CLASS_HASH, items_counter::TEST_CLASS_HASH,
+            character_item_storage::TEST_CLASS_HASH, character_items_storage_counter::TEST_CLASS_HASH,
+            character_item_inventory::TEST_CLASS_HASH, character_items_inventory_counter::TEST_CLASS_HASH,
+            character::TEST_CLASS_HASH, name_record::TEST_CLASS_HASH, shop::TEST_CLASS_HASH];
 
         let world = spawn_test_world("Warpacks", models);
 
         let action_system_address = world
-            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+            .deploy_contract('salt1', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut action_system = IActionsDispatcher { contract_address: action_system_address };
 
         let item_system_address = world
-            .deploy_contract('salt', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+            .deploy_contract('salt2', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut item_system = IItemDispatcher { contract_address: item_system_address };
 
         let shop_system_address = world
-            .deploy_contract('salt', shop_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+            .deploy_contract('salt3', shop_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut shop_system = IShopDispatcher { contract_address: shop_system_address };
-
-        let backpack_system_address = world
-            .deploy_contract('salt', backpack_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
-        let mut backpack_system = IBackpackDispatcher { contract_address: backpack_system_address };
 
         add_items(ref item_system);
 
         set_contract_address(alice);
-        action_system.spawn('Alice', WMClass::Warlock, backpack_system_address);
+        action_system.spawn('Alice', WMClass::Warlock);
         shop_system.reroll_shop();
 
         // mock shop for testing
@@ -327,7 +322,7 @@ mod tests {
 
         shop_system.buy_item(6);
         // place a sword on (8,6) with rotation 90
-        backpack_system.place_item(2, 8, 6, 90);
+        action_system.place_item(2, 8, 6, 90);
     }
 
     #[test]
@@ -336,30 +331,30 @@ mod tests {
     fn test_place_item_revert_y_OOB() {
         let alice = starknet::contract_address_const::<0x1337>();
 
-        let mut models = array![];
+        let mut models = array![backpack_grids::TEST_CLASS_HASH,
+            item::TEST_CLASS_HASH, items_counter::TEST_CLASS_HASH,
+            character_item_storage::TEST_CLASS_HASH, character_items_storage_counter::TEST_CLASS_HASH,
+            character_item_inventory::TEST_CLASS_HASH, character_items_inventory_counter::TEST_CLASS_HASH,
+            character::TEST_CLASS_HASH, name_record::TEST_CLASS_HASH, shop::TEST_CLASS_HASH];
 
         let world = spawn_test_world("Warpacks", models);
 
         let action_system_address = world
-            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+            .deploy_contract('salt1', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut action_system = IActionsDispatcher { contract_address: action_system_address };
 
         let item_system_address = world
-            .deploy_contract('salt', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+            .deploy_contract('salt2', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut item_system = IItemDispatcher { contract_address: item_system_address };
 
         let shop_system_address = world
-            .deploy_contract('salt', shop_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+            .deploy_contract('salt3', shop_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut shop_system = IShopDispatcher { contract_address: shop_system_address };
-
-        let backpack_system_address = world
-            .deploy_contract('salt', backpack_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
-        let mut backpack_system = IBackpackDispatcher { contract_address: backpack_system_address };
 
         add_items(ref item_system);
 
         set_contract_address(alice);
-        action_system.spawn('Alice', WMClass::Warlock, backpack_system_address);
+        action_system.spawn('Alice', WMClass::Warlock);
         shop_system.reroll_shop();
 
         // mock shop for testing
@@ -369,7 +364,7 @@ mod tests {
 
         shop_system.buy_item(7);
         // place a sword on (0,5)
-        backpack_system.place_item(2, 0, 5, 0);
+        action_system.place_item(2, 0, 5, 0);
     }
 
     #[test]
@@ -378,30 +373,30 @@ mod tests {
     fn test_place_item_revert_occupied_grids() {
         let alice = starknet::contract_address_const::<0x1337>();
 
-        let mut models = array![];
+        let mut models = array![backpack_grids::TEST_CLASS_HASH,
+            item::TEST_CLASS_HASH, items_counter::TEST_CLASS_HASH,
+            character_item_storage::TEST_CLASS_HASH, character_items_storage_counter::TEST_CLASS_HASH,
+            character_item_inventory::TEST_CLASS_HASH, character_items_inventory_counter::TEST_CLASS_HASH,
+            character::TEST_CLASS_HASH, name_record::TEST_CLASS_HASH, shop::TEST_CLASS_HASH];
 
         let world = spawn_test_world("Warpacks", models);
 
         let action_system_address = world
-            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+            .deploy_contract('salt1', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut action_system = IActionsDispatcher { contract_address: action_system_address };
 
         let item_system_address = world
-            .deploy_contract('salt', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+            .deploy_contract('salt2', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut item_system = IItemDispatcher { contract_address: item_system_address };
 
         let shop_system_address = world
-            .deploy_contract('salt', shop_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+            .deploy_contract('salt3', shop_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut shop_system = IShopDispatcher { contract_address: shop_system_address };
-
-        let backpack_system_address = world
-            .deploy_contract('salt', backpack_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
-        let mut backpack_system = IBackpackDispatcher { contract_address: backpack_system_address };
 
         add_items(ref item_system);
 
         set_contract_address(alice);
-        action_system.spawn('Alice', WMClass::Warlock, backpack_system_address);
+        action_system.spawn('Alice', WMClass::Warlock);
         shop_system.reroll_shop();
 
         // mock shop for testing
@@ -412,12 +407,12 @@ mod tests {
 
         shop_system.buy_item(5);
         // place a sword on (4,2)
-        backpack_system.place_item(2, 4, 2, 0);
+        action_system.place_item(2, 4, 2, 0);
 
         shop_system.buy_item(6);
         // try to place the shield on of the occupied grids
         // this will collide with grid (4,2)
-        backpack_system.place_item(2, 3, 2, 90);
+        action_system.place_item(2, 3, 2, 90);
     }
 
     #[test]
@@ -426,29 +421,29 @@ mod tests {
     fn test_place_item_revert_item_not_owned() {
         let alice = starknet::contract_address_const::<0x1337>();
 
-        let mut models = array![];
+        let mut models = array![backpack_grids::TEST_CLASS_HASH,
+            item::TEST_CLASS_HASH, items_counter::TEST_CLASS_HASH,
+            character_item_storage::TEST_CLASS_HASH, character_items_storage_counter::TEST_CLASS_HASH,
+            character_item_inventory::TEST_CLASS_HASH, character_items_inventory_counter::TEST_CLASS_HASH,
+            character::TEST_CLASS_HASH, name_record::TEST_CLASS_HASH, shop::TEST_CLASS_HASH];
 
         let world = spawn_test_world("Warpacks", models);
 
         let action_system_address = world
-            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+            .deploy_contract('salt1', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut action_system = IActionsDispatcher { contract_address: action_system_address };
 
         let item_system_address = world
-            .deploy_contract('salt', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+            .deploy_contract('salt2', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut item_system = IItemDispatcher { contract_address: item_system_address };
-
-        let backpack_system_address = world
-            .deploy_contract('salt', backpack_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
-        let mut backpack_system = IBackpackDispatcher { contract_address: backpack_system_address };
 
         add_items(ref item_system);
 
         set_contract_address(alice);
-        action_system.spawn('Alice', WMClass::Warlock, backpack_system_address);
+        action_system.spawn('Alice', WMClass::Warlock);
 
         // place a sword on (2,2)
-        backpack_system.place_item(2, 2, 2, 0);
+        action_system.place_item(2, 2, 2, 0);
     }
 
     #[test]
@@ -457,30 +452,30 @@ mod tests {
     fn test_place_item_revert_item_not_already_placed() {
         let alice = starknet::contract_address_const::<0x1337>();
 
-        let mut models = array![];
+        let mut models = array![backpack_grids::TEST_CLASS_HASH,
+            item::TEST_CLASS_HASH, items_counter::TEST_CLASS_HASH,
+            character_item_storage::TEST_CLASS_HASH, character_items_storage_counter::TEST_CLASS_HASH,
+            character_item_inventory::TEST_CLASS_HASH, character_items_inventory_counter::TEST_CLASS_HASH,
+            character::TEST_CLASS_HASH, name_record::TEST_CLASS_HASH, shop::TEST_CLASS_HASH];
 
         let world = spawn_test_world("Warpacks", models);
 
         let action_system_address = world
-            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+            .deploy_contract('salt1', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut action_system = IActionsDispatcher { contract_address: action_system_address };
 
         let item_system_address = world
-            .deploy_contract('salt', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+            .deploy_contract('salt2', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut item_system = IItemDispatcher { contract_address: item_system_address };
 
         let shop_system_address = world
-            .deploy_contract('salt', shop_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+            .deploy_contract('salt3', shop_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut shop_system = IShopDispatcher { contract_address: shop_system_address };
-
-        let backpack_system_address = world
-            .deploy_contract('salt', backpack_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
-        let mut backpack_system = IBackpackDispatcher { contract_address: backpack_system_address };
 
         add_items(ref item_system);
 
         set_contract_address(alice);
-        action_system.spawn('Alice', WMClass::Warlock, backpack_system_address);
+        action_system.spawn('Alice', WMClass::Warlock);
         shop_system.reroll_shop();
 
         // mock shop for testing
@@ -491,9 +486,9 @@ mod tests {
         shop_system.buy_item(5);
 
         // place a sword on (4,2)
-        backpack_system.place_item(2, 4, 2, 0);
+        action_system.place_item(2, 4, 2, 0);
         // try to place the same sword on (5,2)
-        backpack_system.place_item(2, 5, 2, 0);
+        action_system.place_item(2, 5, 2, 0);
     }
 
     #[test]
@@ -501,30 +496,30 @@ mod tests {
     fn test_place_item_with_rotation() {
         let alice = starknet::contract_address_const::<0x1337>();
 
-        let mut models = array![];
+        let mut models = array![backpack_grids::TEST_CLASS_HASH,
+            item::TEST_CLASS_HASH, items_counter::TEST_CLASS_HASH,
+            character_item_storage::TEST_CLASS_HASH, character_items_storage_counter::TEST_CLASS_HASH,
+            character_item_inventory::TEST_CLASS_HASH, character_items_inventory_counter::TEST_CLASS_HASH,
+            character::TEST_CLASS_HASH, name_record::TEST_CLASS_HASH, shop::TEST_CLASS_HASH];
 
         let world = spawn_test_world("Warpacks", models);
 
         let action_system_address = world
-            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+            .deploy_contract('salt1', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut action_system = IActionsDispatcher { contract_address: action_system_address };
 
         let item_system_address = world
-            .deploy_contract('salt', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+            .deploy_contract('salt2', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut item_system = IItemDispatcher { contract_address: item_system_address };
 
         let shop_system_address = world
-            .deploy_contract('salt', shop_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+            .deploy_contract('salt3', shop_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let mut shop_system = IShopDispatcher { contract_address: shop_system_address };
-
-        let backpack_system_address = world
-            .deploy_contract('salt', backpack_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
-        let mut backpack_system = IBackpackDispatcher { contract_address: backpack_system_address };
 
         add_items(ref item_system);
 
         set_contract_address(alice);
-        action_system.spawn('Alice', WMClass::Warlock, backpack_system_address);
+        action_system.spawn('Alice', WMClass::Warlock);
         shop_system.reroll_shop();
 
         let mut player_data = get!(world, alice, (Character));
@@ -540,7 +535,7 @@ mod tests {
 
         shop_system.buy_item(6);
         // place a sword on (3,3)
-        backpack_system.place_item(2, 3, 3, 270);
+        action_system.place_item(2, 3, 3, 270);
         // (3,3) (4,3) (5,3) should be occupied
         let mut backpack_grid_data = get!(world, (alice, 3, 3), BackpackGrids);
         assert(backpack_grid_data.occupied == true, '(3,3) should be occupied');

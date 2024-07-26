@@ -7,7 +7,7 @@ version = "0.1.0"
 sierra-replace-ids = true
 
 [dependencies]
-dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.0.0-alpha.2" }
+dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.0.0-alpha.3" }
 
 [[target.dojo]]
 
@@ -23,7 +23,7 @@ cover_uri = "file://assets/cover.png"
 icon_uri = "file://assets/icon.png"
 website = "https://twitter.com/WarpackMasters"
 seed = "warpack_masters"
-namespace = { default = "warpack_masters" }
+namespace = { default = "Warpacks" }
 
 
 [tool.dojo.world.socials]
