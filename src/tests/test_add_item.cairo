@@ -7,12 +7,12 @@ mod tests {
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
     // import test utils
-    use dojo::test_utils::{spawn_test_world, deploy_contract};
+    use dojo::utils::test::{spawn_test_world, deploy_contract};
 
     // import test utils
     use warpack_masters::{
-        systems::item::{item, IItemDispatcher, IItemDispatcherTrait},
-        models::Item::{Item, ItemsCounter}, utils::{test_utils::{add_items}}
+        systems::{item::{item_system, IItemDispatcher, IItemDispatcherTrait}},
+        models::Item::{Item, item, ItemsCounter, items_counter}, utils::{test_utils::{add_items}}
     };
 
     use warpack_masters::constants::constants::ITEMS_COUNTER_ID;
@@ -22,13 +22,15 @@ mod tests {
     #[test]
     #[available_gas(3000000000000000)]
     fn test_add_item() {
-        let mut models = array![item::TEST_CLASS_HASH];
+        let mut models = array![item::TEST_CLASS_HASH, items_counter::TEST_CLASS_HASH];
 
-        let world = spawn_test_world("warpack_masters", models);
+        let world = spawn_test_world("Warpacks", models);
 
-        let contract_address = world
-            .deploy_contract('salt', item::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
-        let mut item_system = IItemDispatcher { contract_address };
+        let item_system_address = world
+            .deploy_contract(
+                'salt1', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
+            );
+        let mut item_system = IItemDispatcher { contract_address: item_system_address };
 
         add_items(ref item_system);
 
@@ -178,13 +180,15 @@ mod tests {
     fn test_add_item_revert_not_world_owner() {
         let alice = starknet::contract_address_const::<0x1337>();
 
-        let mut models = array![item::TEST_CLASS_HASH];
+        let mut models = array![item::TEST_CLASS_HASH, items_counter::TEST_CLASS_HASH];
 
-        let world = spawn_test_world("warpack_masters", models);
+        let world = spawn_test_world("Warpacks", models);
 
-        let contract_address = world
-            .deploy_contract('salt', item::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
-        let mut item_system = IItemDispatcher { contract_address };
+        let item_system_address = world
+            .deploy_contract(
+                'salt1', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
+            );
+        let mut item_system = IItemDispatcher { contract_address: item_system_address };
 
         add_items(ref item_system);
 
@@ -220,13 +224,15 @@ mod tests {
     #[available_gas(3000000000000000)]
     #[should_panic(expected: ('width not in range', 'ENTRYPOINT_FAILED'))]
     fn test_add_item_revert_width_not_in_range() {
-        let mut models = array![];
+        let mut models = array![item::TEST_CLASS_HASH, items_counter::TEST_CLASS_HASH];
 
-        let world = spawn_test_world("warpack_masters", models);
+        let world = spawn_test_world("Warpacks", models);
 
-        let contract_address = world
-            .deploy_contract('salt', item::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
-        let item_system = IItemDispatcher { contract_address };
+        let item_system_address = world
+            .deploy_contract(
+                'salt1', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
+            );
+        let mut item_system = IItemDispatcher { contract_address: item_system_address };
 
         item_system
             .add_item(
@@ -258,13 +264,15 @@ mod tests {
     #[available_gas(3000000000000000)]
     #[should_panic(expected: ('height not in range', 'ENTRYPOINT_FAILED'))]
     fn test_add_item_revert_height_not_in_range() {
-        let mut models = array![];
+        let mut models = array![item::TEST_CLASS_HASH, items_counter::TEST_CLASS_HASH];
 
-        let world = spawn_test_world("warpack_masters", models);
+        let world = spawn_test_world("Warpacks", models);
 
-        let contract_address = world
-            .deploy_contract('salt', item::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
-        let item_system = IItemDispatcher { contract_address };
+        let item_system_address = world
+            .deploy_contract(
+                'salt1', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
+            );
+        let mut item_system = IItemDispatcher { contract_address: item_system_address };
 
         item_system
             .add_item(
@@ -296,13 +304,15 @@ mod tests {
     #[available_gas(3000000000000000)]
     #[should_panic(expected: ('price must be greater than 0', 'ENTRYPOINT_FAILED'))]
     fn test_add_item_revert_price_not_valid() {
-        let mut models = array![];
+        let mut models = array![item::TEST_CLASS_HASH, items_counter::TEST_CLASS_HASH];
 
-        let world = spawn_test_world("warpack_masters", models);
+        let world = spawn_test_world("Warpacks", models);
 
-        let contract_address = world
-            .deploy_contract('salt', item::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
-        let item_system = IItemDispatcher { contract_address };
+        let item_system_address = world
+            .deploy_contract(
+                'salt1', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
+            );
+        let mut item_system = IItemDispatcher { contract_address: item_system_address };
 
         item_system
             .add_item(
@@ -334,13 +344,15 @@ mod tests {
     #[available_gas(3000000000000000)]
     #[should_panic(expected: ('rarity not valid', 'ENTRYPOINT_FAILED'))]
     fn test_add_item_revert_invalid_rarity() {
-        let mut models = array![];
+        let mut models = array![item::TEST_CLASS_HASH, items_counter::TEST_CLASS_HASH];
 
-        let world = spawn_test_world("warpack_masters", models);
+        let world = spawn_test_world("Warpacks", models);
 
-        let contract_address = world
-            .deploy_contract('salt', item::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
-        let item_system = IItemDispatcher { contract_address };
+        let item_system_address = world
+            .deploy_contract(
+                'salt1', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
+            );
+        let mut item_system = IItemDispatcher { contract_address: item_system_address };
 
         item_system
             .add_item(
