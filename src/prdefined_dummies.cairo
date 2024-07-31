@@ -261,7 +261,7 @@ mod Dummy4 {
 
         items.append(PredefinedItem {
             itemId: LeatherArmor::id,
-            position: Position{ x:2, y: 5 },
+            position: Position{ x:2, y: 4 },
             rotation: 90,
         });
 
@@ -435,7 +435,7 @@ mod Dummy7 {
 
         items.append(PredefinedItem {
             itemId: Pack::id,
-            position: Position{ x:3, y:0 },
+            position: Position{ x:2, y:0 },
             rotation: 0,
         });
 
@@ -477,7 +477,7 @@ mod Dummy7 {
 
         items.append(PredefinedItem {
             itemId: LeatherArmor::id,
-            position: Position{ x:5, y: 1 },
+            position: Position{ x:4, y: 1 },
             rotation: 0,
         });
 
