@@ -185,7 +185,7 @@ mod Dummy3 {
 
         items.append(PredefinedItem {
             itemId: Spike::id,
-            position: Position{ x:5, y: 3 },
+            position: Position{ x:5, y: 4 },
             rotation: 0,
         });
 
