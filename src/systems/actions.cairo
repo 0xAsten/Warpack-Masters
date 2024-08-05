@@ -67,7 +67,7 @@ mod actions {
     };
     use warpack_masters::models::BattleLog::{BattleLog, BattleLogCounter};
     use warpack_masters::items::{Backpack, Pack};
-    use warpack_masters::prdefined_dummies::{PredefinedItem, Dummy0, Dummy1, Dummy2, Dummy3, Dummy4, Dummy5, Dummy6, Dummy7, Dummy8, Dummy9, Dummy10};
+    use warpack_masters::prdefined_dummies::{PredefinedItem, Dummy0, Dummy1, Dummy2, Dummy3, Dummy4, Dummy5, Dummy6, Dummy7, Dummy8, Dummy9, Dummy10, Dummy11, Dummy12, Dummy13, Dummy14};
 
     #[derive(Model, Copy, Drop, Serde)]
     #[dojo::event]
@@ -1193,9 +1193,33 @@ mod actions {
                     health = Dummy10::health;
                     items = Dummy10::get_items();
                 },
+                11 => {
+                    name = Dummy11::name;
+                    wmClassNo = Dummy11::wmClass;
+                    health = Dummy11::health;
+                    items = Dummy11::get_items();
+                },
+                12 => {
+                    name = Dummy12::name;
+                    wmClassNo = Dummy12::wmClass;
+                    health = Dummy12::health;
+                    items = Dummy12::get_items();
+                },
+                13 => {
+                    name = Dummy13::name;
+                    wmClassNo = Dummy13::wmClass;
+                    health = Dummy13::health;
+                    items = Dummy13::get_items();
+                },
+                14 => {
+                    name = Dummy14::name;
+                    wmClassNo = Dummy14::wmClass;
+                    health = Dummy14::health;
+                    items = Dummy14::get_items();
+                },
                 _ => {
                     assert(false, 'invalid level');
-                }
+                },
             }
 
             match wmClassNo {

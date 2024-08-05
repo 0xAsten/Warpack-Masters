@@ -736,7 +736,7 @@ mod Dummy11 {
     use warpack_masters::models::Character::{WMClass};
     use warpack_masters::models::CharacterItem::Position;
     use super::PredefinedItem;
-    use warpack_masters::items::{Backpack, Pack, Satchel, Greatsword, Buckler, KnightHelmet, MagicWater, HealingPotion};
+    use warpack_masters::items::{Backpack, Pack, Satchel, Bow, Crossbow, Buckler, KnightHelmet, MagicWater, SpikeShield, AugmentedDagger};
 
     const name: felt252 = 'Zippie';
     const wmClass: u8 = 2;
@@ -837,7 +837,7 @@ mod Dummy12 {
     use warpack_masters::models::Character::{WMClass};
     use warpack_masters::models::CharacterItem::Position;
     use super::PredefinedItem;
-    use warpack_masters::items::{Backpack, Pack, Satchel, Greatsword, Buckler, KnightHelmet, MagicWater, HealingPotion};
+    use warpack_masters::items::{Backpack, Pack, Satchel, Pouch, PlagueFlower, AugmentedDagger, MailArmor, HealingPotion, Poison, Crossbow};
 
     const name: felt252 = 'Peppie';
     const wmClass: u8 = 1;
@@ -932,7 +932,7 @@ mod Dummy13 {
     use warpack_masters::models::Character::{WMClass};
     use warpack_masters::models::CharacterItem::Position;
     use super::PredefinedItem;
-    use warpack_masters::items::{Backpack, Pack, Satchel, Greatsword, Buckler, KnightHelmet, MagicWater, HealingPotion};
+    use warpack_masters::items::{Backpack, Pack, Greatsword, Hammer, AugmentedSword, BladeArmor, Buckler, HealingPotion, MagicWater, KnightHelmet};
 
     const name: felt252 = 'Bubbie';
     const wmClass: u8 = 0;
@@ -1038,7 +1038,7 @@ mod Dummy14 {
     use warpack_masters::models::Character::{WMClass};
     use warpack_masters::models::CharacterItem::Position;
     use super::PredefinedItem;
-    use warpack_masters::items::{Backpack, Pack, Satchel, Greatsword, Buckler, KnightHelmet, MagicWater, HealingPotion};
+    use warpack_masters::items::{Backpack, Pack, Satchel, Bow, AugmentedSword, KnightHelmet, SpikeShield, MailArmor, AmuletOfFury, HealingPotion, MagicWater};
 
     const name: felt252 = 'Nettie';
     const wmClass: u8 = 0;
