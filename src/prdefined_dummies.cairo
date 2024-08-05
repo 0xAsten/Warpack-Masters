@@ -927,3 +927,215 @@ mod Dummy12 {
         items
     }
 }
+
+mod Dummy13 {
+    use warpack_masters::models::Character::{WMClass};
+    use warpack_masters::models::CharacterItem::Position;
+    use super::PredefinedItem;
+    use warpack_masters::items::{Backpack, Pack, Satchel, Greatsword, Buckler, KnightHelmet, MagicWater, HealingPotion};
+
+    const name: felt252 = 'Bubbie';
+    const wmClass: u8 = 0;
+    const health: usize = 80;
+
+    fn get_items() -> Array<PredefinedItem> {
+        let mut items: Array<PredefinedItem> = array![];
+        items.append(PredefinedItem {
+            itemId: Backpack::id,
+            position: Position{ x:4, y:2 },
+            rotation: 0,
+        });
+
+        items.append(PredefinedItem {
+            itemId: Pack::id,
+            position: Position{ x:2, y:2 },
+            rotation: 0,
+        });
+
+        items.append(PredefinedItem {
+            itemId: Pack::id,
+            position: Position{ x:2, y:4 },
+            rotation: 0,
+        });
+
+        items.append(PredefinedItem {
+            itemId: Pack::id,
+            position: Position{ x:4, y:0 },
+            rotation: 0,
+        });
+
+        items.append(PredefinedItem {
+            itemId: Pack::id,
+            position: Position{ x:4, y:5 },
+            rotation: 0,
+        });
+
+        items.append(PredefinedItem {
+            itemId: Pack::id,
+            position: Position{ x:6, y:1 },
+            rotation: 0,
+        });
+
+        items.append(PredefinedItem {
+            itemId: Pack::id,
+            position: Position{ x:6, y:3 },
+            rotation: 0,
+        });
+
+        items.append(PredefinedItem {
+            itemId: Greatsword::id,
+            position: Position{ x:2, y:2 },
+            rotation: 0,
+        });
+
+        items.append(PredefinedItem {
+            itemId: Hammer::id,
+            position: Position{ x:7, y:1 },
+            rotation: 0,
+        });
+
+        items.append(PredefinedItem {
+            itemId: AugmentedSword::id,
+            position: Position{ x:6, y:1 },
+            rotation: 0,
+        });
+
+        items.append(PredefinedItem {
+            itemId: BladeArmor::id,
+            position: Position{ x:4, y:0 },
+            rotation: 0,
+        });
+
+        items.append(PredefinedItem {
+            itemId: Buckler::id,
+            position: Position{ x:4, y:3 },
+            rotation: 0,
+        });
+
+        items.append(PredefinedItem {
+            itemId: HealingPotion::id,
+            position: Position{ x:6, y:4 },
+            rotation: 0,
+        });
+
+        items.append(PredefinedItem {
+            itemId: MagicWater::id,
+            position: Position{ x:4, y:5 },
+            rotation: 0,
+        });
+
+        items.append(PredefinedItem {
+            itemId: KnightHelmet::id,
+            position: Position{ x:5, y:5 },
+            rotation: 0,
+        });
+
+        items
+    }
+}
+
+mod Dummy14 {
+    use warpack_masters::models::Character::{WMClass};
+    use warpack_masters::models::CharacterItem::Position;
+    use super::PredefinedItem;
+    use warpack_masters::items::{Backpack, Pack, Satchel, Greatsword, Buckler, KnightHelmet, MagicWater, HealingPotion};
+
+    const name: felt252 = 'Nettie';
+    const wmClass: u8 = 0;
+    const health: usize = 80;
+
+    fn get_items() -> Array<PredefinedItem> {
+        let mut items: Array<PredefinedItem> = array![];
+        items.append(PredefinedItem {
+            itemId: Backpack::id,
+            position: Position{ x:4, y:2 },
+            rotation: 0,
+        });
+
+        items.append(PredefinedItem {
+            itemId: Pack::id,
+            position: Position{ x:2, y:2 },
+            rotation: 0,
+        });
+
+        items.append(PredefinedItem {
+            itemId: Pack::id,
+            position: Position{ x:2, y:4 },
+            rotation: 0,
+        });
+
+        items.append(PredefinedItem {
+            itemId: Pack::id,
+            position: Position{ x:6, y:1 },
+            rotation: 0,
+        });
+
+        items.append(PredefinedItem {
+            itemId: Pack::id,
+            position: Position{ x:6, y:3 },
+            rotation: 0,
+        });
+
+        items.append(PredefinedItem {
+            itemId: Satchel::id,
+            position: Position{ x:4, y:1 },
+            rotation: 0,
+        });
+
+        items.append(PredefinedItem {
+            itemId: Bow::id,
+            position: Position{ x:3, y:2 },
+            rotation: 0,
+        });
+
+        items.append(PredefinedItem {
+            itemId: Bow::id,
+            position: Position{ x:7, y:2 },
+            rotation: 0,
+        });
+
+        items.append(PredefinedItem {
+            itemId: AugmentedSword::id,
+            position: Position{ x:6, y:2 },
+            rotation: 0,
+        });
+
+        items.append(PredefinedItem {
+            itemId: KnightHelmet::id,
+            position: Position{ x:6, y:1 },
+            rotation: 90,
+        });
+
+        items.append(PredefinedItem {
+            itemId: SpikeShield::id,
+            position: Position{ x:4, y:1 },
+            rotation: 0,
+        });
+
+        items.append(PredefinedItem {
+            itemId: MailArmor::id,
+            position: Position{ x:3, y:3 },
+            rotation: 90,
+        });
+
+        items.append(PredefinedItem {
+            itemId: AmuletOfFury::id,
+            position: Position{ x:3, y:5 },
+            rotation: 0,
+        });
+
+        items.append(PredefinedItem {
+            itemId: HealingPotion::id,
+            position: Position{ x:2, y:2 },
+            rotation: 0,
+        });
+
+        items.append(PredefinedItem {
+            itemId: MagicWater::id,
+            position: Position{ x:2, y:3 },
+            rotation: 0,
+        });
+
+        items
+    }
+}
