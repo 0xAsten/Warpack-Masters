@@ -67,7 +67,7 @@ mod actions {
     };
     use warpack_masters::models::BattleLog::{BattleLog, BattleLogCounter};
     use warpack_masters::items::{Backpack, Pack};
-    use warpack_masters::prdefined_dummies::{PredefinedItem, Dummy0, Dummy1, Dummy2, Dummy3, Dummy4, Dummy5, Dummy6, Dummy7, Dummy8, Dummy9, Dummy10, Dummy11, Dummy12, Dummy13, Dummy14};
+    use warpack_masters::prdefined_dummies::{PredefinedItem, Dummy0, Dummy1, Dummy2, Dummy3, Dummy4, Dummy5, Dummy6, Dummy7, Dummy8, Dummy9, Dummy10, Dummy11, Dummy12, Dummy13, Dummy14, Dummy15, Dummy16, Dummy17, Dummy18, Dummy19, Dummy20};
 
     #[derive(Model, Copy, Drop, Serde)]
     #[dojo::event]
@@ -1216,6 +1216,42 @@ mod actions {
                     wmClassNo = Dummy14::wmClass;
                     health = Dummy14::health;
                     items = Dummy14::get_items();
+                },
+                15 => {
+                    name = Dummy15::name;
+                    wmClassNo = Dummy15::wmClass;
+                    health = Dummy15::health;
+                    items = Dummy15::get_items();
+                },
+                16 => {
+                    name = Dummy16::name;
+                    wmClassNo = Dummy16::wmClass;
+                    health = Dummy16::health;
+                    items = Dummy16::get_items();
+                },
+                17 => {
+                    name = Dummy17::name;
+                    wmClassNo = Dummy17::wmClass;
+                    health = Dummy17::health;
+                    items = Dummy17::get_items();
+                },
+                18 => {
+                    name = Dummy18::name;
+                    wmClassNo = Dummy18::wmClass;
+                    health = Dummy18::health;
+                    items = Dummy18::get_items();
+                },
+                19 => {
+                    name = Dummy19::name;
+                    wmClassNo = Dummy19::wmClass;
+                    health = Dummy19::health;
+                    items = Dummy19::get_items();
+                },
+                20 => {
+                    name = Dummy20::name;
+                    wmClassNo = Dummy20::wmClass;
+                    health = Dummy20::health;
+                    items = Dummy20::get_items();
                 },
                 _ => {
                     assert(false, 'invalid level');

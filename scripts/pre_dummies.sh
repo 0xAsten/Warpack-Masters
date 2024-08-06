@@ -31,3 +31,9 @@ sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS prefine_dummy -c 11 --wait 
 sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS prefine_dummy -c 12 --wait --rpc-url $STARKNET_RPC_URL
 sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS prefine_dummy -c 13 --wait --rpc-url $STARKNET_RPC_URL
 sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS prefine_dummy -c 14 --wait --rpc-url $STARKNET_RPC_URL
+sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS prefine_dummy -c 15 --wait --rpc-url $STARKNET_RPC_URL
+sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS prefine_dummy -c 16 --wait --rpc-url $STARKNET_RPC_URL
+sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS prefine_dummy -c 17 --wait --rpc-url $STARKNET_RPC_URL
+sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS prefine_dummy -c 18 --wait --rpc-url $STARKNET_RPC_URL
+sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS prefine_dummy -c 19 --wait --rpc-url $STARKNET_RPC_URL
+sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS prefine_dummy -c 20 --wait --rpc-url $STARKNET_RPC_URL
