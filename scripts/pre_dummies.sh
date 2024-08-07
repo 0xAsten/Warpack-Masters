@@ -6,8 +6,7 @@ pushd $(dirname "$0")/..
 
 export WORLD_ADDRESS=$(cat ./manifests/dev/manifest.json | jq -r '.world.address')
 
-# export ACTIONS_ADDRESS=$(cat ./manifests/deployments/KATANA.json | jq -r '.contracts[] | select(.name == "warpack_masters::systems::actions::actions" ).address')
-export ACTIONS_ADDRESS='0x591fe4c5c0987dfd20e14e82875494699eda1e47c68c98801df329424e1bb03'
+export ACTIONS_ADDRESS=$(cat ./manifests/dev/manifest.json | jq -r '.contracts[] | select(.name == "warpack_masters::systems::actions::actions" ).address')
 
 echo "---------------------------------------------------------------------------"
 echo world : $WORLD_ADDRESS
@@ -28,3 +27,13 @@ sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS prefine_dummy -c 7 --wait -
 sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS prefine_dummy -c 8 --wait --rpc-url $STARKNET_RPC_URL
 sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS prefine_dummy -c 9 --wait --rpc-url $STARKNET_RPC_URL
 sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS prefine_dummy -c 10 --wait --rpc-url $STARKNET_RPC_URL
+sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS prefine_dummy -c 11 --wait --rpc-url $STARKNET_RPC_URL
+sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS prefine_dummy -c 12 --wait --rpc-url $STARKNET_RPC_URL
+sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS prefine_dummy -c 13 --wait --rpc-url $STARKNET_RPC_URL
+sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS prefine_dummy -c 14 --wait --rpc-url $STARKNET_RPC_URL
+sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS prefine_dummy -c 15 --wait --rpc-url $STARKNET_RPC_URL
+sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS prefine_dummy -c 16 --wait --rpc-url $STARKNET_RPC_URL
+sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS prefine_dummy -c 17 --wait --rpc-url $STARKNET_RPC_URL
+sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS prefine_dummy -c 18 --wait --rpc-url $STARKNET_RPC_URL
+sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS prefine_dummy -c 19 --wait --rpc-url $STARKNET_RPC_URL
+sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS prefine_dummy -c 20 --wait --rpc-url $STARKNET_RPC_URL

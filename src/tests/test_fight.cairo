@@ -18,6 +18,7 @@ mod tests {
         systems::{shop::{shop_system, IShopDispatcher, IShopDispatcherTrait}},
         models::backpack::{BackpackGrids, backpack_grids},
         models::Item::{Item, item, ItemsCounter, items_counter},
+
         models::CharacterItem::{
             Position, CharacterItemStorage, character_item_storage, CharacterItemsStorageCounter,
             character_items_storage_counter, CharacterItemInventory, character_item_inventory,
@@ -171,6 +172,7 @@ mod tests {
 
         action_system.spawn('alice', WMClass::Warlock);
         dummy_system.create_dummy();
+
         fight_system.fight();
     }
 
@@ -258,6 +260,7 @@ mod tests {
         set_contract_address(bob);
         action_system.spawn('bob', WMClass::Warlock);
         dummy_system.create_dummy();
+
         fight_system.fight();
     }
 
@@ -309,6 +312,7 @@ mod tests {
         set_contract_address(alice);
 
         action_system.spawn('alice', WMClass::Warlock);
+
         fight_system.fight();
     }
 
@@ -474,6 +478,7 @@ mod tests {
         set!(world, (char));
 
         dummy_system.create_dummy();
+
         fight_system.fight();
     }
 }

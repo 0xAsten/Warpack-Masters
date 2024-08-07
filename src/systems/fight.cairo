@@ -16,6 +16,7 @@ mod fight_system {
         Item::Item
     };
     use warpack_masters::models::Character::{Character, WMClass};
+
     use warpack_masters::utils::random::{pseudo_seed, random};
     use warpack_masters::models::DummyCharacter::{DummyCharacter, DummyCharacterCounter};
     use warpack_masters::models::DummyCharacterItem::{
@@ -52,7 +53,7 @@ mod fight_system {
         dummy_empower_stacks: usize,
         dummy_poison_stacks: usize,
     }
-
+    
     const EFFECT_ARMOR: felt252 = 'armor';
     const EFFECT_REGEN: felt252 = 'regen';
     const EFFECT_REFLECT: felt252 = 'reflect';
@@ -1081,6 +1082,5 @@ mod fight_system {
             char.updatedAt = get_block_timestamp();
             set!(world, (char, dummyChar));
         }
-
     }
 }
