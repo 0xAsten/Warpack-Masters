@@ -1,6 +1,7 @@
 use starknet::ContractAddress;
 
-#[derive(Model, Drop, Serde)]
+#[derive(Drop, Serde)]
+#[dojo::model]
 struct BattleLog {
     #[key]
     player: ContractAddress,
@@ -14,7 +15,8 @@ struct BattleLog {
 }
 
 
-#[derive(Model, Drop, Serde)]
+#[derive(Drop, Serde)]
+#[dojo::model]
 struct BattleLogCounter {
     #[key]
     player: ContractAddress,
