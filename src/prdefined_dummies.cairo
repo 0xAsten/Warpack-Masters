@@ -14,6 +14,7 @@ mod Dummy0 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Dagger, Herb, Spike};
 
+    const level: usize = 0;
     const name: felt252 = 'Noobie';
     const wmClass: u8 = 1;
     const health: usize = 25;
@@ -60,6 +61,7 @@ mod Dummy1 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Sword, Shield, Spike};
 
+    const level: usize = 1;
     const name: felt252 = 'Dumbie';
     const wmClass: u8 = 0;
     const health: usize = 35;
@@ -107,6 +109,7 @@ mod Dummy2 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Bow, Spike, HealingPotion};
 
+    const level: usize = 2;
     const name: felt252 = 'Bertie';
     const wmClass: u8 = 2;
     const health: usize = 45;
@@ -153,6 +156,7 @@ mod Dummy3 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, AugmentedDagger, Poison, Spike, Crossbow, Shield};
 
+    const level: usize = 3;
     const name: felt252 = 'Jodie';
     const wmClass: u8 = 1;
     const health: usize = 55;
@@ -211,6 +215,7 @@ mod Dummy4 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Pouch, AugmentedSword, Club, SpikeShield, LeatherArmor};
 
+    const level: usize = 4;
     const name: felt252 = 'Robertie';
     const wmClass: u8 = 0;
     const health: usize = 65;
@@ -275,6 +280,7 @@ mod Dummy5 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Bow, Crossbow, Buckler, MagicWater, HealingPotion};
 
+    const level: usize = 5;
     const name: felt252 = 'Hartie';
     const wmClass: u8 = 2;
     const health: usize = 80;
@@ -345,6 +351,7 @@ mod Dummy6 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Satchel, AugmentedDagger, Crossbow, PlagueFlower, Poison, Herb};
 
+    const level: usize = 6;
     const name: felt252 = 'Bardie';
     const wmClass: u8 = 1;
     const health: usize = 80;
@@ -415,6 +422,7 @@ mod Dummy7 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Satchel, Hammer, AugmentedDagger, RageGauntlet, SpikeShield, LeatherArmor, Helmet};
 
+    const level: usize = 7;
     const name: felt252 = 'Tartie';
     const wmClass: u8 = 0;
     const health: usize = 80;
@@ -497,6 +505,7 @@ mod Dummy8 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Satchel, Bow, Buckler, RageGauntlet, MagicWater, HealingPotion, Poison};
 
+    const level: usize = 8;
     const name: felt252 = 'Koolie';
     const wmClass: u8 = 2;
     const health: usize = 80;
@@ -579,6 +588,7 @@ mod Dummy9 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Satchel, PlagueFlower, MailArmor, Poison, Crossbow, MagicWater, HealingPotion};
 
+    const level: usize = 9;
     const name: felt252 = 'Goobie';
     const wmClass: u8 = 1;
     const health: usize = 80;
@@ -661,6 +671,7 @@ mod Dummy10 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Satchel, Greatsword, Buckler, KnightHelmet, MagicWater, HealingPotion};
 
+    const level: usize = 10;
     const name: felt252 = 'Goodie';
     const wmClass: u8 = 0;
     const health: usize = 80;
@@ -738,6 +749,7 @@ mod Dummy11 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Satchel, Bow, Crossbow, Buckler, KnightHelmet, MagicWater, SpikeShield, AugmentedDagger};
 
+    const level: usize = 11;
     const name: felt252 = 'Zippie';
     const wmClass: u8 = 2;
     const health: usize = 80;
@@ -839,6 +851,7 @@ mod Dummy12 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Satchel, Pouch, PlagueFlower, AugmentedDagger, MailArmor, HealingPotion, Poison, Crossbow};
 
+    const level: usize = 12;
     const name: felt252 = 'Peppie';
     const wmClass: u8 = 1;
     const health: usize = 80;
@@ -934,6 +947,7 @@ mod Dummy13 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Greatsword, Hammer, AugmentedSword, BladeArmor, Buckler, HealingPotion, MagicWater, KnightHelmet};
 
+    const level: usize = 13;
     const name: felt252 = 'Bubbie';
     const wmClass: u8 = 0;
     const health: usize = 80;
@@ -1040,6 +1054,7 @@ mod Dummy14 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Satchel, Bow, AugmentedSword, KnightHelmet, SpikeShield, MailArmor, AmuletOfFury, HealingPotion, MagicWater};
 
+    const level: usize = 14;
     const name: felt252 = 'Nettie';
     const wmClass: u8 = 0;
     const health: usize = 80;
@@ -1146,6 +1161,7 @@ mod Dummy15 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, PlagueFlower, MailArmor, Buckler, Crossbow, AugmentedSword, HealingPotion, Poison};
 
+    const level: usize = 15;
     const name: felt252 = 'Quillie';
     const wmClass: u8 = 0;
     const health: usize = 80;
@@ -1252,6 +1268,7 @@ mod Dummy16 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Satchel, VampiricArmor, Greatsword, AugmentedDagger, MailArmor, SpikeShield, KnightHelmet, HealingPotion};
 
+    const level: usize = 16;
     const name: felt252 = 'Winkie';
     const wmClass: u8 = 0;
     const health: usize = 80;
@@ -1364,6 +1381,7 @@ mod Dummy17 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Satchel, Bow, AugmentedSword, KnightHelmet, BladeArmor, MailArmor, HealingPotion, AmuletOfFury, MagicWater};
 
+    const level: usize = 17;
     const name: felt252 = 'Rennie';
     const wmClass: u8 = 0;
     const health: usize = 80;
@@ -1482,6 +1500,7 @@ mod Dummy18 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Satchel, PlagueFlower, MailArmor, VampiricArmor, AugmentedSword, Bow, Poison, HealingPotion};
 
+    const level: usize = 18;
     const name: felt252 = 'Huggie';
     const wmClass: u8 = 0;
     const health: usize = 80;
@@ -1594,6 +1613,7 @@ mod Dummy19 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Greatsword, BladeArmor, AugmentedSword, Hammer, KnightHelmet, RageGauntlet, AmuletOfFury, Buckler, HealingPotion, Helmet, MagicWater};
 
+    const level: usize = 19;
     const name: felt252 = 'Dottie';
     const wmClass: u8 = 0;
     const health: usize = 80;
@@ -1736,6 +1756,7 @@ mod Dummy20 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Satchel, Bow, AugmentedSword, Crossbow, PlagueFlower, VampiricArmor, MailArmor, AmuletOfFury, MagicWater, KnightHelmet};
 
+    const level: usize = 20;
     const name: felt252 = 'Quackie';
     const wmClass: u8 = 0;
     const health: usize = 80;
