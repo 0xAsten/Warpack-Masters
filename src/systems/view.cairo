@@ -10,7 +10,7 @@ mod view {
     impl ViewImpl of ViewTrait {
         fn is_world_owner(world: IWorldDispatcher, player: ContractAddress) -> bool {
             // resource id of world is 0
-            let is_owner = world.is_owner(player, 0);
+            let is_owner = world.is_owner(0, player);
 
             is_owner
         }
