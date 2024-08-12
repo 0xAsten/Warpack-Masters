@@ -1,10 +1,6 @@
-use warpack_masters::models::Character::WMClass;
-
-use starknet::ContractAddress;
-
 #[dojo::interface]
 trait IFight {
-    fn fight();
+    fn fight(ref world: IWorldDispatcher);
 }
 
 #[dojo::contract]
@@ -12,26 +8,23 @@ mod fight_system {
     use super::IFight;
 
     use starknet::{ContractAddress, get_caller_address, get_block_timestamp};
-    use warpack_masters::models::{backpack::{BackpackGrids}};
     use warpack_masters::models::{
         CharacterItem::{
-            Position, CharacterItemsStorageCounter, CharacterItemStorage, CharacterItemInventory,
+            Position, CharacterItemInventory,
             CharacterItemsInventoryCounter
         },
-        Item::{Item, ItemsCounter}
+        Item::Item
     };
-    use warpack_masters::models::Character::{Character, WMClass, NameRecord};
-    use warpack_masters::models::Shop::Shop;
+    use warpack_masters::models::Character::{Character, WMClass};
+
     use warpack_masters::utils::random::{pseudo_seed, random};
     use warpack_masters::models::DummyCharacter::{DummyCharacter, DummyCharacterCounter};
     use warpack_masters::models::DummyCharacterItem::{
         DummyCharacterItem, DummyCharacterItemsCounter
     };
     use warpack_masters::models::BattleLog::{BattleLog, BattleLogCounter};
-    use warpack_masters::items::{Backpack, Pack};
-    use warpack_masters::prdefined_dummies::{PredefinedItem, Dummy0, Dummy1, Dummy2, Dummy3, Dummy4, Dummy5, Dummy6, Dummy7, Dummy8, Dummy9, Dummy10};
 
-    #[derive(Model, Copy, Drop, Serde)]
+    #[derive(Copy, Drop, Serde)]
     #[dojo::event]
     struct BattleLogDetail {
         #[key]
@@ -60,16 +53,7 @@ mod fight_system {
         dummy_empower_stacks: usize,
         dummy_poison_stacks: usize,
     }
-
-    const GRID_X: usize = 9;
-    const GRID_Y: usize = 7;
-    const INIT_GOLD: usize = 8;
-    const INIT_HEALTH: usize = 25;
-
-    const ITEMS_COUNTER_ID: felt252 = 'ITEMS_COUNTER_ID';
-
-    const STORAGE_FLAG: usize = 999;
-
+    
     const EFFECT_ARMOR: felt252 = 'armor';
     const EFFECT_REGEN: felt252 = 'regen';
     const EFFECT_REFLECT: felt252 = 'reflect';
@@ -79,7 +63,7 @@ mod fight_system {
 
     #[abi(embed_v0)]
     impl FightImpl of IFight<ContractState> {
-        fn fight(world: IWorldDispatcher) {
+        fn fight(ref world: IWorldDispatcher) {
             let player = get_caller_address();
 
             let mut char = get!(world, player, (Character));

@@ -7,21 +7,23 @@ mod tests {
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
     // import test utils
-    use dojo::test_utils::{spawn_test_world, deploy_contract};
+    use dojo::utils::test::{spawn_test_world, deploy_contract};
 
     // import test utils
     use warpack_masters::{
         systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait}},
-        models::backpack::{BackpackGrids}, models::Item::{Item, item, ItemsCounter},
+        systems::{item::{item_system, IItemDispatcher, IItemDispatcherTrait}},
+        systems::{shop::{shop_system, IShopDispatcher, IShopDispatcherTrait}},
+        models::backpack::{BackpackGrids, backpack_grids},
+        models::Item::{Item, item, ItemsCounter, items_counter},
         models::CharacterItem::{
-            Position, CharacterItemStorage, CharacterItemsStorageCounter, CharacterItemInventory,
-            CharacterItemsInventoryCounter
+            Position, CharacterItemStorage, character_item_storage, CharacterItemsStorageCounter,
+            character_items_storage_counter, CharacterItemInventory, character_item_inventory,
+            CharacterItemsInventoryCounter, character_items_inventory_counter
         },
-        models::Character::{Character, character, WMClass}, models::Shop::{Shop, shop},
-        utils::{test_utils::{add_items}}
+        models::Character::{Character, character, NameRecord, name_record, WMClass},
+        models::Shop::{Shop, shop}, utils::{test_utils::{add_items}}
     };
-
-    use warpack_masters::systems::actions::actions::{ITEMS_COUNTER_ID, STORAGE_FLAG};
 
 
     #[test]
@@ -29,18 +31,44 @@ mod tests {
     fn test_undo_place_item() {
         let alice = starknet::contract_address_const::<0x1337>();
 
-        let mut models = array![];
+        let mut models = array![
+            backpack_grids::TEST_CLASS_HASH,
+            item::TEST_CLASS_HASH,
+            items_counter::TEST_CLASS_HASH,
+            character_item_storage::TEST_CLASS_HASH,
+            character_items_storage_counter::TEST_CLASS_HASH,
+            character_item_inventory::TEST_CLASS_HASH,
+            character_items_inventory_counter::TEST_CLASS_HASH,
+            character::TEST_CLASS_HASH,
+            name_record::TEST_CLASS_HASH,
+            shop::TEST_CLASS_HASH
+        ];
 
-        let world = spawn_test_world(models);
+        let world = spawn_test_world("Warpacks", models);
 
-        let contract_address = world
-            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let mut actions_system = IActionsDispatcher { contract_address };
+        let action_system_address = world
+            .deploy_contract(
+                'salt1', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
+            );
+        let mut action_system = IActionsDispatcher { contract_address: action_system_address };
 
-        add_items(ref actions_system);
+        let item_system_address = world
+            .deploy_contract(
+                'salt2', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
+            );
+        let mut item_system = IItemDispatcher { contract_address: item_system_address };
+
+        let shop_system_address = world
+            .deploy_contract(
+                'salt3', shop_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
+            );
+        let mut shop_system = IShopDispatcher { contract_address: shop_system_address };
+
+        add_items(ref item_system);
 
         set_contract_address(alice);
-        actions_system.spawn('Alice', WMClass::Warlock);
+
+        action_system.spawn('Alice', WMClass::Warlock);
         // mock player gold for testing
         let mut player_data = get!(world, alice, (Character));
         player_data.gold = 100;
@@ -53,11 +81,11 @@ mod tests {
         shop_data.item4 = 1;
         set!(world, (shop_data));
 
-        actions_system.buy_item(5);
+        shop_system.buy_item(5);
         // place a sword on (4,2)
-        actions_system.place_item(2, 4, 2, 0);
+        action_system.place_item(2, 4, 2, 0);
 
-        actions_system.undo_place_item(3);
+        action_system.undo_place_item(3);
 
         let storageItemCounter = get!(world, alice, CharacterItemsStorageCounter);
         assert(storageItemCounter.count == 2, 'storage item count mismatch');
@@ -86,11 +114,11 @@ mod tests {
         assert(backpack_grid_data.occupied == false, '(4,4) should not be occupied');
         assert(backpack_grid_data.enabled == true, '(4,4) should be enabled');
 
-        actions_system.buy_item(6);
+        shop_system.buy_item(6);
         // place a shield on (2,2)
-        actions_system.place_item(1, 2, 2, 0);
+        action_system.place_item(1, 2, 2, 0);
 
-        actions_system.undo_place_item(3);
+        action_system.undo_place_item(3);
 
         let storageItemCounter = get!(world, alice, CharacterItemsStorageCounter);
         assert(storageItemCounter.count == 2, 'storage item count mismatch');
@@ -125,11 +153,11 @@ mod tests {
         assert(backpack_grid_data.occupied == false, '(3,3) should not be occupied');
         assert(backpack_grid_data.enabled == true, '(3,3) should be enabled');
 
-        actions_system.buy_item(8);
+        shop_system.buy_item(8);
         // place a potion on (5,2)
-        actions_system.place_item(3, 5, 2, 0);
+        action_system.place_item(3, 5, 2, 0);
 
-        actions_system.undo_place_item(3);
+        action_system.undo_place_item(3);
 
         let storageItemCounter = get!(world, alice, CharacterItemsStorageCounter);
         assert(storageItemCounter.count == 3, 'storage item count mismatch');
@@ -153,11 +181,11 @@ mod tests {
         assert(backpack_grid_data.occupied == false, '(5,2) should not be occupied');
         assert(backpack_grid_data.enabled == true, '(5,2) should be enabled');
 
-        actions_system.place_item(2, 4, 2, 0);
-        actions_system.place_item(1, 2, 2, 0);
-        actions_system.place_item(3, 5, 2, 0);
+        action_system.place_item(2, 4, 2, 0);
+        action_system.place_item(1, 2, 2, 0);
+        action_system.place_item(3, 5, 2, 0);
 
-        actions_system.undo_place_item(4);
+        action_system.undo_place_item(4);
 
         let storageItemCounter = get!(world, alice, CharacterItemsStorageCounter);
         assert(storageItemCounter.count == 3, 'storage item count mismatch');
@@ -196,20 +224,40 @@ mod tests {
     fn test_undo_place_item_revert_not_in_inventory() {
         let alice = starknet::contract_address_const::<0x1337>();
 
-        let mut models = array![];
+        let mut models = array![
+            backpack_grids::TEST_CLASS_HASH,
+            item::TEST_CLASS_HASH,
+            items_counter::TEST_CLASS_HASH,
+            character_item_storage::TEST_CLASS_HASH,
+            character_items_storage_counter::TEST_CLASS_HASH,
+            character_item_inventory::TEST_CLASS_HASH,
+            character_items_inventory_counter::TEST_CLASS_HASH,
+            character::TEST_CLASS_HASH,
+            name_record::TEST_CLASS_HASH,
+            shop::TEST_CLASS_HASH
+        ];
 
-        let world = spawn_test_world(models);
+        let world = spawn_test_world("Warpacks", models);
 
-        let contract_address = world
-            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
-        let mut actions_system = IActionsDispatcher { contract_address };
+        let action_system_address = world
+            .deploy_contract(
+                'salt1', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
+            );
+        let mut action_system = IActionsDispatcher { contract_address: action_system_address };
 
-        add_items(ref actions_system);
+        let item_system_address = world
+            .deploy_contract(
+                'salt2', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
+            );
+        let mut item_system = IItemDispatcher { contract_address: item_system_address };
+
+        add_items(ref item_system);
 
         set_contract_address(alice);
-        actions_system.spawn('Alice', WMClass::Warlock);
 
-        actions_system.undo_place_item(3);
+        action_system.spawn('Alice', WMClass::Warlock);
+
+        action_system.undo_place_item(3);
     }
 }
 
