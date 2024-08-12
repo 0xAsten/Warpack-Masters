@@ -1,4 +1,6 @@
 use warpack_masters::prdefined_dummies::PredefinedItem;
+use warpack_masters::models::Character::WMClass;
+
 
 #[dojo::interface]
 trait IDummy {
@@ -23,6 +25,8 @@ mod dummy_system {
     use warpack_masters::prdefined_dummies::PredefinedItem;
 
     use warpack_masters::systems::view::view::ViewImpl;
+
+    use warpack_masters::constants::constants::{INIT_HEALTH};
 
     #[abi(embed_v0)]
     impl DummyImpl of IDummy<ContractState> {
@@ -80,9 +84,9 @@ mod dummy_system {
             set!(world, (char, dummyCharCounter, dummyChar));
         }
 
-        fn prefine_dummy(world: IWorldDispatcher, level: usize, name: felt252, wmClass: WMClass, items: Array<PredefinedItem>) {
+        fn prefine_dummy(ref world: IWorldDispatcher, level: usize, name: felt252, wmClass: WMClass, items: Array<PredefinedItem>) {
             let player = get_caller_address();
-            assert(self.is_world_owner(player), 'player not world owner');
+            assert(ViewImpl::is_world_owner(world, player), 'player not world owner');
 
             let mut health: usize = INIT_HEALTH;
 
@@ -158,9 +162,9 @@ mod dummy_system {
             set!(world, (dummyCharCounter, dummyChar, dummyCharItemsCounter, NameRecord { name, player }));
         }
 
-        fn update_prefine_dummy(world: IWorldDispatcher, dummyCharId: usize, level: usize, name: felt252, wmClass: WMClass, items: Array<PredefinedItem>) {
+        fn update_prefine_dummy(ref world: IWorldDispatcher, dummyCharId: usize, level: usize, name: felt252, wmClass: WMClass, items: Array<PredefinedItem>) {
             let player = get_caller_address();
-            assert(self.is_world_owner(player), 'player not world owner');
+            assert(ViewImpl::is_world_owner(world, player), 'player not world owner');
     
             let mut health: usize = INIT_HEALTH;
         

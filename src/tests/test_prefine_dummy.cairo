@@ -64,7 +64,7 @@ mod tests {
 
         set_contract_address(alice);
 
-        dummy_system.prefine_dummy(0);
+        dummy_system.prefine_dummy(0, 'Alice', WMClass::Warrior, Dummy0::get_items());
     }
 
     #[test]
@@ -98,7 +98,7 @@ mod tests {
         add_items(ref item_system);
 
         let mut level = 0;
-        dummy_system.prefine_dummy(level);
+        dummy_system.prefine_dummy(level, Dummy0::name, WMClass::Warrior, Dummy0::get_items());
 
         let dummyCharCounter = get!(world, level, DummyCharacterCounter);
         assert(dummyCharCounter.count == 1, 'Should be equal 1');
@@ -107,13 +107,7 @@ mod tests {
         assert(dummyChar.level == level, 'Should be equal 0');
         assert(dummyChar.id == 1, 'Should be equal 1');
         assert(dummyChar.name == Dummy0::name, 'Should be equal Dummy0::name');
-        let mut dummyClassNo: u8 = 0;
-        match dummyChar.wmClass {
-            WMClass::Warrior => { dummyClassNo = 0; },
-            WMClass::Warlock => { dummyClassNo = 1; },
-            WMClass::Archer => { dummyClassNo = 2; }
-        }
-        assert(dummyClassNo == Dummy0::wmClass, 'Should be equal Dummy0::wmClass');
+        assert(dummyChar.wmClass == WMClass::Warrior, 'Should be equal Warrior');
         assert(dummyChar.health == Dummy0::health, 'Should be equal Dummy0::health');
         assert(
             dummyChar.player == starknet::contract_address_const::<0x1>(), 'Should be equal 0x0'
