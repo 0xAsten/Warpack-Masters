@@ -65,7 +65,7 @@ while ((match = dummyRegex.exec(predefinedDummiesContent)) !== null) {
   console.log(itemDetails)
 
   // Construct the command line
-  const commandLine = `sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS prefine_dummy -c ${level},${encodedName},${wmClass},${itemCount},${itemDetails} --wait --rpc-url $STARKNET_RPC_URL`
+  const commandLine = `sozo execute --world $WORLD_ADDRESS $DUMMY_STSTEM_ADDRESS prefine_dummy -c ${level},${encodedName},${wmClass},${itemCount},${itemDetails} --wait --rpc-url $STARKNET_RPC_URL`
 
   commands += `${commandLine}\n`
   // Output the constructed command line
@@ -74,6 +74,6 @@ while ((match = dummyRegex.exec(predefinedDummiesContent)) !== null) {
 
 const outputFilePath = path.join(__dirname, '../scripts/pre_dummies.sh')
 let shellScriptContent = fs.readFileSync(outputFilePath, 'utf8')
-shellScriptContent += `\n\n# Generated item commands\n${commands}\n`
+shellScriptContent += `\n\n# Generated pre dummies commands\n${commands}\n`
 
 fs.writeFileSync(outputFilePath, shellScriptContent)
