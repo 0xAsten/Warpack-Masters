@@ -25,6 +25,7 @@ mod fight_system {
     use warpack_masters::models::BattleLog::{BattleLog, BattleLogCounter};
 
     #[derive(Copy, Drop, Serde)]
+    #[dojo::model]
     #[dojo::event]
     struct BattleLogDetail {
         #[key]
