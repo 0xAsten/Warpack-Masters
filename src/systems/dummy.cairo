@@ -190,7 +190,16 @@ mod dummy_system {
             }
             
             let mut dummyChar = get!(world, (level, dummyCharId), (DummyCharacter));
-            dummyChar.name = name;
+            if dummyChar.name != name {
+                let nameRecord = get!(world, name, NameRecord);
+                assert(
+                    nameRecord.player == starknet::contract_address_const::<0>(),
+                    'name already exists'
+                );
+
+                dummyChar.name = name;
+            }
+            
             dummyChar.wmClass = wmClass;
             dummyChar.health = health;
             set!(world, (dummyChar));
@@ -198,7 +207,7 @@ mod dummy_system {
             let mut dummyCharItemsCounter = get!(
                 world, (level, dummyCharId), (DummyCharacterItemsCounter)
             );
-            assert(dummyCharItemsCounter.count == items.len(), 'invalid items length');
+            assert(dummyCharItemsCounter.count <= items.len(), 'invalid items length');
     
             let mut i = 0;
             loop {
