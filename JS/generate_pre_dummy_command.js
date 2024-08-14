@@ -26,7 +26,7 @@ const dummyRegex =
   /mod\s+Dummy(\d+)\s*{([\s\S]+?)fn\s+get_items\(\)\s*->\s*Array<PredefinedItem>\s*{([\s\S]+?)}\s*}/g
 
 const itemDetailsRegex =
-  /items.append\(PredefinedItem\s*{\s*itemId:\s*(\w+)::id,[\s\S]+?position:\s*Position\s*{\s*x:(\d+),\s*y:(\d+)\s*},[\s\S]+?rotation:\s*(\d+)/g
+  /items.append\(PredefinedItem\s*{\s*itemId:\s*(\w+)::id,[\s\S]+?position:\s*Position\s*{\s*x:\s*(\d+),\s*y:\s*(\d+)\s*},[\s\S]+?rotation:\s*(\d+)/g
 
 const levelRegex = /const\s+level:\s+usize\s+=\s+(\d+);/
 const nameRegex = /const\s+name:\s+felt252\s+=\s+'([^']+)';/
