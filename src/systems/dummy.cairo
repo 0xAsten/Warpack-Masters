@@ -228,7 +228,10 @@ mod dummy_system {
                 };
     
                 set!(world, (dummyCharItem));
-            };           
+            };
+
+            dummyCharItemsCounter.count = i;
+            set!(world, (dummyCharItemsCounter));
         }
     }
 }
