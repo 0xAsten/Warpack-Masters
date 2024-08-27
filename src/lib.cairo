@@ -17,6 +17,7 @@ mod models {
     mod DummyCharacter;
     mod DummyCharacterItem;
     mod BattleLog;
+    mod Receipt;
 }
 
 mod tests {

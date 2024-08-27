@@ -130,7 +130,7 @@ mod tests {
 
         let shop_system_address = world
             .deploy_contract(
-                'salt3', shop_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
+                'salt3', shop_system::TEST_CLASS_HASH.try_into().unwrap()
             );
         let mut shop_system = IShopDispatcher { contract_address: shop_system_address };
 

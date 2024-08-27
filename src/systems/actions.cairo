@@ -19,6 +19,12 @@ trait IActions {
         ref world: IWorldDispatcher, storage_item_id: u32, x: usize, y: usize, rotation: usize
     );
     fn undo_place_item(ref world: IWorldDispatcher, inventory_item_id: u32);
+    fn add_receipt(
+        ref world: IWorldDispatcher, item1_id: u32, item2_id: u32, result_item_id: u32
+    );
+    fn craft_item(
+        ref world: IWorldDispatcher, item1_id: u32, item2_id: u32
+    );
 }
 
 // TODO: rename the count filed in counter model
@@ -32,10 +38,11 @@ mod actions {
     use warpack_masters::models::{
         CharacterItem::{
             Position, CharacterItemsStorageCounter, CharacterItemStorage, CharacterItemInventory,
-            CharacterItemsInventoryCounter
+            CharacterItemsInventoryCounter, are_items_nearby
         },
         Item::Item,
         Character::{Character, NameRecord},
+        Receipt::Receipt,
         Shop::Shop
     };
 
@@ -482,6 +489,109 @@ mod actions {
             inventoryItem.position.y = 0;
             inventoryItem.rotation = 0;
             set!(world, (inventoryItem));
+        }
+
+        fn add_receipt(
+            ref world: IWorldDispatcher, item1_id: u32, item2_id: u32, result_item_id: u32
+        ) {
+            let item1 = get!(world, item1_id, Item);
+            assert!(item1.height != 0, "Item1 does not exist or is invalid");
+            let item2 = get!(world, item2_id, Item);
+            assert!(item2.height != 0, "Item2 does not exist or is invalid");
+            let result_item = get!(world, result_item_id, Item);
+            assert!(result_item.height != 0, "Result item does not exist or is invalid");
+    
+    
+            let receipt = Receipt {
+                item1_id,
+                item2_id,
+                result_item_id,
+            };
+            set!(world, (receipt));
+        }
+
+        fn craft_item(
+            ref world: IWorldDispatcher, item1_id: u32, item2_id: u32
+        ) {
+            let player = get_caller_address();
+
+            let mut item1_position = Position { x: 0, y: 0 };
+            let mut item2_position = Position { x: 0, y: 0 };
+            let mut item1_rotation = 0;
+            let mut item2_rotation = 0;
+            let mut item1_width = 0;
+            let mut item1_height = 0;
+            let mut item2_width = 0;
+            let mut item2_height = 0;
+
+            let mut found_item1 = false;
+            let mut found_item2 = false;
+
+            let mut inventory_counter = get!(world, player, (CharacterItemsInventoryCounter));
+            let mut count = inventory_counter.count;
+
+            // Search for the items in the player's inventory
+            loop {
+                if count == 0 {
+                    break;
+                }
+
+                let inventory_item = get!(world, (player, count), (CharacterItemInventory));
+
+                if inventory_item.itemId == item1_id && inventory_item.itemId != 0 {
+                    item1_position = inventory_item.position;
+                    item1_rotation = inventory_item.rotation;
+                    let item1_data = get!(world, item1_id, (Item));
+                    item1_width = item1_data.width;
+                    item1_height = item1_data.height;
+                    found_item1 = true;
+                } else if inventory_item.itemId == item2_id && inventory_item.itemId != 0 {
+                    item2_position = inventory_item.position;
+                    item2_rotation = inventory_item.rotation;
+                    let item2_data = get!(world, item2_id, (Item));
+                    item2_width = item2_data.width;
+                    item2_height = item2_data.height;
+                    found_item2 = true;
+                }
+
+                if found_item1 && found_item2 {
+                    break;
+                }
+
+                count -= 1;
+            };
+
+            assert!(found_item1, "Item1 not found or invalid in inventory");
+            assert!(found_item2, "Item2 not found or invalid in inventory");
+
+            assert!(
+                are_items_nearby(item1_position, item1_width, item1_height, item1_rotation, item2_position, item2_width, item2_height, item2_rotation),
+                "Items are not nearby"
+            );
+
+            let receipt = get!(world, (item1_id, item2_id), (Receipt));
+            assert!(receipt.result_item_id != 0, "No valid receipt found for these items");
+
+            self.undo_place_item(item1_id);
+            self.undo_place_item(item2_id);
+
+            let new_item_id = receipt.result_item_id;
+            let new_item = get!(world, new_item_id, Item);
+            let new_item_width = new_item.width;
+            let new_item_height = new_item.height;
+
+            let mut position_x = item1_position.x;
+            let mut position_y = item1_position.y;
+            let mut rotation = item1_rotation;
+
+            // Check if the new item can fit in the position of the first item
+            if new_item_width > item1_width || new_item_height > item1_height {
+                // If it doesn't fit, try the position of the second item
+                position_x = item2_position.x;
+                position_y = item2_position.y;
+                rotation = item2_rotation;
+            }
+            self.place_item(new_item_id, position_x, position_y, rotation);
         }
     }
 }
