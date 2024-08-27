@@ -3,7 +3,7 @@ mod tests {
     use starknet::class_hash::Felt252TryIntoClassHash;
     use starknet::testing::set_contract_address;
 
-    // import world dispatcher
+    use dojo::model::{Model, ModelTest, ModelIndex, ModelEntityTest};
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
     // import test utils
@@ -22,7 +22,7 @@ mod tests {
             CharacterItemInventory, character_item_inventory,
             CharacterItemsInventoryCounter, character_items_inventory_counter
         },
-        models::Character::{Character, character, NameRecord, name_record, WMClass}, 
+        models::Character::{Characters, characters, NameRecord, name_record, WMClass}, 
         models::Shop::{Shop, shop},
         utils::{test_utils::{add_items}}
     };
@@ -38,34 +38,39 @@ mod tests {
             item::TEST_CLASS_HASH, items_counter::TEST_CLASS_HASH,
             character_item_storage::TEST_CLASS_HASH, character_items_storage_counter::TEST_CLASS_HASH,
             character_item_inventory::TEST_CLASS_HASH, character_items_inventory_counter::TEST_CLASS_HASH,
-            character::TEST_CLASS_HASH, name_record::TEST_CLASS_HASH, shop::TEST_CLASS_HASH];
+            characters::TEST_CLASS_HASH, name_record::TEST_CLASS_HASH, shop::TEST_CLASS_HASH];
 
-        let world = spawn_test_world("Warpacks", models);
+        let world = spawn_test_world(["dojo", "warpacks"].span(), models.span());
 
         let action_system_address = world
-            .deploy_contract('salt1', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+            .deploy_contract('salt1', actions::TEST_CLASS_HASH.try_into().unwrap());
         let mut action_system = IActionsDispatcher { contract_address: action_system_address };
+        world.grant_writer(dojo::utils::bytearray_hash(@"warpacks"), action_system_address);
+
 
         let item_system_address = world
-            .deploy_contract('salt2', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+            .deploy_contract('salt2', item_system::TEST_CLASS_HASH.try_into().unwrap());
         let mut item_system = IItemDispatcher { contract_address: item_system_address };
+        world.grant_writer(dojo::utils::bytearray_hash(@"warpacks"), item_system_address);
 
         let shop_system_address = world
-            .deploy_contract('salt3', shop_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+            .deploy_contract('salt3', shop_system::TEST_CLASS_HASH.try_into().unwrap());
         let mut shop_system = IShopDispatcher { contract_address: shop_system_address };
+        world.grant_writer(dojo::utils::bytearray_hash(@"warpacks"), shop_system_address);
 
         add_items(ref item_system);
-
-        set_contract_address(alice);
         let item = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
         assert(item.count == 16, 'total item count mismatch');
 
+        set_contract_address(alice);
         action_system.spawn('Alice', WMClass::Warlock);
         shop_system.reroll_shop();
 
         // mock player gold for testing
-        let mut player_data = get!(world, alice, (Character));
+        let mut player_data = get!(world, alice, (Characters));
         player_data.gold = 100;
+
+        set_contract_address(action_system_address);
         set!(world, (player_data));
         // mock shop for testing
         let mut shop_data = get!(world, alice, (Shop));
@@ -75,6 +80,7 @@ mod tests {
         shop_data.item4 = 1;
         set!(world, (shop_data));
 
+        set_contract_address(alice);
         shop_system.buy_item(7);
         // place a sword on (4,2)
         action_system.place_item(2, 4, 2, 0);
@@ -522,7 +528,7 @@ mod tests {
         action_system.spawn('Alice', WMClass::Warlock);
         shop_system.reroll_shop();
 
-        let mut player_data = get!(world, alice, (Character));
+        let mut player_data = get!(world, alice, (Characters));
         player_data.gold = 100;
         set!(world, (player_data));
 

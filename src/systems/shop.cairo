@@ -16,7 +16,7 @@ mod shop_system {
         CharacterItem::{CharacterItemsStorageCounter, CharacterItemStorage,},
         Item::{Item, ItemsCounter}
     };
-    use warpack_masters::models::Character::{Character};
+    use warpack_masters::models::Character::{Characters};
     use warpack_masters::models::Shop::Shop;
     use warpack_masters::utils::random::{pseudo_seed, random};
     use warpack_masters::constants::constants::{ITEMS_COUNTER_ID};
@@ -63,7 +63,7 @@ mod shop_system {
             );
 
             let item = get!(world, item_id, (Item));
-            let mut player_char = get!(world, player, (Character));
+            let mut player_char = get!(world, player, (Characters));
 
             assert(player_char.gold >= item.price, 'Not enough gold');
             player_char.gold -= item.price;
@@ -132,7 +132,7 @@ mod shop_system {
             assert(itemId != 0, 'invalid item_id');
 
             let mut item = get!(world, itemId, (Item));
-            let mut playerChar = get!(world, player, (Character));
+            let mut playerChar = get!(world, player, (Characters));
 
             let itemPrice = item.price;
             let sellPrice = itemPrice / 2;
@@ -158,7 +158,7 @@ mod shop_system {
         fn reroll_shop(ref world: IWorldDispatcher) {
             let player = get_caller_address();
 
-            let mut char = get!(world, player, (Character));
+            let mut char = get!(world, player, (Characters));
             assert(char.gold >= 1, 'Not enough gold');
 
             let mut shop = get!(world, player, (Shop));

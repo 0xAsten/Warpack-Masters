@@ -15,7 +15,7 @@ mod fight_system {
         },
         Item::Item
     };
-    use warpack_masters::models::Character::{Character, WMClass};
+    use warpack_masters::models::Character::{Characters, WMClass};
 
     use warpack_masters::utils::random::{pseudo_seed, random};
     use warpack_masters::models::DummyCharacter::{DummyCharacter, DummyCharacterCounter};
@@ -67,7 +67,7 @@ mod fight_system {
         fn fight(ref world: IWorldDispatcher) {
             let player = get_caller_address();
 
-            let mut char = get!(world, player, (Character));
+            let mut char = get!(world, player, (Characters));
 
             assert(char.dummied == true, 'dummy not created');
             assert(char.loss < 5, 'max loss reached');

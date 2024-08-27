@@ -2,7 +2,7 @@ use starknet::ContractAddress;
 
 #[derive(Drop, Serde)]
 #[dojo::model]
-struct Character {
+struct Characters {
     #[key]
     player: ContractAddress,
     // must be less than 31 ASCII characters

@@ -14,7 +14,7 @@ mod dummy_system {
     use super::IDummy;
 
     use starknet::{get_caller_address};
-    use warpack_masters::models::Character::{Character, WMClass, NameRecord};
+    use warpack_masters::models::Character::{Characters, WMClass, NameRecord};
     use warpack_masters::models::CharacterItem::{
         CharacterItemsInventoryCounter, CharacterItemInventory
     };
@@ -33,7 +33,7 @@ mod dummy_system {
         fn create_dummy(ref world: IWorldDispatcher) {
             let player = get_caller_address();
 
-            let mut char = get!(world, player, (Character));
+            let mut char = get!(world, player, (Characters));
 
             assert(char.dummied == false, 'dummy already created');
             assert(char.loss < 5, 'max loss reached');

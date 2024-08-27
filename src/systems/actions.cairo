@@ -41,7 +41,7 @@ mod actions {
             CharacterItemsInventoryCounter, are_items_nearby
         },
         Item::Item,
-        Character::{Character, NameRecord},
+        Character::{Characters, NameRecord},
         Receipt::Receipt,
         Shop::Shop
     };
@@ -69,7 +69,7 @@ mod actions {
 
             set!(world, (NameRecord { name, player }));
 
-            let player_exists = get!(world, player, (Character));
+            let player_exists = get!(world, player, (Characters));
             assert(player_exists.name == '', 'player already exists');
 
             // Default the player has 2 Backpacks
@@ -102,7 +102,7 @@ mod actions {
             set!(
                 world,
                 (
-                    Character {
+                    Characters {
                         player,
                         name,
                         wmClass,
@@ -130,7 +130,7 @@ mod actions {
         ) {
             let player = get_caller_address();
 
-            let mut char = get!(world, player, (Character));
+            let mut char = get!(world, player, (Characters));
 
             assert(char.loss >= 5, 'loss not reached');
 
