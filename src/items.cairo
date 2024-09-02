@@ -20,6 +20,7 @@ mod Backpack {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod Pack {
@@ -44,6 +45,7 @@ mod Pack {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod Satchel {
@@ -68,6 +70,7 @@ mod Satchel {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod Pouch {
@@ -92,6 +95,7 @@ mod Pouch {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod Herb {
@@ -116,6 +120,7 @@ mod Herb {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod Dagger {
@@ -140,6 +145,7 @@ mod Dagger {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod Sword {
@@ -164,6 +170,7 @@ mod Sword {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod Spike {
@@ -188,6 +195,7 @@ mod Spike {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod Shield {
@@ -212,6 +220,7 @@ mod Shield {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod Helmet {
@@ -236,6 +245,7 @@ mod Helmet {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod HealingPotion {
@@ -260,6 +270,7 @@ mod HealingPotion {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod LeatherArmor {
@@ -284,6 +295,7 @@ mod LeatherArmor {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod Poison {
@@ -308,6 +320,7 @@ mod Poison {
     const poisonActivation: u8 = 1;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod AugmentedSword {
@@ -332,6 +345,7 @@ mod AugmentedSword {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod AugmentedDagger {
@@ -356,6 +370,7 @@ mod AugmentedDagger {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod SpikeShield {
@@ -380,6 +395,7 @@ mod SpikeShield {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod PlagueFlower {
@@ -404,6 +420,7 @@ mod PlagueFlower {
     const poisonActivation: u8 = 3;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod MailArmor {
@@ -428,6 +445,7 @@ mod MailArmor {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 
@@ -453,6 +471,7 @@ mod Buckler {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod MagicWater {
@@ -477,6 +496,7 @@ mod MagicWater {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod VampiricArmor {
@@ -501,6 +521,7 @@ mod VampiricArmor {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod Greatsword {
@@ -525,6 +546,7 @@ mod Greatsword {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod Bow {
@@ -549,6 +571,7 @@ mod Bow {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod Crossbow {
@@ -573,6 +596,7 @@ mod Crossbow {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod Hammer {
@@ -597,6 +621,7 @@ mod Hammer {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod AmuletOfFury {
@@ -621,6 +646,7 @@ mod AmuletOfFury {
     const poisonActivation: u8 = 0;
     const empower: usize = 2;
     const empowerActivation: u8 = 2;
+    const energyCost: u8 = 0;
 }
 
 mod RageGauntlet {
@@ -645,6 +671,7 @@ mod RageGauntlet {
     const poisonActivation: u8 = 0;
     const empower: usize = 1;
     const empowerActivation: u8 = 4;
+    const energyCost: u8 = 0;
 }
 
 mod KnightHelmet {
@@ -669,6 +696,7 @@ mod KnightHelmet {
     const poisonActivation: u8 = 0;
     const empower: usize = 3;
     const empowerActivation: u8 = 3;
+    const energyCost: u8 = 0;
 }
 
 mod BladeArmor {
@@ -693,6 +721,7 @@ mod BladeArmor {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod Club {
@@ -717,4 +746,5 @@ mod Club {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }

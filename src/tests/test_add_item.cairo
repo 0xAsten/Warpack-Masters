@@ -24,11 +24,11 @@ mod tests {
     fn test_add_item() {
         let mut models = array![item::TEST_CLASS_HASH, items_counter::TEST_CLASS_HASH];
 
-        let world = spawn_test_world("Warpacks", models);
+        let world =  spawn_test_world(["Warpacks"].span(), models.span());
 
         let item_system_address = world
             .deploy_contract(
-                'salt1', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
+                'salt1', item_system::TEST_CLASS_HASH.try_into().unwrap()
             );
         let mut item_system = IItemDispatcher { contract_address: item_system_address };
 
@@ -182,11 +182,11 @@ mod tests {
 
         let mut models = array![item::TEST_CLASS_HASH, items_counter::TEST_CLASS_HASH];
 
-        let world = spawn_test_world("Warpacks", models);
+        let world =  spawn_test_world(["Warpacks"].span(), models.span());
 
         let item_system_address = world
             .deploy_contract(
-                'salt1', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
+                'salt1', item_system::TEST_CLASS_HASH.try_into().unwrap()
             );
         let mut item_system = IItemDispatcher { contract_address: item_system_address };
 
@@ -226,11 +226,11 @@ mod tests {
     fn test_add_item_revert_width_not_in_range() {
         let mut models = array![item::TEST_CLASS_HASH, items_counter::TEST_CLASS_HASH];
 
-        let world = spawn_test_world("Warpacks", models);
+        let world =  spawn_test_world(["Warpacks"].span(), models.span());
 
         let item_system_address = world
             .deploy_contract(
-                'salt1', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
+                'salt1', item_system::TEST_CLASS_HASH.try_into().unwrap()
             );
         let mut item_system = IItemDispatcher { contract_address: item_system_address };
 
@@ -266,11 +266,11 @@ mod tests {
     fn test_add_item_revert_height_not_in_range() {
         let mut models = array![item::TEST_CLASS_HASH, items_counter::TEST_CLASS_HASH];
 
-        let world = spawn_test_world("Warpacks", models);
+        let world =  spawn_test_world(["Warpacks"].span(), models.span());
 
         let item_system_address = world
             .deploy_contract(
-                'salt1', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
+                'salt1', item_system::TEST_CLASS_HASH.try_into().unwrap()
             );
         let mut item_system = IItemDispatcher { contract_address: item_system_address };
 
@@ -306,11 +306,11 @@ mod tests {
     fn test_add_item_revert_price_not_valid() {
         let mut models = array![item::TEST_CLASS_HASH, items_counter::TEST_CLASS_HASH];
 
-        let world = spawn_test_world("Warpacks", models);
+        let world =  spawn_test_world(["Warpacks"].span(), models.span());
 
         let item_system_address = world
             .deploy_contract(
-                'salt1', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
+                'salt1', item_system::TEST_CLASS_HASH.try_into().unwrap()
             );
         let mut item_system = IItemDispatcher { contract_address: item_system_address };
 
@@ -346,11 +346,11 @@ mod tests {
     fn test_add_item_revert_invalid_rarity() {
         let mut models = array![item::TEST_CLASS_HASH, items_counter::TEST_CLASS_HASH];
 
-        let world = spawn_test_world("Warpacks", models);
+        let world =  spawn_test_world(["Warpacks"].span(), models.span());
 
         let item_system_address = world
             .deploy_contract(
-                'salt1', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
+                'salt1', item_system::TEST_CLASS_HASH.try_into().unwrap()
             );
         let mut item_system = IItemDispatcher { contract_address: item_system_address };
 

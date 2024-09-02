@@ -26,7 +26,7 @@ mod dummy_system {
 
     use warpack_masters::systems::view::view::ViewImpl;
 
-    use warpack_masters::constants::constants::{INIT_HEALTH};
+    use warpack_masters::constants::constants::{INIT_HEALTH, INIT_STAMINA, INIT_VAMPIRISM};
 
     #[abi(embed_v0)]
     impl DummyImpl of IDummy<ContractState> {
@@ -49,6 +49,8 @@ mod dummy_system {
                 health: char.health,
                 player: player,
                 rating: char.rating,
+                stamina: INIT_STAMINA,
+                vampirism: INIT_VAMPIRISM,
             };
             char.dummied = true;
 
@@ -129,6 +131,8 @@ mod dummy_system {
                 health: health,
                 player: player,
                 rating: 0,
+                stamina: INIT_STAMINA,
+                vampirism: INIT_VAMPIRISM,
             };
 
             let mut dummyCharItemsCounter = get!(

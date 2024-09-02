@@ -23,6 +23,7 @@ trait IItem {
         poisonActivation: u8,
         empower: u32,
         empowerActivation: u8,
+        energyCost: u8,
     );
 }
 
@@ -62,6 +63,7 @@ mod item_system {
             poisonActivation: u8,
             empower: u32,
             empowerActivation: u8,
+            energyCost: u8,
         ) {
             let player = get_caller_address();
 
@@ -104,6 +106,7 @@ mod item_system {
                 poisonActivation,
                 empower,
                 empowerActivation,
+                energyCost,
             };
 
             set!(world, (item));

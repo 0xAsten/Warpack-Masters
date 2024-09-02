@@ -44,23 +44,23 @@ mod tests {
             shop::TEST_CLASS_HASH
         ];
 
-        let world = spawn_test_world("Warpacks", models);
+        let world =  spawn_test_world(["Warpacks"].span(), models.span());
 
         let action_system_address = world
             .deploy_contract(
-                'salt1', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
+                'salt1', actions::TEST_CLASS_HASH.try_into().unwrap() 
             );
         let mut action_system = IActionsDispatcher { contract_address: action_system_address };
 
         let item_system_address = world
             .deploy_contract(
-                'salt2', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
+                'salt2', item_system::TEST_CLASS_HASH.try_into().unwrap() 
             );
         let mut item_system = IItemDispatcher { contract_address: item_system_address };
 
         let shop_system_address = world
             .deploy_contract(
-                'salt3', shop_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
+                'salt3', shop_system::TEST_CLASS_HASH.try_into().unwrap() 
             );
         let mut shop_system = IShopDispatcher { contract_address: shop_system_address };
 
@@ -202,17 +202,17 @@ mod tests {
             shop::TEST_CLASS_HASH
         ];
 
-        let world = spawn_test_world("Warpacks", models);
+        let world =  spawn_test_world(["Warpacks"].span(), models.span());
 
         let action_system_address = world
             .deploy_contract(
-                'salt1', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
+                'salt1', actions::TEST_CLASS_HASH.try_into().unwrap() 
             );
         let mut action_system = IActionsDispatcher { contract_address: action_system_address };
 
         let item_system_address = world
             .deploy_contract(
-                'salt2', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
+                'salt2', item_system::TEST_CLASS_HASH.try_into().unwrap() 
             );
         let mut item_system = IItemDispatcher { contract_address: item_system_address };
 
@@ -247,17 +247,17 @@ mod tests {
             shop::TEST_CLASS_HASH
         ];
 
-        let world = spawn_test_world("Warpacks", models);
+        let world =  spawn_test_world(["Warpacks"].span(), models.span());
 
         let action_system_address = world
             .deploy_contract(
-                'salt1', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
+                'salt1', actions::TEST_CLASS_HASH.try_into().unwrap() 
             );
         let mut action_system = IActionsDispatcher { contract_address: action_system_address };
 
         let item_system_address = world
             .deploy_contract(
-                'salt2', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
+                'salt2', item_system::TEST_CLASS_HASH.try_into().unwrap() 
             );
         let mut item_system = IItemDispatcher { contract_address: item_system_address };
 
@@ -295,17 +295,17 @@ mod tests {
             shop::TEST_CLASS_HASH
         ];
 
-        let world = spawn_test_world("Warpacks", models);
+        let world =  spawn_test_world(["Warpacks"].span(), models.span());
 
         let action_system_address = world
             .deploy_contract(
-                'salt1', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
+                'salt1', actions::TEST_CLASS_HASH.try_into().unwrap() 
             );
         let mut action_system = IActionsDispatcher { contract_address: action_system_address };
 
         let item_system_address = world
             .deploy_contract(
-                'salt2', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
+                'salt2', item_system::TEST_CLASS_HASH.try_into().unwrap() 
             );
         let mut item_system = IItemDispatcher { contract_address: item_system_address };
 
@@ -345,17 +345,17 @@ mod tests {
             shop::TEST_CLASS_HASH
         ];
 
-        let world = spawn_test_world("Warpacks", models);
+        let world =  spawn_test_world(["Warpacks"].span(), models.span());
 
         let action_system_address = world
             .deploy_contract(
-                'salt1', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
+                'salt1', actions::TEST_CLASS_HASH.try_into().unwrap() 
             );
         let mut action_system = IActionsDispatcher { contract_address: action_system_address };
 
         let item_system_address = world
             .deploy_contract(
-                'salt2', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
+                'salt2', item_system::TEST_CLASS_HASH.try_into().unwrap() 
             );
         let mut item_system = IItemDispatcher { contract_address: item_system_address };
 

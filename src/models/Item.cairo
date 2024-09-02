@@ -32,6 +32,7 @@ struct Item {
     poisonActivation: u8,
     empower: usize,
     empowerActivation: u8,
+    energyCost: u8,
 }
 
 #[derive(Drop, Serde)]
