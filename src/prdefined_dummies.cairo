@@ -1361,7 +1361,7 @@ mod Dummy16 {
 
         items.append(PredefinedItem {
             itemId: KnightHelmet::id,
-            position: Position{ x:5, y:2 },
+            position: Position{ x:2, y:5 },
             rotation: 90,
         });
 
