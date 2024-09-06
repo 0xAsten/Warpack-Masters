@@ -407,11 +407,11 @@ mod tests {
         action_system.spawn('Alice', WMClass::Warlock);
         shop_system.reroll_shop();
 
+        set_contract_address(action_system_address);
         let mut player_data = get!(world, alice, (Characters));
         player_data.gold = 100;
         set!(world, (player_data));
 
-        set_contract_address(action_system_address);
         let mut shop_data = get!(world, alice, (Shop));
         shop_data.item1 = 4;
         shop_data.item2 = 6;
