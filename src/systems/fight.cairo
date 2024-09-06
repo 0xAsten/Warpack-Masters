@@ -1,5 +1,6 @@
 #[dojo::interface]
 trait IFight {
+    fn match_dummy(ref world: IWorldDispatcher);
     fn fight(ref world: IWorldDispatcher);
 }
 
@@ -61,7 +62,7 @@ mod fight_system {
 
     #[abi(embed_v0)]
     impl FightImpl of IFight<ContractState> {
-        fn fight(ref world: IWorldDispatcher) {
+        fn match_dummy(ref world: IWorldDispatcher) {
             let player = get_caller_address();
 
             let mut char = get!(world, player, (Characters));
@@ -69,20 +70,49 @@ mod fight_system {
             assert(char.dummied == true, 'dummy not created');
             assert(char.loss < 5, 'max loss reached');
 
-            let (seed1, seed2, _, _) = pseudo_seed();
+            let (seed1, _, _, _) = pseudo_seed();
             let dummyCharCounter = get!(world, char.wins, (DummyCharacterCounter));
             assert(dummyCharCounter.count > 1, 'only self dummy created');
+
+            let mut battleLogCounter = get!(world, player, (BattleLogCounter));
+            let latestBattleLog = get!(world, (player, battleLogCounter.count), BattleLog);
+            assert(latestBattleLog.winner != 0, 'battle not fought');
 
             let random_index = random(seed1, dummyCharCounter.count) + 1;
             let mut dummy_index = random_index;
             let mut dummyChar = get!(world, (char.wins, dummy_index), DummyCharacter);
 
-            while dummyChar
-                .player == player {
-                    dummy_index = dummy_index % dummyCharCounter.count + 1;
-                    assert(dummy_index != random_index, 'no others dummy found');
-                    dummyChar = get!(world, (char.wins, dummy_index), DummyCharacter);
-                };
+            while dummyChar.player == player {
+                dummy_index = dummy_index % dummyCharCounter.count + 1;
+                assert(dummy_index != random_index, 'no others dummy found');
+                dummyChar = get!(world, (char.wins, dummy_index), DummyCharacter);
+            };
+
+            // record the battle log
+            battleLogCounter.count += 1;
+
+            let battleLog = BattleLog {
+                player: player,
+                id: battleLogCounter.count,
+                dummyCharLevel: char.wins,
+                dummyCharId: dummy_index,
+                winner: 0,
+                seconds: 0,
+            };
+            set!(world, (battleLogCounter, battleLog));
+        }
+
+        fn fight(ref world: IWorldDispatcher) {
+            let player = get_caller_address();
+
+            let mut char = get!(world, player, (Characters));
+
+            let battleLogCounter = get!(world, player, (BattleLogCounter));
+            let mut battleLog = get!(world, (player, battleLogCounter.count), BattleLog);
+
+            assert(battleLog.winner == 0, 'battle already fought');
+
+            let mut dummyChar = get!(world, (char.wins, battleLog.dummyCharId), DummyCharacter);
 
             // start the battle
             let mut char_health: usize = char.health;
@@ -96,10 +126,6 @@ mod fight_system {
             // stamina
             let mut char_stamina = char.stamina;
             let mut dummy_stamina = dummyChar.stamina;
-
-            // vampirism
-            let mut char_vampirism = char.vampirism;
-            let mut dummy_vampirism = dummyChar.vampirism;
 
             // =========  buffs/debuffs stacks ========= 
             let mut char_armor: usize = 0;
@@ -116,6 +142,10 @@ mod fight_system {
 
             let mut char_poison: usize = 0;
             let mut dummy_poison: usize = 0;
+
+            // vampirism
+            let mut char_vampirism = char.vampirism;
+            let mut dummy_vampirism = dummyChar.vampirism;
 
             let mut char_on_hit_items = ArrayTrait::new();
             let mut dummy_on_hit_items = ArrayTrait::new();
@@ -313,8 +343,7 @@ mod fight_system {
             };
 
             // record the battle log
-            let mut battleLogCounter = get!(world, player, (BattleLogCounter));
-            battleLogCounter.count += 1;
+            let battleLogCounter = get!(world, player, (BattleLogCounter));
             let battleLogCounterCount = battleLogCounter.count;
 
             let mut battleLogsCount = 0;
@@ -1141,15 +1170,9 @@ mod fight_system {
                 }
             };
 
-            let battleLog = BattleLog {
-                player: player,
-                id: battleLogCounter.count,
-                dummyCharLevel: char.wins,
-                dummyCharId: dummy_index,
-                winner: winner,
-                seconds: seconds,
-            };
-            set!(world, (battleLogCounter, battleLog));
+            battleLog.winner = winner;
+            battleLog.seconds = seconds;
+            set!(world, (battleLog));
 
             if winner == 'player' {
                 char.wins += 1;
