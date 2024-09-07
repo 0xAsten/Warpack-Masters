@@ -147,12 +147,13 @@ mod fight_system {
             let mut char_vampirism = char.vampirism;
             let mut dummy_vampirism = dummyChar.vampirism;
 
+            // =========  end =========
+
             let mut char_on_hit_items = ArrayTrait::new();
             let mut dummy_on_hit_items = ArrayTrait::new();
 
             let mut char_on_attack_items = ArrayTrait::new();
             let mut dummy_on_attack_items = ArrayTrait::new();
-            // =========  end =========
 
             // sort items
             let mut items: Felt252Dict<u32> = Default::default();
