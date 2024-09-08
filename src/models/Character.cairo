@@ -37,3 +37,6 @@ struct NameRecord {
     name: felt252,
     player: ContractAddress,
 }
+
+const PLAYER: felt252 = 'player';
+const DUMMY: felt252 = 'dummy';

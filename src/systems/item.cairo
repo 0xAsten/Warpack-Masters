@@ -79,6 +79,11 @@ mod item_system {
                 'rarity not valid'
             );
 
+            assert(
+                cooldown == 0 || cooldown == 4 || cooldown == 5 || cooldown == 6 || cooldown == 7,
+                'cooldown not valid'
+            );
+
             let counter = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
             if id > counter.count {
                 set!(world, ItemsCounter { id: ITEMS_COUNTER_ID, count: id });

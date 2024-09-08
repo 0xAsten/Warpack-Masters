@@ -112,7 +112,8 @@ mod fight_system {
 
             assert(battleLog.winner == 0, 'battle already fought');
 
-            let mut dummyChar = get!(world, (char.wins, battleLog.dummyCharId), DummyCharacter);
+            let dummy_index = battleLog.dummyCharId;
+            let mut dummyChar = get!(world, (char.wins, dummy_index), DummyCharacter);
 
             // start the battle
             let mut char_health: usize = char.health;
@@ -232,7 +233,7 @@ mod fight_system {
             let char_on_attack_items_span = char_on_attack_items.span();
 
             let dummyCharItemsCounter = get!(
-                world, (char.wins, dummy_index), (DummyCharacterItemsCounter)
+                world, (char.wins, dummy_index), DummyCharacterItemsCounter
             );
             let mut dummy_item_count = dummyCharItemsCounter.count;
             loop {
@@ -241,7 +242,7 @@ mod fight_system {
                 }
 
                 let dummy_item = get!(
-                    world, (char.wins, dummy_index, dummy_item_count), (DummyCharacterItem)
+                    world, (char.wins, dummy_index, dummy_item_count), DummyCharacterItem
                 );
                 let item = get!(world, dummy_item.itemId, (Item));
                 if item.itemType == 4 {
@@ -462,6 +463,7 @@ mod fight_system {
                     let cooldown = curr_item_data.cooldown;
 
                     // each second is treated as 1 unit of cooldown 
+                    let (_, seed2, _, _) = pseudo_seed();
                     if seconds % cooldown == 0 {
                         v += seconds.into();
                         rand = random(seed2 + v, 100);
