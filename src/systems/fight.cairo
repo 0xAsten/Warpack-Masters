@@ -13,9 +13,10 @@ mod fight_system {
         CharacterItem::{Position, CharacterItemInventory, CharacterItemsInventoryCounter},
         Item::Item
     };
-    use warpack_masters::models::Character::{Characters, WMClass};
+    use warpack_masters::models::Character::{Characters, WMClass, PLAYER, DUMMY};
 
     use warpack_masters::utils::random::{pseudo_seed, random};
+    use warpack_masters::utils::sort_items::{append_item, combine_items};
     use warpack_masters::models::DummyCharacter::{DummyCharacter, DummyCharacterCounter};
     use warpack_masters::models::DummyCharacterItem::{
         DummyCharacterItem, DummyCharacterItemsCounter
@@ -88,45 +89,10 @@ mod fight_system {
                 dummyChar = get!(world, (char.wins, dummy_index), DummyCharacter);
             };
 
-            // record the battle log
-            battleLogCounter.count += 1;
-
-            let battleLog = BattleLog {
-                player: player,
-                id: battleLogCounter.count,
-                dummyCharLevel: char.wins,
-                dummyCharId: dummy_index,
-                winner: 0,
-                seconds: 0,
-            };
-            set!(world, (battleLogCounter, battleLog));
-        }
-
-        fn fight(ref world: IWorldDispatcher) {
-            let player = get_caller_address();
-
-            let mut char = get!(world, player, (Characters));
-
-            let battleLogCounter = get!(world, player, (BattleLogCounter));
-            let mut battleLog = get!(world, (player, battleLogCounter.count), BattleLog);
-
-            assert(battleLog.winner == 0, 'battle already fought');
-
-            let dummy_index = battleLog.dummyCharId;
-            let mut dummyChar = get!(world, (char.wins, dummy_index), DummyCharacter);
-
-            // start the battle
-            let mut char_health: usize = char.health;
-            let char_health_flag: usize = char.health;
-            let mut dummy_health: usize = dummyChar.health;
-            let dummy_health_flag: usize = dummyChar.health;
-
-            let mut char_items_len: usize = 0;
-            let mut dummy_items_len: usize = 0;
-
-            // stamina
-            let mut char_stamina = char.stamina;
-            let mut dummy_stamina = dummyChar.stamina;
+            let mut items_cooldown4 = ArrayTrait::new();
+            let mut items_cooldown5 = ArrayTrait::new();
+            let mut items_cooldown6 = ArrayTrait::new();
+            let mut items_cooldown7 = ArrayTrait::new();
 
             // =========  buffs/debuffs stacks ========= 
             let mut char_armor: usize = 0;
@@ -144,10 +110,8 @@ mod fight_system {
             let mut char_poison: usize = 0;
             let mut dummy_poison: usize = 0;
 
-            // vampirism
-            let mut char_vampirism = char.vampirism;
-            let mut dummy_vampirism = dummyChar.vampirism;
-
+            let mut char_vampirism: usize = 0;
+            let mut dummy_vampirism: usize = 0;
             // =========  end =========
 
             let mut char_on_hit_items = ArrayTrait::new();
@@ -156,14 +120,10 @@ mod fight_system {
             let mut char_on_attack_items = ArrayTrait::new();
             let mut dummy_on_attack_items = ArrayTrait::new();
 
-            // sort items
-            let mut items: Felt252Dict<u32> = Default::default();
-            let mut item_belongs: Felt252Dict<felt252> = Default::default();
-            let mut items_length: usize = 0;
-
             let inventoryItemsCounter = get!(world, player, (CharacterItemsInventoryCounter));
             let mut inventoryItemCount = inventoryItemsCounter.count;
 
+            let mut items_length = 0;
             loop {
                 if inventoryItemCount == 0 {
                     break;
@@ -176,11 +136,16 @@ mod fight_system {
                 }
                 let cooldown = item.cooldown;
                 if cooldown > 0 {
-                    items.insert(items_length.into(), charItem.itemId);
-                    item_belongs.insert(items_length.into(), 'player');
-
-                    items_length += 1;
-                    char_items_len += 1;
+                    items_length = append_item(
+                        ref items_cooldown4,
+                        ref items_cooldown5,
+                        ref items_cooldown6,
+                        ref items_cooldown7,
+                        item.id,
+                        PLAYER,
+                        cooldown,
+                        items_length,
+                    );
                 } else if cooldown == 0 {
                     // ====== `on start / on hit / on attack` to plus stacks ======
                     // buff
@@ -223,14 +188,11 @@ mod fight_system {
                     } else if item.poisonActivation == 4 {
                         char_on_attack_items.append((EFFECT_POISON, item.chance, item.poison));
                     }
-                // ====== end ======
+                    // ====== plus stacks end ======
                 }
 
                 inventoryItemCount -= 1;
             };
-
-            let char_on_hit_items_span = char_on_hit_items.span();
-            let char_on_attack_items_span = char_on_attack_items.span();
 
             let dummyCharItemsCounter = get!(
                 world, (char.wins, dummy_index), DummyCharacterItemsCounter
@@ -249,13 +211,19 @@ mod fight_system {
                     dummy_item_count -= 1;
                     continue;
                 }
-                if item.cooldown > 0 {
-                    items.insert(items_length.into(), dummy_item.itemId);
-                    item_belongs.insert(items_length.into(), 'dummy');
-
-                    items_length += 1;
-                    dummy_items_len += 1;
-                } else if item.cooldown == 0 {
+                let cooldown = item.cooldown;
+                if cooldown > 0 {
+                    items_length = append_item(
+                        ref items_cooldown4,
+                        ref items_cooldown5,
+                        ref items_cooldown6,
+                        ref items_cooldown7,
+                        item.id,
+                        DUMMY,
+                        cooldown,
+                        items_length,
+                    );
+                } else if cooldown == 0 {
                     // ====== `on start / on hit / on attack` to plus stacks ======
                     // buff
                     if item.armorActivation == 1 {
@@ -298,51 +266,70 @@ mod fight_system {
                     } else if item.poisonActivation == 4 {
                         dummy_on_attack_items.append((EFFECT_POISON, item.chance, item.poison));
                     }
-                // ====== end ======
+                    // ====== plus stacks end ======
                 }
 
                 dummy_item_count -= 1;
             };
+
+            // combine items
+            let (item_ids, belongs_tos) = combine_items(
+                ref items_cooldown4,
+                ref items_cooldown5,
+                ref items_cooldown6,
+                ref items_cooldown7,
+            );
+
+            // record the battle log
+            battleLogCounter.count += 1;
+
+            let battleLog = BattleLog {
+                player: player,
+                id: battleLogCounter.count,
+                dummyCharLevel: char.wins,
+                dummyCharId: dummy_index,
+                winner: 0,
+                seconds: 0,
+            };
+            set!(world, (battleLogCounter, battleLog));
+        }
+
+        fn fight(ref world: IWorldDispatcher) {
+            let player = get_caller_address();
+
+            let mut char = get!(world, player, (Characters));
+
+            let battleLogCounter = get!(world, player, (BattleLogCounter));
+            let mut battleLog = get!(world, (player, battleLogCounter.count), BattleLog);
+
+            assert(battleLog.winner == 0, 'battle already fought');
+
+            let dummy_index = battleLog.dummyCharId;
+            let mut dummyChar = get!(world, (char.wins, dummy_index), DummyCharacter);
+
+            // start the battle
+            let mut char_health: usize = char.health;
+            let char_health_flag: usize = char.health;
+            let mut dummy_health: usize = dummyChar.health;
+            let dummy_health_flag: usize = dummyChar.health;
+
+            let mut char_items_len: usize = 0;
+            let mut dummy_items_len: usize = 0;
+
+            // stamina
+            let mut char_stamina = char.stamina;
+            let mut dummy_stamina = dummyChar.stamina;
+
+            // sort items
+            // let mut items: Felt252Dict<u32> = Default::default();
+            // let mut item_belongs: Felt252Dict<felt252> = Default::default();
+            // let mut items_length: usize = 0;            
+
+            let char_on_hit_items_span = char_on_hit_items.span();
+            let char_on_attack_items_span = char_on_attack_items.span();
+
             let dummy_on_hit_items_span = dummy_on_hit_items.span();
             let dummy_on_attack_items_span = dummy_on_attack_items.span();
-
-            // sorting items based on cooldown in ascending order
-            let mut i: usize = 0;
-            let mut j: usize = 0;
-            loop {
-                if i >= items_length {
-                    break;
-                }
-                loop {
-                    if j >= (items_length - i - 1) {
-                        break;
-                    }
-
-                    // fetch respective itemids
-                    let items_at_j = items.get(j.into());
-                    let items_at_j_belongs = item_belongs.get(j.into());
-                    let items_at_j_plus_one = items.get((j + 1).into());
-                    let items_at_j_plus_one_belongs = item_belongs.get((j + 1).into());
-
-                    //fetch itemid data
-                    let item_data_at_j = get!(world, items_at_j, Item);
-                    let item_data_at_j_plus_one = get!(world, items_at_j_plus_one, Item);
-
-                    // Sort items by cooldown first, and by energy cost if cooldowns are equal
-                    if item_data_at_j.cooldown > item_data_at_j_plus_one.cooldown
-                        || (item_data_at_j.cooldown == item_data_at_j_plus_one.cooldown
-                            && item_data_at_j.energyCost > item_data_at_j_plus_one.energyCost) {
-                        items.insert(j.into(), items_at_j_plus_one);
-                        item_belongs.insert(j.into(), items_at_j_plus_one_belongs);
-                        items.insert((j + 1).into(), items_at_j);
-                        item_belongs.insert((j + 1).into(), items_at_j_belongs);
-                    }
-
-                    j += 1;
-                };
-                j = 0;
-                i += 1;
-            };
 
             // record the battle log
             let battleLogCounter = get!(world, player, (BattleLogCounter));

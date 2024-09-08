@@ -18,7 +18,6 @@ struct Characters {
     totalLoss: usize,
     winStreak: usize,
     stamina: u8,
-    vampirism: usize,
     birthCount: u32,
     updatedAt: u64
 }
