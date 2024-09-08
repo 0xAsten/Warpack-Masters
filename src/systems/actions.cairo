@@ -117,7 +117,6 @@ mod actions {
                         winStreak: 0,
                         birthCount: prev_birth_count + 1,
                         stamina: INIT_STAMINA,
-                        vampirism: INIT_VAMPIRISM,
                         updatedAt,
                     }
                 )

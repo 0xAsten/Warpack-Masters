@@ -123,7 +123,7 @@ mod fight_system {
             let inventoryItemsCounter = get!(world, player, (CharacterItemsInventoryCounter));
             let mut inventoryItemCount = inventoryItemsCounter.count;
 
-            let mut items_length = 0;
+            let mut items_length: usize = 0;
             loop {
                 if inventoryItemCount == 0 {
                     break;
@@ -286,8 +286,17 @@ mod fight_system {
             let battleLog = BattleLog {
                 player: player,
                 id: battleLogCounter.count,
-                dummyCharLevel: char.wins,
+                dummyLevel: char.wins,
                 dummyCharId: dummy_index,
+                item_ids: item_ids.span(),
+                belongs_tos: belongs_tos.span(),
+                items_length: items_length,
+                char_buffs: array![char_armor, char_regen, char_reflect, char_empower, char_poison, char_vampirism].span(),
+                dummy_buffs: array![dummy_armor, dummy_regen, dummy_reflect, dummy_empower, dummy_poison, dummy_vampirism].span(),
+                char_on_hit_items: char_on_hit_items.span(),
+                dummy_on_hit_items: dummy_on_hit_items.span(),
+                char_on_attack_items: char_on_attack_items.span(),
+                dummy_on_attack_items: dummy_on_attack_items.span(),
                 winner: 0,
                 seconds: 0,
             };
@@ -313,23 +322,35 @@ mod fight_system {
             let mut dummy_health: usize = dummyChar.health;
             let dummy_health_flag: usize = dummyChar.health;
 
-            let mut char_items_len: usize = 0;
-            let mut dummy_items_len: usize = 0;
-
             // stamina
             let mut char_stamina = char.stamina;
             let mut dummy_stamina = dummyChar.stamina;
 
-            // sort items
-            // let mut items: Felt252Dict<u32> = Default::default();
-            // let mut item_belongs: Felt252Dict<felt252> = Default::default();
-            // let mut items_length: usize = 0;            
+            let item_ids = battleLog.item_ids;
+            let belongs_tos = battleLog.belongs_tos;
+            let items_length = battleLog.items_length;
 
-            let char_on_hit_items_span = char_on_hit_items.span();
-            let char_on_attack_items_span = char_on_attack_items.span();
+            let char_on_hit_items_span = battleLog.char_on_hit_items;
+            let char_on_attack_items_span = battleLog.char_on_attack_items;
 
-            let dummy_on_hit_items_span = dummy_on_hit_items.span();
-            let dummy_on_attack_items_span = dummy_on_attack_items.span();
+            let dummy_on_hit_items_span = battleLog.dummy_on_hit_items;
+            let dummy_on_attack_items_span = battleLog.dummy_on_attack_items;
+
+            let char_buffs = battleLog.char_buffs;
+            let mut char_armor = *char_buffs.at(0);
+            let mut char_regen = *char_buffs.at(1);
+            let mut char_reflect = *char_buffs.at(2);
+            let mut char_empower = *char_buffs.at(3);
+            let mut char_poison = *char_buffs.at(4);
+            let mut char_vampirism = *char_buffs.at(5);
+
+            let dummy_buffs = battleLog.dummy_buffs;
+            let mut dummy_armor = *dummy_buffs.at(0);
+            let mut dummy_regen = *dummy_buffs.at(1);
+            let mut dummy_reflect = *dummy_buffs.at(2);
+            let mut dummy_empower = *dummy_buffs.at(3);
+            let mut dummy_poison = *dummy_buffs.at(4);
+            let mut dummy_vampirism = *dummy_buffs.at(5);
 
             // record the battle log
             let battleLogCounter = get!(world, player, (BattleLogCounter));
@@ -408,8 +429,8 @@ mod fight_system {
                         break;
                     }
 
-                    let curr_item_index = items.get(i.into());
-                    let curr_item_belongs = item_belongs.get(i.into());
+                    let curr_item_index = *item_ids.at(i);
+                    let curr_item_belongs = *belongs_tos.at(i.into());
 
                     let curr_item_data = get!(world, curr_item_index, (Item));
 
@@ -418,7 +439,6 @@ mod fight_system {
                         if curr_item_belongs == 'player' {
                             if curr_item_data.energyCost > char_stamina {
                                 // Not enough stamina, skip this activation and reset cooldown
-                                items.insert(i.into(), curr_item_index);
                                 i += 1;
                                 continue;
                             }
@@ -427,7 +447,6 @@ mod fight_system {
                         } else if curr_item_belongs == 'dummy' {
                             if curr_item_data.energyCost > dummy_stamina {
                                 // Not enough stamina, skip this activation and reset cooldown
-                                items.insert(i.into(), curr_item_index);
                                 i += 1;
                                 continue;
                             }
