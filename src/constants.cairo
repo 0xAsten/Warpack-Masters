@@ -4,7 +4,6 @@ mod constants {
     const INIT_GOLD: usize = 8;
     const INIT_HEALTH: usize = 25;
     const INIT_STAMINA: u8 = 100;
-    const INIT_VAMPIRISM: usize = 20;
 
     const ITEMS_COUNTER_ID: felt252 = 'ITEMS_COUNTER_ID';
     const STORAGE_FLAG: usize = 999;

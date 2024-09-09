@@ -47,7 +47,7 @@ mod actions {
     };
 
     use warpack_masters::items::{Backpack, Pack};
-    use warpack_masters::constants::constants::{GRID_X, GRID_Y, INIT_GOLD, INIT_HEALTH, INIT_STAMINA, INIT_VAMPIRISM};
+    use warpack_masters::constants::constants::{GRID_X, GRID_Y, INIT_GOLD, INIT_HEALTH, INIT_STAMINA};
 
     #[abi(embed_v0)]
     impl ActionsImpl of IActions<ContractState> {

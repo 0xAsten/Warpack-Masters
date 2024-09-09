@@ -77,7 +77,7 @@ mod fight_system {
 
             let mut battleLogCounter = get!(world, player, (BattleLogCounter));
             let latestBattleLog = get!(world, (player, battleLogCounter.count), BattleLog);
-            assert(latestBattleLog.winner != 0, 'battle not fought');
+            assert(battleLogCounter.count == 0 || latestBattleLog.winner != 0, 'battle not fought');
 
             let random_index = random(seed1, dummyCharCounter.count) + 1;
             let mut dummy_index = random_index;
@@ -311,7 +311,7 @@ mod fight_system {
             let battleLogCounter = get!(world, player, (BattleLogCounter));
             let mut battleLog = get!(world, (player, battleLogCounter.count), BattleLog);
 
-            assert(battleLog.winner == 0, 'battle already fought');
+            assert(battleLogCounter.count != 0 && battleLog.winner == 0, 'no new match found');
 
             let dummy_index = battleLog.dummyCharId;
             let mut dummyChar = get!(world, (char.wins, dummy_index), DummyCharacter);

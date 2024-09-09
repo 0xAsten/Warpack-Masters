@@ -15,7 +15,6 @@ struct DummyCharacter {
     player: ContractAddress,
     rating: usize,
     stamina: u8,
-    vampirism: usize,
 }
 
 #[derive(Drop, Serde)]
