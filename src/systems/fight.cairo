@@ -22,6 +22,7 @@ mod fight_system {
         DummyCharacterItem, DummyCharacterItemsCounter
     };
     use warpack_masters::models::BattleLog::{BattleLog, BattleLogCounter};
+    use warpack_masters::constants::constants::{EFFECT_ARMOR, EFFECT_REGEN, EFFECT_REFLECT, EFFECT_EMPOWER, EFFECT_POISON, EFFECT_CLEANSE_POISON};
 
     #[derive(Copy, Drop, Serde)]
     #[dojo::model]
@@ -53,13 +54,6 @@ mod fight_system {
         dummy_empower_stacks: usize,
         dummy_poison_stacks: usize,
     }
-
-    const EFFECT_ARMOR: felt252 = 'armor';
-    const EFFECT_REGEN: felt252 = 'regen';
-    const EFFECT_REFLECT: felt252 = 'reflect';
-    const EFFECT_EMPOWER: felt252 = 'empower';
-    const EFFECT_POISON: felt252 = 'poison';
-    const EFFECT_CLEANSE_POISON: felt252 = 'cleanse_poison';
 
     #[abi(embed_v0)]
     impl FightImpl of IFight<ContractState> {

@@ -3,6 +3,7 @@ mod tests {
     use core::starknet::contract_address::ContractAddress;
     use starknet::class_hash::Felt252TryIntoClassHash;
     use starknet::testing::set_contract_address;
+    use debug::PrintTrait;
 
     // import world dispatcher
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
@@ -26,7 +27,7 @@ mod tests {
             character_items_storage_counter, CharacterItemInventory, character_item_inventory,
             CharacterItemsInventoryCounter, character_items_inventory_counter
         },
-        models::Character::{Characters, characters, NameRecord, name_record, WMClass},
+        models::Character::{Characters, characters, NameRecord, name_record, WMClass, PLAYER, DUMMY},
         models::DummyCharacter::{
             DummyCharacter, dummy_character, DummyCharacterCounter, dummy_character_counter
         },
@@ -37,7 +38,7 @@ mod tests {
         models::Shop::{Shop, shop},
         models::BattleLog::{BattleLog, battle_log, BattleLogCounter, battle_log_counter},
         utils::{test_utils::{add_items}},
-        constants::constants::{INIT_STAMINA}
+        constants::constants::{INIT_STAMINA, EFFECT_ARMOR, EFFECT_REFLECT}
     };
 
     fn get_systems(
@@ -273,13 +274,39 @@ mod tests {
             position: Position { x: 0, y: 0 },
             rotation: 0,
         };
+        // add Dagger id 6, damage 3, cooldown 4
+        inventoryCounter.count += 1;
+        let item5 = CharacterItemInventory {
+            player: bob,
+            id: inventoryCounter.count,
+            itemId: 6,
+            position: Position { x: 0, y: 0 },
+            rotation: 0,
+        };
 
-        set!(world, (inventoryCounter, item1, item2, item3, item4));
+        set!(world, (inventoryCounter, item1, item2, item3, item4, item5));
 
         set_contract_address(bob);
         dummy_system.create_dummy();
 
         fight_system.match_dummy();
+
+        let battleLog = get!(world, (bob, 1), (BattleLog));
+        assert(battleLog.dummyLevel == 0, 'dummyLevel should be 0');
+        assert(battleLog.dummyCharId == 1, 'dummyCharId should be 1');
+        assert(battleLog.item_ids == array![6, 6, 7].span(), 'item_ids should be [6, 6, 7]');
+        assert(battleLog.belongs_tos == array![PLAYER, DUMMY, PLAYER].span(), 'belongs_tos is incorrect');
+        assert(battleLog.items_length == 3, 'items_length should be 3');
+        // armor, regen, reflect, empower, poison, vampirism
+        assert(battleLog.char_buffs == array![15, 0, 0, 0, 0, 0].span(), 'char_buffs is incorrect');
+        assert(battleLog.dummy_buffs == array![0, 1, 1, 0, 2, 0].span(), 'dummy_buffs is incorrect');
+        // on hit, on attack
+        assert(battleLog.char_on_hit_items == array![(EFFECT_ARMOR, 50, 3)].span(), 'char_on_hit_items is incorrect');
+        assert(battleLog.dummy_on_hit_items == array![(EFFECT_REFLECT, 75, 2)].span(), 'dummy_on_hit_items is incorrect');
+        assert(battleLog.char_on_attack_items == array![].span(), 'on_attack_items is incorrect');
+        assert(battleLog.dummy_on_attack_items == array![].span(), 'on_attack_items is incorrect');
+        assert(battleLog.winner == 0, 'winner should be 0');
+        assert(battleLog.seconds == 0, 'seconds should be 0');
     }
 
     // #[test]
