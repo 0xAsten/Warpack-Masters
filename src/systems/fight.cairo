@@ -391,9 +391,9 @@ mod fight_system {
                 seconds += 1;
                 if seconds >= 25_u8 {
                     if char_health <= dummy_health {
-                        winner = 'dummy';
+                        winner = DUMMY;
                     } else {
-                        winner = 'player';
+                        winner = PLAYER;
                     }
                     break;
                 }
@@ -430,7 +430,7 @@ mod fight_system {
 
                     // Handle stamina cost for melee and ranged weapons for both player and dummy
                     if (curr_item_data.itemType == 1 || curr_item_data.itemType == 2) {
-                        if curr_item_belongs == 'player' {
+                        if curr_item_belongs == PLAYER {
                             if curr_item_data.energyCost > char_stamina {
                                 // Not enough stamina, skip this activation and reset cooldown
                                 i += 1;
@@ -438,7 +438,7 @@ mod fight_system {
                             }
                             // Deduct stamina
                             char_stamina -= curr_item_data.energyCost;
-                        } else if curr_item_belongs == 'dummy' {
+                        } else if curr_item_belongs == DUMMY {
                             if curr_item_data.energyCost > dummy_stamina {
                                 // Not enough stamina, skip this activation and reset cooldown
                                 i += 1;
@@ -451,9 +451,9 @@ mod fight_system {
 
                     let mut damage = curr_item_data.damage;
                     if curr_item_data.itemType == 1 {
-                        if curr_item_belongs == 'player' && char_empower > 0 {
+                        if curr_item_belongs == PLAYER && char_empower > 0 {
                             damage += char_empower;
-                        } else if curr_item_belongs == 'dummy' && dummy_empower > 0 {
+                        } else if curr_item_belongs == DUMMY && dummy_empower > 0 {
                             damage += dummy_empower;
                         }
                     }
@@ -468,7 +468,7 @@ mod fight_system {
                         v += seconds.into();
                         rand = random(seed2 + v, 100);
                         if rand < chance {
-                            if curr_item_belongs == 'player' {
+                            if curr_item_belongs == PLAYER {
                                 // ====== on cooldown to plus stacks, all use the same randomness ======
                                 if curr_item_data.armorActivation == 3 {
                                     char_armor += curr_item_data.armor;
@@ -546,7 +546,7 @@ mod fight_system {
                                     );
 
                                     if dummy_health == 0 {
-                                        winner = 'player';
+                                        winner = PLAYER;
                                         break;
                                     }
 
@@ -622,7 +622,7 @@ mod fight_system {
                                                 player,
                                                 battleLogId: battleLogCounterCount,
                                                 id: battleLogsCount,
-                                                whoTriggered: 'dummy',
+                                                whoTriggered: DUMMY,
                                                 whichItem: 0,
                                                 damageCaused: damageCaused,
                                                 isDodged: false,
@@ -645,7 +645,7 @@ mod fight_system {
                                         );
 
                                         if char_health == 0 {
-                                            winner = 'dummy';
+                                            winner = DUMMY;
                                             break;
                                         }
                                     }
@@ -799,7 +799,7 @@ mod fight_system {
                                     );
 
                                     if char_health == 0 {
-                                        winner = 'dummy';
+                                        winner = DUMMY;
                                         break;
                                     }
 
@@ -876,7 +876,7 @@ mod fight_system {
                                                 player,
                                                 battleLogId: battleLogCounterCount,
                                                 id: battleLogsCount,
-                                                whoTriggered: 'player',
+                                                whoTriggered: PLAYER,
                                                 whichItem: 0,
                                                 damageCaused: damageCaused,
                                                 isDodged: false,
@@ -899,7 +899,7 @@ mod fight_system {
                                         );
 
                                         if dummy_health == 0 {
-                                            winner = 'player';
+                                            winner = PLAYER;
                                             break;
                                         }
                                     }
@@ -1027,7 +1027,7 @@ mod fight_system {
                                 player,
                                 battleLogId: battleLogCounterCount,
                                 id: battleLogsCount,
-                                whoTriggered: 'dummy',
+                                whoTriggered: DUMMY,
                                 whichItem: 0,
                                 damageCaused: char_poison,
                                 isDodged: false,
@@ -1050,7 +1050,7 @@ mod fight_system {
                         );
 
                         if char_health == 0 {
-                            winner = 'dummy';
+                            winner = DUMMY;
                             break;
                         }
                     }
@@ -1068,7 +1068,7 @@ mod fight_system {
                                 player,
                                 battleLogId: battleLogCounterCount,
                                 id: battleLogsCount,
-                                whoTriggered: 'player',
+                                whoTriggered: PLAYER,
                                 whichItem: 0,
                                 damageCaused: dummy_poison,
                                 isDodged: false,
@@ -1091,7 +1091,7 @@ mod fight_system {
                         );
 
                         if dummy_health == 0 {
-                            winner = 'player';
+                            winner = PLAYER;
                             break;
                         }
                     }
@@ -1108,7 +1108,7 @@ mod fight_system {
                                 player,
                                 battleLogId: battleLogCounterCount,
                                 id: battleLogsCount,
-                                whoTriggered: 'player',
+                                whoTriggered: PLAYER,
                                 whichItem: 0,
                                 damageCaused: 0,
                                 isDodged: false,
@@ -1143,7 +1143,7 @@ mod fight_system {
                                 player,
                                 battleLogId: battleLogCounterCount,
                                 id: battleLogsCount,
-                                whoTriggered: 'dummy',
+                                whoTriggered: DUMMY,
                                 whichItem: 0,
                                 damageCaused: 0,
                                 isDodged: false,
@@ -1177,7 +1177,7 @@ mod fight_system {
             battleLog.seconds = seconds;
             set!(world, (battleLog));
 
-            if winner == 'player' {
+            if winner == PLAYER {
                 char.wins += 1;
                 char.totalWins += 1;
                 char.winStreak += 1;
