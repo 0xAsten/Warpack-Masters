@@ -3,6 +3,7 @@ mod tests {
     use core::starknet::contract_address::ContractAddress;
     use starknet::class_hash::Felt252TryIntoClassHash;
     use starknet::testing::set_contract_address;
+    use debug::PrintTrait;
 
     // import world dispatcher
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
@@ -26,7 +27,7 @@ mod tests {
             character_items_storage_counter, CharacterItemInventory, character_item_inventory,
             CharacterItemsInventoryCounter, character_items_inventory_counter
         },
-        models::Character::{Characters, characters, NameRecord, name_record, WMClass},
+        models::Character::{Characters, characters, NameRecord, name_record, WMClass, PLAYER, DUMMY},
         models::DummyCharacter::{
             DummyCharacter, dummy_character, DummyCharacterCounter, dummy_character_counter
         },
@@ -37,7 +38,7 @@ mod tests {
         models::Shop::{Shop, shop},
         models::BattleLog::{BattleLog, battle_log, BattleLogCounter, battle_log_counter},
         utils::{test_utils::{add_items}},
-        constants::constants::{INIT_STAMINA}
+        constants::constants::{INIT_STAMINA, EFFECT_ARMOR, EFFECT_REFLECT, INIT_GOLD, INIT_HEALTH}
     };
 
     fn get_systems(
@@ -174,310 +175,328 @@ mod tests {
         fight_system.match_dummy();
     }
 
-    // #[test]
-    // #[available_gas(3000000000000000)]
-    // fn test_sort_array() {
-    //     let alice = starknet::contract_address_const::<0x0>();
+    #[test]
+    #[available_gas(3000000000000000)]
+    fn test_match_dummy() {
+        let alice = starknet::contract_address_const::<0x0>();
 
-    //     let mut models = array![
-    //         backpack_grids::TEST_CLASS_HASH,
-    //         item::TEST_CLASS_HASH,
-    //         items_counter::TEST_CLASS_HASH,
-    //         character_item_storage::TEST_CLASS_HASH,
-    //         character_items_storage_counter::TEST_CLASS_HASH,
-    //         character_item_inventory::TEST_CLASS_HASH,
-    //         character_items_inventory_counter::TEST_CLASS_HASH,
-    //         character::TEST_CLASS_HASH,
-    //         name_record::TEST_CLASS_HASH,
-    //         shop::TEST_CLASS_HASH,
-    //         dummy_character::TEST_CLASS_HASH,
-    //         dummy_character_counter::TEST_CLASS_HASH,
-    //         dummy_character_item::TEST_CLASS_HASH,
-    //         dummy_character_items_counter::TEST_CLASS_HASH,
-    //         battle_log::TEST_CLASS_HASH,
-    //         battle_log_counter::TEST_CLASS_HASH
-    //     ];
+        let world =  spawn_test_world!();
+        let (action_system_address, mut action_system, _, mut item_system, _, mut fight_system, _, mut dummy_system) = get_systems(world);
 
-    //     let world =  spawn_test_world(["Warpacks"].span(), models.span());
+        add_items(ref item_system);
 
-    //     let action_system_address = world
-    //         .deploy_contract(
-    //             'salt1', actions::TEST_CLASS_HASH.try_into().unwrap() 
-    //         );
-    //     let mut action_system = IActionsDispatcher { contract_address: action_system_address };
+        set_contract_address(alice);
+        action_system.spawn('alice', WMClass::Warlock);
 
-    //     let item_system_address = world
-    //         .deploy_contract(
-    //             'salt2', item_system::TEST_CLASS_HASH.try_into().unwrap() 
-    //         );
-    //     let mut item_system = IItemDispatcher { contract_address: item_system_address };
+        set_contract_address(action_system_address);
+        let mut inventoryCounter = get!(world, alice, (CharacterItemsInventoryCounter));
+        // add Herb id 5, on start +1 regen
+        inventoryCounter.count += 1;
+        let item1 = CharacterItemInventory {
+            player: alice,
+            id: inventoryCounter.count,
+            itemId: 5,
+            position: Position { x: 0, y: 0 },
+            rotation: 0,
+        };
+        // add Dagger id 6, damage 3, cooldown 4
+        inventoryCounter.count += 1;
+        let item2 = CharacterItemInventory {
+            player: alice,
+            id: inventoryCounter.count,
+            itemId: 6,
+            position: Position { x: 0, y: 0 },
+            rotation: 0,
+        };
+        // add Spike id 8, on start +1 reflect
+        inventoryCounter.count += 1;
+        let item3 = CharacterItemInventory {
+            player: alice,
+            id: inventoryCounter.count,
+            itemId: 8,
+            position: Position { x: 0, y: 0 },
+            rotation: 0,
+        };
+        // add SpikeShield id 16, chance 75, on hit +2 reflect
+        inventoryCounter.count += 1;
+        let item4 = CharacterItemInventory {
+            player: alice,
+            id: inventoryCounter.count,
+            itemId: 16,
+            position: Position { x: 0, y: 0 },
+            rotation: 0,
+        };
 
-    //     let fight_system_address = world
-    //         .deploy_contract(
-    //             'salt3', fight_system::TEST_CLASS_HASH.try_into().unwrap() 
-    //         );
-    //     let mut fight_system = IFightDispatcher { contract_address: fight_system_address };
+        set!(world, (inventoryCounter, item1, item2, item3, item4));
 
-    //     let dummy_system_address = world
-    //         .deploy_contract(
-    //             'salt4', dummy_system::TEST_CLASS_HASH.try_into().unwrap() 
-    //         );
-    //     let mut dummy_system = IDummyDispatcher { contract_address: dummy_system_address };
+        set_contract_address(alice);
+        dummy_system.create_dummy();
 
-    //     let shop_system_address = world
-    //         .deploy_contract(
-    //             'salt', shop_system::TEST_CLASS_HASH.try_into().unwrap() 
-    //         );
-    //     let mut shop_system = IShopDispatcher { contract_address: shop_system_address };
+        let bob = starknet::contract_address_const::<0x1>();
+        set_contract_address(bob);
+        action_system.spawn('bob', WMClass::Warlock);
 
-    //     add_items(ref item_system);
+        set_contract_address(action_system_address);
+        let mut inventoryCounter = get!(world, bob, (CharacterItemsInventoryCounter));
+        // add Sward id 7, damage 5, cooldown 5
+        inventoryCounter.count += 1;
+        let item1 = CharacterItemInventory {
+            player: bob,
+            id: inventoryCounter.count,
+            itemId: 7,
+            position: Position { x: 0, y: 0 },
+            rotation: 0,
+        };
+        // add Shield id 9, on start +15 armor
+        inventoryCounter.count += 1;
+        let item2 = CharacterItemInventory {
+            player: bob,
+            id: inventoryCounter.count,
+            itemId: 9,
+            position: Position { x: 0, y: 0 },
+            rotation: 0,
+        };
+        // add Helmet id 10, chance 50, on hit +3 armor
+        inventoryCounter.count += 1;
+        let item3 = CharacterItemInventory {
+            player: bob,
+            id: inventoryCounter.count,
+            itemId: 10,
+            position: Position { x: 0, y: 0 },
+            rotation: 0,
+        };
+        // add Poison id 13, on start +2 posion
+        inventoryCounter.count += 1;
+        let item4 = CharacterItemInventory {
+            player: bob,
+            id: inventoryCounter.count,
+            itemId: 13,
+            position: Position { x: 0, y: 0 },
+            rotation: 0,
+        };
+        // add Dagger id 6, damage 3, cooldown 4
+        inventoryCounter.count += 1;
+        let item5 = CharacterItemInventory {
+            player: bob,
+            id: inventoryCounter.count,
+            itemId: 6,
+            position: Position { x: 0, y: 0 },
+            rotation: 0,
+        };
 
-    //     set_contract_address(alice);
+        set!(world, (inventoryCounter, item1, item2, item3, item4, item5));
 
-    //     action_system.spawn('alice', WMClass::Warlock);
+        set_contract_address(bob);
+        dummy_system.create_dummy();
 
-    //     let mut shop = get!(world, alice, (Shop));
-    //     shop.item1 = 4;
-    //     shop.item2 = 6;
-    //     shop.item3 = 8;
-    //     shop.item4 = 1;
-    //     let mut char = get!(world, alice, (Character));
-    //     char.gold = 100;
-    //     set!(world, (shop, char));
+        fight_system.match_dummy();
 
-    //     shop_system.buy_item(4);
-    //     action_system.place_item(2, 2, 4, 0);
-    //     shop_system.buy_item(6);
-    //     action_system.place_item(2, 2, 2, 0);
-    //     shop_system.buy_item(8);
-    //     action_system.place_item(2, 5, 2, 0);
-    //     // actions_system.
-    //     dummy_system.create_dummy();
+        let battleLog = get!(world, (bob, 1), (BattleLog));
+        assert(battleLog.dummyLevel == 0, 'dummyLevel should be 0');
+        assert(battleLog.dummyCharId == 1, 'dummyCharId should be 1');
+        assert(battleLog.item_ids == array![6, 6, 7].span(), 'item_ids should be [6, 6, 7]');
+        assert(battleLog.belongs_tos == array![PLAYER, DUMMY, PLAYER].span(), 'belongs_tos is incorrect');
+        assert(battleLog.items_length == 3, 'items_length should be 3');
+        // armor, regen, reflect, empower, poison, vampirism
+        assert(battleLog.char_buffs == array![15, 0, 0, 0, 0, 0].span(), 'char_buffs is incorrect');
+        assert(battleLog.dummy_buffs == array![0, 1, 1, 0, 2, 0].span(), 'dummy_buffs is incorrect');
+        // on hit, on attack
+        assert(battleLog.char_on_hit_items == array![(EFFECT_ARMOR, 50, 3)].span(), 'char_on_hit_items is incorrect');
+        assert(battleLog.dummy_on_hit_items == array![(EFFECT_REFLECT, 75, 2)].span(), 'dummy_on_hit_items is incorrect');
+        assert(battleLog.char_on_attack_items == array![].span(), 'on_attack_items is incorrect');
+        assert(battleLog.dummy_on_attack_items == array![].span(), 'on_attack_items is incorrect');
+        assert(battleLog.winner == 0, 'winner should be 0');
+        assert(battleLog.seconds == 0, 'seconds should be 0');
+    }
 
-    //     let bob = starknet::contract_address_const::<0x1>();
-    //     set_contract_address(bob);
-    //     action_system.spawn('bob', WMClass::Warlock);
-    //     dummy_system.create_dummy();
+    #[test]
+    #[available_gas(3000000000000000)]
+    #[should_panic(expected: ('dummy already created', 'ENTRYPOINT_FAILED'))]
+    fn test_revert_dummy_already_created() {
+        let alice = starknet::contract_address_const::<0x0>();
+        
+        let world =  spawn_test_world!();
+        let (_, mut action_system, _, mut item_system, _, _, _, mut dummy_system) = get_systems(world);
 
-    //     fight_system.fight();
-    // }
+        add_items(ref item_system);
 
-    // #[test]
-    // #[available_gas(3000000000000000)]
-    // #[should_panic(expected: ('dummy not created', 'ENTRYPOINT_FAILED'))]
-    // fn test_revert_dummy_not_created() {
-    //     let alice = starknet::contract_address_const::<0x0>();
+        set_contract_address(alice);
 
-    //     let mut models = array![
-    //         backpack_grids::TEST_CLASS_HASH,
-    //         item::TEST_CLASS_HASH,
-    //         items_counter::TEST_CLASS_HASH,
-    //         character_item_storage::TEST_CLASS_HASH,
-    //         character_items_storage_counter::TEST_CLASS_HASH,
-    //         character_item_inventory::TEST_CLASS_HASH,
-    //         character_items_inventory_counter::TEST_CLASS_HASH,
-    //         character::TEST_CLASS_HASH,
-    //         name_record::TEST_CLASS_HASH,
-    //         shop::TEST_CLASS_HASH,
-    //         dummy_character::TEST_CLASS_HASH,
-    //         dummy_character_counter::TEST_CLASS_HASH,
-    //         dummy_character_item::TEST_CLASS_HASH,
-    //         dummy_character_items_counter::TEST_CLASS_HASH,
-    //     ];
+        action_system.spawn('alice', WMClass::Warlock);
+        dummy_system.create_dummy();
+        dummy_system.create_dummy();
+    }
 
-    //     let world =  spawn_test_world(["Warpacks"].span(), models.span());
+    #[test]
+    #[available_gas(3000000000000000)]
+    #[should_panic(expected: ('max loss reached', 'ENTRYPOINT_FAILED'))]
+    fn test_max_loss_reached() {
+        let alice = starknet::contract_address_const::<0x0>();
 
-    //     let action_system_address = world
-    //         .deploy_contract(
-    //             'salt1', actions::TEST_CLASS_HASH.try_into().unwrap() 
-    //         );
-    //     let mut action_system = IActionsDispatcher { contract_address: action_system_address };
+        let world =  spawn_test_world!();
+        let (action_system_address, mut action_system, _, mut item_system, _, mut fight_system, _, mut dummy_system) = get_systems(world);
 
-    //     let item_system_address = world
-    //         .deploy_contract(
-    //             'salt2', item_system::TEST_CLASS_HASH.try_into().unwrap() 
-    //         );
-    //     let mut item_system = IItemDispatcher { contract_address: item_system_address };
+        add_items(ref item_system);
 
-    //     let fight_system_address = world
-    //         .deploy_contract(
-    //             'salt3', fight_system::TEST_CLASS_HASH.try_into().unwrap() 
-    //         );
-    //     let mut fight_system = IFightDispatcher { contract_address: fight_system_address };
+        set_contract_address(alice);
+        action_system.spawn('alice', WMClass::Warlock);
 
-    //     add_items(ref item_system);
+        set_contract_address(action_system_address);
+        let mut char = get!(world, (alice), Characters);
+        char.loss = 5;
+        set!(world, (char));
 
-    //     set_contract_address(alice);
+        set_contract_address(alice);
+        dummy_system.create_dummy();
 
-    //     action_system.spawn('alice', WMClass::Warlock);
+        fight_system.match_dummy();
+    }
 
-    //     fight_system.fight();
-    // }
+    #[test]
+    #[available_gas(3000000000000000)]
+    fn test_fight() {
+        let alice = starknet::contract_address_const::<0x0>();
 
-    // #[test]
-    // #[available_gas(3000000000000000)]
-    // #[should_panic(expected: ('dummy already created', 'ENTRYPOINT_FAILED'))]
-    // fn test_revert_dummy_already_created() {
-    //     let alice = starknet::contract_address_const::<0x0>();
+        let world =  spawn_test_world!();
+        let (action_system_address, mut action_system, _, mut item_system, _, mut fight_system, _, mut dummy_system) = get_systems(world);
 
-    //     let mut models = array![
-    //         backpack_grids::TEST_CLASS_HASH,
-    //         item::TEST_CLASS_HASH,
-    //         items_counter::TEST_CLASS_HASH,
-    //         character_item_storage::TEST_CLASS_HASH,
-    //         character_items_storage_counter::TEST_CLASS_HASH,
-    //         character_item_inventory::TEST_CLASS_HASH,
-    //         character_items_inventory_counter::TEST_CLASS_HASH,
-    //         character::TEST_CLASS_HASH,
-    //         name_record::TEST_CLASS_HASH,
-    //         shop::TEST_CLASS_HASH,
-    //         dummy_character::TEST_CLASS_HASH,
-    //         dummy_character_counter::TEST_CLASS_HASH,
-    //         dummy_character_item::TEST_CLASS_HASH,
-    //         dummy_character_items_counter::TEST_CLASS_HASH,
-    //     ];
+        add_items(ref item_system);
 
-    //     let world =  spawn_test_world(["Warpacks"].span(), models.span());
+        set_contract_address(alice);
+        action_system.spawn('alice', WMClass::Warlock);
 
-    //     let action_system_address = world
-    //         .deploy_contract(
-    //             'salt1', actions::TEST_CLASS_HASH.try_into().unwrap() 
-    //         );
-    //     let mut action_system = IActionsDispatcher { contract_address: action_system_address };
+        set_contract_address(action_system_address);
+        let mut inventoryCounter = get!(world, alice, (CharacterItemsInventoryCounter));
+        // add Herb id 5, on start +1 regen
+        inventoryCounter.count += 1;
+        let item1 = CharacterItemInventory {
+            player: alice,
+            id: inventoryCounter.count,
+            itemId: 5,
+            position: Position { x: 0, y: 0 },
+            rotation: 0,
+        };
+        // add Dagger id 6, damage 3, cooldown 4
+        inventoryCounter.count += 1;
+        let item2 = CharacterItemInventory {
+            player: alice,
+            id: inventoryCounter.count,
+            itemId: 6,
+            position: Position { x: 0, y: 0 },
+            rotation: 0,
+        };
+        // add Spike id 8, on start +1 reflect
+        inventoryCounter.count += 1;
+        let item3 = CharacterItemInventory {
+            player: alice,
+            id: inventoryCounter.count,
+            itemId: 8,
+            position: Position { x: 0, y: 0 },
+            rotation: 0,
+        };
+        // add SpikeShield id 16, chance 75, on hit +2 reflect
+        inventoryCounter.count += 1;
+        let item4 = CharacterItemInventory {
+            player: alice,
+            id: inventoryCounter.count,
+            itemId: 16,
+            position: Position { x: 0, y: 0 },
+            rotation: 0,
+        };
 
-    //     let item_system_address = world
-    //         .deploy_contract(
-    //             'salt2', item_system::TEST_CLASS_HASH.try_into().unwrap() 
-    //         );
-    //     let mut item_system = IItemDispatcher { contract_address: item_system_address };
+        set!(world, (inventoryCounter, item1, item2, item3, item4));
 
-    //     let dummy_system_address = world
-    //         .deploy_contract(
-    //             'salt4', dummy_system::TEST_CLASS_HASH.try_into().unwrap() 
-    //         );
-    //     let mut dummy_system = IDummyDispatcher { contract_address: dummy_system_address };
+        set_contract_address(alice);
+        dummy_system.create_dummy();
 
-    //     add_items(ref item_system);
+        let bob = starknet::contract_address_const::<0x1>();
+        set_contract_address(bob);
+        action_system.spawn('bob', WMClass::Warlock);
 
-    //     set_contract_address(alice);
+        set_contract_address(action_system_address);
+        let mut inventoryCounter = get!(world, bob, (CharacterItemsInventoryCounter));
+        // add Sward id 7, damage 5, cooldown 5
+        inventoryCounter.count += 1;
+        let item1 = CharacterItemInventory {
+            player: bob,
+            id: inventoryCounter.count,
+            itemId: 7,
+            position: Position { x: 0, y: 0 },
+            rotation: 0,
+        };
+        // add Shield id 9, on start +15 armor
+        inventoryCounter.count += 1;
+        let item2 = CharacterItemInventory {
+            player: bob,
+            id: inventoryCounter.count,
+            itemId: 9,
+            position: Position { x: 0, y: 0 },
+            rotation: 0,
+        };
+        // add Helmet id 10, chance 50, on hit +3 armor
+        inventoryCounter.count += 1;
+        let item3 = CharacterItemInventory {
+            player: bob,
+            id: inventoryCounter.count,
+            itemId: 10,
+            position: Position { x: 0, y: 0 },
+            rotation: 0,
+        };
+        // add Poison id 13, on start +2 posion
+        inventoryCounter.count += 1;
+        let item4 = CharacterItemInventory {
+            player: bob,
+            id: inventoryCounter.count,
+            itemId: 13,
+            position: Position { x: 0, y: 0 },
+            rotation: 0,
+        };
+        // add Dagger id 6, damage 3, cooldown 4
+        inventoryCounter.count += 1;
+        let item5 = CharacterItemInventory {
+            player: bob,
+            id: inventoryCounter.count,
+            itemId: 6,
+            position: Position { x: 0, y: 0 },
+            rotation: 0,
+        };
 
-    //     action_system.spawn('alice', WMClass::Warlock);
-    //     dummy_system.create_dummy();
-    //     dummy_system.create_dummy();
-    // }
+        set!(world, (inventoryCounter, item1, item2, item3, item4, item5));
 
-    // #[test]
-    // #[available_gas(3000000000000000)]
-    // #[should_panic(expected: ('dummy not created', 'ENTRYPOINT_FAILED'))]
-    // fn test_dummy_not_created() {
-    //     let alice = starknet::contract_address_const::<0x0>();
+        set_contract_address(bob);
+        dummy_system.create_dummy();
 
-    //     let mut models = array![
-    //         backpack_grids::TEST_CLASS_HASH,
-    //         item::TEST_CLASS_HASH,
-    //         items_counter::TEST_CLASS_HASH,
-    //         character_item_storage::TEST_CLASS_HASH,
-    //         character_items_storage_counter::TEST_CLASS_HASH,
-    //         character_item_inventory::TEST_CLASS_HASH,
-    //         character_items_inventory_counter::TEST_CLASS_HASH,
-    //         character::TEST_CLASS_HASH,
-    //         name_record::TEST_CLASS_HASH,
-    //         shop::TEST_CLASS_HASH,
-    //         dummy_character::TEST_CLASS_HASH,
-    //         dummy_character_counter::TEST_CLASS_HASH,
-    //         dummy_character_item::TEST_CLASS_HASH,
-    //         dummy_character_items_counter::TEST_CLASS_HASH,
-    //     ];
+        fight_system.match_dummy();
 
-    //     let world =  spawn_test_world(["Warpacks"].span(), models.span());
+        fight_system.fight();
 
-    //     let action_system_address = world
-    //         .deploy_contract(
-    //             'salt1', actions::TEST_CLASS_HASH.try_into().unwrap() 
-    //         );
-    //     let mut action_system = IActionsDispatcher { contract_address: action_system_address };
+        let battleLog = get!(world, (bob, 1), (BattleLog));
+        assert(battleLog.winner != 0, 'winner should not be 0');
+        assert(battleLog.seconds > 0, 'seconds be greater than 0');
 
-    //     let item_system_address = world
-    //         .deploy_contract(
-    //             'salt2', item_system::TEST_CLASS_HASH.try_into().unwrap() 
-    //         );
-    //     let mut item_system = IItemDispatcher { contract_address: item_system_address };
+        let char = get!(world, (bob), Characters);
 
-    //     let fight_system_address = world
-    //         .deploy_contract(
-    //             'salt3', fight_system::TEST_CLASS_HASH.try_into().unwrap() 
-    //         );
-    //     let mut fight_system = IFightDispatcher { contract_address: fight_system_address };
-
-    //     add_items(ref item_system);
-
-    //     set_contract_address(alice);
-
-    //     action_system.spawn('alice', WMClass::Warlock);
-
-    //     fight_system.fight();
-    // }
-
-    // #[test]
-    // #[available_gas(3000000000000000)]
-    // #[should_panic(expected: ('max loss reached', 'ENTRYPOINT_FAILED'))]
-    // fn test_max_loss_reached() {
-    //     let alice = starknet::contract_address_const::<0x0>();
-
-    //     let mut models = array![
-    //         backpack_grids::TEST_CLASS_HASH,
-    //         item::TEST_CLASS_HASH,
-    //         items_counter::TEST_CLASS_HASH,
-    //         character_item_storage::TEST_CLASS_HASH,
-    //         character_items_storage_counter::TEST_CLASS_HASH,
-    //         character_item_inventory::TEST_CLASS_HASH,
-    //         character_items_inventory_counter::TEST_CLASS_HASH,
-    //         character::TEST_CLASS_HASH,
-    //         name_record::TEST_CLASS_HASH,
-    //         shop::TEST_CLASS_HASH,
-    //         dummy_character::TEST_CLASS_HASH,
-    //         dummy_character_counter::TEST_CLASS_HASH,
-    //         dummy_character_item::TEST_CLASS_HASH,
-    //         dummy_character_items_counter::TEST_CLASS_HASH,
-    //     ];
-
-    //     let world =  spawn_test_world(["Warpacks"].span(), models.span());
-
-    //     let action_system_address = world
-    //         .deploy_contract(
-    //             'salt1', actions::TEST_CLASS_HASH.try_into().unwrap() 
-    //         );
-    //     let mut action_system = IActionsDispatcher { contract_address: action_system_address };
-
-    //     let item_system_address = world
-    //         .deploy_contract(
-    //             'salt2', item_system::TEST_CLASS_HASH.try_into().unwrap() 
-    //         );
-    //     let mut item_system = IItemDispatcher { contract_address: item_system_address };
-
-    //     let fight_system_address = world
-    //         .deploy_contract(
-    //             'salt3', fight_system::TEST_CLASS_HASH.try_into().unwrap() 
-    //         );
-    //     let mut fight_system = IFightDispatcher { contract_address: fight_system_address };
-
-    //     let dummy_system_address = world
-    //         .deploy_contract(
-    //             'salt4', dummy_system::TEST_CLASS_HASH.try_into().unwrap() 
-    //         );
-    //     let mut dummy_system = IDummyDispatcher { contract_address: dummy_system_address };
-
-    //     add_items(ref item_system);
-
-    //     action_system.spawn('alice', WMClass::Warlock);
-
-    //     let mut char = get!(world, (alice), Character);
-    //     char.loss = 5;
-    //     set!(world, (char));
-
-    //     dummy_system.create_dummy();
-
-    //     fight_system.fight();
-    // }
+        if battleLog.winner == PLAYER {
+            assert(char.wins == 1, 'wins should be 1');
+            assert(char.totalWins == 1, 'totalWins should be 1');
+            assert(char.winStreak == 1, 'winStreak should be 1');
+            assert(char.dummied == false, 'dummied should be false');
+            assert(char.gold == INIT_GOLD + 6, 'gold should be INIT_GOLD + 6');
+            assert(char.health == INIT_HEALTH + 10, 'health be INIT_HEALTH + 10');
+            assert(char.rating == 25, 'rating should be 25');
+            assert(char.loss == 0, 'loss should be 0');
+            assert(char.totalLoss == 0, 'totalLoss should be 0');
+        } else {
+            assert(char.wins == 0, 'wins should be 0');
+            assert(char.totalWins == 0, 'totalWins should be 0');
+            assert(char.winStreak == 0, 'winStreak should be 0');
+            assert(char.dummied == false, 'dummied should be false');
+            assert(char.gold == INIT_GOLD + 6, 'gold be INIT_GOLD + 6');
+            assert(char.health == INIT_HEALTH, 'health be INIT_HEALTH');
+            assert(char.rating == 0, 'rating should be 25');
+            assert(char.loss == 1, 'loss should be 0');
+            assert(char.totalLoss == 1, 'totalLoss should be 0');
+        }
+    }
 }
 
