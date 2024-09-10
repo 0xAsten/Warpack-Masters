@@ -188,7 +188,7 @@ mod tests {
             'I15 poisonActivation mismatch'
         );
         assert(
-            item_fifteen_data.energyCost == items::AugmentedSword::energyCost,
+            item_fifteen_data.energyCost == items::AugmentedDagger::energyCost,
             'I15 energyCost mismatch'
         );
     }
