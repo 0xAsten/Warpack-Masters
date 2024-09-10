@@ -1,8 +1,10 @@
 #[cfg(test)]
 mod tests {
+    use core::starknet::contract_address::ContractAddress;
     use starknet::class_hash::Felt252TryIntoClassHash;
     use starknet::testing::{set_contract_address, set_block_timestamp};
 
+    use dojo::model::{Model, ModelTest, ModelIndex, ModelEntityTest};
     // import world dispatcher
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
@@ -19,11 +21,40 @@ mod tests {
             character_items_storage_counter, CharacterItemInventory, character_item_inventory,
             CharacterItemsInventoryCounter, character_items_inventory_counter
         },
-        models::Character::{Character, character, NameRecord, name_record, WMClass},
+        models::Character::{Characters, characters, NameRecord, name_record, WMClass},
         models::Shop::{Shop, shop}, utils::{test_utils::{add_items}}
     };
 
     use warpack_masters::constants::constants::{INIT_HEALTH, INIT_GOLD};
+
+    fn get_systems(
+        world: IWorldDispatcher
+    ) -> (ContractAddress, IActionsDispatcher, ContractAddress, IItemDispatcher,) {
+        let action_system_address = world
+            .deploy_contract('salt1', actions::TEST_CLASS_HASH.try_into().unwrap());
+        let mut action_system = IActionsDispatcher { contract_address: action_system_address };
+
+        world.grant_writer(Model::<CharacterItemStorage>::selector(), action_system_address);
+        world
+            .grant_writer(Model::<CharacterItemsStorageCounter>::selector(), action_system_address);
+        world.grant_writer(Model::<CharacterItemInventory>::selector(), action_system_address);
+        world
+            .grant_writer(
+                Model::<CharacterItemsInventoryCounter>::selector(), action_system_address
+            );
+        world.grant_writer(Model::<BackpackGrids>::selector(), action_system_address);
+        world.grant_writer(Model::<Characters>::selector(), action_system_address);
+        world.grant_writer(Model::<NameRecord>::selector(), action_system_address);
+
+        let item_system_address = world
+            .deploy_contract('salt2', item_system::TEST_CLASS_HASH.try_into().unwrap());
+        let mut item_system = IItemDispatcher { contract_address: item_system_address };
+
+        world.grant_writer(Model::<Item>::selector(), item_system_address);
+        world.grant_writer(Model::<ItemsCounter>::selector(), item_system_address);
+
+        (action_system_address, action_system, item_system_address, item_system,)
+    }
 
 
     #[test]
@@ -31,43 +62,18 @@ mod tests {
     fn test_spawn() {
         let alice = starknet::contract_address_const::<0x0>();
 
-        let mut models = array![
-            backpack_grids::TEST_CLASS_HASH,
-            item::TEST_CLASS_HASH,
-            items_counter::TEST_CLASS_HASH,
-            character_item_storage::TEST_CLASS_HASH,
-            character_items_storage_counter::TEST_CLASS_HASH,
-            character_item_inventory::TEST_CLASS_HASH,
-            character_items_inventory_counter::TEST_CLASS_HASH,
-            character::TEST_CLASS_HASH,
-            name_record::TEST_CLASS_HASH,
-            shop::TEST_CLASS_HASH
-        ];
-
-        let world =  spawn_test_world(["Warpacks"].span(), models.span());
-
-        let action_system_address = world
-            .deploy_contract(
-                'salt1', actions::TEST_CLASS_HASH.try_into().unwrap() 
-            );
-        let mut action_system = IActionsDispatcher { contract_address: action_system_address };
-
-        let item_system_address = world
-            .deploy_contract(
-                'salt2', item_system::TEST_CLASS_HASH.try_into().unwrap() 
-            );
-        let mut item_system = IItemDispatcher { contract_address: item_system_address };
+        let world = spawn_test_world!();
+        let (_, mut action_system, _, mut item_system) = get_systems(world);
 
         add_items(ref item_system);
-
-        set_contract_address(alice);
 
         // mocking timestamp for testing
         let timestamp = 1716770021;
         set_block_timestamp(timestamp);
+
         action_system.spawn('alice', WMClass::Warlock);
 
-        let char = get!(world, (alice), Character);
+        let char = get!(world, (alice), Characters);
         assert(!char.dummied, 'Should be false');
         assert(char.wins == 0, 'wins count should be 0');
         assert(char.loss == 0, 'loss count should be 0');
@@ -161,26 +167,8 @@ mod tests {
     fn test_name_is_empty() {
         let alice = starknet::contract_address_const::<0x0>();
 
-        let mut models = array![
-            backpack_grids::TEST_CLASS_HASH,
-            item::TEST_CLASS_HASH,
-            items_counter::TEST_CLASS_HASH,
-            character_item_storage::TEST_CLASS_HASH,
-            character_items_storage_counter::TEST_CLASS_HASH,
-            character_item_inventory::TEST_CLASS_HASH,
-            character_items_inventory_counter::TEST_CLASS_HASH,
-            character::TEST_CLASS_HASH,
-            name_record::TEST_CLASS_HASH,
-            shop::TEST_CLASS_HASH
-        ];
-
-        let world =  spawn_test_world(["Warpacks"].span(), models.span());
-
-        let action_system_address = world
-            .deploy_contract(
-                'salt1', actions::TEST_CLASS_HASH.try_into().unwrap() 
-            );
-        let mut action_system = IActionsDispatcher { contract_address: action_system_address };
+        let world = spawn_test_world!();
+        let (_, mut action_system, _, _) = get_systems(world);
 
         set_contract_address(alice);
 
@@ -194,32 +182,8 @@ mod tests {
     fn test_player_already_exists() {
         let alice = starknet::contract_address_const::<0x0>();
 
-        let mut models = array![
-            backpack_grids::TEST_CLASS_HASH,
-            item::TEST_CLASS_HASH,
-            items_counter::TEST_CLASS_HASH,
-            character_item_storage::TEST_CLASS_HASH,
-            character_items_storage_counter::TEST_CLASS_HASH,
-            character_item_inventory::TEST_CLASS_HASH,
-            character_items_inventory_counter::TEST_CLASS_HASH,
-            character::TEST_CLASS_HASH,
-            name_record::TEST_CLASS_HASH,
-            shop::TEST_CLASS_HASH
-        ];
-
-        let world =  spawn_test_world(["Warpacks"].span(), models.span());
-
-        let action_system_address = world
-            .deploy_contract(
-                'salt1', actions::TEST_CLASS_HASH.try_into().unwrap() 
-            );
-        let mut action_system = IActionsDispatcher { contract_address: action_system_address };
-
-        let item_system_address = world
-            .deploy_contract(
-                'salt2', item_system::TEST_CLASS_HASH.try_into().unwrap() 
-            );
-        let mut item_system = IItemDispatcher { contract_address: item_system_address };
+        let world = spawn_test_world!();
+        let (_, mut action_system, _, mut item_system) = get_systems(world);
 
         add_items(ref item_system);
 
@@ -234,32 +198,8 @@ mod tests {
     #[available_gas(3000000000000000)]
     #[should_panic(expected: ('name already exists', 'ENTRYPOINT_FAILED'))]
     fn test_name_already_exists() {
-        let mut models = array![
-            backpack_grids::TEST_CLASS_HASH,
-            item::TEST_CLASS_HASH,
-            items_counter::TEST_CLASS_HASH,
-            character_item_storage::TEST_CLASS_HASH,
-            character_items_storage_counter::TEST_CLASS_HASH,
-            character_item_inventory::TEST_CLASS_HASH,
-            character_items_inventory_counter::TEST_CLASS_HASH,
-            character::TEST_CLASS_HASH,
-            name_record::TEST_CLASS_HASH,
-            shop::TEST_CLASS_HASH
-        ];
-
-        let world =  spawn_test_world(["Warpacks"].span(), models.span());
-
-        let action_system_address = world
-            .deploy_contract(
-                'salt1', actions::TEST_CLASS_HASH.try_into().unwrap() 
-            );
-        let mut action_system = IActionsDispatcher { contract_address: action_system_address };
-
-        let item_system_address = world
-            .deploy_contract(
-                'salt2', item_system::TEST_CLASS_HASH.try_into().unwrap() 
-            );
-        let mut item_system = IItemDispatcher { contract_address: item_system_address };
+        let world = spawn_test_world!();
+        let (_, mut action_system, _, mut item_system) = get_systems(world);
 
         add_items(ref item_system);
 
@@ -276,45 +216,22 @@ mod tests {
     #[test]
     #[available_gas(3000000000000000)]
     fn test_spawn_a_Archer() {
-        let mut models = array![
-            backpack_grids::TEST_CLASS_HASH,
-            item::TEST_CLASS_HASH,
-            items_counter::TEST_CLASS_HASH,
-            character_item_storage::TEST_CLASS_HASH,
-            character_items_storage_counter::TEST_CLASS_HASH,
-            character_item_inventory::TEST_CLASS_HASH,
-            character_items_inventory_counter::TEST_CLASS_HASH,
-            character::TEST_CLASS_HASH,
-            name_record::TEST_CLASS_HASH,
-            shop::TEST_CLASS_HASH
-        ];
-
-        let world =  spawn_test_world(["Warpacks"].span(), models.span());
-
-        let action_system_address = world
-            .deploy_contract(
-                'salt1', actions::TEST_CLASS_HASH.try_into().unwrap() 
-            );
-        let mut action_system = IActionsDispatcher { contract_address: action_system_address };
-
-        let item_system_address = world
-            .deploy_contract(
-                'salt2', item_system::TEST_CLASS_HASH.try_into().unwrap() 
-            );
-        let mut item_system = IItemDispatcher { contract_address: item_system_address };
+        let world = spawn_test_world!();
+        let (_, mut action_system, _, mut item_system) = get_systems(world);
 
         add_items(ref item_system);
 
         let alice = starknet::contract_address_const::<0x1>();
-        set_contract_address(alice);
 
         // mocking timestamp for testing
         let timestamp = 1716770021;
         set_block_timestamp(timestamp);
 
+        set_contract_address(alice);
+
         action_system.spawn('alice', WMClass::Archer);
 
-        let char = get!(world, (alice), Character);
+        let char = get!(world, (alice), Characters);
         assert(!char.dummied, 'Should be false');
         assert(char.wins == 0, 'wins count should be 0');
         assert(char.loss == 0, 'loss count should be 0');
