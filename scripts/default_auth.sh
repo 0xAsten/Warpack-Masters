@@ -5,12 +5,12 @@ pushd $(dirname "$0")/..
 # export STARKNET_RPC_URL="https://api.cartridge.gg/x/warpack-masters-v3/katana";
 : "${STARKNET_RPC_URL:?Environment variable STARKNET_RPC_URL must be set}"
 
-export WORLD_ADDRESS=$(cat ./manifests/dev/deployment/manifest.json | jq -r '.world.address')
-export ACTIONS_ADDRESS=$(cat ./manifests/dev/deployment/manifest.json | jq -r '.contracts[] | select(.tag == "Warpacks-actions" and .kind == "DojoContract").address')
-export DUMMY_STSTEM_ADDRESS=$(cat ./manifests/dev/deployment/manifest.json | jq -r '.contracts[] | select(.tag == "Warpacks-dummy_system" and .kind == "DojoContract").address')
-export FIGHT_STSTEM_ADDRESS=$(cat ./manifests/dev/deployment/manifest.json | jq -r '.contracts[] | select(.tag == "Warpacks-fight_system" and .kind == "DojoContract").address')
-export ITEM_STSTEM_ADDRESS=$(cat ./manifests/dev/deployment/manifest.json | jq -r '.contracts[] | select(.tag == "Warpacks-item_system" and .kind == "DojoContract").address')
-export SHOP_STSTEM_ADDRESS=$(cat ./manifests/dev/deployment/manifest.json | jq -r '.contracts[] | select(.tag == "Warpacks-shop_system" and .kind == "DojoContract").address')
+export WORLD_ADDRESS=$(cat ./manifests/release/deployment/manifest.json | jq -r '.world.address')
+export ACTIONS_ADDRESS=$(cat ./manifests/release/deployment/manifest.json | jq -r '.contracts[] | select(.tag == "Warpacks-actions" and .kind == "DojoContract").address')
+export DUMMY_STSTEM_ADDRESS=$(cat ./manifests/release/deployment/manifest.json | jq -r '.contracts[] | select(.tag == "Warpacks-dummy_system" and .kind == "DojoContract").address')
+export FIGHT_STSTEM_ADDRESS=$(cat ./manifests/release/deployment/manifest.json | jq -r '.contracts[] | select(.tag == "Warpacks-fight_system" and .kind == "DojoContract").address')
+export ITEM_STSTEM_ADDRESS=$(cat ./manifests/release/deployment/manifest.json | jq -r '.contracts[] | select(.tag == "Warpacks-item_system" and .kind == "DojoContract").address')
+export SHOP_STSTEM_ADDRESS=$(cat ./manifests/release/deployment/manifest.json | jq -r '.contracts[] | select(.tag == "Warpacks-shop_system" and .kind == "DojoContract").address')
 
 
 echo "---------------------------------------------------------------------------"
@@ -30,7 +30,7 @@ echo "--------------------------------------------------------------------------
 # enable system -> models authorizations
 sozo auth grant --world $WORLD_ADDRESS --rpc-url $STARKNET_RPC_URL --wait writer \
   model:Warpacks-BackpackGrids,$ACTIONS_ADDRESS \
-  model:Warpacks-Character,$ACTIONS_ADDRESS \
+  model:Warpacks-Characters,$ACTIONS_ADDRESS \
   model:Warpacks-CharacterItemStorage,$ACTIONS_ADDRESS \
   model:Warpacks-CharacterItemsStorageCounter,$ACTIONS_ADDRESS \
   model:Warpacks-CharacterItemInventory,$ACTIONS_ADDRESS \
@@ -48,7 +48,7 @@ sozo auth grant --world $WORLD_ADDRESS --rpc-url $STARKNET_RPC_URL --wait writer
 
 sozo auth grant --world $WORLD_ADDRESS --rpc-url $STARKNET_RPC_URL --wait writer \
   model:Warpacks-BackpackGrids,$DUMMY_STSTEM_ADDRESS \
-  model:Warpacks-Character,$DUMMY_STSTEM_ADDRESS \
+  model:Warpacks-Characters,$DUMMY_STSTEM_ADDRESS \
   model:Warpacks-CharacterItemStorage,$DUMMY_STSTEM_ADDRESS \
   model:Warpacks-CharacterItemsStorageCounter,$DUMMY_STSTEM_ADDRESS \
   model:Warpacks-CharacterItemInventory,$DUMMY_STSTEM_ADDRESS \
@@ -66,7 +66,7 @@ sozo auth grant --world $WORLD_ADDRESS --rpc-url $STARKNET_RPC_URL --wait writer
 
 sozo auth grant --world $WORLD_ADDRESS --rpc-url $STARKNET_RPC_URL --wait writer \
   model:Warpacks-BackpackGrids,$FIGHT_STSTEM_ADDRESS \
-  model:Warpacks-Character,$FIGHT_STSTEM_ADDRESS \
+  model:Warpacks-Characters,$FIGHT_STSTEM_ADDRESS \
   model:Warpacks-CharacterItemStorage,$FIGHT_STSTEM_ADDRESS \
   model:Warpacks-CharacterItemsStorageCounter,$FIGHT_STSTEM_ADDRESS \
   model:Warpacks-CharacterItemInventory,$FIGHT_STSTEM_ADDRESS \
@@ -84,7 +84,7 @@ sozo auth grant --world $WORLD_ADDRESS --rpc-url $STARKNET_RPC_URL --wait writer
 
 sozo auth grant --world $WORLD_ADDRESS --rpc-url $STARKNET_RPC_URL --wait writer \
   model:Warpacks-BackpackGrids,$ITEM_STSTEM_ADDRESS \
-  model:Warpacks-Character,$ITEM_STSTEM_ADDRESS \
+  model:Warpacks-Characters,$ITEM_STSTEM_ADDRESS \
   model:Warpacks-CharacterItemStorage,$ITEM_STSTEM_ADDRESS \
   model:Warpacks-CharacterItemsStorageCounter,$ITEM_STSTEM_ADDRESS \
   model:Warpacks-CharacterItemInventory,$ITEM_STSTEM_ADDRESS \
@@ -102,7 +102,7 @@ sozo auth grant --world $WORLD_ADDRESS --rpc-url $STARKNET_RPC_URL --wait writer
 
 sozo auth grant --world $WORLD_ADDRESS --rpc-url $STARKNET_RPC_URL --wait writer \
   model:Warpacks-BackpackGrids,$SHOP_STSTEM_ADDRESS \
-  model:Warpacks-Character,$SHOP_STSTEM_ADDRESS \
+  model:Warpacks-Characters,$SHOP_STSTEM_ADDRESS \
   model:Warpacks-CharacterItemStorage,$SHOP_STSTEM_ADDRESS \
   model:Warpacks-CharacterItemsStorageCounter,$SHOP_STSTEM_ADDRESS \
   model:Warpacks-CharacterItemInventory,$SHOP_STSTEM_ADDRESS \
