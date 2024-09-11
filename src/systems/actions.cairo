@@ -43,7 +43,8 @@ mod actions {
         Item::Item,
         Character::{Characters, NameRecord},
         Receipt::Receipt,
-        Shop::Shop
+        Shop::Shop,
+        BattleLog::{BattleLog, BattleLogCounter}
     };
 
     use warpack_masters::items::{Backpack, Pack};
@@ -229,6 +230,11 @@ mod actions {
         ) {
             let player = get_caller_address();
 
+            // check if the player has fought the matching battle
+            let mut battleLogCounter = get!(world, player, (BattleLogCounter));
+            let latestBattleLog = get!(world, (player, battleLogCounter.count), BattleLog);
+            assert(battleLogCounter.count == 0 || latestBattleLog.winner != 0, 'battle not fought');
+
             assert(x < GRID_X, 'x out of range');
             assert(y < GRID_Y, 'y out of range');
             assert(
@@ -370,6 +376,11 @@ mod actions {
 
         fn undo_place_item(ref world: IWorldDispatcher, inventory_item_id: u32) {
             let player = get_caller_address();
+
+            // check if the player has fought the matching battle
+            let mut battleLogCounter = get!(world, player, (BattleLogCounter));
+            let latestBattleLog = get!(world, (player, battleLogCounter.count), BattleLog);
+            assert(battleLogCounter.count == 0 || latestBattleLog.winner != 0, 'battle not fought');
 
             let mut inventoryItem = get!(
                 world, (player, inventory_item_id), (CharacterItemInventory)
