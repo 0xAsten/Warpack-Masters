@@ -436,15 +436,14 @@ mod fight_system {
                     let chance = curr_item_data.chance;
                     let cooldown = curr_item_data.cooldown;
 
+                    let mut damage = curr_item_data.damage;
+
                     // each second is treated as 1 unit of cooldown 
                     let (_, seed2, _, _) = pseudo_seed();
                     if seconds % cooldown == 0 {
                         v += seconds.into();
                         rand = random(seed2 + v, 100);
                         if rand < chance {
-
-                            let mut damage = curr_item_data.damage;
-
                             if curr_item_belongs == PLAYER {
                                 // ====== on cooldown to plus stacks, all use the same randomness ======
                                 if curr_item_data.armorActivation == 3 {
