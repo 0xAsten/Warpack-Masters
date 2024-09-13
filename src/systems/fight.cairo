@@ -432,36 +432,6 @@ mod fight_system {
 
                     let curr_item_data = get!(world, curr_item_index, (Item));
 
-                    // Handle stamina cost for melee and ranged weapons for both player and dummy
-                    if (curr_item_data.itemType == 1 || curr_item_data.itemType == 2) {
-                        if curr_item_belongs == PLAYER {
-                            if curr_item_data.energyCost > char_stamina {
-                                // Not enough stamina, skip this activation and reset cooldown
-                                i += 1;
-                                continue;
-                            }
-                            // Deduct stamina
-                            char_stamina -= curr_item_data.energyCost;
-                        } else if curr_item_belongs == DUMMY {
-                            if curr_item_data.energyCost > dummy_stamina {
-                                // Not enough stamina, skip this activation and reset cooldown
-                                i += 1;
-                                continue;
-                            }
-                            // Deduct stamina
-                            dummy_stamina -= curr_item_data.energyCost;
-                        }
-                    }
-
-                    let mut damage = curr_item_data.damage;
-                    if curr_item_data.itemType == 1 {
-                        if curr_item_belongs == PLAYER && char_empower > 0 {
-                            damage += char_empower;
-                        } else if curr_item_belongs == DUMMY && dummy_empower > 0 {
-                            damage += dummy_empower;
-                        }
-                    }
-
                     let cleansePoison = curr_item_data.cleansePoison;
                     let chance = curr_item_data.chance;
                     let cooldown = curr_item_data.cooldown;
@@ -472,6 +442,9 @@ mod fight_system {
                         v += seconds.into();
                         rand = random(seed2 + v, 100);
                         if rand < chance {
+
+                            let mut damage = curr_item_data.damage;
+
                             if curr_item_belongs == PLAYER {
                                 // ====== on cooldown to plus stacks, all use the same randomness ======
                                 if curr_item_data.armorActivation == 3 {
@@ -490,6 +463,18 @@ mod fight_system {
                                     dummy_poison += curr_item_data.poison;
                                 }
                                 // ====== end ======
+
+                                if curr_item_data.energyCost > char_stamina {
+                                    // Not enough stamina, skip this activation
+                                    i += 1;
+                                    continue;
+                                }
+                                // Deduct stamina
+                                char_stamina -= curr_item_data.energyCost;
+
+                                if curr_item_data.itemType == 1 && char_empower > 0 {
+                                    damage += char_empower;
+                                }
 
                                 if damage > 0 {
                                     // ====== Armor: used to absorb damage ======
@@ -749,6 +734,18 @@ mod fight_system {
                                     char_poison += curr_item_data.poison;
                                 }
                                 // ====== end ======
+
+                                if curr_item_data.energyCost > dummy_stamina {
+                                    // Not enough stamina, skip this activation
+                                    i += 1;
+                                    continue;
+                                }
+                                // Deduct stamina
+                                dummy_stamina -= curr_item_data.energyCost;
+
+                                if curr_item_data.itemType == 1 && dummy_empower > 0 {
+                                    damage += dummy_empower;
+                                }
 
                                 if damage > 0 {
                                     // ====== Armor: used to absorb damage ======
