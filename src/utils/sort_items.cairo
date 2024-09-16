@@ -1,29 +1,30 @@
 
 fn append_item(
-    ref items_cooldown4: Array<(u32, felt252)>,
-    ref items_cooldown5: Array<(u32, felt252)>,
-    ref items_cooldown6: Array<(u32, felt252)>,
-    ref items_cooldown7: Array<(u32, felt252)>,
+    ref items_cooldown4: Array<(u32, felt252, u32)>,
+    ref items_cooldown5: Array<(u32, felt252, u32)>,
+    ref items_cooldown6: Array<(u32, felt252, u32)>,
+    ref items_cooldown7: Array<(u32, felt252, u32)>,
     item_id: u32,
     belongs_to: felt252,
     cooldown: u8,
     items_length: usize,
+    empower_value: usize,
 ) -> usize {
     match cooldown {
         0 | 1 | 2 | 3 => {
             assert(false, 'cooldown not valid');
         },
         4 => {
-            items_cooldown4.append((item_id, belongs_to));
+            items_cooldown4.append((item_id, belongs_to, empower_value));
         },
         5 => {
-            items_cooldown5.append((item_id, belongs_to));
+            items_cooldown5.append((item_id, belongs_to, empower_value));
         },
         6 => {
-            items_cooldown6.append((item_id, belongs_to));
+            items_cooldown6.append((item_id, belongs_to, empower_value));
         },
         7 => {
-            items_cooldown7.append((item_id, belongs_to));
+            items_cooldown7.append((item_id, belongs_to, empower_value));
         },
         _ => {
             assert(false, 'cooldown not valid');
@@ -34,39 +35,44 @@ fn append_item(
 }
 
 fn combine_items(
-    ref items_cooldown4: Array<(u32, felt252)>,
-    ref items_cooldown5: Array<(u32, felt252)>,
-    ref items_cooldown6: Array<(u32, felt252)>,
-    ref items_cooldown7: Array<(u32, felt252)>,
-) -> (Array<u32>, Array<felt252>) {
+    ref items_cooldown4: Array<(u32, felt252, u32)>,
+    ref items_cooldown5: Array<(u32, felt252, u32)>,
+    ref items_cooldown6: Array<(u32, felt252, u32)>,
+    ref items_cooldown7: Array<(u32, felt252, u32)>,
+) -> (Array<u32>, Array<felt252>, Array<u32>) {
     let mut item_ids = ArrayTrait::new();
     let mut belongs_tos = ArrayTrait::new();
+    let mut empower_values = ArrayTrait::new();
 
     for item in items_cooldown4.span() {
-        let (item_id, belongs_to) = *item;
+        let (item_id, belongs_to, empower_value) = *item;
         item_ids.append(item_id);
         belongs_tos.append(belongs_to);
+        empower_values.append(empower_value);
     };
 
     for item in items_cooldown5.span() {
-        let (item_id, belongs_to) = *item;
+        let (item_id, belongs_to, empower_value) = *item;
         item_ids.append(item_id);
         belongs_tos.append(belongs_to);
+        empower_values.append(empower_value);
     };
 
     for item in items_cooldown6.span() {
-        let (item_id, belongs_to) = *item;
+        let (item_id, belongs_to, empower_value) = *item;
         item_ids.append(item_id);
         belongs_tos.append(belongs_to);
+        empower_values.append(empower_value);
     };
 
     for item in items_cooldown7.span() {
-        let (item_id, belongs_to) = *item;
+        let (item_id, belongs_to, empower_value) = *item;
         item_ids.append(item_id);
         belongs_tos.append(belongs_to);
+        empower_values.append(empower_value);
     };
 
-    (item_ids, belongs_tos)
+    (item_ids, belongs_tos, empower_values)
 }
 
 #[cfg(test)]

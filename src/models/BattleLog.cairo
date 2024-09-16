@@ -18,6 +18,7 @@ struct BattleLog {
     dummy_on_hit_items: Span<(felt252, usize, usize)>,
     char_on_attack_items: Span<(felt252, usize, usize)>,
     dummy_on_attack_items: Span<(felt252, usize, usize)>,
+    empower_values: Span<usize>,
     // dummy or player
     winner: felt252,
     seconds: u8

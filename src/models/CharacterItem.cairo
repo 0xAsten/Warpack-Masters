@@ -45,6 +45,16 @@ struct CharacterItemsInventoryCounter {
     count: usize,
 }
 
+#[derive(Drop, Copy)]
+struct ItemProperties {
+    id: usize,
+    position: Position,
+    rotation: usize,
+    width: usize,
+    height: usize,
+    empower: usize,
+}
+
 pub fn are_items_nearby(pos1: Position, width1: usize, height1: usize, rotation1: usize, pos2: Position, width2: usize, height2: usize, rotation2: usize) -> bool {
     // Calculate item dimensions considering rotation
     let (final_width1, final_height1) = if rotation1 == 90 || rotation1 == 270 {

@@ -10,7 +10,7 @@ mod fight_system {
 
     use starknet::{ContractAddress, get_caller_address, get_block_timestamp};
     use warpack_masters::models::{
-        CharacterItem::{Position, CharacterItemInventory, CharacterItemsInventoryCounter},
+        CharacterItem::{Position, CharacterItemInventory, CharacterItemsInventoryCounter, are_items_nearby, ItemProperties},
         Item::Item
     };
     use warpack_masters::models::Character::{Characters, WMClass, PLAYER, DUMMY};
@@ -116,8 +116,37 @@ mod fight_system {
             let mut char_on_attack_items = ArrayTrait::new();
             let mut dummy_on_attack_items = ArrayTrait::new();
 
+            // Arrays for nearby item checks
+            let mut empower_item_properties = ArrayTrait::new();
+
             let inventoryItemsCounter = get!(world, player, (CharacterItemsInventoryCounter));
             let mut inventoryItemCount = inventoryItemsCounter.count;
+
+            loop {
+                if inventoryItemCount == 0 {
+                    break;
+                }
+
+                let charItem = get!(world, (player, inventoryItemCount), (CharacterItemInventory));
+                let item = get!(world, charItem.itemId, (Item));
+
+                // If the item has a non-zero `empower` value, add it to the array
+                if item.empower > 0 {
+                    empower_item_properties.append(ItemProperties {
+                        id: charItem.id,
+                        position: charItem.position,
+                        rotation: charItem.rotation,
+                        width: item.width,
+                        height: item.height,
+                        empower: item.empower,
+                    });
+                }
+
+                inventoryItemCount -= 1;
+            };
+            
+            let mut inventoryItemCount = inventoryItemsCounter.count;
+
 
             let mut items_length: usize = 0;
             loop {
@@ -131,6 +160,42 @@ mod fight_system {
                     continue;
                 }
                 let cooldown = item.cooldown;
+                // Initially, empower is set to 0
+                let mut empower_value = 0; 
+
+
+                // If this item is a weapon, we need to check if there are nearby empower items
+                if item.itemType == 1 || item.itemType == 2 {
+                    let weapon = ItemProperties {
+                        id: charItem.id,
+                        position: charItem.position,
+                        rotation: charItem.rotation,
+                        width: item.width,
+                        height: item.height,
+                        empower: 0, // Initially no empower applied
+                    };
+
+                    // Check for nearby items with non-zero empower
+                    let mut j = 0;
+                    let empower_items_len = empower_item_properties.len();
+                    loop {
+                        if j >= empower_items_len {
+                            break;
+                        }
+            
+                        let empower_item = *empower_item_properties.at(j);
+            
+                        if are_items_nearby(
+                            weapon.position, weapon.width, weapon.height, weapon.rotation,
+                            empower_item.position, empower_item.width, empower_item.height, empower_item.rotation
+                        ) {
+                            empower_value = empower_item.empower; // Apply empower if nearby
+                        }
+            
+                        j += 1;
+                    }
+                }
+
                 if cooldown > 0 {
                     items_length = append_item(
                         ref items_cooldown4,
@@ -141,6 +206,7 @@ mod fight_system {
                         PLAYER,
                         cooldown,
                         items_length,
+                        empower_value,
                     );
                 } else if cooldown == 0 {
                     // ====== `on start / on hit / on attack` to plus stacks ======
@@ -176,6 +242,8 @@ mod fight_system {
                     } else if item.empowerActivation == 4 {
                         char_on_attack_items.append((EFFECT_EMPOWER, item.chance, item.empower));
                     }
+
+                    char_empower += empower_value;
                     // debuff
                     if item.poisonActivation == 1 {
                         dummy_poison += item.poison;
@@ -184,16 +252,44 @@ mod fight_system {
                     } else if item.poisonActivation == 4 {
                         char_on_attack_items.append((EFFECT_POISON, item.chance, item.poison));
                     }
-                    // ====== plus stacks end ======
+                    // ====== plus stacks end ======} 
                 }
 
                 inventoryItemCount -= 1;
             };
 
+         
+
             let dummyCharItemsCounter = get!(
                 world, (char.wins, dummy_index), DummyCharacterItemsCounter
             );
             let mut dummy_item_count = dummyCharItemsCounter.count;
+
+            loop {
+                if dummy_item_count == 0 {
+                    break;
+                }
+
+                let charItem = get!(world, (player, dummy_item_count), (CharacterItemInventory));
+                let item = get!(world, charItem.itemId, (Item));
+
+                // If the item has a non-zero `empower` value, add it to the array
+                if item.empower > 0 {
+                    empower_item_properties.append(ItemProperties {
+                        id: charItem.id,
+                        position: charItem.position,
+                        rotation: charItem.rotation,
+                        width: item.width,
+                        height: item.height,
+                        empower: item.empower,
+                    });
+                }
+
+                inventoryItemCount -= 1;
+            };
+
+            let mut dummy_item_count = dummyCharItemsCounter.count;
+
             loop {
                 if dummy_item_count == 0 {
                     break;
@@ -208,6 +304,42 @@ mod fight_system {
                     continue;
                 }
                 let cooldown = item.cooldown;
+
+                // Initially, empower is set to 0
+                let mut empower_value = 0; 
+
+                // If this item is a weapon, we need to check if there are nearby empower items
+                if item.itemType == 1 || item.itemType == 2 {
+                    let weapon = ItemProperties {
+                        id: item.id,
+                        position: dummy_item.position,
+                        rotation: dummy_item.rotation,
+                        width: item.width,
+                        height: item.height,
+                        empower: 0, // Initially no empower applied
+                    };
+
+                    // Check for nearby items with non-zero empower
+                    let mut j = 0;
+                    let empower_items_len = empower_item_properties.len();
+                    loop {
+                        if j >= empower_items_len {
+                            break;
+                        }
+            
+                        let empower_item = *empower_item_properties.at(j);
+            
+                        if are_items_nearby(
+                            weapon.position, weapon.width, weapon.height, weapon.rotation,
+                            empower_item.position, empower_item.width, empower_item.height, empower_item.rotation
+                        ) {
+                            empower_value = empower_item.empower; // Apply empower if nearby
+                        }
+            
+                        j += 1;
+                    }
+                }
+
                 if cooldown > 0 {
                     items_length = append_item(
                         ref items_cooldown4,
@@ -218,6 +350,7 @@ mod fight_system {
                         DUMMY,
                         cooldown,
                         items_length,
+                        empower_value,
                     );
                 } else if cooldown == 0 {
                     // ====== `on start / on hit / on attack` to plus stacks ======
@@ -269,7 +402,7 @@ mod fight_system {
             };
 
             // combine items
-            let (item_ids, belongs_tos) = combine_items(
+            let (item_ids, belongs_tos, empower_values) = combine_items(
                 ref items_cooldown4,
                 ref items_cooldown5,
                 ref items_cooldown6,
@@ -293,6 +426,7 @@ mod fight_system {
                 dummy_on_hit_items: dummy_on_hit_items.span(),
                 char_on_attack_items: char_on_attack_items.span(),
                 dummy_on_attack_items: dummy_on_attack_items.span(),
+                empower_values: empower_values.span(),
                 winner: 0,
                 seconds: 0,
             };
@@ -324,6 +458,7 @@ mod fight_system {
 
             let item_ids = battleLog.item_ids;
             let belongs_tos = battleLog.belongs_tos;
+            let empower_values = battleLog.empower_values;
             let items_length = battleLog.items_length;
 
             let char_on_hit_items_span = battleLog.char_on_hit_items;
@@ -339,7 +474,7 @@ mod fight_system {
             let mut char_empower = *char_buffs.at(3);
             let mut char_poison = *char_buffs.at(4);
             let mut char_vampirism = *char_buffs.at(5);
-
+        
             let dummy_buffs = battleLog.dummy_buffs;
             let mut dummy_armor = *dummy_buffs.at(0);
             let mut dummy_regen = *dummy_buffs.at(1);
@@ -429,6 +564,9 @@ mod fight_system {
 
                     let curr_item_index = *item_ids.at(i);
                     let curr_item_belongs = *belongs_tos.at(i.into());
+                    let empower_value = *empower_values.at(i.into());
+                    // if item is nearby items with non-zero empower values, increase char_empower
+                    char_empower += empower_value;
 
                     let curr_item_data = get!(world, curr_item_index, (Item));
 
