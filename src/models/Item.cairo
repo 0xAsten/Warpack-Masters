@@ -1,5 +1,12 @@
 use starknet::ContractAddress;
 
+#[derive(Serde, Copy, Drop, Introspect, PartialEq)]
+enum ItemRarity {
+    None,
+    Common,
+    Rare,
+    Legendary,
+}
 
 #[derive(Drop, Serde)]
 #[dojo::model]
@@ -19,7 +26,7 @@ struct Item {
     chance: usize,
     // item reuse time
     cooldown: u8,
-    rarity: u8,
+    rarity: ItemRarity,
     // Effects
     // activation 0 - passive, 1 - on start, 2 - on hit, 3 - on cooldown, 4 - on attack
     armor: usize,

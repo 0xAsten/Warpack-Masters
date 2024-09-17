@@ -14,7 +14,7 @@ mod shop_system {
     use starknet::{get_caller_address};
     use warpack_masters::models::{
         CharacterItem::{CharacterItemsStorageCounter, CharacterItemStorage,},
-        Item::{Item, ItemsCounter}
+        Item::{Item, ItemsCounter, ItemRarity}
     };
     use warpack_masters::models::Character::{Characters};
     use warpack_masters::models::Shop::Shop;
@@ -161,15 +161,10 @@ mod shop_system {
             let mut char = get!(world, player, (Characters));
             assert(char.gold >= 1, 'Not enough gold');
 
-            let mut shop = get!(world, player, (Shop));
-
             // TODO: Will move these arrays after Dojo supports storing array
             let mut common: Array<usize> = ArrayTrait::new();
-            let mut commonSize: usize = 0;
-            let mut uncommon: Array<usize> = ArrayTrait::new();
-            let mut uncommonSize: usize = 0;
             let mut rare: Array<usize> = ArrayTrait::new();
-            let mut rareSize: usize = 0;
+            let mut legendary: Array<usize> = ArrayTrait::new();
 
             let itemsCounter = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
             let mut count = itemsCounter.count;
@@ -181,27 +176,24 @@ mod shop_system {
 
                 let item = get!(world, count, (Item));
 
-                if item.id == 14 || item.id == 18 || item.id == 19 || item.id == 22 {
-                    count -= 1;
-                    continue;
-                }
+                // skip some without images
+                // if item.id == 14 || item.id == 18 || item.id == 19 || item.id == 22 {
+                //     count -= 1;
+                //     continue;
+                // }
 
-                let rarity: felt252 = item.rarity.into();
+                let rarity: ItemRarity = item.rarity;
                 match rarity {
-                    0 => {},
-                    1 => {
+                    ItemRarity::None => {},
+                    ItemRarity::Common => {
                         common.append(count);
-                        commonSize += 1;
                     },
-                    2 => {
-                        uncommon.append(count);
-                        uncommonSize += 1;
-                    },
-                    3 => {
+                    ItemRarity::Rare => {
                         rare.append(count);
-                        rareSize += 1;
                     },
-                    _ => {}
+                    ItemRarity::Legendary => {
+                        legendary.append(count);
+                    },
                 }
 
                 count -= 1;
@@ -209,112 +201,41 @@ mod shop_system {
 
             assert(commonSize > 0, 'No common items found');
 
+            let mut shop = get!(world, player, (Shop));
+
             let (seed1, seed2, seed3, seed4) = pseudo_seed();
 
-            let mut rareFlag = false;
-            // common: 70%, uncommon: 30%, rare: 10%
-            let mut random_index = 0;
-            if char.wins < 3 {
-                random_index = random(seed1, 90);
-            } else {
-                random_index = random(seed1, 100);
-            }
-            if uncommonSize == 0 {
-                random_index = random(seed1, 70);
-            } else if rareSize == 0 && uncommonSize > 0 {
-                random_index = random(seed1, 90);
-            }
+            // common: 70%, rare: 20%, legendary: 10%
+            let mut i = 0;
+            for seed in (seed1, seed2, seed3, seed4) {
+                let mut random_index = 0;
 
-            if random_index < 70 {
-                // commonSize is always greater than 0
-                random_index = random(seed1, commonSize);
-                shop.item1 = *common.at(random_index);
-            } else if random_index < 90 {
-                // uncommonSize is always greater than 0
-                random_index = random(seed1, uncommonSize);
-                shop.item1 = *uncommon.at(random_index);
+                if char.wins < 3 {
+                    random_index = random(seed, 90);
+                } else {
+                    random_index = random(seed, 100);
+                }
+    
+                let itemId = if random_index < 70 {
+                    random_index = random(seed, common.len());
+                    *common.at(random_index);
+                } else if random_index < 90 {
+                    random_index = random(seed, rare.len());
+                    *rare.at(random_index);
+                } else {
+                    random_index = random(seed, legendary.len());
+                    *legendary.at(random_index);
+                };
 
-                rareFlag = true;
-            } else {
-                // rareSize is always greater than 0
-                random_index = random(seed1, rareSize);
-                shop.item1 = *rare.at(random_index);
+                match i {
+                    0 => shop.item1 = itemId,
+                    1 => shop.item2 = itemId,
+                    2 => shop.item3 = itemId,
+                    3 => shop.item4 = itemId,
+                    _ => {},
+                }
 
-                rareFlag = true;
-            }
-
-            if char.wins < 3 {
-                random_index = random(seed2, 90);
-            } else {
-                random_index = random(seed2, 100);
-            }
-            if uncommonSize == 0 {
-                random_index = random(seed2, 70);
-            } else if rareSize == 0 && uncommonSize > 0 {
-                random_index = random(seed2, 90);
-            }
-
-            if random_index < 70 || rareFlag {
-                random_index = random(seed2, commonSize);
-                shop.item2 = *common.at(random_index);
-            } else if random_index < 90 {
-                random_index = random(seed2, uncommonSize);
-                shop.item2 = *uncommon.at(random_index);
-
-                rareFlag = true;
-            } else {
-                random_index = random(seed2, rareSize);
-                shop.item2 = *rare.at(random_index);
-
-                rareFlag = true;
-            }
-
-            if char.wins < 3 {
-                random_index = random(seed3, 90);
-            } else {
-                random_index = random(seed3, 100);
-            }
-            if uncommonSize == 0 {
-                random_index = random(seed3, 70);
-            } else if rareSize == 0 && uncommonSize > 0 {
-                random_index = random(seed3, 90);
-            }
-
-            if random_index < 70 || rareFlag {
-                random_index = random(seed3, commonSize);
-                shop.item3 = *common.at(random_index);
-            } else if random_index < 90 {
-                random_index = random(seed3, uncommonSize);
-                shop.item3 = *uncommon.at(random_index);
-
-                rareFlag = true;
-            } else {
-                random_index = random(seed3, rareSize);
-                shop.item3 = *rare.at(random_index);
-
-                rareFlag = true;
-            }
-
-            if char.wins < 3 {
-                random_index = random(seed4, 90);
-            } else {
-                random_index = random(seed4, 100);
-            }
-            if uncommonSize == 0 {
-                random_index = random(seed4, 70);
-            } else if rareSize == 0 && uncommonSize > 0 {
-                random_index = random(seed4, 90);
-            }
-
-            if random_index < 70 || rareFlag {
-                random_index = random(seed4, commonSize);
-                shop.item4 = *common.at(random_index);
-            } else if random_index < 90 {
-                random_index = random(seed4, uncommonSize);
-                shop.item4 = *uncommon.at(random_index);
-            } else {
-                random_index = random(seed4, rareSize);
-                shop.item4 = *rare.at(random_index);
+                i += 1;
             }
 
             char.gold -= 1;
