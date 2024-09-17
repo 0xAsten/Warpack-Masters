@@ -79,6 +79,11 @@ mod item_system {
             assert(price > 0, 'price must be greater than 0');
 
             assert(
+                rarity == 1 || rarity == 2 || rarity == 3 || (rarity == 0 && itemType == 4),
+                'rarity not valid'
+            );
+
+            assert(
                 cooldown == 0 || cooldown == 4 || cooldown == 5 || cooldown == 6 || cooldown == 7,
                 'cooldown not valid'
             );
