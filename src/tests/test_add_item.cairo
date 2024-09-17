@@ -229,6 +229,8 @@ mod tests {
                 items::Backpack::poisonActivation,
                 items::Backpack::empower,
                 items::Backpack::empowerActivation,
+                items::Backpack::vampirism,
+                items::Backpack::vampirismActivation,
                 items::Backpack::energyCost
             );
     }
@@ -263,6 +265,8 @@ mod tests {
                 items::Backpack::poisonActivation,
                 items::Backpack::empower,
                 items::Backpack::empowerActivation,
+                items::Backpack::vampirism,
+                items::Backpack::vampirismActivation,
                 items::Backpack::energyCost
             );
     }
@@ -297,6 +301,8 @@ mod tests {
                 items::Backpack::poisonActivation,
                 items::Backpack::empower,
                 items::Backpack::empowerActivation,
+                items::Backpack::vampirism,
+                items::Backpack::vampirismActivation,
                 items::Backpack::energyCost
             );
     }
@@ -331,6 +337,8 @@ mod tests {
                 items::Backpack::poisonActivation,
                 items::Backpack::empower,
                 items::Backpack::empowerActivation,
+                items::Backpack::vampirism,
+                items::Backpack::vampirismActivation,
                 items::Backpack::energyCost
             );
     }
@@ -365,6 +373,8 @@ mod tests {
                 items::Backpack::poisonActivation,
                 items::Backpack::empower,
                 items::Backpack::empowerActivation,
+                items::Backpack::vampirism,
+                items::Backpack::vampirismActivation,
                 items::Backpack::energyCost
             );
     }

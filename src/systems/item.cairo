@@ -23,6 +23,8 @@ trait IItem {
         poisonActivation: u8,
         empower: u32,
         empowerActivation: u8,
+        vampirism: u32,
+        vampirismActivation: u8,
         energyCost: u8,
     );
 }
@@ -63,6 +65,8 @@ mod item_system {
             poisonActivation: u8,
             empower: u32,
             empowerActivation: u8,
+            vampirism: u32,
+            vampirismActivation: u8,
             energyCost: u8,
         ) {
             let player = get_caller_address();
@@ -73,11 +77,6 @@ mod item_system {
             assert(height > 0 && height <= GRID_Y, 'height not in range');
 
             assert(price > 0, 'price must be greater than 0');
-
-            assert(
-                rarity == 1 || rarity == 2 || rarity == 3 || (rarity == 0 && itemType == 4),
-                'rarity not valid'
-            );
 
             assert(
                 cooldown == 0 || cooldown == 4 || cooldown == 5 || cooldown == 6 || cooldown == 7,
@@ -111,6 +110,8 @@ mod item_system {
                 poisonActivation,
                 empower,
                 empowerActivation,
+                vampirism,
+                vampirismActivation,
                 energyCost,
             };
 

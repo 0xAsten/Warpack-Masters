@@ -14,7 +14,7 @@ mod shop_system {
     use starknet::{get_caller_address};
     use warpack_masters::models::{
         CharacterItem::{CharacterItemsStorageCounter, CharacterItemStorage,},
-        Item::{Item, ItemsCounter, ItemRarity}
+        Item::{Item, ItemsCounter}
     };
     use warpack_masters::models::Character::{Characters};
     use warpack_masters::models::Shop::Shop;
@@ -182,24 +182,24 @@ mod shop_system {
                 //     continue;
                 // }
 
-                let rarity: ItemRarity = item.rarity;
-                match rarity {
-                    ItemRarity::None => {},
-                    ItemRarity::Common => {
+                match item.rarity {
+                    0 => {},
+                    1 => {
                         common.append(count);
                     },
-                    ItemRarity::Rare => {
+                    2 => {
                         rare.append(count);
                     },
-                    ItemRarity::Legendary => {
+                    3 => {
                         legendary.append(count);
                     },
+                    _ => {},
                 }
 
                 count -= 1;
             };
 
-            assert(commonSize > 0, 'No common items found');
+            assert(common.len() > 0, 'No common items found');
 
             let mut shop = get!(world, player, (Shop));
 
@@ -207,7 +207,7 @@ mod shop_system {
 
             // common: 70%, rare: 20%, legendary: 10%
             let mut i = 0;
-            for seed in (seed1, seed2, seed3, seed4) {
+            for seed in array![seed1, seed2, seed3, seed4] {
                 let mut random_index = 0;
 
                 if char.wins < 3 {
@@ -218,13 +218,13 @@ mod shop_system {
     
                 let itemId = if random_index < 70 {
                     random_index = random(seed, common.len());
-                    *common.at(random_index);
+                    *common.at(random_index)
                 } else if random_index < 90 {
                     random_index = random(seed, rare.len());
-                    *rare.at(random_index);
+                    *rare.at(random_index)
                 } else {
                     random_index = random(seed, legendary.len());
-                    *legendary.at(random_index);
+                    *legendary.at(random_index)
                 };
 
                 match i {
@@ -236,7 +236,7 @@ mod shop_system {
                 }
 
                 i += 1;
-            }
+            };
 
             char.gold -= 1;
 

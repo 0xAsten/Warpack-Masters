@@ -1,4 +1,4 @@
-use warpack_masters::models::item::ItemRarity;
+// Rarity: None - 0, Common - 1, Rare - 2, Legendary - 3
 
 mod Backpack {
     const id: usize = 1;
@@ -11,7 +11,7 @@ mod Backpack {
     const cleansePoison: usize = 0;
     const chance: usize = 0;
     const cooldown: u8 = 0;
-    const rarity: u8 = ItemRarity::None;
+    const rarity: u8 = 0;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
     const regen: usize = 0;
@@ -38,7 +38,7 @@ mod Pack {
     const cleansePoison: usize = 0;
     const chance: usize = 0;
     const cooldown: u8 = 0;
-    const rarity: u8 = ItemRarity::Rare;
+    const rarity: u8 = 2;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
     const regen: usize = 0;
@@ -65,7 +65,7 @@ mod Satchel {
     const cleansePoison: usize = 0;
     const chance: usize = 0;
     const cooldown: u8 = 0;
-    const rarity: u8 = ItemRarity::Common;
+    const rarity: u8 = 1;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
     const regen: usize = 0;
@@ -92,7 +92,7 @@ mod Pouch {
     const cleansePoison: usize = 0;
     const chance: usize = 0;
     const cooldown: u8 = 0;
-    const rarity: u8 = ItemRarity::Common;
+    const rarity: u8 = 1;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
     const regen: usize = 0;
@@ -119,7 +119,7 @@ mod Herb {
     const cleansePoison: usize = 0;
     const chance: usize = 100;
     const cooldown: u8 = 0;
-    const rarity: u8 = ItemRarity::Common;
+    const rarity: u8 = 1;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
     const regen: usize = 1;
@@ -146,7 +146,7 @@ mod Dagger {
     const cleansePoison: usize = 0;
     const chance: usize = 90;
     const cooldown: u8 = 4;
-    const rarity: u8 = ItemRarity::Common;
+    const rarity: u8 = 1;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
     const regen: usize = 0;
@@ -173,7 +173,7 @@ mod Sword {
     const cleansePoison: usize = 0;
     const chance: usize = 80;
     const cooldown: u8 = 5;
-    const rarity: u8 = ItemRarity::Common;
+    const rarity: u8 = 1;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
     const regen: usize = 0;
@@ -200,7 +200,7 @@ mod Spike {
     const cleansePoison: usize = 0;
     const chance: usize = 100;
     const cooldown: u8 = 0;
-    const rarity: u8 = ItemRarity::Common;
+    const rarity: u8 = 1;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
     const regen: usize = 0;
@@ -227,7 +227,7 @@ mod Shield {
     const cleansePoison: usize = 0;
     const chance: usize = 100;
     const cooldown: u8 = 0;
-    const rarity: u8 = ItemRarity::Common;
+    const rarity: u8 = 1;
     const armor: usize = 12;
     const armorActivation: u8 = 1;
     const regen: usize = 0;
@@ -254,7 +254,7 @@ mod Helmet {
     const cleansePoison: usize = 0;
     const chance: usize = 50;
     const cooldown: u8 = 0;
-    const rarity: u8 = ItemRarity::Common;
+    const rarity: u8 = 1;
     const armor: usize = 2;
     const armorActivation: u8 = 2;
     const regen: usize = 0;
@@ -281,7 +281,7 @@ mod HealingPotion {
     const cleansePoison: usize = 0;
     const chance: usize = 100;
     const cooldown: u8 = 0;
-    const rarity: u8 = ItemRarity::Rare;
+    const rarity: u8 = 2;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
     const regen: usize = 2;
@@ -308,7 +308,7 @@ mod LeatherArmor {
     const cleansePoison: usize = 0;
     const chance: usize = 100;
     const cooldown: u8 = 0;
-    const rarity: u8 = ItemRarity::Rare;
+    const rarity: u8 = 2;
     const armor: usize = 25;
     const armorActivation: u8 = 1;
     const regen: usize = 0;
@@ -335,7 +335,7 @@ mod Poison {
     const cleansePoison: usize = 0;
     const chance: usize = 100;
     const cooldown: u8 = 0;
-    const rarity: u8 = ItemRarity::Rare;
+    const rarity: u8 = 2;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
     const regen: usize = 0;
@@ -362,7 +362,7 @@ mod AugmentedSword {
     const cleansePoison: usize = 0;
     const chance: usize = 80;
     const cooldown: u8 = 5;
-    const rarity: u8 = ItemRarity::Rare;
+    const rarity: u8 = 2;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
     const regen: usize = 0;
@@ -389,7 +389,7 @@ mod AugmentedDagger {
     const cleansePoison: usize = 0;
     const chance: usize = 90;
     const cooldown: u8 = 4;
-    const rarity: u8 = ItemRarity::Rare;
+    const rarity: u8 = 2;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
     const regen: usize = 0;
@@ -416,7 +416,7 @@ mod SpikeShield {
     const cleansePoison: usize = 0;
     const chance: usize = 75;
     const cooldown: u8 = 0;
-    const rarity: u8 = ItemRarity::Rare;
+    const rarity: u8 = 2;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
     const regen: usize = 0;
@@ -443,7 +443,7 @@ mod PlagueFlower {
     const cleansePoison: usize = 0;
     const chance: usize = 80;
     const cooldown: u8 = 4;
-    const rarity: u8 = ItemRarity::Legendary;
+    const rarity: u8 = 3;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
     const regen: usize = 0;
@@ -470,7 +470,7 @@ mod MailArmor {
     const cleansePoison: usize = 0;
     const chance: usize = 100;
     const cooldown: u8 = 0;
-    const rarity: u8 = ItemRarity::Legendary;
+    const rarity: u8 = 3;
     const armor: usize = 55;
     const armorActivation: u8 = 1;
     const regen: usize = 0;
@@ -498,7 +498,7 @@ mod Buckler {
     const cleansePoison: usize = 0;
     const chance: usize = 70;
     const cooldown: u8 = 0;
-    const rarity: u8 = ItemRarity::Rare;
+    const rarity: u8 = 2;
     const armor: usize = 5;
     const armorActivation: u8 = 2;
     const regen: usize = 0;
@@ -525,7 +525,7 @@ mod MagicWater {
     const cleansePoison: usize = 5;
     const chance: usize = 90;
     const cooldown: u8 = 5;
-    const rarity: u8 = ItemRarity::Rare;
+    const rarity: u8 = 2;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
     const regen: usize = 0;
@@ -552,7 +552,7 @@ mod VampiricArmor {
     const cleansePoison: usize = 0;
     const chance: usize = 55;
     const cooldown: u8 = 0;
-    const rarity: u8 = ItemRarity::Legendary;
+    const rarity: u8 = 3;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
     const regen: usize = 0;
@@ -579,7 +579,7 @@ mod Greatsword {
     const cleansePoison: usize = 0;
     const chance: usize = 70;
     const cooldown: u8 = 7;
-    const rarity: u8 = ItemRarity::Rare;
+    const rarity: u8 = 2;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
     const regen: usize = 0;
@@ -606,7 +606,7 @@ mod Bow {
     const cleansePoison: usize = 0;
     const chance: usize = 90;
     const cooldown: u8 = 7;
-    const rarity: u8 = ItemRarity::Rare;
+    const rarity: u8 = 2;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
     const regen: usize = 0;
@@ -633,7 +633,7 @@ mod Crossbow {
     const cleansePoison: usize = 0;
     const chance: usize = 90;
     const cooldown: u8 = 5;
-    const rarity: u8 = ItemRarity::Common;
+    const rarity: u8 = 1;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
     const regen: usize = 0;
@@ -660,7 +660,7 @@ mod Hammer {
     const cleansePoison: usize = 0;
     const chance: usize = 70;
     const cooldown: u8 = 7;
-    const rarity: u8 = ItemRarity::Common;
+    const rarity: u8 = 1;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
     const regen: usize = 0;
@@ -687,7 +687,7 @@ mod AmuletOfFury {
     const cleansePoison: usize = 0;
     const chance: usize = 75;
     const cooldown: u8 = 0;
-    const rarity: u8 = ItemRarity::Common;
+    const rarity: u8 = 1;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
     const regen: usize = 0;
@@ -714,7 +714,7 @@ mod RageGauntlet {
     const cleansePoison: usize = 0;
     const chance: usize = 65;
     const cooldown: u8 = 0;
-    const rarity: u8 = ItemRarity::Rare;
+    const rarity: u8 = 2;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
     const regen: usize = 0;
@@ -741,7 +741,7 @@ mod KnightHelmet {
     const cleansePoison: usize = 0;
     const chance: usize = 100;
     const cooldown: u8 = 5;
-    const rarity: u8 = ItemRarity::Legendary;
+    const rarity: u8 = 3;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
     const regen: usize = 0;
@@ -768,7 +768,7 @@ mod BladeArmor {
     const cleansePoison: usize = 0;
     const chance: usize = 80;
     const cooldown: u8 = 5;
-    const rarity: u8 = ItemRarity::Legendary;
+    const rarity: u8 = 3;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
     const regen: usize = 0;
@@ -795,7 +795,7 @@ mod Club {
     const cleansePoison: usize = 0;
     const chance: usize = 70;
     const cooldown: u8 = 6;
-    const rarity: u8 = ItemRarity::Common;
+    const rarity: u8 = 1;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
     const regen: usize = 0;
@@ -822,7 +822,7 @@ mod Fang {
     const cleansePoison: usize = 0;
     const chance: usize = 100;
     const cooldown: u8 = 0;
-    const rarity: u8 = ItemRarity::Common;
+    const rarity: u8 = 1;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
     const regen: usize = 0;
@@ -849,7 +849,7 @@ mod ScarletCloak {
     const cleansePoison: usize = 0;
     const chance: usize = 45;
     const cooldown: u8 = 0;
-    const rarity: u8 = ItemRarity::Rare;
+    const rarity: u8 = 2;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
     const regen: usize = 0;
@@ -875,8 +875,8 @@ mod DraculaGrimoire {
     const damage: usize = 0;
     const cleansePoison: usize = 0;
     const chance: usize = 65;
-    const cooldown: u8 = 8;
-    const rarity: u8 = ItemRarity::Legendary;
+    const cooldown: u8 = 7;
+    const rarity: u8 = 3;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
     const regen: usize = 0;
@@ -903,7 +903,7 @@ mod Longbow {
     const cleansePoison: usize = 0;
     const chance: usize = 90;
     const cooldown: u8 = 7;
-    const rarity: u8 = ItemRarity::Legendary;
+    const rarity: u8 = 3;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
     const regen: usize = 0;

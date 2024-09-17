@@ -49,11 +49,13 @@ mod fight_system {
         player_regen_stacks: usize,
         player_reflect_stacks: usize,
         player_empower_stacks: usize,
+        player_vampirism_stacks: usize,
         player_poison_stacks: usize,
         dummy_armor_stacks: usize,
         dummy_regen_stacks: usize,
         dummy_reflect_stacks: usize,
         dummy_empower_stacks: usize,
+        dummy_vampirism_stacks: usize,
         dummy_poison_stacks: usize,
     }
 
@@ -602,10 +604,10 @@ mod fight_system {
                                             };
                                             // ====== end ======
 
-                                            if char_health <= damageCaused {
+                                            if char_health <= reflectDamageCaused {
                                                 char_health = 0;
                                             } else {
-                                                char_health -= damageCaused;
+                                                char_health -= reflectDamageCaused;
                                             }
 
                                             battleLogsCount += 1;
@@ -617,7 +619,7 @@ mod fight_system {
                                                     id: battleLogsCount,
                                                     whoTriggered: DUMMY,
                                                     whichItem: 0,
-                                                    damageCaused: damageCaused,
+                                                    damageCaused: reflectDamageCaused,
                                                     isDodged: false,
                                                     cleansePoison: 0,
                                                     buffType: EFFECT_REFLECT,
@@ -929,7 +931,7 @@ mod fight_system {
                                                     id: battleLogsCount,
                                                     whoTriggered: PLAYER,
                                                     whichItem: 0,
-                                                    damageCaused: damageCaused,
+                                                    damageCaused: reflectDamageCaused,
                                                     isDodged: false,
                                                     cleansePoison: 0,
                                                     buffType: EFFECT_REFLECT,
