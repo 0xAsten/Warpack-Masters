@@ -14,4 +14,5 @@ mod constants {
     const EFFECT_EMPOWER: felt252 = 'empower';
     const EFFECT_POISON: felt252 = 'poison';
     const EFFECT_CLEANSE_POISON: felt252 = 'cleanse_poison';
+    const EFFECT_VAMPIRISM: felt252 = 'vampirism';
 }

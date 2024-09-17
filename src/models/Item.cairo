@@ -32,6 +32,8 @@ struct Item {
     poisonActivation: u8,
     empower: usize,
     empowerActivation: u8,
+    vampirism: usize,
+    vampirismActivation: u8,
     energyCost: u8,
 }
 
