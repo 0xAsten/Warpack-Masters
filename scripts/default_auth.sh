@@ -11,6 +11,7 @@ export DUMMY_STSTEM_ADDRESS=$(cat ./manifests/release/deployment/manifest.json |
 export FIGHT_STSTEM_ADDRESS=$(cat ./manifests/release/deployment/manifest.json | jq -r '.contracts[] | select(.tag == "Warpacks-fight_system" and .kind == "DojoContract").address')
 export ITEM_STSTEM_ADDRESS=$(cat ./manifests/release/deployment/manifest.json | jq -r '.contracts[] | select(.tag == "Warpacks-item_system" and .kind == "DojoContract").address')
 export SHOP_STSTEM_ADDRESS=$(cat ./manifests/release/deployment/manifest.json | jq -r '.contracts[] | select(.tag == "Warpacks-shop_system" and .kind == "DojoContract").address')
+export RECIPE_STSTEM_ADDRESS=$(cat ./manifests/release/deployment/manifest.json | jq -r '.contracts[] | select(.tag == "Warpacks-recipe_system" and .kind == "DojoContract").address')
 
 
 echo "---------------------------------------------------------------------------"
@@ -25,6 +26,8 @@ echo " "
 echo ITEM_STSTEM : $ITEM_STSTEM_ADDRESS
 echo " "
 echo SHOP_STSTEM : $SHOP_STSTEM_ADDRESS
+echo " "
+echo RECIPE_STSTEM : $RECIPE_STSTEM_ADDRESS
 echo "---------------------------------------------------------------------------"
 
 # enable system -> models authorizations
@@ -117,5 +120,10 @@ sozo auth grant --world $WORLD_ADDRESS --rpc-url $STARKNET_RPC_URL --wait writer
   model:Warpacks-BattleLog,$SHOP_STSTEM_ADDRESS \
   model:Warpacks-BattleLogCounter,$SHOP_STSTEM_ADDRESS\
   model:Warpacks-NameRecord,$SHOP_STSTEM_ADDRESS
+
+sozo auth grant --world $WORLD_ADDRESS --rpc-url $STARKNET_RPC_URL --wait writer \
+  model:Warpacks-CharacterItemStorage,$RECIPE_STSTEM_ADDRESS \
+  model:Warpacks-Item,$RECIPE_STSTEM_ADDRESS \
+  model:Warpacks-Recipe,$RECIPE_STSTEM_ADDRESS
 
 echo "Default authorizations have been successfully set."
