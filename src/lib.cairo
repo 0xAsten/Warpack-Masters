@@ -32,6 +32,7 @@ mod tests {
     mod test_rebirth;
     mod test_spawn;
     mod test_prefine_dummy;
+    mod test_recipe;
 }
 
 mod utils {

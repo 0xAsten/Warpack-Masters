@@ -30,13 +30,13 @@ mod recipe_system {
             assert(ViewImpl::is_world_owner(world, player), 'player not world owner');
 
             let item1 = get!(world, item1_id, Item);
-            assert!(item1.height != 0, "Item1 does not exist or is invalid");
+            assert(item1.height != 0, 'item1 does not exist');
             let item2 = get!(world, item2_id, Item);
-            assert!(item2.height != 0, "Item2 does not exist or is invalid");
+            assert(item2.height != 0, 'item2 does not exist');
 
             // make constructor
             let result_item = get!(world, result_item_id, Item);
-            assert!(result_item.height != 0, "Result item does not exist or is invalid");
+            assert(result_item.height != 0, 'result item does not exist');
 
             set!(world, Recipe {
                     item1_id,
@@ -67,7 +67,7 @@ mod recipe_system {
             assert(storageItem2.itemId != 0, 'item not owned');
 
             let recipe = get!(world, (storageItem1.itemId, storageItem2.itemId), (Recipe));
-            assert!(recipe.result_item_id != 0, "No valid recipe found for these items");
+            assert(recipe.result_item_id != 0, 'No valid recipe found');
 
             storageItem1.itemId = recipe.result_item_id;
             storageItem2.itemId = 0;
