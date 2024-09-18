@@ -1,7 +1,4 @@
-use starknet::ContractAddress;
 use warpack_masters::models::Character::WMClass;
-
-use warpack_masters::prdefined_dummies::PredefinedItem;
 
 #[dojo::interface]
 trait IActions {
@@ -19,37 +16,30 @@ trait IActions {
         ref world: IWorldDispatcher, storage_item_id: u32, x: usize, y: usize, rotation: usize
     );
     fn undo_place_item(ref world: IWorldDispatcher, inventory_item_id: u32);
-    fn add_receipt(
-        ref world: IWorldDispatcher, item1_id: u32, item2_id: u32, result_item_id: u32
-    );
-    fn craft_item(
-        ref world: IWorldDispatcher, storage_item_id1: u32, storage_item_id2: u32
-    );
 }
 
 // TODO: rename the count filed in counter model
 
 #[dojo::contract]
 mod actions {
-    use super::{IActions, ContractAddress, WMClass};
+    use super::{IActions, WMClass};
+    use starknet::ContractAddress;
 
     use starknet::{get_caller_address, get_block_timestamp};
     use warpack_masters::models::{backpack::{BackpackGrids}};
     use warpack_masters::models::{
         CharacterItem::{
             Position, CharacterItemsStorageCounter, CharacterItemStorage, CharacterItemInventory,
-            CharacterItemsInventoryCounter, are_items_nearby
+            CharacterItemsInventoryCounter
         },
         Item::Item,
         Character::{Characters, NameRecord},
-        Receipt::Receipt,
         Shop::Shop,
         BattleLog::{BattleLog, BattleLogCounter}
     };
 
     use warpack_masters::items::{Backpack, Pack};
     use warpack_masters::constants::constants::{GRID_X, GRID_Y, INIT_GOLD, INIT_HEALTH, INIT_STAMINA};
-    use warpack_masters::systems::view::view::ViewImpl;
 
     #[abi(embed_v0)]
     impl ActionsImpl of IActions<ContractState> {
@@ -502,57 +492,6 @@ mod actions {
             inventoryItem.position.y = 0;
             inventoryItem.rotation = 0;
             set!(world, (inventoryItem));
-        }
-
-        fn add_receipt(
-            ref world: IWorldDispatcher, item1_id: u32, item2_id: u32, result_item_id: u32
-        ) {
-            let player = get_caller_address();
-            assert(ViewImpl::is_world_owner(world, player), 'player not world owner');
-
-            let item1 = get!(world, item1_id, Item);
-            assert!(item1.height != 0, "Item1 does not exist or is invalid");
-            let item2 = get!(world, item2_id, Item);
-            assert!(item2.height != 0, "Item2 does not exist or is invalid");
-
-            // make constructor
-            let result_item = get!(world, result_item_id, Item);
-            assert!(result_item.height != 0, "Result item does not exist or is invalid");
-
-            set!(world, Receipt {
-                    item1_id,
-                    item2_id,
-                    result_item_id,
-                }
-            );
-
-            if item1_id != item2_id {
-                set!(world, Receipt {
-                        item1_id: item2_id,
-                        item2_id: item1_id,
-                        result_item_id,
-                    }
-                );
-            }
-        }
-
-        fn craft_item(
-            ref world: IWorldDispatcher, storage_item_id1: u32, storage_item_id2: u32
-        ) {
-            let player = get_caller_address();
-
-            let mut storageItem1 = get!(world, (player, storage_item_id1), (CharacterItemStorage));
-            assert(storageItem1.itemId != 0, 'item not owned');
-
-            let mut storageItem2 = get!(world, (player, storage_item_id2), (CharacterItemStorage));
-            assert(storageItem2.itemId != 0, 'item not owned');
-
-            let receipt = get!(world, (storageItem1.itemId, storageItem2.itemId), (Receipt));
-            assert!(receipt.result_item_id != 0, "No valid receipt found for these items");
-
-            storageItem1.itemId = receipt.result_item_id;
-            storageItem2.itemId = 0;
-            set!(world, (storageItem1, storageItem2));
         }
     }
 }

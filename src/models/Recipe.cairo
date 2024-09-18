@@ -1,6 +1,6 @@
 #[derive(Drop, Serde)]
 #[dojo::model]
-struct Receipt {
+struct Recipe {
     #[key]
     item1_id: u32,
     #[key]

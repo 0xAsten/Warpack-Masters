@@ -6,6 +6,7 @@ mod systems {
     mod item;
     mod shop;
     mod view;
+    mod recipe;
 }
 
 mod models {
@@ -17,7 +18,7 @@ mod models {
     mod DummyCharacter;
     mod DummyCharacterItem;
     mod BattleLog;
-    mod Receipt;
+    mod Recipe;
 }
 
 mod tests {
