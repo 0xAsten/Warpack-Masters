@@ -298,10 +298,12 @@ mod tests {
         assert(battleLog.belongs_tos == array![PLAYER, DUMMY, PLAYER].span(), 'belongs_tos is incorrect');
         assert(battleLog.items_length == 3, 'items_length should be 3');
         // armor, regen, reflect, empower, poison, vampirism
-        assert(battleLog.char_buffs == array![15, 0, 0, 0, 0, 0].span(), 'char_buffs is incorrect');
-        assert(battleLog.dummy_buffs == array![0, 1, 1, 0, 2, 0].span(), 'dummy_buffs is incorrect');
+        // itemids 6 7 9 10 13
+        assert(battleLog.char_buffs == array![12, 0, 0, 0, 0, 0].span(), 'char_buffs is incorrect');
+        // itemids 5 6 8 16
+        assert(battleLog.dummy_buffs == array![0, 1, 2, 0, 2, 0].span(), 'dummy_buffs is incorrect');
         // on hit, on attack
-        assert(battleLog.char_on_hit_items == array![(EFFECT_ARMOR, 50, 3)].span(), 'char_on_hit_items is incorrect');
+        assert(battleLog.char_on_hit_items == array![(EFFECT_ARMOR, 50, 2)].span(), 'char_on_hit_items is incorrect');
         assert(battleLog.dummy_on_hit_items == array![(EFFECT_REFLECT, 75, 2)].span(), 'dummy_on_hit_items is incorrect');
         assert(battleLog.char_on_attack_items == array![].span(), 'on_attack_items is incorrect');
         assert(battleLog.dummy_on_attack_items == array![].span(), 'on_attack_items is incorrect');
