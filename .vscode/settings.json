@@ -4,5 +4,4 @@
     "cairo1.languageServerPath": "${userHome}/.dojo/bin/dojo-language-server",
     "editor.defaultFormatter": "StarkWare.cairo1",
     "editor.formatOnSave": false
-  }
-  
+}
