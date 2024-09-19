@@ -1,0 +1,15 @@
+Item 1,Item 2,Result
+Pouch,Pouch,Satchel
+Pack,Satchel,Backpack
+Herb,Herb,Healing Potion
+Dagger,Dagger,Augmented Dagger
+Sword,Sword,Augmented Sword
+Shield,Spike,Spike Shield
+Shield,Helmet,Buckler
+Leather Armor,Shield,Mail Armor
+Leather Armor,Spike Shield,Blade Armor
+Leather Armor,Scarlet Cloak,Vampiric Armor
+Bow,Bow,Longbow
+Rage Gauntlet,Helmet,Knight Helmet
+Club,Club,Hammer
+Dagger,Poison,Poison Dagger

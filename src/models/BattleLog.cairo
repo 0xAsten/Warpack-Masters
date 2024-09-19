@@ -7,8 +7,17 @@ struct BattleLog {
     player: ContractAddress,
     #[key]
     id: usize,
-    dummyCharLevel: usize,
+    dummyLevel: usize,
     dummyCharId: usize,
+    item_ids: Span<u32>,
+    belongs_tos: Span<felt252>,
+    items_length: usize,
+    char_buffs: Span<u32>,
+    dummy_buffs: Span<u32>,
+    char_on_hit_items: Span<(felt252, usize, usize)>,
+    dummy_on_hit_items: Span<(felt252, usize, usize)>,
+    char_on_attack_items: Span<(felt252, usize, usize)>,
+    dummy_on_attack_items: Span<(felt252, usize, usize)>,
     // dummy or player
     winner: felt252,
     seconds: u8

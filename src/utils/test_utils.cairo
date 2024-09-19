@@ -26,6 +26,9 @@ fn add_items(ref item_system: IItemDispatcher) {
             items::Backpack::poisonActivation,
             items::Backpack::empower,
             items::Backpack::empowerActivation,
+            items::Backpack::vampirism,
+            items::Backpack::vampirismActivation,
+            items::Backpack::energyCost,
         );
 
     item_system
@@ -51,6 +54,9 @@ fn add_items(ref item_system: IItemDispatcher) {
             items::Pack::poisonActivation,
             items::Pack::empower,
             items::Pack::empowerActivation,
+            items::Pack::vampirism,
+            items::Pack::vampirismActivation,
+            items::Pack::energyCost,
         );
 
     item_system
@@ -76,6 +82,9 @@ fn add_items(ref item_system: IItemDispatcher) {
             items::Satchel::poisonActivation,
             items::Satchel::empower,
             items::Satchel::empowerActivation,
+            items::Satchel::vampirism,
+            items::Satchel::vampirismActivation,
+            items::Satchel::energyCost,
         );
 
     item_system
@@ -101,6 +110,9 @@ fn add_items(ref item_system: IItemDispatcher) {
             items::Pouch::poisonActivation,
             items::Pouch::empower,
             items::Pouch::empowerActivation,
+            items::Pouch::vampirism,
+            items::Pouch::vampirismActivation,
+            items::Pouch::energyCost,
         );
 
     item_system
@@ -126,6 +138,9 @@ fn add_items(ref item_system: IItemDispatcher) {
             items::Herb::poisonActivation,
             items::Herb::empower,
             items::Herb::empowerActivation,
+            items::Herb::vampirism,
+            items::Herb::vampirismActivation,
+            items::Herb::energyCost,
         );
 
     item_system
@@ -151,6 +166,9 @@ fn add_items(ref item_system: IItemDispatcher) {
             items::Dagger::poisonActivation,
             items::Dagger::empower,
             items::Dagger::empowerActivation,
+            items::Dagger::vampirism,
+            items::Dagger::vampirismActivation,
+            items::Dagger::energyCost,
         );
 
     item_system
@@ -176,6 +194,9 @@ fn add_items(ref item_system: IItemDispatcher) {
             items::Sword::poisonActivation,
             items::Sword::empower,
             items::Sword::empowerActivation,
+            items::Sword::vampirism,
+            items::Sword::vampirismActivation,
+            items::Sword::energyCost,
         );
 
     item_system
@@ -201,6 +222,9 @@ fn add_items(ref item_system: IItemDispatcher) {
             items::Spike::poisonActivation,
             items::Spike::empower,
             items::Spike::empowerActivation,
+            items::Spike::vampirism,
+            items::Spike::vampirismActivation,
+            items::Spike::energyCost,
         );
 
     item_system
@@ -226,6 +250,9 @@ fn add_items(ref item_system: IItemDispatcher) {
             items::Shield::poisonActivation,
             items::Shield::empower,
             items::Shield::empowerActivation,
+            items::Shield::vampirism,
+            items::Shield::vampirismActivation,
+            items::Shield::energyCost,
         );
 
     item_system
@@ -251,6 +278,9 @@ fn add_items(ref item_system: IItemDispatcher) {
             items::Helmet::poisonActivation,
             items::Helmet::empower,
             items::Helmet::empowerActivation,
+            items::Helmet::vampirism,
+            items::Helmet::vampirismActivation,
+            items::Helmet::energyCost,
         );
 
     item_system
@@ -276,6 +306,9 @@ fn add_items(ref item_system: IItemDispatcher) {
             items::HealingPotion::poisonActivation,
             items::HealingPotion::empower,
             items::HealingPotion::empowerActivation,
+            items::HealingPotion::vampirism,
+            items::HealingPotion::vampirismActivation,
+            items::HealingPotion::energyCost,
         );
 
     item_system
@@ -301,6 +334,9 @@ fn add_items(ref item_system: IItemDispatcher) {
             items::LeatherArmor::poisonActivation,
             items::LeatherArmor::empower,
             items::LeatherArmor::empowerActivation,
+            items::LeatherArmor::vampirism,
+            items::LeatherArmor::vampirismActivation,
+            items::LeatherArmor::energyCost,
         );
 
     item_system
@@ -326,6 +362,9 @@ fn add_items(ref item_system: IItemDispatcher) {
             items::Poison::poisonActivation,
             items::Poison::empower,
             items::Poison::empowerActivation,
+            items::Poison::vampirism,
+            items::Poison::vampirismActivation,
+            items::Poison::energyCost,
         );
 
     item_system
@@ -351,6 +390,9 @@ fn add_items(ref item_system: IItemDispatcher) {
             items::AugmentedSword::poisonActivation,
             items::AugmentedSword::empower,
             items::AugmentedSword::empowerActivation,
+            items::AugmentedSword::vampirism,
+            items::AugmentedSword::vampirismActivation,
+            items::AugmentedSword::energyCost,
         );
 
     item_system
@@ -376,6 +418,9 @@ fn add_items(ref item_system: IItemDispatcher) {
             items::AugmentedDagger::poisonActivation,
             items::AugmentedDagger::empower,
             items::AugmentedDagger::empowerActivation,
+            items::AugmentedDagger::vampirism,
+            items::AugmentedDagger::vampirismActivation,
+            items::AugmentedDagger::energyCost,
         );
 
     item_system
@@ -401,6 +446,9 @@ fn add_items(ref item_system: IItemDispatcher) {
             items::SpikeShield::poisonActivation,
             items::SpikeShield::empower,
             items::SpikeShield::empowerActivation,
+            items::SpikeShield::vampirism,
+            items::SpikeShield::vampirismActivation,
+            items::SpikeShield::energyCost,
         );
 }
 

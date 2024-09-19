@@ -6,6 +6,7 @@ mod systems {
     mod item;
     mod shop;
     mod view;
+    mod recipe;
 }
 
 mod models {
@@ -17,6 +18,7 @@ mod models {
     mod DummyCharacter;
     mod DummyCharacterItem;
     mod BattleLog;
+    mod Recipe;
 }
 
 mod tests {
@@ -30,11 +32,13 @@ mod tests {
     mod test_rebirth;
     mod test_spawn;
     mod test_prefine_dummy;
+    mod test_recipe;
 }
 
 mod utils {
     mod random;
     mod test_utils;
+    mod sort_items;
 }
 
 mod items;

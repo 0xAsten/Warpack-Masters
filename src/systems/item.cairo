@@ -23,6 +23,9 @@ trait IItem {
         poisonActivation: u8,
         empower: u32,
         empowerActivation: u8,
+        vampirism: u32,
+        vampirismActivation: u8,
+        energyCost: u8,
     );
 }
 
@@ -62,6 +65,9 @@ mod item_system {
             poisonActivation: u8,
             empower: u32,
             empowerActivation: u8,
+            vampirism: u32,
+            vampirismActivation: u8,
+            energyCost: u8,
         ) {
             let player = get_caller_address();
 
@@ -75,6 +81,11 @@ mod item_system {
             assert(
                 rarity == 1 || rarity == 2 || rarity == 3 || (rarity == 0 && itemType == 4),
                 'rarity not valid'
+            );
+
+            assert(
+                cooldown == 0 || cooldown == 4 || cooldown == 5 || cooldown == 6 || cooldown == 7,
+                'cooldown not valid'
             );
 
             let counter = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
@@ -104,6 +115,9 @@ mod item_system {
                 poisonActivation,
                 empower,
                 empowerActivation,
+                vampirism,
+                vampirismActivation,
+                energyCost,
             };
 
             set!(world, (item));

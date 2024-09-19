@@ -1,6 +1,5 @@
 use starknet::ContractAddress;
 
-
 #[derive(Drop, Serde)]
 #[dojo::model]
 struct Item {
@@ -32,6 +31,9 @@ struct Item {
     poisonActivation: u8,
     empower: usize,
     empowerActivation: u8,
+    vampirism: usize,
+    vampirismActivation: u8,
+    energyCost: u8,
 }
 
 #[derive(Drop, Serde)]

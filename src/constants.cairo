@@ -3,6 +3,7 @@ mod constants {
     const GRID_Y: usize = 7;
     const INIT_GOLD: usize = 8;
     const INIT_HEALTH: usize = 25;
+    const INIT_STAMINA: u8 = 100;
 
     const ITEMS_COUNTER_ID: felt252 = 'ITEMS_COUNTER_ID';
     const STORAGE_FLAG: usize = 999;
@@ -13,4 +14,5 @@ mod constants {
     const EFFECT_EMPOWER: felt252 = 'empower';
     const EFFECT_POISON: felt252 = 'poison';
     const EFFECT_CLEANSE_POISON: felt252 = 'cleanse_poison';
+    const EFFECT_VAMPIRISM: felt252 = 'vampirism';
 }

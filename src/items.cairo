@@ -1,3 +1,5 @@
+// Rarity: None - 0, Common - 1, Rare - 2, Legendary - 3
+
 mod Backpack {
     const id: usize = 1;
     const name: felt252 = 'Backpack';
@@ -20,6 +22,9 @@ mod Backpack {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const vampirism: usize = 0;
+    const vampirismActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod Pack {
@@ -44,6 +49,9 @@ mod Pack {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const vampirism: usize = 0;
+    const vampirismActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod Satchel {
@@ -68,6 +76,9 @@ mod Satchel {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const vampirism: usize = 0;
+    const vampirismActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod Pouch {
@@ -92,6 +103,9 @@ mod Pouch {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const vampirism: usize = 0;
+    const vampirismActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod Herb {
@@ -116,6 +130,9 @@ mod Herb {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const vampirism: usize = 0;
+    const vampirismActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod Dagger {
@@ -140,6 +157,9 @@ mod Dagger {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const vampirism: usize = 0;
+    const vampirismActivation: u8 = 0;
+    const energyCost: u8 = 20;
 }
 
 mod Sword {
@@ -164,6 +184,9 @@ mod Sword {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const vampirism: usize = 0;
+    const vampirismActivation: u8 = 0;
+    const energyCost: u8 = 30;
 }
 
 mod Spike {
@@ -182,12 +205,15 @@ mod Spike {
     const armorActivation: u8 = 0;
     const regen: usize = 0;
     const regenActivation: u8 = 0;
-    const reflect: usize = 1;
+    const reflect: usize = 2;
     const reflectActivation: u8 = 1;
     const poison: usize = 0;
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const vampirism: usize = 0;
+    const vampirismActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod Shield {
@@ -202,7 +228,7 @@ mod Shield {
     const chance: usize = 100;
     const cooldown: u8 = 0;
     const rarity: u8 = 1;
-    const armor: usize = 15;
+    const armor: usize = 12;
     const armorActivation: u8 = 1;
     const regen: usize = 0;
     const regenActivation: u8 = 0;
@@ -212,6 +238,9 @@ mod Shield {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const vampirism: usize = 0;
+    const vampirismActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod Helmet {
@@ -226,7 +255,7 @@ mod Helmet {
     const chance: usize = 50;
     const cooldown: u8 = 0;
     const rarity: u8 = 1;
-    const armor: usize = 3;
+    const armor: usize = 2;
     const armorActivation: u8 = 2;
     const regen: usize = 0;
     const regenActivation: u8 = 0;
@@ -236,6 +265,9 @@ mod Helmet {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const vampirism: usize = 0;
+    const vampirismActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod HealingPotion {
@@ -260,6 +292,9 @@ mod HealingPotion {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const vampirism: usize = 0;
+    const vampirismActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod LeatherArmor {
@@ -268,13 +303,13 @@ mod LeatherArmor {
     const itemType: u8 = 3;
     const width: usize = 2;
     const height: usize = 3;
-    const price: usize = 5;
+    const price: usize = 6;
     const damage: usize = 0;
     const cleansePoison: usize = 0;
     const chance: usize = 100;
     const cooldown: u8 = 0;
     const rarity: u8 = 2;
-    const armor: usize = 35;
+    const armor: usize = 25;
     const armorActivation: u8 = 1;
     const regen: usize = 0;
     const regenActivation: u8 = 0;
@@ -284,6 +319,9 @@ mod LeatherArmor {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const vampirism: usize = 0;
+    const vampirismActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod Poison {
@@ -308,6 +346,9 @@ mod Poison {
     const poisonActivation: u8 = 1;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const vampirism: usize = 0;
+    const vampirismActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod AugmentedSword {
@@ -332,6 +373,9 @@ mod AugmentedSword {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const vampirism: usize = 0;
+    const vampirismActivation: u8 = 0;
+    const energyCost: u8 = 30;
 }
 
 mod AugmentedDagger {
@@ -356,6 +400,9 @@ mod AugmentedDagger {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const vampirism: usize = 0;
+    const vampirismActivation: u8 = 0;
+    const energyCost: u8 = 20;
 }
 
 mod SpikeShield {
@@ -380,6 +427,9 @@ mod SpikeShield {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const vampirism: usize = 0;
+    const vampirismActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod PlagueFlower {
@@ -404,6 +454,9 @@ mod PlagueFlower {
     const poisonActivation: u8 = 3;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const vampirism: usize = 0;
+    const vampirismActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod MailArmor {
@@ -418,7 +471,7 @@ mod MailArmor {
     const chance: usize = 100;
     const cooldown: u8 = 0;
     const rarity: u8 = 3;
-    const armor: usize = 75;
+    const armor: usize = 55;
     const armorActivation: u8 = 1;
     const regen: usize = 0;
     const regenActivation: u8 = 0;
@@ -428,6 +481,9 @@ mod MailArmor {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const vampirism: usize = 0;
+    const vampirismActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 
@@ -440,10 +496,10 @@ mod Buckler {
     const price: usize = 8;
     const damage: usize = 0;
     const cleansePoison: usize = 0;
-    const chance: usize = 60;
+    const chance: usize = 70;
     const cooldown: u8 = 0;
     const rarity: u8 = 2;
-    const armor: usize = 10;
+    const armor: usize = 5;
     const armorActivation: u8 = 2;
     const regen: usize = 0;
     const regenActivation: u8 = 0;
@@ -453,6 +509,9 @@ mod Buckler {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const vampirism: usize = 0;
+    const vampirismActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod MagicWater {
@@ -477,6 +536,9 @@ mod MagicWater {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const vampirism: usize = 0;
+    const vampirismActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod VampiricArmor {
@@ -485,22 +547,25 @@ mod VampiricArmor {
     const itemType: u8 = 3;
     const width: usize = 2;
     const height: usize = 3;
-    const price: usize = 10;
+    const price: usize = 12;
     const damage: usize = 0;
     const cleansePoison: usize = 0;
-    const chance: usize = 70;
+    const chance: usize = 55;
     const cooldown: u8 = 0;
     const rarity: u8 = 3;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
-    const regen: usize = 3;
-    const regenActivation: u8 = 4;
+    const regen: usize = 0;
+    const regenActivation: u8 = 0;
     const reflect: usize = 0;
     const reflectActivation: u8 = 0;
     const poison: usize = 0;
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const vampirism: usize = 2;
+    const vampirismActivation: u8 = 2;
+    const energyCost: u8 = 0;
 }
 
 mod Greatsword {
@@ -525,6 +590,9 @@ mod Greatsword {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const vampirism: usize = 0;
+    const vampirismActivation: u8 = 0;
+    const energyCost: u8 = 60;
 }
 
 mod Bow {
@@ -549,6 +617,9 @@ mod Bow {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const vampirism: usize = 0;
+    const vampirismActivation: u8 = 0;
+    const energyCost: u8 = 25;
 }
 
 mod Crossbow {
@@ -573,6 +644,9 @@ mod Crossbow {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const vampirism: usize = 0;
+    const vampirismActivation: u8 = 0;
+    const energyCost: u8 = 15;
 }
 
 mod Hammer {
@@ -597,6 +671,9 @@ mod Hammer {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const vampirism: usize = 0;
+    const vampirismActivation: u8 = 0;
+    const energyCost: u8 = 45;
 }
 
 mod AmuletOfFury {
@@ -610,7 +687,7 @@ mod AmuletOfFury {
     const cleansePoison: usize = 0;
     const chance: usize = 75;
     const cooldown: u8 = 0;
-    const rarity: u8 = 2;
+    const rarity: u8 = 1;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
     const regen: usize = 0;
@@ -621,6 +698,9 @@ mod AmuletOfFury {
     const poisonActivation: u8 = 0;
     const empower: usize = 2;
     const empowerActivation: u8 = 2;
+    const vampirism: usize = 0;
+    const vampirismActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod RageGauntlet {
@@ -634,7 +714,7 @@ mod RageGauntlet {
     const cleansePoison: usize = 0;
     const chance: usize = 65;
     const cooldown: u8 = 0;
-    const rarity: u8 = 1;
+    const rarity: u8 = 2;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
     const regen: usize = 0;
@@ -645,6 +725,9 @@ mod RageGauntlet {
     const poisonActivation: u8 = 0;
     const empower: usize = 1;
     const empowerActivation: u8 = 4;
+    const vampirism: usize = 0;
+    const vampirismActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod KnightHelmet {
@@ -669,6 +752,9 @@ mod KnightHelmet {
     const poisonActivation: u8 = 0;
     const empower: usize = 3;
     const empowerActivation: u8 = 3;
+    const vampirism: usize = 0;
+    const vampirismActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod BladeArmor {
@@ -693,6 +779,9 @@ mod BladeArmor {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const vampirism: usize = 0;
+    const vampirismActivation: u8 = 0;
+    const energyCost: u8 = 0;
 }
 
 mod Club {
@@ -717,4 +806,115 @@ mod Club {
     const poisonActivation: u8 = 0;
     const empower: usize = 0;
     const empowerActivation: u8 = 0;
+    const vampirism: usize = 0;
+    const vampirismActivation: u8 = 0;
+    const energyCost: u8 = 35;
+}
+
+mod Fang {
+    const id: usize = 31;
+    const name: felt252 = 'Fang';
+    const itemType: u8 = 3;
+    const width: usize = 1;
+    const height: usize = 1;
+    const price: usize = 3;
+    const damage: usize = 0;
+    const cleansePoison: usize = 0;
+    const chance: usize = 100;
+    const cooldown: u8 = 0;
+    const rarity: u8 = 1;
+    const armor: usize = 0;
+    const armorActivation: u8 = 0;
+    const regen: usize = 0;
+    const regenActivation: u8 = 0;
+    const reflect: usize = 0;
+    const reflectActivation: u8 = 0;
+    const poison: usize = 0;
+    const poisonActivation: u8 = 0;
+    const empower: usize = 0;
+    const empowerActivation: u8 = 0;
+    const vampirism: usize = 1;
+    const vampirismActivation: u8 = 1;
+    const energyCost: u8 = 0;
+}
+
+mod ScarletCloak {
+    const id: usize = 32;
+    const name: felt252 = 'Scarlet Cloak';
+    const itemType: u8 = 3;
+    const width: usize = 2;
+    const height: usize = 2;
+    const price: usize = 6;
+    const damage: usize = 0;
+    const cleansePoison: usize = 0;
+    const chance: usize = 45;
+    const cooldown: u8 = 0;
+    const rarity: u8 = 2;
+    const armor: usize = 0;
+    const armorActivation: u8 = 0;
+    const regen: usize = 0;
+    const regenActivation: u8 = 0;
+    const reflect: usize = 0;
+    const reflectActivation: u8 = 0;
+    const poison: usize = 0;
+    const poisonActivation: u8 = 0;
+    const empower: usize = 0;
+    const empowerActivation: u8 = 0;
+    const vampirism: usize = 1;
+    const vampirismActivation: u8 = 4;
+    const energyCost: u8 = 0;
+}
+
+mod DraculaGrimoire {
+    const id: usize = 33;
+    const name: felt252 = 'Dracula Grimoire';
+    const itemType: u8 = 3;
+    const width: usize = 2;
+    const height: usize = 2;
+    const price: usize = 12;
+    const damage: usize = 0;
+    const cleansePoison: usize = 0;
+    const chance: usize = 65;
+    const cooldown: u8 = 7;
+    const rarity: u8 = 3;
+    const armor: usize = 0;
+    const armorActivation: u8 = 0;
+    const regen: usize = 0;
+    const regenActivation: u8 = 0;
+    const reflect: usize = 0;
+    const reflectActivation: u8 = 0;
+    const poison: usize = 0;
+    const poisonActivation: u8 = 0;
+    const empower: usize = 0;
+    const empowerActivation: u8 = 0;
+    const vampirism: usize = 2;
+    const vampirismActivation: u8 = 3;
+    const energyCost: u8 = 0;
+}
+
+mod Longbow {
+    const id: usize = 34;
+    const name: felt252 = 'Longbow';
+    const itemType: u8 = 2;
+    const width: usize = 1;
+    const height: usize = 4;
+    const price: usize = 10;
+    const damage: usize = 15;
+    const cleansePoison: usize = 0;
+    const chance: usize = 90;
+    const cooldown: u8 = 7;
+    const rarity: u8 = 3;
+    const armor: usize = 0;
+    const armorActivation: u8 = 0;
+    const regen: usize = 0;
+    const regenActivation: u8 = 0;
+    const reflect: usize = 0;
+    const reflectActivation: u8 = 0;
+    const poison: usize = 0;
+    const poisonActivation: u8 = 0;
+    const empower: usize = 0;
+    const empowerActivation: u8 = 0;
+    const vampirism: usize = 0;
+    const vampirismActivation: u8 = 0;
+    const energyCost: u8 = 35;
 }

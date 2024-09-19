@@ -54,8 +54,11 @@ const commands = items
       poisonActivation,
       empower,
       empowerActivation,
+      vampirism,
+      vampirismActivation,
+      energyCost,
     } = item
-    return `sozo execute --world $WORLD_ADDRESS $ITEM_STSTEM_ADDRESS add_item -c ${id},${name},${itemType},${width},${height},${price},${damage},${cleansePoison},${chance},${cooldown},${rarity},${armor},${armorActivation},${regen},${regenActivation},${reflect},${reflectActivation},${poison},${poisonActivation},${empower},${empowerActivation} --wait --rpc-url $STARKNET_RPC_URL`
+    return `sozo execute --world $WORLD_ADDRESS $ITEM_STSTEM_ADDRESS add_item -c ${id},${name},${itemType},${width},${height},${price},${damage},${cleansePoison},${chance},${cooldown},${rarity},${armor},${armorActivation},${regen},${regenActivation},${reflect},${reflectActivation},${poison},${poisonActivation},${empower},${empowerActivation},${vampirism},${vampirismActivation},${energyCost} --wait --rpc-url $STARKNET_RPC_URL`
   })
   .join('\n')
 

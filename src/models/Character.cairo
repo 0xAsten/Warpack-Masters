@@ -2,7 +2,7 @@ use starknet::ContractAddress;
 
 #[derive(Drop, Serde)]
 #[dojo::model]
-struct Character {
+struct Characters {
     #[key]
     player: ContractAddress,
     // must be less than 31 ASCII characters
@@ -17,6 +17,7 @@ struct Character {
     totalWins: usize,
     totalLoss: usize,
     winStreak: usize,
+    stamina: u8,
     birthCount: u32,
     updatedAt: u64
 }
@@ -35,3 +36,6 @@ struct NameRecord {
     name: felt252,
     player: ContractAddress,
 }
+
+const PLAYER: felt252 = 'player';
+const DUMMY: felt252 = 'dummy';

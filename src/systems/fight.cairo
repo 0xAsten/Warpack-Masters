@@ -1,5 +1,6 @@
 #[dojo::interface]
 trait IFight {
+    fn match_dummy(ref world: IWorldDispatcher);
     fn fight(ref world: IWorldDispatcher);
 }
 
@@ -9,20 +10,19 @@ mod fight_system {
 
     use starknet::{ContractAddress, get_caller_address, get_block_timestamp};
     use warpack_masters::models::{
-        CharacterItem::{
-            Position, CharacterItemInventory,
-            CharacterItemsInventoryCounter
-        },
+        CharacterItem::{Position, CharacterItemInventory, CharacterItemsInventoryCounter},
         Item::Item
     };
-    use warpack_masters::models::Character::{Character, WMClass};
+    use warpack_masters::models::Character::{Characters, WMClass, PLAYER, DUMMY};
 
     use warpack_masters::utils::random::{pseudo_seed, random};
+    use warpack_masters::utils::sort_items::{append_item, combine_items};
     use warpack_masters::models::DummyCharacter::{DummyCharacter, DummyCharacterCounter};
     use warpack_masters::models::DummyCharacterItem::{
         DummyCharacterItem, DummyCharacterItemsCounter
     };
     use warpack_masters::models::BattleLog::{BattleLog, BattleLogCounter};
+    use warpack_masters::constants::constants::{EFFECT_ARMOR, EFFECT_REGEN, EFFECT_REFLECT, EFFECT_EMPOWER, EFFECT_POISON, EFFECT_CLEANSE_POISON, EFFECT_VAMPIRISM};
 
     #[derive(Copy, Drop, Serde)]
     #[dojo::model]
@@ -43,38 +43,39 @@ mod fight_system {
         regenHP: usize,
         player_remaining_health: usize,
         dummy_remaining_health: usize,
+        player_stamina: u8,
+        dummy_stamina: u8,
         player_armor_stacks: usize,
         player_regen_stacks: usize,
         player_reflect_stacks: usize,
         player_empower_stacks: usize,
+        player_vampirism_stacks: usize,
         player_poison_stacks: usize,
         dummy_armor_stacks: usize,
         dummy_regen_stacks: usize,
         dummy_reflect_stacks: usize,
         dummy_empower_stacks: usize,
+        dummy_vampirism_stacks: usize,
         dummy_poison_stacks: usize,
     }
-    
-    const EFFECT_ARMOR: felt252 = 'armor';
-    const EFFECT_REGEN: felt252 = 'regen';
-    const EFFECT_REFLECT: felt252 = 'reflect';
-    const EFFECT_EMPOWER: felt252 = 'empower';
-    const EFFECT_POISON: felt252 = 'poison';
-    const EFFECT_CLEANSE_POISON: felt252 = 'cleanse_poison';
 
     #[abi(embed_v0)]
     impl FightImpl of IFight<ContractState> {
-        fn fight(ref world: IWorldDispatcher) {
+        fn match_dummy(ref world: IWorldDispatcher) {
             let player = get_caller_address();
 
-            let mut char = get!(world, player, (Character));
+            let mut char = get!(world, player, (Characters));
 
             assert(char.dummied == true, 'dummy not created');
             assert(char.loss < 5, 'max loss reached');
 
-            let (seed1, seed2, _, _) = pseudo_seed();
+            let (seed1, _, _, _) = pseudo_seed();
             let dummyCharCounter = get!(world, char.wins, (DummyCharacterCounter));
             assert(dummyCharCounter.count > 1, 'only self dummy created');
+
+            let mut battleLogCounter = get!(world, player, (BattleLogCounter));
+            let latestBattleLog = get!(world, (player, battleLogCounter.count), BattleLog);
+            assert(battleLogCounter.count == 0 || latestBattleLog.winner != 0, 'battle not fought');
 
             let random_index = random(seed1, dummyCharCounter.count) + 1;
             let mut dummy_index = random_index;
@@ -86,14 +87,10 @@ mod fight_system {
                 dummyChar = get!(world, (char.wins, dummy_index), DummyCharacter);
             };
 
-            // start the battle
-            let mut char_health: usize = char.health;
-            let char_health_flag: usize = char.health;
-            let mut dummy_health: usize = dummyChar.health;
-            let dummy_health_flag: usize = dummyChar.health;
-
-            let mut char_items_len: usize = 0;
-            let mut dummy_items_len: usize = 0;
+            let mut items_cooldown4 = ArrayTrait::new();
+            let mut items_cooldown5 = ArrayTrait::new();
+            let mut items_cooldown6 = ArrayTrait::new();
+            let mut items_cooldown7 = ArrayTrait::new();
 
             // =========  buffs/debuffs stacks ========= 
             let mut char_armor: usize = 0;
@@ -108,24 +105,23 @@ mod fight_system {
             let mut char_empower: usize = 0;
             let mut dummy_empower: usize = 0;
 
+            let mut char_vampirism: usize = 0;
+            let mut dummy_vampirism: usize = 0;
+
             let mut char_poison: usize = 0;
             let mut dummy_poison: usize = 0;
+            // =========  end =========
 
             let mut char_on_hit_items = ArrayTrait::new();
             let mut dummy_on_hit_items = ArrayTrait::new();
 
             let mut char_on_attack_items = ArrayTrait::new();
             let mut dummy_on_attack_items = ArrayTrait::new();
-            // =========  end =========
-
-            // sort items
-            let mut items: Felt252Dict<u32> = Default::default();
-            let mut item_belongs: Felt252Dict<felt252> = Default::default();
-            let mut items_length: usize = 0;
 
             let inventoryItemsCounter = get!(world, player, (CharacterItemsInventoryCounter));
             let mut inventoryItemCount = inventoryItemsCounter.count;
 
+            let mut items_length: usize = 0;
             loop {
                 if inventoryItemCount == 0 {
                     break;
@@ -138,11 +134,16 @@ mod fight_system {
                 }
                 let cooldown = item.cooldown;
                 if cooldown > 0 {
-                    items.insert(items_length.into(), charItem.itemId);
-                    item_belongs.insert(items_length.into(), 'player');
-
-                    items_length += 1;
-                    char_items_len += 1;
+                    items_length = append_item(
+                        ref items_cooldown4,
+                        ref items_cooldown5,
+                        ref items_cooldown6,
+                        ref items_cooldown7,
+                        item.id,
+                        PLAYER,
+                        cooldown,
+                        items_length,
+                    );
                 } else if cooldown == 0 {
                     // ====== `on start / on hit / on attack` to plus stacks ======
                     // buff
@@ -177,6 +178,14 @@ mod fight_system {
                     } else if item.empowerActivation == 4 {
                         char_on_attack_items.append((EFFECT_EMPOWER, item.chance, item.empower));
                     }
+
+                    if item.vampirismActivation == 1 {
+                        char_vampirism += item.vampirism;
+                    } else if item.vampirismActivation == 2 {
+                        char_on_hit_items.append((EFFECT_VAMPIRISM, item.chance, item.vampirism));
+                    } else if item.vampirismActivation == 4 {
+                        char_on_attack_items.append((EFFECT_VAMPIRISM, item.chance, item.vampirism));
+                    }
                     // debuff
                     if item.poisonActivation == 1 {
                         dummy_poison += item.poison;
@@ -185,16 +194,14 @@ mod fight_system {
                     } else if item.poisonActivation == 4 {
                         char_on_attack_items.append((EFFECT_POISON, item.chance, item.poison));
                     }
-                // ====== end ======
+                    // ====== plus stacks end ======
                 }
 
                 inventoryItemCount -= 1;
             };
-            let char_on_hit_items_span = char_on_hit_items.span();
-            let char_on_attack_items_span = char_on_attack_items.span();
 
             let dummyCharItemsCounter = get!(
-                world, (char.wins, dummy_index), (DummyCharacterItemsCounter)
+                world, (char.wins, dummy_index), DummyCharacterItemsCounter
             );
             let mut dummy_item_count = dummyCharItemsCounter.count;
             loop {
@@ -203,20 +210,26 @@ mod fight_system {
                 }
 
                 let dummy_item = get!(
-                    world, (char.wins, dummy_index, dummy_item_count), (DummyCharacterItem)
+                    world, (char.wins, dummy_index, dummy_item_count), DummyCharacterItem
                 );
                 let item = get!(world, dummy_item.itemId, (Item));
                 if item.itemType == 4 {
                     dummy_item_count -= 1;
                     continue;
                 }
-                if item.cooldown > 0 {
-                    items.insert(items_length.into(), dummy_item.itemId);
-                    item_belongs.insert(items_length.into(), 'dummy');
-
-                    items_length += 1;
-                    dummy_items_len += 1;
-                } else if item.cooldown == 0 {
+                let cooldown = item.cooldown;
+                if cooldown > 0 {
+                    items_length = append_item(
+                        ref items_cooldown4,
+                        ref items_cooldown5,
+                        ref items_cooldown6,
+                        ref items_cooldown7,
+                        item.id,
+                        DUMMY,
+                        cooldown,
+                        items_length,
+                    );
+                } else if cooldown == 0 {
                     // ====== `on start / on hit / on attack` to plus stacks ======
                     // buff
                     if item.armorActivation == 1 {
@@ -251,6 +264,14 @@ mod fight_system {
                         dummy_on_attack_items.append((EFFECT_EMPOWER, item.chance, item.empower));
                     }
 
+                    if item.vampirismActivation == 1 {
+                        dummy_vampirism += item.vampirism;
+                    } else if item.vampirismActivation == 2 {
+                        dummy_on_hit_items.append((EFFECT_VAMPIRISM, item.chance, item.vampirism));
+                    } else if item.vampirismActivation == 4 {
+                        dummy_on_attack_items.append((EFFECT_VAMPIRISM, item.chance, item.vampirism));
+                    }
+
                     // debuff
                     if item.poisonActivation == 1 {
                         char_poison += item.poison;
@@ -259,54 +280,95 @@ mod fight_system {
                     } else if item.poisonActivation == 4 {
                         dummy_on_attack_items.append((EFFECT_POISON, item.chance, item.poison));
                     }
-                // ====== end ======
+                    // ====== plus stacks end ======
                 }
 
                 dummy_item_count -= 1;
             };
-            let dummy_on_hit_items_span = dummy_on_hit_items.span();
-            let dummy_on_attack_items_span = dummy_on_attack_items.span();
 
-            // sorting items based on cooldown in ascending order
-            let mut i: usize = 0;
-            let mut j: usize = 0;
-            loop {
-                if i >= items_length {
-                    break;
-                }
-                loop {
-                    if j >= (items_length - i - 1) {
-                        break;
-                    }
-
-                    // fetch respective itemids
-                    let items_at_j = items.get(j.into());
-                    let items_at_j_belongs = item_belongs.get(j.into());
-                    let items_at_j_plus_one = items.get((j + 1).into());
-                    let items_at_j_plus_one_belongs = item_belongs.get((j + 1).into());
-
-                    //fetch itemid data
-                    let item_data_at_j = get!(world, items_at_j, Item);
-                    let item_data_at_j_plus_one = get!(world, items_at_j_plus_one, Item);
-
-                    if item_data_at_j.cooldown > item_data_at_j_plus_one.cooldown {
-                        items.insert(j.into(), items_at_j_plus_one);
-                        item_belongs.insert(j.into(), items_at_j_plus_one_belongs);
-                        items.insert((j + 1).into(), items_at_j);
-                        item_belongs.insert((j + 1).into(), items_at_j_belongs);
-                    }
-
-                    j += 1;
-                };
-                j = 0;
-                i += 1;
-            };
+            // combine items
+            let (item_ids, belongs_tos) = combine_items(
+                ref items_cooldown4,
+                ref items_cooldown5,
+                ref items_cooldown6,
+                ref items_cooldown7,
+            );
 
             // record the battle log
-            let mut battleLogCounter = get!(world, player, (BattleLogCounter));
             battleLogCounter.count += 1;
+
+            let battleLog = BattleLog {
+                player: player,
+                id: battleLogCounter.count,
+                dummyLevel: char.wins,
+                dummyCharId: dummy_index,
+                item_ids: item_ids.span(),
+                belongs_tos: belongs_tos.span(),
+                items_length: items_length,
+                char_buffs: array![char_armor, char_regen, char_reflect, char_empower, char_poison, char_vampirism].span(),
+                dummy_buffs: array![dummy_armor, dummy_regen, dummy_reflect, dummy_empower, dummy_poison, dummy_vampirism].span(),
+                char_on_hit_items: char_on_hit_items.span(),
+                dummy_on_hit_items: dummy_on_hit_items.span(),
+                char_on_attack_items: char_on_attack_items.span(),
+                dummy_on_attack_items: dummy_on_attack_items.span(),
+                winner: 0,
+                seconds: 0,
+            };
+            set!(world, (battleLogCounter, battleLog));
+        }
+
+        fn fight(ref world: IWorldDispatcher) {
+            let player = get_caller_address();
+
+            let mut char = get!(world, player, (Characters));
+
+            let battleLogCounter = get!(world, player, (BattleLogCounter));
+            let mut battleLog = get!(world, (player, battleLogCounter.count), BattleLog);
+
             let battleLogCounterCount = battleLogCounter.count;
 
+            assert(battleLogCounterCount != 0 && battleLog.winner == 0, 'no new match found');
+
+            let dummy_index = battleLog.dummyCharId;
+            let mut dummyChar = get!(world, (char.wins, dummy_index), DummyCharacter);
+
+            // start the battle
+            let mut char_health: usize = char.health;
+            let char_health_flag: usize = char.health;
+            let mut dummy_health: usize = dummyChar.health;
+            let dummy_health_flag: usize = dummyChar.health;
+
+            // stamina
+            let mut char_stamina = char.stamina;
+            let mut dummy_stamina = dummyChar.stamina;
+
+            let item_ids = battleLog.item_ids;
+            let belongs_tos = battleLog.belongs_tos;
+            let items_length = battleLog.items_length;
+
+            let char_on_hit_items_span = battleLog.char_on_hit_items;
+            let char_on_attack_items_span = battleLog.char_on_attack_items;
+
+            let dummy_on_hit_items_span = battleLog.dummy_on_hit_items;
+            let dummy_on_attack_items_span = battleLog.dummy_on_attack_items;
+
+            let char_buffs = battleLog.char_buffs;
+            let mut char_armor = *char_buffs.at(0);
+            let mut char_regen = *char_buffs.at(1);
+            let mut char_reflect = *char_buffs.at(2);
+            let mut char_empower = *char_buffs.at(3);
+            let mut char_poison = *char_buffs.at(4);
+            let mut char_vampirism = *char_buffs.at(5);
+
+            let dummy_buffs = battleLog.dummy_buffs;
+            let mut dummy_armor = *dummy_buffs.at(0);
+            let mut dummy_regen = *dummy_buffs.at(1);
+            let mut dummy_reflect = *dummy_buffs.at(2);
+            let mut dummy_empower = *dummy_buffs.at(3);
+            let mut dummy_poison = *dummy_buffs.at(4);
+            let mut dummy_vampirism = *dummy_buffs.at(5);
+
+            // record the battle log
             let mut battleLogsCount = 0;
 
             // battle logic
@@ -331,15 +393,19 @@ mod fight_system {
                     regenHP: 0,
                     player_remaining_health: char_health,
                     dummy_remaining_health: dummy_health,
+                    player_stamina: char_stamina,
+                    dummy_stamina: dummy_stamina,
                     player_armor_stacks: char_armor,
                     player_regen_stacks: char_regen,
                     player_reflect_stacks: char_reflect,
                     player_empower_stacks: char_empower,
+                    player_vampirism_stacks: char_vampirism,
                     player_poison_stacks: char_poison,
                     dummy_armor_stacks: dummy_armor,
                     dummy_regen_stacks: dummy_regen,
                     dummy_reflect_stacks: dummy_reflect,
                     dummy_empower_stacks: dummy_empower,
+                    dummy_vampirism_stacks: dummy_vampirism,
                     dummy_poison_stacks: dummy_poison,
                 })
             );
@@ -348,44 +414,56 @@ mod fight_system {
                 seconds += 1;
                 if seconds >= 25_u8 {
                     if char_health <= dummy_health {
-                        winner = 'dummy';
+                        winner = DUMMY;
                     } else {
-                        winner = 'player';
+                        winner = PLAYER;
                     }
                     break;
                 }
 
                 let mut i: usize = 0;
 
+                // Skip stamina regeneration on the first second
+                if seconds > 1 {
+                    // Regenerate stamina for both player and dummy at the beginning of each cycle
+                    if char_stamina < 100 {
+                        char_stamina += 10;
+                        if char_stamina > 100 {
+                            char_stamina = 100;
+                        }
+                    }
+
+                    if dummy_stamina < 100 {
+                        dummy_stamina += 10;
+                        if dummy_stamina > 100 {
+                            dummy_stamina = 100;
+                        }
+                    }
+                }
+
                 loop {
                     if i == items_length {
                         break;
                     }
 
-                    let curr_item_index = items.get(i.into());
-                    let curr_item_belongs = item_belongs.get(i.into());
+                    let curr_item_index = *item_ids.at(i);
+                    let curr_item_belongs = *belongs_tos.at(i.into());
 
                     let curr_item_data = get!(world, curr_item_index, (Item));
-
-                    let mut damage = curr_item_data.damage;
-                    if curr_item_data.itemType == 1 {
-                        if curr_item_belongs == 'player' && char_empower > 0 {
-                            damage += char_empower;
-                        } else if curr_item_belongs == 'dummy' && dummy_empower > 0 {
-                            damage += dummy_empower;
-                        }
-                    }
 
                     let cleansePoison = curr_item_data.cleansePoison;
                     let chance = curr_item_data.chance;
                     let cooldown = curr_item_data.cooldown;
 
+                    let mut damage = curr_item_data.damage;
+
                     // each second is treated as 1 unit of cooldown 
+                    let (_, seed2, _, _) = pseudo_seed();
                     if seconds % cooldown == 0 {
                         v += seconds.into();
                         rand = random(seed2 + v, 100);
                         if rand < chance {
-                            if curr_item_belongs == 'player' {
+                            if curr_item_belongs == PLAYER {
                                 // ====== on cooldown to plus stacks, all use the same randomness ======
                                 if curr_item_data.armorActivation == 3 {
                                     char_armor += curr_item_data.armor;
@@ -399,10 +477,25 @@ mod fight_system {
                                 if curr_item_data.empowerActivation == 3 {
                                     char_empower += curr_item_data.empower;
                                 }
+                                if curr_item_data.vampirismActivation == 3 {
+                                    char_vampirism += curr_item_data.vampirism;
+                                }
                                 if curr_item_data.poisonActivation == 3 {
                                     dummy_poison += curr_item_data.poison;
                                 }
                                 // ====== end ======
+
+                                if curr_item_data.energyCost > char_stamina {
+                                    // Not enough stamina, skip this activation
+                                    i += 1;
+                                    continue;
+                                }
+                                // Deduct stamina
+                                char_stamina -= curr_item_data.energyCost;
+
+                                if curr_item_data.itemType == 1 && char_empower > 0 {
+                                    damage += char_empower;
+                                }
 
                                 if damage > 0 {
                                     // ====== Armor: used to absorb damage ======
@@ -437,21 +530,25 @@ mod fight_system {
                                             regenHP: 0,
                                             player_remaining_health: char_health,
                                             dummy_remaining_health: dummy_health,
+                                            player_stamina: char_stamina,
+                                            dummy_stamina: dummy_stamina,
                                             player_armor_stacks: char_armor,
                                             player_regen_stacks: char_regen,
                                             player_reflect_stacks: char_reflect,
                                             player_empower_stacks: char_empower,
+                                            player_vampirism_stacks: char_vampirism,
                                             player_poison_stacks: char_poison,
                                             dummy_armor_stacks: dummy_armor,
                                             dummy_regen_stacks: dummy_regen,
                                             dummy_reflect_stacks: dummy_reflect,
                                             dummy_empower_stacks: dummy_empower,
+                                            dummy_vampirism_stacks: dummy_vampirism,
                                             dummy_poison_stacks: dummy_poison,
                                         })
                                     );
 
                                     if dummy_health == 0 {
-                                        winner = 'player';
+                                        winner = PLAYER;
                                         break;
                                     }
 
@@ -477,6 +574,8 @@ mod fight_system {
                                                 dummy_reflect += on_hit_item_stack;
                                             } else if on_hit_item_type == EFFECT_EMPOWER {
                                                 dummy_empower += on_hit_item_stack;
+                                            } else if on_hit_item_type == EFFECT_VAMPIRISM {
+                                                dummy_vampirism += on_hit_item_stack;
                                             } else if on_hit_item_type == EFFECT_POISON {
                                                 char_poison += on_hit_item_stack;
                                             }
@@ -486,65 +585,120 @@ mod fight_system {
                                     };
                                     // ====== end ======
 
-                                    // ====== Reflect effect: Deals 1 damage per stack when hit with a Melee weapon (up to 100% of the damage). ======
-                                    if curr_item_data.itemType == 1 && dummy_reflect > 0 {
-                                        damageCaused = 0;
-                                        let mut reflect_damage = dummy_reflect;
-                                        if reflect_damage > damage {
-                                            reflect_damage = damage;
-                                        }
+                                    if curr_item_data.itemType == 1 && damageCaused > 0 {
+                                        // ====== Reflect effect: Deals 1 damage per stack when hit with a Melee weapon (up to 100% of the damage). ======
+                                        if dummy_reflect > 0 {
+                                            let reflect_damage = if dummy_reflect < damageCaused {
+                                                dummy_reflect
+                                            } else {
+                                                damageCaused
+                                            };
 
-                                        // ====== Armor: used to absorb damage ======
-                                        if reflect_damage <= char_armor {
-                                            char_armor -= reflect_damage;
-                                        } else {
-                                            damageCaused = reflect_damage - char_armor;
-                                            char_armor = 0;
+                                            // ====== Armor: used to absorb damage ======
+                                            let reflectDamageCaused =  if reflect_damage <= char_armor {
+                                                char_armor -= reflect_damage;
+                                                0 
+                                            } else {
+                                                char_armor = 0;
+                                                reflect_damage - char_armor
+                                            };
+                                            // ====== end ======
+
+                                            if char_health <= reflectDamageCaused {
+                                                char_health = 0;
+                                            } else {
+                                                char_health -= reflectDamageCaused;
+                                            }
+
+                                            battleLogsCount += 1;
+                                            emit!(
+                                                world,
+                                                (BattleLogDetail {
+                                                    player,
+                                                    battleLogId: battleLogCounterCount,
+                                                    id: battleLogsCount,
+                                                    whoTriggered: DUMMY,
+                                                    whichItem: 0,
+                                                    damageCaused: reflectDamageCaused,
+                                                    isDodged: false,
+                                                    cleansePoison: 0,
+                                                    buffType: EFFECT_REFLECT,
+                                                    regenHP: 0,
+                                                    player_remaining_health: char_health,
+                                                    dummy_remaining_health: dummy_health,
+                                                    player_stamina: char_stamina,
+                                                    dummy_stamina: dummy_stamina,
+                                                    player_armor_stacks: char_armor,
+                                                    player_regen_stacks: char_regen,
+                                                    player_reflect_stacks: char_reflect,
+                                                    player_empower_stacks: char_empower,
+                                                    player_vampirism_stacks: char_vampirism,
+                                                    player_poison_stacks: char_poison,
+                                                    dummy_armor_stacks: dummy_armor,
+                                                    dummy_regen_stacks: dummy_regen,
+                                                    dummy_reflect_stacks: dummy_reflect,
+                                                    dummy_empower_stacks: dummy_empower,
+                                                    dummy_vampirism_stacks: dummy_vampirism,
+                                                    dummy_poison_stacks: dummy_poison,
+                                                })
+                                            );
+
+                                            if char_health == 0 {
+                                                winner = DUMMY;
+                                                break;
+                                            }
                                         }
                                         // ====== end ======
 
-                                        if char_health <= damageCaused {
-                                            char_health = 0;
-                                        } else {
-                                            char_health -= damageCaused;
-                                        }
+                                        // ====== Vampirism effect: Heals HP on Melee Weapon strike equal to amount of stacks, up to 100% of damage done. ======
+                                        if char_vampirism > 0 {
+                                            let vampirism_heal = if char_vampirism < damageCaused {
+                                                char_vampirism
+                                            } else {
+                                                damageCaused
+                                            };
 
-                                        battleLogsCount += 1;
-                                        emit!(
-                                            world,
-                                            (BattleLogDetail {
-                                                player,
-                                                battleLogId: battleLogCounterCount,
-                                                id: battleLogsCount,
-                                                whoTriggered: 'dummy',
-                                                whichItem: 0,
-                                                damageCaused: damageCaused,
-                                                isDodged: false,
-                                                cleansePoison: 0,
-                                                buffType: EFFECT_REFLECT,
-                                                regenHP: 0,
-                                                player_remaining_health: char_health,
-                                                dummy_remaining_health: dummy_health,
-                                                player_armor_stacks: char_armor,
-                                                player_regen_stacks: char_regen,
-                                                player_reflect_stacks: char_reflect,
-                                                player_empower_stacks: char_empower,
-                                                player_poison_stacks: char_poison,
-                                                dummy_armor_stacks: dummy_armor,
-                                                dummy_regen_stacks: dummy_regen,
-                                                dummy_reflect_stacks: dummy_reflect,
-                                                dummy_empower_stacks: dummy_empower,
-                                                dummy_poison_stacks: dummy_poison,
-                                            })
-                                        );
+                                            char_health += vampirism_heal;
+                                            if char_health > char_health_flag {
+                                                char_health = char_health_flag;
+                                            }
 
-                                        if char_health == 0 {
-                                            winner = 'dummy';
-                                            break;
+                                            battleLogsCount += 1;
+                                            emit!(
+                                                world,
+                                                (BattleLogDetail {
+                                                    player,
+                                                    battleLogId: battleLogCounterCount,
+                                                    id: battleLogsCount,
+                                                    whoTriggered: PLAYER,
+                                                    whichItem: 0,
+                                                    damageCaused: 0,
+                                                    isDodged: false,
+                                                    cleansePoison: 0,
+                                                    buffType: EFFECT_VAMPIRISM,
+                                                    regenHP: vampirism_heal,
+                                                    player_remaining_health: char_health,
+                                                    dummy_remaining_health: dummy_health,
+                                                    player_stamina: char_stamina,
+                                                    dummy_stamina: dummy_stamina,
+                                                    player_armor_stacks: char_armor,
+                                                    player_regen_stacks: char_regen,
+                                                    player_reflect_stacks: char_reflect,
+                                                    player_empower_stacks: char_empower,
+                                                    player_vampirism_stacks: char_vampirism,
+                                                    player_poison_stacks: char_poison,
+                                                    dummy_armor_stacks: dummy_armor,
+                                                    dummy_regen_stacks: dummy_regen,
+                                                    dummy_reflect_stacks: dummy_reflect,
+                                                    dummy_empower_stacks: dummy_empower,
+                                                    dummy_vampirism_stacks: dummy_vampirism,
+                                                    dummy_poison_stacks: dummy_poison,
+                                                })
+                                            );
                                         }
+                                        // ====== end ======
                                     }
-                                    // ====== end ======
-
+                                    
                                     // ====== char attack, to plus stacks ======
                                     let mut on_attack_items_len = char_on_attack_items_span.len();
                                     loop {
@@ -553,9 +707,12 @@ mod fight_system {
                                         }
 
                                         let (
-                                            on_attack_item_type, on_attack_item_chance, on_attack_item_stack
+                                            on_attack_item_type,
+                                            on_attack_item_chance,
+                                            on_attack_item_stack
                                         ) =
-                                            *char_on_attack_items_span.at(on_attack_items_len - 1);
+                                            *char_on_attack_items_span
+                                            .at(on_attack_items_len - 1);
 
                                         if rand < on_attack_item_chance {
                                             if on_attack_item_type == EFFECT_ARMOR {
@@ -566,6 +723,8 @@ mod fight_system {
                                                 char_reflect += on_attack_item_stack;
                                             } else if on_attack_item_type == EFFECT_EMPOWER {
                                                 char_empower += on_attack_item_stack;
+                                            } else if on_attack_item_type == EFFECT_VAMPIRISM {
+                                                char_vampirism += on_attack_item_stack;
                                             } else if on_attack_item_type == EFFECT_POISON {
                                                 dummy_poison += on_attack_item_stack;
                                             }
@@ -573,7 +732,7 @@ mod fight_system {
 
                                         on_attack_items_len -= 1;
                                     };
-                                    // ====== end ======
+                                // ====== end ======
 
                                 } else {
                                     if cleansePoison > 0 {
@@ -598,15 +757,19 @@ mod fight_system {
                                                 regenHP: 0,
                                                 player_remaining_health: char_health,
                                                 dummy_remaining_health: dummy_health,
+                                                player_stamina: char_stamina,
+                                                dummy_stamina: dummy_stamina,
                                                 player_armor_stacks: char_armor,
                                                 player_regen_stacks: char_regen,
                                                 player_reflect_stacks: char_reflect,
                                                 player_empower_stacks: char_empower,
+                                                player_vampirism_stacks: char_vampirism,
                                                 player_poison_stacks: char_poison,
                                                 dummy_armor_stacks: dummy_armor,
                                                 dummy_regen_stacks: dummy_regen,
                                                 dummy_reflect_stacks: dummy_reflect,
                                                 dummy_empower_stacks: dummy_empower,
+                                                dummy_vampirism_stacks: dummy_vampirism,
                                                 dummy_poison_stacks: dummy_poison,
                                             })
                                         );
@@ -626,10 +789,25 @@ mod fight_system {
                                 if curr_item_data.empowerActivation == 3 {
                                     dummy_empower += curr_item_data.empower;
                                 }
+                                if curr_item_data.vampirismActivation == 3 {
+                                    dummy_vampirism += curr_item_data.vampirism;
+                                }
                                 if curr_item_data.poisonActivation == 3 {
                                     char_poison += curr_item_data.poison;
                                 }
                                 // ====== end ======
+
+                                if curr_item_data.energyCost > dummy_stamina {
+                                    // Not enough stamina, skip this activation
+                                    i += 1;
+                                    continue;
+                                }
+                                // Deduct stamina
+                                dummy_stamina -= curr_item_data.energyCost;
+
+                                if curr_item_data.itemType == 1 && dummy_empower > 0 {
+                                    damage += dummy_empower;
+                                }
 
                                 if damage > 0 {
                                     // ====== Armor: used to absorb damage ======
@@ -664,21 +842,25 @@ mod fight_system {
                                             regenHP: 0,
                                             player_remaining_health: char_health,
                                             dummy_remaining_health: dummy_health,
+                                            player_stamina: char_stamina,
+                                            dummy_stamina: dummy_stamina,
                                             player_armor_stacks: char_armor,
                                             player_regen_stacks: char_regen,
                                             player_reflect_stacks: char_reflect,
                                             player_empower_stacks: char_empower,
+                                            player_vampirism_stacks: char_vampirism,
                                             player_poison_stacks: char_poison,
                                             dummy_armor_stacks: dummy_armor,
                                             dummy_regen_stacks: dummy_regen,
                                             dummy_reflect_stacks: dummy_reflect,
                                             dummy_empower_stacks: dummy_empower,
+                                            dummy_vampirism_stacks: dummy_vampirism,
                                             dummy_poison_stacks: dummy_poison,
                                         })
                                     );
 
                                     if char_health == 0 {
-                                        winner = 'dummy';
+                                        winner = DUMMY;
                                         break;
                                     }
 
@@ -704,73 +886,131 @@ mod fight_system {
                                                 char_reflect += on_hit_item_stack;
                                             } else if on_hit_item_type == EFFECT_EMPOWER {
                                                 char_empower += on_hit_item_stack;
+                                            } else if on_hit_item_type == EFFECT_VAMPIRISM {
+                                                char_vampirism += on_hit_item_stack;
                                             } else if on_hit_item_type == EFFECT_POISON {
                                                 dummy_poison += on_hit_item_stack;
-                                            }
+                                            } 
                                         }
 
                                         on_hit_items_len -= 1;
                                     };
                                     // ====== end ======
 
-                                    // ====== Reflect effect: Deals 1 damage per stack when hit with a Melee weapon (up to 100% of the damage). ======
-                                    if curr_item_data.itemType == 1 && char_reflect > 0 {
-                                        damageCaused = 0;
-                                        let mut reflect_damage = char_reflect;
-                                        if reflect_damage > damage {
-                                            reflect_damage = damage;
-                                        }
+                                    if curr_item_data.itemType == 1 && damageCaused > 0 {
+                                        // ====== Reflect effect: Deals 1 damage per stack when hit with a Melee weapon (up to 100% of the damage). ======
+                                        if char_reflect > 0 {
+                                            let reflect_damage = if char_reflect < damageCaused {
+                                                char_reflect
+                                            } else {
+                                                damageCaused
+                                            };
 
-                                        // ====== Armor: used to absorb damage ======
-                                        if reflect_damage <= dummy_armor {
-                                            dummy_armor -= reflect_damage;
-                                        } else {
-                                            damageCaused = reflect_damage - dummy_armor;
-                                            dummy_armor = 0;
+                                            // ====== Armor: used to absorb damage ======
+                                            let reflectDamageCaused =  if reflect_damage <= dummy_armor {
+                                                dummy_armor -= reflect_damage;
+                                                0 
+                                            } else {
+                                                dummy_armor = 0;
+                                                reflect_damage - dummy_armor
+                                            };
+                                            // ====== end ======
+
+                                            if dummy_health <= reflectDamageCaused {
+                                                dummy_health = 0;
+                                            } else {
+                                                dummy_health -= reflectDamageCaused;
+                                            }
+
+                                            battleLogsCount += 1;
+                                            emit!(
+                                                world,
+                                                (BattleLogDetail {
+                                                    player,
+                                                    battleLogId: battleLogCounterCount,
+                                                    id: battleLogsCount,
+                                                    whoTriggered: PLAYER,
+                                                    whichItem: 0,
+                                                    damageCaused: reflectDamageCaused,
+                                                    isDodged: false,
+                                                    cleansePoison: 0,
+                                                    buffType: EFFECT_REFLECT,
+                                                    regenHP: 0,
+                                                    player_remaining_health: char_health,
+                                                    dummy_remaining_health: dummy_health,
+                                                    player_stamina: char_stamina,
+                                                    dummy_stamina: dummy_stamina,
+                                                    player_armor_stacks: char_armor,
+                                                    player_regen_stacks: char_regen,
+                                                    player_reflect_stacks: char_reflect,
+                                                    player_empower_stacks: char_empower,
+                                                    player_vampirism_stacks: char_vampirism,
+                                                    player_poison_stacks: char_poison,
+                                                    dummy_armor_stacks: dummy_armor,
+                                                    dummy_regen_stacks: dummy_regen,
+                                                    dummy_reflect_stacks: dummy_reflect,
+                                                    dummy_empower_stacks: dummy_empower,
+                                                    dummy_vampirism_stacks: dummy_vampirism,
+                                                    dummy_poison_stacks: dummy_poison,
+                                                })
+                                            );
+
+                                            if dummy_health == 0 {
+                                                winner = PLAYER;
+                                                break;
+                                            }
                                         }
                                         // ====== end ======
 
-                                        if dummy_health <= damageCaused {
-                                            dummy_health = 0;
-                                        } else {
-                                            dummy_health -= damageCaused;
-                                        }
+                                        // ====== Vampirism effect: Heals HP on Melee Weapon strike equal to amount of stacks, up to 100% of damage done. ======
+                                        if dummy_vampirism > 0 {
+                                            let vampirism_heal = if dummy_vampirism < damageCaused {
+                                                dummy_vampirism
+                                            } else {
+                                                damageCaused
+                                            };
 
-                                        battleLogsCount += 1;
-                                        emit!(
-                                            world,
-                                            (BattleLogDetail {
-                                                player,
-                                                battleLogId: battleLogCounterCount,
-                                                id: battleLogsCount,
-                                                whoTriggered: 'player',
-                                                whichItem: 0,
-                                                damageCaused: damageCaused,
-                                                isDodged: false,
-                                                cleansePoison: 0,
-                                                buffType: EFFECT_REFLECT,
-                                                regenHP: 0,
-                                                player_remaining_health: char_health,
-                                                dummy_remaining_health: dummy_health,
-                                                player_armor_stacks: char_armor,
-                                                player_regen_stacks: char_regen,
-                                                player_reflect_stacks: char_reflect,
-                                                player_empower_stacks: char_empower,
-                                                player_poison_stacks: char_poison,
-                                                dummy_armor_stacks: dummy_armor,
-                                                dummy_regen_stacks: dummy_regen,
-                                                dummy_reflect_stacks: dummy_reflect,
-                                                dummy_empower_stacks: dummy_empower,
-                                                dummy_poison_stacks: dummy_poison,
-                                            })
-                                        );
+                                            dummy_health += vampirism_heal;
+                                            if dummy_health > dummy_health_flag {
+                                                dummy_health = dummy_health_flag;
+                                            }
 
-                                        if dummy_health == 0 {
-                                            winner = 'player';
-                                            break;
+                                            battleLogsCount += 1;
+                                            emit!(
+                                                world,
+                                                (BattleLogDetail {
+                                                    player,
+                                                    battleLogId: battleLogCounterCount,
+                                                    id: battleLogsCount,
+                                                    whoTriggered: DUMMY,
+                                                    whichItem: 0,
+                                                    damageCaused: 0,
+                                                    isDodged: false,
+                                                    cleansePoison: 0,
+                                                    buffType: EFFECT_VAMPIRISM,
+                                                    regenHP: vampirism_heal,
+                                                    player_remaining_health: char_health,
+                                                    dummy_remaining_health: dummy_health,
+                                                    player_stamina: char_stamina,
+                                                    dummy_stamina: dummy_stamina,
+                                                    player_armor_stacks: char_armor,
+                                                    player_regen_stacks: char_regen,
+                                                    player_reflect_stacks: char_reflect,
+                                                    player_empower_stacks: char_empower,
+                                                    player_vampirism_stacks: char_vampirism,
+                                                    player_poison_stacks: char_poison,
+                                                    dummy_armor_stacks: dummy_armor,
+                                                    dummy_regen_stacks: dummy_regen,
+                                                    dummy_reflect_stacks: dummy_reflect,
+                                                    dummy_empower_stacks: dummy_empower,
+                                                    dummy_vampirism_stacks: dummy_vampirism,
+                                                    dummy_poison_stacks: dummy_poison,
+                                                })
+                                            );
                                         }
+                                        // ====== end ======
                                     }
-                                    // ====== end ======
+                                    
 
                                     // ====== char attack, to plus stacks ======
                                     let mut on_attack_items_len = dummy_on_attack_items_span.len();
@@ -780,9 +1020,12 @@ mod fight_system {
                                         }
 
                                         let (
-                                            on_attack_item_type, on_attack_item_chance, on_attack_item_stack
+                                            on_attack_item_type,
+                                            on_attack_item_chance,
+                                            on_attack_item_stack
                                         ) =
-                                            *dummy_on_attack_items_span.at(on_attack_items_len - 1);
+                                            *dummy_on_attack_items_span
+                                            .at(on_attack_items_len - 1);
 
                                         if rand < on_attack_item_chance {
                                             if on_attack_item_type == EFFECT_ARMOR {
@@ -793,6 +1036,8 @@ mod fight_system {
                                                 dummy_reflect += on_attack_item_stack;
                                             } else if on_attack_item_type == EFFECT_EMPOWER {
                                                 dummy_empower += on_attack_item_stack;
+                                            } else if on_attack_item_type == EFFECT_VAMPIRISM {
+                                                dummy_vampirism += on_attack_item_stack;
                                             } else if on_attack_item_type == EFFECT_POISON {
                                                 char_poison += on_attack_item_stack;
                                             }
@@ -800,7 +1045,7 @@ mod fight_system {
 
                                         on_attack_items_len -= 1;
                                     };
-                                    // ====== end ======
+                                // ====== end ======
                                 } else {
                                     if cleansePoison > 0 {
                                         if dummy_poison > cleansePoison {
@@ -824,15 +1069,19 @@ mod fight_system {
                                                 regenHP: 0,
                                                 player_remaining_health: char_health,
                                                 dummy_remaining_health: dummy_health,
+                                                player_stamina: char_stamina,
+                                                dummy_stamina: dummy_stamina,
                                                 player_armor_stacks: char_armor,
                                                 player_regen_stacks: char_regen,
                                                 player_reflect_stacks: char_reflect,
                                                 player_empower_stacks: char_empower,
+                                                player_vampirism_stacks: char_vampirism,
                                                 player_poison_stacks: char_poison,
                                                 dummy_armor_stacks: dummy_armor,
                                                 dummy_regen_stacks: dummy_regen,
                                                 dummy_reflect_stacks: dummy_reflect,
                                                 dummy_empower_stacks: dummy_empower,
+                                                dummy_vampirism_stacks: dummy_vampirism,
                                                 dummy_poison_stacks: dummy_poison,
                                             })
                                         );
@@ -856,15 +1105,19 @@ mod fight_system {
                                     regenHP: 0,
                                     player_remaining_health: char_health,
                                     dummy_remaining_health: dummy_health,
+                                    player_stamina: char_stamina,
+                                    dummy_stamina: dummy_stamina,
                                     player_armor_stacks: char_armor,
                                     player_regen_stacks: char_regen,
                                     player_reflect_stacks: char_reflect,
                                     player_empower_stacks: char_empower,
+                                    player_vampirism_stacks: char_vampirism,
                                     player_poison_stacks: char_poison,
                                     dummy_armor_stacks: dummy_armor,
                                     dummy_regen_stacks: dummy_regen,
                                     dummy_reflect_stacks: dummy_reflect,
                                     dummy_empower_stacks: dummy_empower,
+                                    dummy_vampirism_stacks: dummy_vampirism,
                                     dummy_poison_stacks: dummy_poison,
                                 })
                             );
@@ -891,7 +1144,7 @@ mod fight_system {
                                 player,
                                 battleLogId: battleLogCounterCount,
                                 id: battleLogsCount,
-                                whoTriggered: 'dummy',
+                                whoTriggered: DUMMY,
                                 whichItem: 0,
                                 damageCaused: char_poison,
                                 isDodged: false,
@@ -900,21 +1153,25 @@ mod fight_system {
                                 regenHP: 0,
                                 player_remaining_health: char_health,
                                 dummy_remaining_health: dummy_health,
+                                player_stamina: char_stamina,
+                                dummy_stamina: dummy_stamina,
                                 player_armor_stacks: char_armor,
                                 player_regen_stacks: char_regen,
                                 player_reflect_stacks: char_reflect,
                                 player_empower_stacks: char_empower,
+                                player_vampirism_stacks: char_vampirism,
                                 player_poison_stacks: char_poison,
                                 dummy_armor_stacks: dummy_armor,
                                 dummy_regen_stacks: dummy_regen,
                                 dummy_reflect_stacks: dummy_reflect,
                                 dummy_empower_stacks: dummy_empower,
+                                dummy_vampirism_stacks: dummy_vampirism,
                                 dummy_poison_stacks: dummy_poison,
                             })
                         );
 
                         if char_health == 0 {
-                            winner = 'dummy';
+                            winner = DUMMY;
                             break;
                         }
                     }
@@ -932,7 +1189,7 @@ mod fight_system {
                                 player,
                                 battleLogId: battleLogCounterCount,
                                 id: battleLogsCount,
-                                whoTriggered: 'player',
+                                whoTriggered: PLAYER,
                                 whichItem: 0,
                                 damageCaused: dummy_poison,
                                 isDodged: false,
@@ -941,21 +1198,25 @@ mod fight_system {
                                 regenHP: 0,
                                 player_remaining_health: char_health,
                                 dummy_remaining_health: dummy_health,
+                                player_stamina: char_stamina,
+                                dummy_stamina: dummy_stamina,
                                 player_armor_stacks: char_armor,
                                 player_regen_stacks: char_regen,
                                 player_reflect_stacks: char_reflect,
                                 player_empower_stacks: char_empower,
+                                player_vampirism_stacks: char_vampirism,
                                 player_poison_stacks: char_poison,
                                 dummy_armor_stacks: dummy_armor,
                                 dummy_regen_stacks: dummy_regen,
                                 dummy_reflect_stacks: dummy_reflect,
                                 dummy_empower_stacks: dummy_empower,
+                                dummy_vampirism_stacks: dummy_vampirism,
                                 dummy_poison_stacks: dummy_poison,
                             })
                         );
 
                         if dummy_health == 0 {
-                            winner = 'player';
+                            winner = PLAYER;
                             break;
                         }
                     }
@@ -972,7 +1233,7 @@ mod fight_system {
                                 player,
                                 battleLogId: battleLogCounterCount,
                                 id: battleLogsCount,
-                                whoTriggered: 'player',
+                                whoTriggered: PLAYER,
                                 whichItem: 0,
                                 damageCaused: 0,
                                 isDodged: false,
@@ -981,15 +1242,19 @@ mod fight_system {
                                 regenHP: char_regen,
                                 player_remaining_health: char_health,
                                 dummy_remaining_health: dummy_health,
+                                player_stamina: char_stamina,
+                                dummy_stamina: dummy_stamina,
                                 player_armor_stacks: char_armor,
                                 player_regen_stacks: char_regen,
                                 player_reflect_stacks: char_reflect,
                                 player_empower_stacks: char_empower,
+                                player_vampirism_stacks: char_vampirism,
                                 player_poison_stacks: char_poison,
                                 dummy_armor_stacks: dummy_armor,
                                 dummy_regen_stacks: dummy_regen,
                                 dummy_reflect_stacks: dummy_reflect,
                                 dummy_empower_stacks: dummy_empower,
+                                dummy_vampirism_stacks: dummy_vampirism,
                                 dummy_poison_stacks: dummy_poison,
                             })
                         );
@@ -1007,7 +1272,7 @@ mod fight_system {
                                 player,
                                 battleLogId: battleLogCounterCount,
                                 id: battleLogsCount,
-                                whoTriggered: 'dummy',
+                                whoTriggered: DUMMY,
                                 whichItem: 0,
                                 damageCaused: 0,
                                 isDodged: false,
@@ -1016,15 +1281,19 @@ mod fight_system {
                                 regenHP: dummy_regen,
                                 player_remaining_health: char_health,
                                 dummy_remaining_health: dummy_health,
+                                player_stamina: char_stamina,
+                                dummy_stamina: dummy_stamina,
                                 player_armor_stacks: char_armor,
                                 player_regen_stacks: char_regen,
                                 player_reflect_stacks: char_reflect,
                                 player_empower_stacks: char_empower,
+                                player_vampirism_stacks: char_vampirism,
                                 player_poison_stacks: char_poison,
                                 dummy_armor_stacks: dummy_armor,
                                 dummy_regen_stacks: dummy_regen,
                                 dummy_reflect_stacks: dummy_reflect,
                                 dummy_empower_stacks: dummy_empower,
+                                dummy_vampirism_stacks: dummy_vampirism,
                                 dummy_poison_stacks: dummy_poison,
                             })
                         );
@@ -1037,17 +1306,11 @@ mod fight_system {
                 }
             };
 
-            let battleLog = BattleLog {
-                player: player,
-                id: battleLogCounter.count,
-                dummyCharLevel: char.wins,
-                dummyCharId: dummy_index,
-                winner: winner,
-                seconds: seconds,
-            };
-            set!(world, (battleLogCounter, battleLog));
+            battleLog.winner = winner;
+            battleLog.seconds = seconds;
+            set!(world, (battleLog));
 
-            if winner == 'player' {
+            if winner == PLAYER {
                 char.wins += 1;
                 char.totalWins += 1;
                 char.winStreak += 1;

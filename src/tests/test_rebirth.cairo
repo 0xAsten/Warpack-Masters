@@ -1,8 +1,10 @@
 #[cfg(test)]
 mod tests {
+    use core::starknet::contract_address::ContractAddress;
     use starknet::class_hash::Felt252TryIntoClassHash;
     use starknet::testing::{set_contract_address, set_block_timestamp};
 
+    use dojo::model::{Model, ModelTest, ModelIndex, ModelEntityTest};
     // import world dispatcher
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
@@ -20,55 +22,84 @@ mod tests {
             character_items_storage_counter, CharacterItemInventory, character_item_inventory,
             CharacterItemsInventoryCounter, character_items_inventory_counter
         },
-        models::Character::{Character, character, NameRecord, name_record, WMClass},
+        models::Character::{Characters, characters, NameRecord, name_record, WMClass},
         models::Shop::{Shop, shop}, utils::{test_utils::{add_items}}
     };
 
     use warpack_masters::constants::constants::{INIT_HEALTH, INIT_GOLD};
+
+    fn get_systems(
+        world: IWorldDispatcher
+    ) -> (
+        ContractAddress,
+        IActionsDispatcher,
+        ContractAddress,
+        IItemDispatcher,
+        ContractAddress,
+        IShopDispatcher
+    ) {
+        let action_system_address = world
+            .deploy_contract('salt1', actions::TEST_CLASS_HASH.try_into().unwrap());
+        let mut action_system = IActionsDispatcher { contract_address: action_system_address };
+
+        world.grant_writer(Model::<CharacterItemStorage>::selector(), action_system_address);
+        world
+            .grant_writer(Model::<CharacterItemsStorageCounter>::selector(), action_system_address);
+        world.grant_writer(Model::<CharacterItemInventory>::selector(), action_system_address);
+        world
+            .grant_writer(
+                Model::<CharacterItemsInventoryCounter>::selector(), action_system_address
+            );
+        world.grant_writer(Model::<BackpackGrids>::selector(), action_system_address);
+        world.grant_writer(Model::<Characters>::selector(), action_system_address);
+        world.grant_writer(Model::<NameRecord>::selector(), action_system_address);
+        world.grant_writer(Model::<Shop>::selector(), action_system_address);
+
+        let item_system_address = world
+            .deploy_contract('salt2', item_system::TEST_CLASS_HASH.try_into().unwrap());
+        let mut item_system = IItemDispatcher { contract_address: item_system_address };
+
+        world.grant_writer(Model::<Item>::selector(), item_system_address);
+        world.grant_writer(Model::<ItemsCounter>::selector(), item_system_address);
+
+        let shop_system_address = world
+            .deploy_contract('salt3', shop_system::TEST_CLASS_HASH.try_into().unwrap());
+        let mut shop_system = IShopDispatcher { contract_address: shop_system_address };
+
+        world.grant_writer(Model::<CharacterItemStorage>::selector(), shop_system_address);
+        world.grant_writer(Model::<CharacterItemsStorageCounter>::selector(), shop_system_address);
+        world.grant_writer(Model::<Characters>::selector(), shop_system_address);
+        world.grant_writer(Model::<Shop>::selector(), shop_system_address);
+
+        (
+            action_system_address,
+            action_system,
+            item_system_address,
+            item_system,
+            shop_system_address,
+            shop_system
+        )
+    }
+
 
     #[test]
     #[available_gas(3000000000000000)]
     fn test_rebirth() {
         let alice = starknet::contract_address_const::<0x0>();
 
-        let mut models = array![
-            backpack_grids::TEST_CLASS_HASH,
-            item::TEST_CLASS_HASH,
-            items_counter::TEST_CLASS_HASH,
-            character_item_storage::TEST_CLASS_HASH,
-            character_items_storage_counter::TEST_CLASS_HASH,
-            character_item_inventory::TEST_CLASS_HASH,
-            character_items_inventory_counter::TEST_CLASS_HASH,
-            character::TEST_CLASS_HASH,
-            name_record::TEST_CLASS_HASH,
-            shop::TEST_CLASS_HASH
-        ];
-
-        let world = spawn_test_world("Warpacks", models);
-
-        let action_system_address = world
-            .deploy_contract(
-                'salt1', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
-            );
-        let mut action_system = IActionsDispatcher { contract_address: action_system_address };
-
-        let item_system_address = world
-            .deploy_contract(
-                'salt2', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
-            );
-        let mut item_system = IItemDispatcher { contract_address: item_system_address };
-
-        let shop_system_address = world
-            .deploy_contract(
-                'salt3', shop_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
-            );
-        let mut shop_system = IShopDispatcher { contract_address: shop_system_address };
+        let world = spawn_test_world!();
+        let (action_system_address, mut action_system, _, mut item_system, _, mut shop_system) =
+            get_systems(
+            world
+        );
 
         add_items(ref item_system);
 
         set_contract_address(alice);
 
         action_system.spawn('alice', WMClass::Warlock);
+
+        set_contract_address(action_system_address);
 
         // mock shop for testing
         let mut shop_data = get!(world, alice, (Shop));
@@ -78,6 +109,8 @@ mod tests {
         shop_data.item4 = 1;
         set!(world, (shop_data));
 
+        set_contract_address(alice);
+
         shop_system.buy_item(5);
         shop_system.buy_item(6);
         shop_system.buy_item(8);
@@ -86,7 +119,9 @@ mod tests {
         action_system.place_item(1, 2, 2, 0);
         action_system.place_item(3, 5, 2, 0);
 
-        let mut char = get!(world, (alice), Character);
+        set_contract_address(action_system_address);
+
+        let mut char = get!(world, (alice), Characters);
         char.loss = 5;
         char.rating = 300;
         char.totalWins = 10;
@@ -97,9 +132,12 @@ mod tests {
         // mocking timestamp for testing
         let timestamp = 1717770021;
         set_block_timestamp(timestamp);
+
+        set_contract_address(alice);
+
         action_system.rebirth('bob', WMClass::Warrior);
 
-        let char = get!(world, (alice), Character);
+        let char = get!(world, (alice), Characters);
         let inventoryItemsCounter = get!(world, (alice), CharacterItemsInventoryCounter);
         let storageItemsCounter = get!(world, (alice), CharacterItemsStorageCounter);
         let playerShopData = get!(world, (alice), Shop);
@@ -189,32 +227,10 @@ mod tests {
     fn test_loss_not_reached() {
         let alice = starknet::contract_address_const::<0x0>();
 
-        let mut models = array![
-            backpack_grids::TEST_CLASS_HASH,
-            item::TEST_CLASS_HASH,
-            items_counter::TEST_CLASS_HASH,
-            character_item_storage::TEST_CLASS_HASH,
-            character_items_storage_counter::TEST_CLASS_HASH,
-            character_item_inventory::TEST_CLASS_HASH,
-            character_items_inventory_counter::TEST_CLASS_HASH,
-            character::TEST_CLASS_HASH,
-            name_record::TEST_CLASS_HASH,
-            shop::TEST_CLASS_HASH
-        ];
-
-        let world = spawn_test_world("Warpacks", models);
-
-        let action_system_address = world
-            .deploy_contract(
-                'salt1', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
-            );
-        let mut action_system = IActionsDispatcher { contract_address: action_system_address };
-
-        let item_system_address = world
-            .deploy_contract(
-                'salt2', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
-            );
-        let mut item_system = IItemDispatcher { contract_address: item_system_address };
+        let world = spawn_test_world!();
+        let (action_system_address, mut action_system, _, mut item_system, _, _) = get_systems(
+            world
+        );
 
         add_items(ref item_system);
 
@@ -222,9 +238,13 @@ mod tests {
 
         action_system.spawn('alice', WMClass::Warlock);
 
-        let mut char = get!(world, (alice), Character);
+        set_contract_address(action_system_address);
+
+        let mut char = get!(world, (alice), Characters);
         char.loss = 4;
         set!(world, (char));
+
+        set_contract_address(alice);
 
         action_system.rebirth('bob', WMClass::Warlock);
     }
@@ -234,32 +254,10 @@ mod tests {
     #[available_gas(3000000000000000)]
     #[should_panic(expected: ('name already exists', 'ENTRYPOINT_FAILED'))]
     fn test_name_already_exists() {
-        let mut models = array![
-            backpack_grids::TEST_CLASS_HASH,
-            item::TEST_CLASS_HASH,
-            items_counter::TEST_CLASS_HASH,
-            character_item_storage::TEST_CLASS_HASH,
-            character_items_storage_counter::TEST_CLASS_HASH,
-            character_item_inventory::TEST_CLASS_HASH,
-            character_items_inventory_counter::TEST_CLASS_HASH,
-            character::TEST_CLASS_HASH,
-            name_record::TEST_CLASS_HASH,
-            shop::TEST_CLASS_HASH
-        ];
-
-        let world = spawn_test_world("Warpacks", models);
-
-        let action_system_address = world
-            .deploy_contract(
-                'salt1', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
-            );
-        let mut action_system = IActionsDispatcher { contract_address: action_system_address };
-
-        let item_system_address = world
-            .deploy_contract(
-                'salt2', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
-            );
-        let mut item_system = IItemDispatcher { contract_address: item_system_address };
+        let world = spawn_test_world!();
+        let (action_system_address, mut action_system, _, mut item_system, _, _) = get_systems(
+            world
+        );
 
         add_items(ref item_system);
 
@@ -271,9 +269,13 @@ mod tests {
         set_contract_address(bob);
         action_system.spawn('bob', WMClass::Warlock);
 
-        let mut char = get!(world, (bob), Character);
+        set_contract_address(action_system_address);
+
+        let mut char = get!(world, (bob), Characters);
         char.loss = 5;
         set!(world, (char));
+
+        set_contract_address(bob);
 
         action_system.rebirth('alice', WMClass::Warlock);
     }
@@ -282,32 +284,10 @@ mod tests {
     #[test]
     #[available_gas(3000000000000000)]
     fn test_rebirth_with_same_name() {
-        let mut models = array![
-            backpack_grids::TEST_CLASS_HASH,
-            item::TEST_CLASS_HASH,
-            items_counter::TEST_CLASS_HASH,
-            character_item_storage::TEST_CLASS_HASH,
-            character_items_storage_counter::TEST_CLASS_HASH,
-            character_item_inventory::TEST_CLASS_HASH,
-            character_items_inventory_counter::TEST_CLASS_HASH,
-            character::TEST_CLASS_HASH,
-            name_record::TEST_CLASS_HASH,
-            shop::TEST_CLASS_HASH
-        ];
-
-        let world = spawn_test_world("Warpacks", models);
-
-        let action_system_address = world
-            .deploy_contract(
-                'salt1', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
-            );
-        let mut action_system = IActionsDispatcher { contract_address: action_system_address };
-
-        let item_system_address = world
-            .deploy_contract(
-                'salt2', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
-            );
-        let mut item_system = IItemDispatcher { contract_address: item_system_address };
+        let world = spawn_test_world!();
+        let (action_system_address, mut action_system, _, mut item_system, _, _) = get_systems(
+            world
+        );
 
         add_items(ref item_system);
 
@@ -318,9 +298,13 @@ mod tests {
         let nameRecord = get!(world, 'bob', NameRecord);
         assert(nameRecord.player == bob, 'player should be bob');
 
-        let mut char = get!(world, (bob), Character);
+        set_contract_address(action_system_address);
+
+        let mut char = get!(world, (bob), Characters);
         char.loss = 5;
         set!(world, (char));
+
+        set_contract_address(bob);
 
         action_system.rebirth('bob', WMClass::Warlock);
 
@@ -332,32 +316,10 @@ mod tests {
     #[test]
     #[available_gas(3000000000000000)]
     fn test_rebirth_with_different_name() {
-        let mut models = array![
-            backpack_grids::TEST_CLASS_HASH,
-            item::TEST_CLASS_HASH,
-            items_counter::TEST_CLASS_HASH,
-            character_item_storage::TEST_CLASS_HASH,
-            character_items_storage_counter::TEST_CLASS_HASH,
-            character_item_inventory::TEST_CLASS_HASH,
-            character_items_inventory_counter::TEST_CLASS_HASH,
-            character::TEST_CLASS_HASH,
-            name_record::TEST_CLASS_HASH,
-            shop::TEST_CLASS_HASH
-        ];
-
-        let world = spawn_test_world("Warpacks", models);
-
-        let action_system_address = world
-            .deploy_contract(
-                'salt1', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
-            );
-        let mut action_system = IActionsDispatcher { contract_address: action_system_address };
-
-        let item_system_address = world
-            .deploy_contract(
-                'salt2', item_system::TEST_CLASS_HASH.try_into().unwrap(), array![].span()
-            );
-        let mut item_system = IItemDispatcher { contract_address: item_system_address };
+        let world = spawn_test_world!();
+        let (action_system_address, mut action_system, _, mut item_system, _, _) = get_systems(
+            world
+        );
 
         add_items(ref item_system);
 
@@ -368,9 +330,13 @@ mod tests {
         let nameRecord = get!(world, 'bob', NameRecord);
         assert(nameRecord.player == bob, 'player should be bob');
 
-        let mut char = get!(world, (bob), Character);
+        set_contract_address(action_system_address);
+
+        let mut char = get!(world, (bob), Characters);
         char.loss = 5;
         set!(world, (char));
+
+        set_contract_address(bob);
 
         action_system.rebirth('Alice', WMClass::Warlock);
 

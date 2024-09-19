@@ -1,7 +1,4 @@
-use starknet::ContractAddress;
 use warpack_masters::models::Character::WMClass;
-
-use warpack_masters::prdefined_dummies::PredefinedItem;
 
 #[dojo::interface]
 trait IActions {
@@ -25,7 +22,8 @@ trait IActions {
 
 #[dojo::contract]
 mod actions {
-    use super::{IActions, ContractAddress, WMClass};
+    use super::{IActions, WMClass};
+    use starknet::ContractAddress;
 
     use starknet::{get_caller_address, get_block_timestamp};
     use warpack_masters::models::{backpack::{BackpackGrids}};
@@ -35,12 +33,13 @@ mod actions {
             CharacterItemsInventoryCounter
         },
         Item::Item,
-        Character::{Character, NameRecord},
-        Shop::Shop
+        Character::{Characters, NameRecord},
+        Shop::Shop,
+        BattleLog::{BattleLog, BattleLogCounter}
     };
 
     use warpack_masters::items::{Backpack, Pack};
-    use warpack_masters::constants::constants::{GRID_X, GRID_Y, INIT_GOLD, INIT_HEALTH};
+    use warpack_masters::constants::constants::{GRID_X, GRID_Y, INIT_GOLD, INIT_HEALTH, INIT_STAMINA};
 
     #[abi(embed_v0)]
     impl ActionsImpl of IActions<ContractState> {
@@ -62,7 +61,7 @@ mod actions {
 
             set!(world, (NameRecord { name, player }));
 
-            let player_exists = get!(world, player, (Character));
+            let player_exists = get!(world, player, (Characters));
             assert(player_exists.name == '', 'player already exists');
 
             // Default the player has 2 Backpacks
@@ -95,7 +94,7 @@ mod actions {
             set!(
                 world,
                 (
-                    Character {
+                    Characters {
                         player,
                         name,
                         wmClass,
@@ -109,6 +108,7 @@ mod actions {
                         totalLoss: prev_total_loss,
                         winStreak: 0,
                         birthCount: prev_birth_count + 1,
+                        stamina: INIT_STAMINA,
                         updatedAt,
                     }
                 )
@@ -123,7 +123,7 @@ mod actions {
         ) {
             let player = get_caller_address();
 
-            let mut char = get!(world, player, (Character));
+            let mut char = get!(world, player, (Characters));
 
             assert(char.loss >= 5, 'loss not reached');
 
@@ -220,6 +220,11 @@ mod actions {
             ref world: IWorldDispatcher, storage_item_id: u32, x: usize, y: usize, rotation: usize
         ) {
             let player = get_caller_address();
+
+            // check if the player has fought the matching battle
+            let mut battleLogCounter = get!(world, player, (BattleLogCounter));
+            let latestBattleLog = get!(world, (player, battleLogCounter.count), BattleLog);
+            assert(battleLogCounter.count == 0 || latestBattleLog.winner != 0, 'battle not fought');
 
             assert(x < GRID_X, 'x out of range');
             assert(y < GRID_Y, 'y out of range');
@@ -362,6 +367,11 @@ mod actions {
 
         fn undo_place_item(ref world: IWorldDispatcher, inventory_item_id: u32) {
             let player = get_caller_address();
+
+            // check if the player has fought the matching battle
+            let mut battleLogCounter = get!(world, player, (BattleLogCounter));
+            let latestBattleLog = get!(world, (player, battleLogCounter.count), BattleLog);
+            assert(battleLogCounter.count == 0 || latestBattleLog.winner != 0, 'battle not fought');
 
             let mut inventoryItem = get!(
                 world, (player, inventory_item_id), (CharacterItemInventory)
