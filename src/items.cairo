@@ -182,7 +182,7 @@ mod Spike {
     const armorActivation: u8 = 0;
     const regen: usize = 0;
     const regenActivation: u8 = 0;
-    const reflect: usize = 1;
+    const reflect: usize = 2;
     const reflectActivation: u8 = 1;
     const poison: usize = 0;
     const poisonActivation: u8 = 0;
@@ -226,7 +226,7 @@ mod Helmet {
     const chance: usize = 50;
     const cooldown: u8 = 0;
     const rarity: u8 = 1;
-    const armor: usize = 3;
+    const armor: usize = 2;
     const armorActivation: u8 = 2;
     const regen: usize = 0;
     const regenActivation: u8 = 0;
@@ -274,7 +274,7 @@ mod LeatherArmor {
     const chance: usize = 100;
     const cooldown: u8 = 0;
     const rarity: u8 = 2;
-    const armor: usize = 35;
+    const armor: usize = 25;
     const armorActivation: u8 = 1;
     const regen: usize = 0;
     const regenActivation: u8 = 0;
@@ -418,7 +418,7 @@ mod MailArmor {
     const chance: usize = 100;
     const cooldown: u8 = 0;
     const rarity: u8 = 3;
-    const armor: usize = 75;
+    const armor: usize = 55;
     const armorActivation: u8 = 1;
     const regen: usize = 0;
     const regenActivation: u8 = 0;
@@ -440,10 +440,10 @@ mod Buckler {
     const price: usize = 8;
     const damage: usize = 0;
     const cleansePoison: usize = 0;
-    const chance: usize = 60;
+    const chance: usize = 70;
     const cooldown: u8 = 0;
     const rarity: u8 = 2;
-    const armor: usize = 10;
+    const armor: usize = 5;
     const armorActivation: u8 = 2;
     const regen: usize = 0;
     const regenActivation: u8 = 0;
@@ -605,12 +605,12 @@ mod AmuletOfFury {
     const itemType: u8 = 3;
     const width: usize = 1;
     const height: usize = 1;
-    const price: usize = 7;
+    const price: usize = 5;
     const damage: usize = 0;
     const cleansePoison: usize = 0;
-    const chance: usize = 75;
-    const cooldown: u8 = 0;
-    const rarity: u8 = 2;
+    const chance: usize = 65;
+    const cooldown: u8 = 5;
+    const rarity: u8 = 1;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
     const regen: usize = 0;
@@ -619,8 +619,8 @@ mod AmuletOfFury {
     const reflectActivation: u8 = 0;
     const poison: usize = 0;
     const poisonActivation: u8 = 0;
-    const empower: usize = 2;
-    const empowerActivation: u8 = 2;
+    const empower: usize = 1;
+    const empowerActivation: u8 = 3;
 }
 
 mod RageGauntlet {
@@ -629,12 +629,12 @@ mod RageGauntlet {
     const itemType: u8 = 3;
     const width: usize = 1;
     const height: usize = 2;
-    const price: usize = 4;
+    const price: usize = 7;
     const damage: usize = 0;
     const cleansePoison: usize = 0;
-    const chance: usize = 65;
+    const chance: usize = 45;
     const cooldown: u8 = 0;
-    const rarity: u8 = 1;
+    const rarity: u8 = 2;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
     const regen: usize = 0;
@@ -656,8 +656,8 @@ mod KnightHelmet {
     const price: usize = 10;
     const damage: usize = 0;
     const cleansePoison: usize = 0;
-    const chance: usize = 100;
-    const cooldown: u8 = 5;
+    const chance: usize = 50;
+    const cooldown: u8 = 0;
     const rarity: u8 = 3;
     const armor: usize = 0;
     const armorActivation: u8 = 0;
@@ -668,7 +668,7 @@ mod KnightHelmet {
     const poison: usize = 0;
     const poisonActivation: u8 = 0;
     const empower: usize = 3;
-    const empowerActivation: u8 = 3;
+    const empowerActivation: u8 = 2;
 }
 
 mod BladeArmor {
