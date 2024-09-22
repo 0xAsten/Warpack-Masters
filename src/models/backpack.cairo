@@ -12,6 +12,10 @@ struct BackpackGrids {
     y: usize,
     enabled: bool,
     occupied: bool,
+    inventoryItemId: usize,
+    itemId: usize,
+    isWeapon: bool,
+    isPllugin: bool,
 }
 
 #[cfg(test)]
