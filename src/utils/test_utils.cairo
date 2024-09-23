@@ -289,5 +289,23 @@ fn add_items(ref item_system: IItemDispatcher) {
             items::SpikeShield::energyCost,
             items::SpikeShield::isPlugin,
         );
+
+    item_system
+        .add_item(
+            items::PlagueFlower::id,
+            items::PlagueFlower::name,
+            items::PlagueFlower::itemType,
+            items::PlagueFlower::rarity,
+            items::PlagueFlower::width,
+            items::PlagueFlower::height,
+            items::PlagueFlower::price,
+            items::PlagueFlower::effectType,
+            items::PlagueFlower::effectStacks,
+            items::PlagueFlower::effectActivationType,
+            items::PlagueFlower::chance,
+            items::PlagueFlower::cooldown,
+            items::PlagueFlower::energyCost,
+            items::PlagueFlower::isPlugin,
+        );
 }
 
