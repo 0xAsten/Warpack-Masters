@@ -15,7 +15,7 @@ trait IActions {
     fn place_item(
         ref world: IWorldDispatcher, storage_item_id: u32, x: usize, y: usize, rotation: usize
     );
-    // fn undo_place_item(ref world: IWorldDispatcher, inventory_item_id: u32);
+    fn undo_place_item(ref world: IWorldDispatcher, inventory_item_id: u32);
 }
 
 // TODO: rename the count filed in counter model
@@ -268,7 +268,8 @@ mod actions {
                     break;
                 }
 
-                if inventoryItem.itemId == 0 {
+                let currentInventoryItem = get!(world, (player, count), (CharacterItemInventory));
+                if currentInventoryItem.itemId == 0 {
                     inventoryItem.id = count;
                     break;
                 }
@@ -502,10 +503,10 @@ mod actions {
                             if i > 0 && i == x {
                                 let grid = get!(world, (player, i - 1, j), (BackpackGrids));
                                 if !isHandled.get(grid.inventoryItemId.into()) && grid.isWeapon {
-                                    let weapon = get!(world, (player, grid.inventoryItemId), (CharacterItemInventory));
+                                    let mut weapon = get!(world, (player, grid.inventoryItemId), (CharacterItemInventory));
                                     let mut k = 0;
                                     let plugins = weapon.plugins;
-                                    let newPlugins = array![];
+                                    let mut newPlugins = array![];
                                     loop {
                                         if k >= plugins.len() {
                                             break;
@@ -516,7 +517,7 @@ mod actions {
                                         }
                                         newPlugins.append(*plugins.at(k));
                                         k += 1;
-                                    }
+                                    };
                                     weapon.plugins = newPlugins;
                                     set!(world, (weapon));
                                     isHandled.insert(grid.inventoryItemId.into(), true);
@@ -526,10 +527,10 @@ mod actions {
                             if j < GRID_Y - 1 && j == yMax {
                                 let grid = get!(world, (player, i, j + 1), (BackpackGrids));
                                 if !isHandled.get(grid.inventoryItemId.into()) && grid.isWeapon {
-                                    let weapon = get!(world, (player, grid.inventoryItemId), (CharacterItemInventory));
+                                    let mut weapon = get!(world, (player, grid.inventoryItemId), (CharacterItemInventory));
                                     let mut k = 0;
                                     let plugins = weapon.plugins;
-                                    let newPlugins = array![];
+                                    let mut newPlugins = array![];
                                     loop {
                                         if k >= plugins.len() {
                                             break;
@@ -540,7 +541,7 @@ mod actions {
                                         }
                                         newPlugins.append(*plugins.at(k));
                                         k += 1;
-                                    }
+                                    };
                                     weapon.plugins = newPlugins;
                                     set!(world, (weapon));
                                     isHandled.insert(grid.inventoryItemId.into(), true);
@@ -550,10 +551,10 @@ mod actions {
                             if i < GRID_X - 1 && i == xMax {
                                 let grid = get!(world, (player, i + 1, j), (BackpackGrids));
                                 if !isHandled.get(grid.inventoryItemId.into()) && grid.isWeapon {
-                                    let weapon = get!(world, (player, grid.inventoryItemId), (CharacterItemInventory));
+                                    let mut weapon = get!(world, (player, grid.inventoryItemId), (CharacterItemInventory));
                                     let mut k = 0;
                                     let plugins = weapon.plugins;
-                                    let newPlugins = array![];
+                                    let mut newPlugins = array![];
                                     loop {
                                         if k >= plugins.len() {
                                             break;
@@ -564,7 +565,7 @@ mod actions {
                                         }
                                         newPlugins.append(*plugins.at(k));
                                         k += 1;
-                                    }
+                                    };
                                     weapon.plugins = newPlugins;
                                     set!(world, (weapon));
                                     isHandled.insert(grid.inventoryItemId.into(), true);
@@ -574,10 +575,10 @@ mod actions {
                             if j > 0 && j == y {
                                 let grid = get!(world, (player, i, j - 1), (BackpackGrids));
                                 if !isHandled.get(grid.inventoryItemId.into()) && grid.isWeapon {
-                                    let weapon = get!(world, (player, grid.inventoryItemId), (CharacterItemInventory));
+                                    let mut weapon = get!(world, (player, grid.inventoryItemId), (CharacterItemInventory));
                                     let mut k = 0;
                                     let plugins = weapon.plugins;
-                                    let newPlugins = array![];
+                                    let mut newPlugins = array![];
                                     loop {
                                         if k >= plugins.len() {
                                             break;
@@ -588,7 +589,7 @@ mod actions {
                                         }
                                         newPlugins.append(*plugins.at(k));
                                         k += 1;
-                                    }
+                                    };
                                     weapon.plugins = newPlugins;
                                     set!(world, (weapon));
                                     isHandled.insert(grid.inventoryItemId.into(), true);
@@ -601,12 +602,11 @@ mod actions {
                 };
                 j = y;
                 i += 1;
-            }
+            };
         
 
             let mut storageCounter = get!(world, player, (CharacterItemsStorageCounter));
             let mut count = storageCounter.count;
-            let mut isUpdated = false;
             loop {
                 if count == 0 {
                     break;
@@ -615,7 +615,6 @@ mod actions {
                 let mut storageItem = get!(world, (player, count), (CharacterItemStorage));
                 if storageItem.itemId == 0 {
                     storageItem.itemId = itemId;
-                    isUpdated = true;
                     set!(world, (storageItem));
                     break;
                 }
@@ -623,7 +622,7 @@ mod actions {
                 count -= 1;
             };
 
-            if isUpdated == false {
+            if count == 0 {
                 storageCounter.count += 1;
                 set!(
                     world,

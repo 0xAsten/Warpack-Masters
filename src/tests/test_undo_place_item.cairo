@@ -27,6 +27,7 @@ mod tests {
         models::Shop::{Shop, shop}, utils::{test_utils::{add_items}}
     };
 
+    use debug::PrintTrait;
 
     fn get_systems(
         world: IWorldDispatcher
@@ -135,18 +136,31 @@ mod tests {
         assert(invetoryItem.position.x == 0, 'x position mismatch');
         assert(invetoryItem.position.y == 0, 'y position mismatch');
         assert(invetoryItem.rotation == 0, 'rotation mismatch');
+        assert(invetoryItem.plugins.len() == 0, 'plugins length mismatch');
 
         let mut backpack_grid_data = get!(world, (alice, 4, 2), BackpackGrids);
         assert(backpack_grid_data.occupied == false, '(4,2) should not be occupied');
         assert(backpack_grid_data.enabled == true, '(4,2) should be enabled');
+        assert(backpack_grid_data.inventoryItemId == 0, 'id should equal 0');
+        assert(backpack_grid_data.itemId == 0, 'item id should equal 0');
+        assert(backpack_grid_data.isWeapon == false, 'isWeapon should be false');
+        assert(backpack_grid_data.isPlugin == false, 'isPlugin should be false');
 
         let mut backpack_grid_data = get!(world, (alice, 4, 3), BackpackGrids);
         assert(backpack_grid_data.occupied == false, '(4,3) should not be occupied');
         assert(backpack_grid_data.enabled == true, '(4,3) should be enabled');
+        assert(backpack_grid_data.inventoryItemId == 0, 'id should equal 0');
+        assert(backpack_grid_data.itemId == 0, 'item id should equal 0');
+        assert(backpack_grid_data.isWeapon == false, 'isWeapon should be false');
+        assert(backpack_grid_data.isPlugin == false, 'isPlugin should be false');
 
         let mut backpack_grid_data = get!(world, (alice, 4, 4), BackpackGrids);
         assert(backpack_grid_data.occupied == false, '(4,4) should not be occupied');
         assert(backpack_grid_data.enabled == true, '(4,4) should be enabled');
+        assert(backpack_grid_data.inventoryItemId == 0, 'id should equal 0');
+        assert(backpack_grid_data.itemId == 0, 'item id should equal 0');
+        assert(backpack_grid_data.isWeapon == false, 'isWeapon should be false');
+        assert(backpack_grid_data.isPlugin == false, 'isPlugin should be false');
 
         shop_system.buy_item(6);
         // place a shield on (2,2)
@@ -170,22 +184,39 @@ mod tests {
         assert(invetoryItem.position.x == 0, 'x position mismatch');
         assert(invetoryItem.position.y == 0, 'y position mismatch');
         assert(invetoryItem.rotation == 0, 'rotation mismatch');
+        assert(invetoryItem.plugins.len() == 0, 'plugins length mismatch');
 
         let mut backpack_grid_data = get!(world, (alice, 2, 2), BackpackGrids);
         assert(backpack_grid_data.occupied == false, '(2,2) should not be occupied');
         assert(backpack_grid_data.enabled == true, '(2,2) should be occupied');
+        assert(backpack_grid_data.inventoryItemId == 0, 'id should equal 0');
+        assert(backpack_grid_data.itemId == 0, 'item id should equal 0');
+        assert(backpack_grid_data.isWeapon == false, 'isWeapon should be false');
+        assert(backpack_grid_data.isPlugin == false, 'isPlugin should be false');
 
         let mut backpack_grid_data = get!(world, (alice, 3, 2), BackpackGrids);
         assert(backpack_grid_data.occupied == false, '(3,2) should not be occupied');
         assert(backpack_grid_data.enabled == true, '(3,2) should be enabled');
+        assert(backpack_grid_data.inventoryItemId == 0, 'id should equal 0');
+        assert(backpack_grid_data.itemId == 0, 'item id should equal 0');
+        assert(backpack_grid_data.isWeapon == false, 'isWeapon should be false');
+        assert(backpack_grid_data.isPlugin == false, 'isPlugin should be false');
 
         let mut backpack_grid_data = get!(world, (alice, 2, 3), BackpackGrids);
         assert(backpack_grid_data.occupied == false, '(2,3) should not be occupied');
         assert(backpack_grid_data.enabled == true, '(2,3) should be enabled');
+        assert(backpack_grid_data.inventoryItemId == 0, 'id should equal 0');
+        assert(backpack_grid_data.itemId == 0, 'item id should equal 0');
+        assert(backpack_grid_data.isWeapon == false, 'isWeapon should be false');
+        assert(backpack_grid_data.isPlugin == false, 'isPlugin should be false');
 
         let mut backpack_grid_data = get!(world, (alice, 3, 3), BackpackGrids);
         assert(backpack_grid_data.occupied == false, '(3,3) should not be occupied');
         assert(backpack_grid_data.enabled == true, '(3,3) should be enabled');
+        assert(backpack_grid_data.inventoryItemId == 0, 'id should equal 0');
+        assert(backpack_grid_data.itemId == 0, 'item id should equal 0');
+        assert(backpack_grid_data.isWeapon == false, 'isWeapon should be false');
+        assert(backpack_grid_data.isPlugin == false, 'isPlugin should be false');
 
         shop_system.buy_item(8);
         // place a potion on (5,2)
@@ -210,10 +241,15 @@ mod tests {
         assert(invetoryItem.position.x == 0, 'x position mismatch');
         assert(invetoryItem.position.y == 0, 'y position mismatch');
         assert(invetoryItem.rotation == 0, 'rotation mismatch');
+        assert(invetoryItem.plugins.len() == 0, 'plugins length mismatch');
 
         let mut backpack_grid_data = get!(world, (alice, 5, 2), BackpackGrids);
         assert(backpack_grid_data.occupied == false, '(5,2) should not be occupied');
         assert(backpack_grid_data.enabled == true, '(5,2) should be enabled');
+        assert(backpack_grid_data.inventoryItemId == 0, 'id should equal 0');
+        assert(backpack_grid_data.itemId == 0, 'item id should equal 0');
+        assert(backpack_grid_data.isWeapon == false, 'isWeapon should be false');
+        assert(backpack_grid_data.isPlugin == false, 'isPlugin should be false');
 
         action_system.place_item(2, 4, 2, 0);
         action_system.place_item(1, 2, 2, 0);
@@ -239,11 +275,14 @@ mod tests {
         assert(invetoryItem.position.x == 4, 'x position mismatch');
         assert(invetoryItem.position.y == 2, 'y position mismatch');
         assert(invetoryItem.rotation == 0, 'rotation mismatch');
+
         let invetoryItem = get!(world, (alice, 4), CharacterItemInventory);
         assert(invetoryItem.itemId == 0, 'item id should equal 0');
         assert(invetoryItem.position.x == 0, 'x position mismatch');
         assert(invetoryItem.position.y == 0, 'y position mismatch');
         assert(invetoryItem.rotation == 0, 'rotation mismatch');
+        assert(invetoryItem.plugins.len() == 0, 'plugins length mismatch');
+
         let invetoryItem = get!(world, (alice, 5), CharacterItemInventory);
         assert(invetoryItem.itemId == 8, 'item id should equal 6');
         assert(invetoryItem.position.x == 5, 'x position mismatch');
@@ -269,5 +308,9 @@ mod tests {
 
         action_system.undo_place_item(3);
     }
+
+    #[test]
+    #[available_gas(3000000000000000)]
+    fn test_undo_place_item_with_plugins_check() {}
 }
 
