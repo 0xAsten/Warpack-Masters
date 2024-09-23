@@ -36,7 +36,7 @@ struct CharacterItemInventory {
     // 0, 90, 180, 270
     rotation: usize,
     // effectType, chance, stacks
-    plugins: Span<(felt252, usize, usize)>,
+    plugins: Array<(u8, usize, usize)>,
 }
 
 #[derive(Drop, Serde)]
