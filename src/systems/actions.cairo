@@ -284,17 +284,18 @@ mod actions {
             let mut xMax = 0;
             let mut yMax = 0;
 
-            // only check grids which are above the starting (x,y)
+            
             if rotation == 0 || rotation == 180 {
+                // only check grids which are above the starting (x,y)
                 xMax = x + itemWidth - 1;
                 yMax = y + itemHeight - 1;
-            }
-
-            // only check grids which are to the right of the starting (x,y)
-            if rotation == 90 || rotation == 270 {
+            } else if rotation == 90 || rotation == 270 {
+                // only check grids which are to the right of the starting (x,y)
                 //item_h becomes item_w and vice versa
                 xMax = x + itemHeight - 1;
                 yMax = y + itemWidth - 1;
+            } else {
+                assert(false, 'invalid rotation');
             }
 
             assert(xMax < GRID_X, 'item out of bound for x');
@@ -413,133 +414,232 @@ mod actions {
             );
         }
 
-        // fn undo_place_item(ref world: IWorldDispatcher, inventory_item_id: u32) {
-        //     let player = get_caller_address();
+        fn undo_place_item(ref world: IWorldDispatcher, inventory_item_id: u32) {
+            let player = get_caller_address();
 
-        //     // check if the player has fought the matching battle
-        //     let mut battleLogCounter = get!(world, player, (BattleLogCounter));
-        //     let latestBattleLog = get!(world, (player, battleLogCounter.count), BattleLog);
-        //     assert(battleLogCounter.count == 0 || latestBattleLog.winner != 0, 'battle not fought');
+            // check if the player has fought the matching battle
+            let mut battleLogCounter = get!(world, player, (BattleLogCounter));
+            let latestBattleLog = get!(world, (player, battleLogCounter.count), BattleLog);
+            assert(battleLogCounter.count == 0 || latestBattleLog.winner != 0, 'battle not fought');
 
-        //     let mut inventoryItem = get!(
-        //         world, (player, inventory_item_id), (CharacterItemInventory)
-        //     );
-        //     let itemId = inventoryItem.itemId;
-        //     assert(itemId != 0, 'invalid inventory item id');
-        //     let item = get!(world, itemId, (Item));
+            let mut inventoryItem = get!(
+                world, (player, inventory_item_id), (CharacterItemInventory)
+            );
+            let itemId = inventoryItem.itemId;
+            assert(itemId != 0, 'invalid inventory item id');
+            let item = get!(world, itemId, (Item));
 
-        //     let x = inventoryItem.position.x;
-        //     let y = inventoryItem.position.y;
-        //     let rotation = inventoryItem.rotation;
-        //     let itemHeight = item.height;
-        //     let itemWidth = item.width;
+            let x = inventoryItem.position.x;
+            let y = inventoryItem.position.y;
+            let rotation = inventoryItem.rotation;
 
-        //     let playerBackpackGrids = get!(world, (player, x, y), (BackpackGrids));
-        //     if itemHeight == 1 && itemWidth == 1 {
-        //         if item.itemType == 4 {
-        //             assert(!playerBackpackGrids.occupied, 'Already occupied');
-        //             set!(
-        //                 world,
-        //                 (BackpackGrids {
-        //                     player: player, x: x, y: y, enabled: false, occupied: false
-        //                 })
-        //             );
-        //         } else {
-        //             set!(
-        //                 world,
-        //                 (BackpackGrids {
-        //                     player: player, x: x, y: y, enabled: true, occupied: false
-        //                 })
-        //             );
-        //         }
-        //     } else {
-        //         let mut xMax = 0;
-        //         let mut yMax = 0;
+            let itemHeight = item.height;
+            let itemWidth = item.width;
 
-        //         // only check grids which are above the starting (x,y)
-        //         if rotation == 0 || rotation == 180 {
-        //             xMax = x + itemWidth - 1;
-        //             yMax = y + itemHeight - 1;
-        //         }
+            let isWeapon = if item.itemType == 1 || item.itemType == 2 {
+                true
+            } else {
+                false
+            };
 
-        //         // only check grids which are to the right of the starting (x,y)
-        //         if rotation == 90 || rotation == 270 {
-        //             //item_h becomes item_w and vice versa
-        //             xMax = x + itemHeight - 1;
-        //             yMax = y + itemWidth - 1;
-        //         }
+            let mut xMax = 0;
+            let mut yMax = 0;
 
-        //         let mut i = x;
-        //         let mut j = y;
-        //         loop {
-        //             if i > xMax {
-        //                 break;
-        //             }
-        //             loop {
-        //                 if j > yMax {
-        //                     break;
-        //                 }
+            if rotation == 0 || rotation == 180 {
+                // only check grids which are above the starting (x,y)
+                xMax = x + itemWidth - 1;
+                yMax = y + itemHeight - 1;
+            } else if rotation == 90 || rotation == 270 {
+                // only check grids which are to the right of the starting (x,y)
+                //item_h becomes item_w and vice versa
+                xMax = x + itemHeight - 1;
+                yMax = y + itemWidth - 1;
+            } else {
+                assert(false, 'invalid rotation');
+            }
 
-        //                 let playerBackpackGrids = get!(world, (player, i, j), (BackpackGrids));
-        //                 if item.itemType == 4 {
-        //                     assert(!playerBackpackGrids.occupied, 'Already occupied');
-        //                     set!(
-        //                         world,
-        //                         (BackpackGrids {
-        //                             player: player, x: i, y: j, enabled: false, occupied: false
-        //                         })
-        //                     );
-        //                 } else {
-        //                     set!(
-        //                         world,
-        //                         (BackpackGrids {
-        //                             player: player, x: i, y: j, enabled: true, occupied: false
-        //                         })
-        //                     );
-        //                 }
+            let mut i = x;
+            let mut j = y;
+            let mut isHandled: Felt252Dict<bool> = Default::default();
+            loop {
+                if i > xMax {
+                    break;
+                }
+                loop {
+                    if j > yMax {
+                        break;
+                    }
 
-        //                 j += 1;
-        //             };
-        //             j = y;
-        //             i += 1;
-        //         }
-        //     }
+                    let mut playerBackpackGrids = get!(world, (player, i, j), (BackpackGrids));
+                    if item.itemType == 4 {
+                        assert(!playerBackpackGrids.occupied, 'Already occupied');
+                        playerBackpackGrids.enabled = false;
+                        set!(
+                            world,
+                            (playerBackpackGrids)
+                        );
+                    } else {
+                        assert(playerBackpackGrids.enabled, 'Grid not enabled');
+                        assert(playerBackpackGrids.occupied, 'Grid not occupied');
+                        assert(playerBackpackGrids.inventoryItemId == inventory_item_id, 'Invalid inventory item id');
+                        assert(playerBackpackGrids.itemId == itemId, 'Invalid item id');
+                        assert(playerBackpackGrids.isWeapon == isWeapon, 'Invalid item type');
+                        assert(playerBackpackGrids.isPlugin == item.isPlugin, 'Is not aligned with plugin');
 
-        //     let mut storageCounter = get!(world, player, (CharacterItemsStorageCounter));
-        //     let mut count = storageCounter.count;
-        //     let mut isUpdated = false;
-        //     loop {
-        //         if count == 0 {
-        //             break;
-        //         }
+                        playerBackpackGrids.occupied = false;
+                        playerBackpackGrids.itemId = 0;
+                        playerBackpackGrids.inventoryItemId = 0;
+                        playerBackpackGrids.isWeapon = false;
+                        playerBackpackGrids.isPlugin = false;
+                        set!(
+                            world,
+                            (playerBackpackGrids)
+                        );
 
-        //         let mut storageItem = get!(world, (player, count), (CharacterItemStorage));
-        //         if storageItem.itemId == 0 {
-        //             storageItem.itemId = itemId;
-        //             isUpdated = true;
-        //             set!(world, (storageItem));
-        //             break;
-        //         }
+                        // to check around if it is a plugin
+                        if item.isPlugin {
+                            // left
+                            if i > 0 && i == x {
+                                let grid = get!(world, (player, i - 1, j), (BackpackGrids));
+                                if !isHandled.get(grid.inventoryItemId.into()) && grid.isWeapon {
+                                    let weapon = get!(world, (player, grid.inventoryItemId), (CharacterItemInventory));
+                                    let mut k = 0;
+                                    let plugins = weapon.plugins;
+                                    let newPlugins = array![];
+                                    loop {
+                                        if k >= plugins.len() {
+                                            break;
+                                        }
+                                        if *plugins.at(k) == (item.effectType, item.chance, item.effectStacks) {
+                                            k += 1;
+                                            continue;
+                                        }
+                                        newPlugins.append(*plugins.at(k));
+                                        k += 1;
+                                    }
+                                    weapon.plugins = newPlugins;
+                                    set!(world, (weapon));
+                                    isHandled.insert(grid.inventoryItemId.into(), true);
+                                }
+                            }
+                            // top
+                            if j < GRID_Y - 1 && j == yMax {
+                                let grid = get!(world, (player, i, j + 1), (BackpackGrids));
+                                if !isHandled.get(grid.inventoryItemId.into()) && grid.isWeapon {
+                                    let weapon = get!(world, (player, grid.inventoryItemId), (CharacterItemInventory));
+                                    let mut k = 0;
+                                    let plugins = weapon.plugins;
+                                    let newPlugins = array![];
+                                    loop {
+                                        if k >= plugins.len() {
+                                            break;
+                                        }
+                                        if *plugins.at(k) == (item.effectType, item.chance, item.effectStacks) {
+                                            k += 1;
+                                            continue;
+                                        }
+                                        newPlugins.append(*plugins.at(k));
+                                        k += 1;
+                                    }
+                                    weapon.plugins = newPlugins;
+                                    set!(world, (weapon));
+                                    isHandled.insert(grid.inventoryItemId.into(), true);
+                                }
+                            }
+                            // right
+                            if i < GRID_X - 1 && i == xMax {
+                                let grid = get!(world, (player, i + 1, j), (BackpackGrids));
+                                if !isHandled.get(grid.inventoryItemId.into()) && grid.isWeapon {
+                                    let weapon = get!(world, (player, grid.inventoryItemId), (CharacterItemInventory));
+                                    let mut k = 0;
+                                    let plugins = weapon.plugins;
+                                    let newPlugins = array![];
+                                    loop {
+                                        if k >= plugins.len() {
+                                            break;
+                                        }
+                                        if *plugins.at(k) == (item.effectType, item.chance, item.effectStacks) {
+                                            k += 1;
+                                            continue;
+                                        }
+                                        newPlugins.append(*plugins.at(k));
+                                        k += 1;
+                                    }
+                                    weapon.plugins = newPlugins;
+                                    set!(world, (weapon));
+                                    isHandled.insert(grid.inventoryItemId.into(), true);
+                                }
+                            }
+                            // bottom
+                            if j > 0 && j == y {
+                                let grid = get!(world, (player, i, j - 1), (BackpackGrids));
+                                if !isHandled.get(grid.inventoryItemId.into()) && grid.isWeapon {
+                                    let weapon = get!(world, (player, grid.inventoryItemId), (CharacterItemInventory));
+                                    let mut k = 0;
+                                    let plugins = weapon.plugins;
+                                    let newPlugins = array![];
+                                    loop {
+                                        if k >= plugins.len() {
+                                            break;
+                                        }
+                                        if *plugins.at(k) == (item.effectType, item.chance, item.effectStacks) {
+                                            k += 1;
+                                            continue;
+                                        }
+                                        newPlugins.append(*plugins.at(k));
+                                        k += 1;
+                                    }
+                                    weapon.plugins = newPlugins;
+                                    set!(world, (weapon));
+                                    isHandled.insert(grid.inventoryItemId.into(), true);
+                                }
+                            }
+                        }
+                    }
 
-        //         count -= 1;
-        //     };
+                    j += 1;
+                };
+                j = y;
+                i += 1;
+            }
+        
 
-        //     if isUpdated == false {
-        //         storageCounter.count += 1;
-        //         set!(
-        //             world,
-        //             (
-        //                 CharacterItemStorage { player, id: storageCounter.count, itemId: itemId, },
-        //                 CharacterItemsStorageCounter { player, count: storageCounter.count },
-        //             )
-        //         );
-        //     }
+            let mut storageCounter = get!(world, player, (CharacterItemsStorageCounter));
+            let mut count = storageCounter.count;
+            let mut isUpdated = false;
+            loop {
+                if count == 0 {
+                    break;
+                }
 
-        //     inventoryItem.itemId = 0;
-        //     inventoryItem.position.x = 0;
-        //     inventoryItem.position.y = 0;
-        //     inventoryItem.rotation = 0;
-        //     set!(world, (inventoryItem));
-        // }
+                let mut storageItem = get!(world, (player, count), (CharacterItemStorage));
+                if storageItem.itemId == 0 {
+                    storageItem.itemId = itemId;
+                    isUpdated = true;
+                    set!(world, (storageItem));
+                    break;
+                }
+
+                count -= 1;
+            };
+
+            if isUpdated == false {
+                storageCounter.count += 1;
+                set!(
+                    world,
+                    (
+                        CharacterItemStorage { player, id: storageCounter.count, itemId: itemId, },
+                        CharacterItemsStorageCounter { player, count: storageCounter.count },
+                    )
+                );
+            }
+
+            inventoryItem.itemId = 0;
+            inventoryItem.position.x = 0;
+            inventoryItem.position.y = 0;
+            inventoryItem.rotation = 0;
+            inventoryItem.plugins = array![];
+            set!(world, (inventoryItem));
+        }
     }
 }
