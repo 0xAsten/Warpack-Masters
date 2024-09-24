@@ -25,7 +25,7 @@ mod tests {
         models::Shop::{Shop, shop}, utils::{test_utils::{add_items}}
     };
 
-    use warpack_masters::constants::constants::{INIT_HEALTH, INIT_GOLD};
+    use warpack_masters::constants::constants::{INIT_HEALTH, INIT_GOLD, INIT_STAMINA};
 
     fn get_systems(
         world: IWorldDispatcher
@@ -87,6 +87,7 @@ mod tests {
         assert(char.winStreak == 0, 'win streak should be 0');
         assert(char.birthCount == 1, 'birth count should be 1');
         assert(char.updatedAt == timestamp, 'updatedAt mismatch');
+        assert(char.stamina == INIT_STAMINA, 'stamina mismatch');
 
         let storageItemsCounter = get!(world, (alice), CharacterItemsStorageCounter);
         assert(storageItemsCounter.count == 2, 'Storage item count should be 2');
@@ -104,11 +105,15 @@ mod tests {
         assert(inventoryItem.itemId == 1, 'item 1 should be 1');
         assert(inventoryItem.position.x == 4, 'item 1 x should be 4');
         assert(inventoryItem.position.y == 2, 'item 1 y should be 2');
+        assert(inventoryItem.rotation == 0, 'item 1 rotation should be 0');
+        assert(inventoryItem.plugins.len() == 0, 'item 1 plugins should be empty');
 
         let inventoryItem = get!(world, (alice, 2), CharacterItemInventory);
         assert(inventoryItem.itemId == 2, 'item 2 should be 2');
         assert(inventoryItem.position.x == 2, 'item 2 x should be 4');
         assert(inventoryItem.position.y == 2, 'item 2 y should be 3');
+        assert(inventoryItem.rotation == 0, 'item 1 rotation should be 0');
+        assert(inventoryItem.plugins.len() == 0, 'item 1 plugins should be empty');
 
         let playerShopData = get!(world, (alice), Shop);
         assert(playerShopData.item1 == 0, 'item 1 should be 0');
@@ -122,42 +127,82 @@ mod tests {
         let playerGridData = get!(world, (alice, 4, 2), BackpackGrids);
         assert(playerGridData.enabled == true, '(4,2) should be enabled');
         assert(playerGridData.occupied == false, '(4,2) should not be occupied');
+        assert(playerGridData.inventoryItemId == 0, 'should have inventory item 0');
+        assert(playerGridData.itemId == 0, 'should have item 0');
+        assert(playerGridData.isWeapon == false, 'should not be weapon');
+        assert(playerGridData.isPlugin == false, 'should not be plugin');
 
         let playerGridData = get!(world, (alice, 4, 3), BackpackGrids);
         assert(playerGridData.enabled == true, '(4,3) should be enabled');
         assert(playerGridData.occupied == false, '(4,3) should not be occupied');
+        assert(playerGridData.inventoryItemId == 0, 'should have inventory item 0');
+        assert(playerGridData.itemId == 0, 'should have item 0');
+        assert(playerGridData.isWeapon == false, 'should not be weapon');
+        assert(playerGridData.isPlugin == false, 'should not be plugin');
 
         let playerGridData = get!(world, (alice, 4, 4), BackpackGrids);
         assert(playerGridData.enabled == true, '(4,4) should be enabled');
         assert(playerGridData.occupied == false, '(4,4) should not be occupied');
+        assert(playerGridData.inventoryItemId == 0, 'should have inventory item 0');
+        assert(playerGridData.itemId == 0, 'should have item 0');
+        assert(playerGridData.isWeapon == false, 'should not be weapon');
+        assert(playerGridData.isPlugin == false, 'should not be plugin');
 
         let playerGridData = get!(world, (alice, 5, 2), BackpackGrids);
         assert(playerGridData.enabled == true, '(5,2) should be enabled');
         assert(playerGridData.occupied == false, '(5,2) should not be occupied');
+        assert(playerGridData.inventoryItemId == 0, 'should have inventory item 0');
+        assert(playerGridData.itemId == 0, 'should have item 0');
+        assert(playerGridData.isWeapon == false, 'should not be weapon');
+        assert(playerGridData.isPlugin == false, 'should not be plugin');
 
         let playerGridData = get!(world, (alice, 5, 3), BackpackGrids);
         assert(playerGridData.enabled == true, '(5,3) should be enabled');
         assert(playerGridData.occupied == false, '(5,3) should not be occupied');
+        assert(playerGridData.inventoryItemId == 0, 'should have inventory item 0');
+        assert(playerGridData.itemId == 0, 'should have item 0');
+        assert(playerGridData.isWeapon == false, 'should not be weapon');
+        assert(playerGridData.isPlugin == false, 'should not be plugin');
 
         let playerGridData = get!(world, (alice, 5, 4), BackpackGrids);
         assert(playerGridData.enabled == true, '(5,4) should be enabled');
         assert(playerGridData.occupied == false, '(5,4) should not be occupied');
+        assert(playerGridData.inventoryItemId == 0, 'should have inventory item 0');
+        assert(playerGridData.itemId == 0, 'should have item 0');
+        assert(playerGridData.isWeapon == false, 'should not be weapon');
+        assert(playerGridData.isPlugin == false, 'should not be plugin');
 
         let playerGridData = get!(world, (alice, 2, 2), BackpackGrids);
         assert(playerGridData.enabled == true, '(2,2) should be enabled');
         assert(playerGridData.occupied == false, '(2,2) should not be occupied');
+        assert(playerGridData.inventoryItemId == 0, 'should have inventory item 0');
+        assert(playerGridData.itemId == 0, 'should have item 0');
+        assert(playerGridData.isWeapon == false, 'should not be weapon');
+        assert(playerGridData.isPlugin == false, 'should not be plugin');
 
         let playerGridData = get!(world, (alice, 2, 3), BackpackGrids);
         assert(playerGridData.enabled == true, '(2,3) should be enabled');
         assert(playerGridData.occupied == false, '(2,3) should not be occupied');
+        assert(playerGridData.inventoryItemId == 0, 'should have inventory item 0');
+        assert(playerGridData.itemId == 0, 'should have item 0');
+        assert(playerGridData.isWeapon == false, 'should not be weapon');
+        assert(playerGridData.isPlugin == false, 'should not be plugin');
 
         let playerGridData = get!(world, (alice, 3, 2), BackpackGrids);
         assert(playerGridData.enabled == true, '(3,2) should be enabled');
         assert(playerGridData.occupied == false, '(3,2) should not be occupied');
+        assert(playerGridData.inventoryItemId == 0, 'should have inventory item 0');
+        assert(playerGridData.itemId == 0, 'should have item 0');
+        assert(playerGridData.isWeapon == false, 'should not be weapon');
+        assert(playerGridData.isPlugin == false, 'should not be plugin');
 
         let playerGridData = get!(world, (alice, 3, 3), BackpackGrids);
         assert(playerGridData.enabled == true, '(3,3) should be enabled');
         assert(playerGridData.occupied == false, '(3,3) should not be occupied');
+        assert(playerGridData.inventoryItemId == 0, 'should have inventory item 0');
+        assert(playerGridData.itemId == 0, 'should have item 0');
+        assert(playerGridData.isWeapon == false, 'should not be weapon');
+        assert(playerGridData.isPlugin == false, 'should not be plugin');
     }
 
 
@@ -245,6 +290,7 @@ mod tests {
         assert(char.winStreak == 0, 'win streak should be 0');
         assert(char.birthCount == 1, 'birth count should be 1');
         assert(char.updatedAt == timestamp, 'updatedAt mismatch');
+        assert(char.stamina == INIT_STAMINA, 'stamina mismatch');
     }
 }
 
