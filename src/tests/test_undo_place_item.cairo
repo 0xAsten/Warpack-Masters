@@ -311,6 +311,108 @@ mod tests {
 
     #[test]
     #[available_gas(3000000000000000)]
-    fn test_undo_place_item_with_plugins_check() {}
+    fn test_undo_place_item_with_plugins_check() {
+        let alice = starknet::contract_address_const::<0x1337>();
+
+        let world = spawn_test_world!();
+        let (action_system_address, mut action_system, _, mut item_system, _, mut shop_system) = get_systems(world);
+
+        add_items(ref item_system);
+
+        set_contract_address(alice);
+        action_system.spawn('Alice', WMClass::Warlock);
+        shop_system.reroll_shop();
+
+        // mock player gold for testing
+        let mut player_data = get!(world, alice, (Characters));
+        player_data.gold = 100;
+
+        set_contract_address(action_system_address);
+        set!(world, (player_data));
+        // mock shop for testing
+        let mut shop_data = get!(world, alice, (Shop));
+        shop_data.item1 = 7; // sword weapon
+        shop_data.item2 = 13; // poison plugin
+        shop_data.item3 = 17; // PlagueFlower plugin
+        shop_data.item4 = 1;
+        set!(world, (shop_data));
+
+        set_contract_address(alice);
+
+        shop_system.buy_item(13);
+        action_system.place_item(2, 5, 2, 0);
+
+        shop_system.buy_item(7);
+        // place a sword on (4,2)
+        action_system.place_item(2, 4, 2, 0);
+        
+        shop_system.buy_item(17);
+        action_system.place_item(2, 2, 2, 0);
+
+        action_system.undo_place_item(3);
+        let storageItemCounter = get!(world, alice, CharacterItemsStorageCounter);
+        assert(storageItemCounter.count == 2, 'storage item count mismatch');
+        let storageItem = get!(world, (alice, 2), CharacterItemStorage);
+        assert(storageItem.itemId == 13, 'item id should equal 7');
+        
+        let inventoryItemCounter = get!(world, alice, CharacterItemsInventoryCounter);
+        assert(inventoryItemCounter.count == 5, 'inventory item count mismatch');
+        let invetoryItem = get!(world, (alice, 3), CharacterItemInventory);
+        assert(invetoryItem.itemId == 0, 'item id should equal 0');
+        assert(invetoryItem.position.x == 0, 'x position mismatch');
+        assert(invetoryItem.position.y == 0, 'y position mismatch');
+        assert(invetoryItem.rotation == 0, 'rotation mismatch');
+        assert(invetoryItem.plugins.len() == 0, 'plugins length mismatch');
+        let invetoryItem = get!(world, (alice, 4), CharacterItemInventory);
+        assert(invetoryItem.itemId == 7, 'item id should equal 7');
+        assert(invetoryItem.position.x == 4, 'x position mismatch');
+        assert(invetoryItem.position.y == 2, 'y position mismatch');
+        assert(invetoryItem.rotation == 0, 'rotation mismatch');
+        assert(invetoryItem.plugins.len() == 1, 'plugins length mismatch');
+        assert(*invetoryItem.plugins.at(0) == (6, 80, 3), 'plugin length mismatch');
+
+        action_system.undo_place_item(4);
+        let storageItemCounter = get!(world, alice, CharacterItemsStorageCounter);
+        assert(storageItemCounter.count == 2, 'storage item count mismatch');
+        let storageItem = get!(world, (alice, 1), CharacterItemStorage);
+        assert(storageItem.itemId == 7, 'item id should equal 7');
+
+        let inventoryItemCounter = get!(world, alice, CharacterItemsInventoryCounter);
+        assert(inventoryItemCounter.count == 5, 'inventory item count mismatch');
+        let invetoryItem = get!(world, (alice, 4), CharacterItemInventory);
+        assert(invetoryItem.itemId == 0, 'item id should equal 0');
+        assert(invetoryItem.position.x == 0, 'x position mismatch');
+        assert(invetoryItem.position.y == 0, 'y position mismatch');
+        assert(invetoryItem.rotation == 0, 'rotation mismatch');
+        assert(invetoryItem.plugins.len() == 0, 'plugins length mismatch');
+
+        action_system.place_item(1, 4, 2, 0);
+        let storageItemCounter = get!(world, alice, CharacterItemsStorageCounter);
+        assert(storageItemCounter.count == 2, 'storage item count mismatch');
+        let storageItem = get!(world, (alice, 1), CharacterItemStorage);
+        assert(storageItem.itemId == 0, 'item id should equal 0');
+
+        let inventoryItemCounter = get!(world, alice, CharacterItemsInventoryCounter);
+        assert(inventoryItemCounter.count == 5, 'inventory item count mismatch');
+        let invetoryItem = get!(world, (alice, 4), CharacterItemInventory);
+        assert(invetoryItem.itemId == 7, 'item id should equal 7');
+        assert(invetoryItem.position.x == 4, 'x position mismatch');
+        assert(invetoryItem.position.y == 2, 'y position mismatch');
+        assert(invetoryItem.rotation == 0, 'rotation mismatch');
+        assert(invetoryItem.plugins.len() == 1, 'plugins length mismatch');
+        assert(*invetoryItem.plugins.at(0) == (6, 80, 3), 'plugin length mismatch');
+        let invetoryItem = get!(world, (alice, 5), CharacterItemInventory);
+        assert(invetoryItem.itemId == 17, 'item id should equal 17');
+        assert(invetoryItem.position.x == 2, 'x position mismatch');
+        assert(invetoryItem.position.y == 2, 'y position mismatch');
+        assert(invetoryItem.rotation == 0, 'rotation mismatch');
+        assert(invetoryItem.plugins.len() == 0, 'plugins length mismatch');
+        let invetoryItem = get!(world, (alice, 3), CharacterItemInventory);
+        assert(invetoryItem.itemId == 0, 'item id should equal 0');
+        assert(invetoryItem.position.x == 0, 'x position mismatch');
+        assert(invetoryItem.position.y == 0, 'y position mismatch');
+        assert(invetoryItem.rotation == 0, 'rotation mismatch');
+        assert(invetoryItem.plugins.len() == 0, 'plugins length mismatch');
+    }
 }
 

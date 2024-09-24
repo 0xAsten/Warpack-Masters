@@ -512,7 +512,6 @@ mod tests {
         let mut backpack_grid_data = get!(world, (alice, 5, 2), BackpackGrids);
         assert(backpack_grid_data.isPlugin, 'isPlugin mismatch');
         let invetoryItem = get!(world, (alice, 3), CharacterItemInventory);
-        invetoryItem.plugins.len().print();
         assert(invetoryItem.plugins.len() == 0, 'plugin length mismatch');
 
         shop_system.buy_item(7);
@@ -520,7 +519,6 @@ mod tests {
         action_system.place_item(2, 4, 2, 0);
         // (4,2) (4,3) (4,4) should be occupied
         let invetoryItem = get!(world, (alice, 4), CharacterItemInventory);
-        invetoryItem.plugins.len().print();
         assert(invetoryItem.plugins.len() == 1, 'plugin length mismatch');
         assert(*invetoryItem.plugins.at(0) == (6, 100, 2), 'plugin length mismatch');
         
@@ -530,7 +528,6 @@ mod tests {
         assert(invetoryItem.plugins.len() == 0, 'plugin length mismatch');
 
         let invetoryItem = get!(world, (alice, 4), CharacterItemInventory);
-        invetoryItem.plugins.len().print();
         assert(invetoryItem.plugins.len() == 2, 'plugin length mismatch');
         assert(*invetoryItem.plugins.at(0) == (6, 100, 2), 'plugin length mismatch');
         assert(*invetoryItem.plugins.at(1) == (6, 80, 3), 'plugin length mismatch');
