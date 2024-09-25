@@ -243,6 +243,8 @@ mod actions {
             let itemId = storageItem.itemId;
             let item = get!(world, itemId, (Item));
 
+            assert(item.width > 0 && item.height > 0, 'invalid item dimensions');
+
             let itemHeight = item.height;
             let itemWidth = item.width;
             let isWeapon = if item.itemType == 1 || item.itemType == 2 {

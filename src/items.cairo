@@ -587,7 +587,7 @@ mod DraculaGrimoire {
     const effectStacks: u32 = 2;
     const effectActivationType: u8 = 3;
     const chance: usize = 65;
-    const cooldown: u8 = 8;
+    const cooldown: u8 = 7;
     const energyCost: u8 = 0;
     const isPlugin: bool = false;
 }
