@@ -10,6 +10,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "csv-parser": "^3.0.0",
     "starknet": "^6.11.0"
   }
 }

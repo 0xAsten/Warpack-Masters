@@ -54,14 +54,14 @@ mod dummy_system {
             char.dummied = true;
 
             let inventoryItemCounter = get!(world, player, (CharacterItemsInventoryCounter));
-            let mut count = inventoryItemCounter.count;
 
+            let mut count = 0;
             loop {
-                if count == 0 {
+                if count == inventoryItemCounter.count {
                     break;
                 }
 
-                let inventoryItem = get!(world, (player, count), (CharacterItemInventory));
+                let inventoryItem = get!(world, (player, count+1), (CharacterItemInventory));
 
                 let mut dummyCharItemsCounter = get!(
                     world, (char.wins, dummyCharCounter.count), (DummyCharacterItemsCounter)
@@ -75,11 +75,12 @@ mod dummy_system {
                     itemId: inventoryItem.itemId,
                     position: inventoryItem.position,
                     rotation: inventoryItem.rotation,
+                    plugins: inventoryItem.plugins.span(),
                 };
 
                 set!(world, (dummyCharItemsCounter, dummyCharItem));
 
-                count -= 1;
+                count += 1;
             };
 
             set!(world, (char, dummyCharCounter, dummyChar));
@@ -154,6 +155,7 @@ mod dummy_system {
                     itemId: item.itemId,
                     position: item.position,
                     rotation: item.rotation,
+                    plugins: item.plugins,
                 };
 
                 set!(world, (dummyCharItem));
@@ -227,6 +229,7 @@ mod dummy_system {
                     itemId: item.itemId,
                     position: item.position,
                     rotation: item.rotation,
+                    plugins: item.plugins,
                 };
     
                 set!(world, (dummyCharItem));
