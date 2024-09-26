@@ -1,7 +1,7 @@
 #[dojo::interface]
 trait IFight {
     fn match_dummy(ref world: IWorldDispatcher);
-    fn fight(ref world: IWorldDispatcher);
+    // fn fight(ref world: IWorldDispatcher);
 }
 
 #[dojo::contract]
@@ -16,7 +16,7 @@ mod fight_system {
     use warpack_masters::models::Character::{Characters, WMClass, PLAYER, DUMMY};
 
     use warpack_masters::utils::random::{pseudo_seed, random};
-    use warpack_masters::utils::sort_items::{append_item, combine_items};
+    use warpack_masters::utils::sort_items::{append_item, order_items};
     use warpack_masters::models::DummyCharacter::{DummyCharacter, DummyCharacterCounter};
     use warpack_masters::models::DummyCharacterItem::{
         DummyCharacterItem, DummyCharacterItemsCounter
@@ -127,72 +127,60 @@ mod fight_system {
                     break;
                 }
                 let charItem = get!(world, (player, inventoryItemCount), (CharacterItemInventory));
+
                 let item = get!(world, charItem.itemId, (Item));
                 if item.itemType == 4 {
                     inventoryItemCount -= 1;
                     continue;
                 }
-                let cooldown = item.cooldown;
-                if cooldown > 0 {
-                    items_length = append_item(
-                        ref items_cooldown4,
-                        ref items_cooldown5,
-                        ref items_cooldown6,
-                        ref items_cooldown7,
-                        item.id,
-                        PLAYER,
-                        cooldown,
-                        items_length,
-                    );
-                } else if cooldown == 0 {
-                    // ====== `on start / on hit / on attack` to plus stacks ======
-                    // buff
-                    if item.armorActivation == 1 {
-                        char_armor += item.armor;
-                    } else if item.armorActivation == 2 {
-                        char_on_hit_items.append((EFFECT_ARMOR, item.chance, item.armor));
-                    } else if item.armorActivation == 4 {
-                        char_on_attack_items.append((EFFECT_ARMOR, item.chance, item.armor));
+
+                if item.cooldown > 0 {
+                    match item.cooldown {
+                        0 | 1 | 2 | 3 => {
+                            assert(false, 'cooldown not valid');
+                        },
+                        4 => {
+                            append_item(ref items_cooldown4, charItem.plugins.span(), @item, PLAYER);
+                        },
+                        5 => {
+                            append_item(ref items_cooldown5, charItem.plugins.span(), @item, PLAYER);
+                        },
+                        6 => {
+                            append_item(ref items_cooldown6, charItem.plugins.span(), @item, PLAYER);
+                        },
+                        7 => {
+                            append_item(ref items_cooldown7, charItem.plugins.span(), @item, PLAYER);
+                        },
+                        _ => {
+                            assert(false, 'cooldown not valid');
+                        },
                     }
 
-                    if item.regenActivation == 1 {
-                        char_regen += item.regen;
-                    } else if item.regenActivation == 2 {
-                        char_on_hit_items.append((EFFECT_REGEN, item.chance, item.regen));
-                    } else if item.regenActivation == 4 {
-                        char_on_attack_items.append((EFFECT_REGEN, item.chance, item.regen));
+                    items_length += 1;
+                } else {
+                    // ====== `on start -- 1 / on hit -- 2 / on attack -- 4` to plus stacks ======
+                    if item.effectActivationType == 1 {
+                        if item.effectType == 3 {
+                            char_armor += item.effectStacks;
+                        } else if item.effectType == 4 {
+                            char_regen += item.effectStacks;
+                        } else if item.effectType == 5 {
+                            char_reflect += item.effectStacks;
+                        } else if item.effectType == 7 {
+                            char_empower += item.effectStacks;
+                        } else if item.effectType == 8 {
+                            char_vampirism += item.effectStacks;
+                        } else if item.effectType == 6 {
+                            dummy_poison += item.effectStacks;
+                        }
                     }
 
-                    if item.reflectActivation == 1 {
-                        char_reflect += item.reflect;
-                    } else if item.reflectActivation == 2 {
-                        char_on_hit_items.append((EFFECT_REFLECT, item.chance, item.reflect));
-                    } else if item.reflectActivation == 4 {
-                        char_on_attack_items.append((EFFECT_REFLECT, item.chance, item.reflect));
+                    if item.effectActivationType == 2 {
+                        char_on_hit_items.append((item.effectType, item.chance, item.effectStacks));
                     }
 
-                    if item.empowerActivation == 1 {
-                        char_empower += item.empower;
-                    } else if item.empowerActivation == 2 {
-                        char_on_hit_items.append((EFFECT_EMPOWER, item.chance, item.empower));
-                    } else if item.empowerActivation == 4 {
-                        char_on_attack_items.append((EFFECT_EMPOWER, item.chance, item.empower));
-                    }
-
-                    if item.vampirismActivation == 1 {
-                        char_vampirism += item.vampirism;
-                    } else if item.vampirismActivation == 2 {
-                        char_on_hit_items.append((EFFECT_VAMPIRISM, item.chance, item.vampirism));
-                    } else if item.vampirismActivation == 4 {
-                        char_on_attack_items.append((EFFECT_VAMPIRISM, item.chance, item.vampirism));
-                    }
-                    // debuff
-                    if item.poisonActivation == 1 {
-                        dummy_poison += item.poison;
-                    } else if item.poisonActivation == 2 {
-                        char_on_hit_items.append((EFFECT_POISON, item.chance, item.poison));
-                    } else if item.poisonActivation == 4 {
-                        char_on_attack_items.append((EFFECT_POISON, item.chance, item.poison));
+                    if item.effectActivationType == 4 {
+                        char_on_attack_items.append((item.effectType, item.chance, item.effectStacks));
                     }
                     // ====== plus stacks end ======
                 }
@@ -212,73 +200,60 @@ mod fight_system {
                 let dummy_item = get!(
                     world, (char.wins, dummy_index, dummy_item_count), DummyCharacterItem
                 );
+
                 let item = get!(world, dummy_item.itemId, (Item));
                 if item.itemType == 4 {
                     dummy_item_count -= 1;
                     continue;
                 }
-                let cooldown = item.cooldown;
-                if cooldown > 0 {
-                    items_length = append_item(
-                        ref items_cooldown4,
-                        ref items_cooldown5,
-                        ref items_cooldown6,
-                        ref items_cooldown7,
-                        item.id,
-                        DUMMY,
-                        cooldown,
-                        items_length,
-                    );
-                } else if cooldown == 0 {
+
+                if item.cooldown > 0 {
+                    match item.cooldown {
+                        0 | 1 | 2 | 3 => {
+                            assert(false, 'cooldown not valid');
+                        },
+                        4 => {
+                            append_item(ref items_cooldown4, dummy_item.plugins, @item, DUMMY);
+                        },
+                        5 => {
+                            append_item(ref items_cooldown5, dummy_item.plugins, @item, DUMMY);
+                        },
+                        6 => {
+                            append_item(ref items_cooldown6, dummy_item.plugins, @item, DUMMY);
+                        },
+                        7 => {
+                            append_item(ref items_cooldown7, dummy_item.plugins, @item, DUMMY);
+                        },
+                        _ => {
+                            assert(false, 'cooldown not valid');
+                        },
+                    }
+
+                    items_length += 1;
+                } else {
                     // ====== `on start / on hit / on attack` to plus stacks ======
-                    // buff
-                    if item.armorActivation == 1 {
-                        dummy_armor += item.armor;
-                    } else if item.armorActivation == 2 {
-                        dummy_on_hit_items.append((EFFECT_ARMOR, item.chance, item.armor));
-                    } else if item.armorActivation == 4 {
-                        dummy_on_attack_items.append((EFFECT_ARMOR, item.chance, item.armor));
+                    if item.effectActivationType == 1 {
+                        if item.effectType == 3 {
+                            dummy_armor += item.effectStacks;
+                        } else if item.effectType == 4 {
+                            dummy_regen += item.effectStacks;
+                        } else if item.effectType == 5 {
+                            dummy_reflect += item.effectStacks;
+                        } else if item.effectType == 7 {
+                            dummy_empower += item.effectStacks;
+                        } else if item.effectType == 8 {
+                            dummy_vampirism += item.effectStacks;
+                        } else if item.effectType == 6 {
+                            char_poison += item.effectStacks;
+                        }
                     }
 
-                    if item.regenActivation == 1 {
-                        dummy_regen += item.regen;
-                    } else if item.regenActivation == 2 {
-                        dummy_on_hit_items.append((EFFECT_REGEN, item.chance, item.regen));
-                    } else if item.regenActivation == 4 {
-                        dummy_on_attack_items.append((EFFECT_REGEN, item.chance, item.regen));
+                    if item.effectActivationType == 2 {
+                        dummy_on_hit_items.append((item.effectType, item.chance, item.effectStacks));
                     }
 
-                    if item.reflectActivation == 1 {
-                        dummy_reflect += item.reflect;
-                    } else if item.reflectActivation == 2 {
-                        dummy_on_hit_items.append((EFFECT_REFLECT, item.chance, item.reflect));
-                    } else if item.reflectActivation == 4 {
-                        dummy_on_attack_items.append((EFFECT_REFLECT, item.chance, item.reflect));
-                    }
-
-                    if item.empowerActivation == 1 {
-                        dummy_empower += item.empower;
-                    } else if item.empowerActivation == 2 {
-                        dummy_on_hit_items.append((EFFECT_EMPOWER, item.chance, item.empower));
-                    } else if item.empowerActivation == 4 {
-                        dummy_on_attack_items.append((EFFECT_EMPOWER, item.chance, item.empower));
-                    }
-
-                    if item.vampirismActivation == 1 {
-                        dummy_vampirism += item.vampirism;
-                    } else if item.vampirismActivation == 2 {
-                        dummy_on_hit_items.append((EFFECT_VAMPIRISM, item.chance, item.vampirism));
-                    } else if item.vampirismActivation == 4 {
-                        dummy_on_attack_items.append((EFFECT_VAMPIRISM, item.chance, item.vampirism));
-                    }
-
-                    // debuff
-                    if item.poisonActivation == 1 {
-                        char_poison += item.poison;
-                    } else if item.poisonActivation == 2 {
-                        dummy_on_hit_items.append((EFFECT_POISON, item.chance, item.poison));
-                    } else if item.poisonActivation == 4 {
-                        dummy_on_attack_items.append((EFFECT_POISON, item.chance, item.poison));
+                    if item.effectActivationType == 4 {
+                        dummy_on_attack_items.append((item.effectType, item.chance, item.effectStacks));
                     }
                     // ====== plus stacks end ======
                 }
@@ -287,7 +262,7 @@ mod fight_system {
             };
 
             // combine items
-            let (item_ids, belongs_tos) = combine_items(
+            let sorted_items = order_items(
                 ref items_cooldown4,
                 ref items_cooldown5,
                 ref items_cooldown6,
@@ -302,8 +277,7 @@ mod fight_system {
                 id: battleLogCounter.count,
                 dummyLevel: char.wins,
                 dummyCharId: dummy_index,
-                item_ids: item_ids.span(),
-                belongs_tos: belongs_tos.span(),
+                sorted_items: sorted_items.span(),
                 items_length: items_length,
                 char_buffs: array![char_armor, char_regen, char_reflect, char_empower, char_poison, char_vampirism].span(),
                 dummy_buffs: array![dummy_armor, dummy_regen, dummy_reflect, dummy_empower, dummy_poison, dummy_vampirism].span(),
