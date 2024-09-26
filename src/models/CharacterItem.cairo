@@ -47,12 +47,12 @@ struct CharacterItemsInventoryCounter {
 
 #[derive(Drop, Copy)]
 struct ItemProperties {
-    id: usize,
     position: Position,
     rotation: usize,
     width: usize,
     height: usize,
     empower: usize,
+    poison: usize,
 }
 
 pub fn are_items_nearby(pos1: Position, width1: usize, height1: usize, rotation1: usize, pos2: Position, width2: usize, height2: usize, rotation2: usize) -> bool {

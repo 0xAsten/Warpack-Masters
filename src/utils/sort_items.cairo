@@ -1,30 +1,31 @@
 
 fn append_item(
-    ref items_cooldown4: Array<(u32, felt252, u32)>,
-    ref items_cooldown5: Array<(u32, felt252, u32)>,
-    ref items_cooldown6: Array<(u32, felt252, u32)>,
-    ref items_cooldown7: Array<(u32, felt252, u32)>,
+    ref items_cooldown4: Array<(u32, felt252, u32, u32)>,
+    ref items_cooldown5: Array<(u32, felt252, u32, u32)>,
+    ref items_cooldown6: Array<(u32, felt252, u32, u32)>,
+    ref items_cooldown7: Array<(u32, felt252, u32, u32)>,
     item_id: u32,
     belongs_to: felt252,
     cooldown: u8,
     items_length: usize,
     empower_value: usize,
+    poison_value: usize,
 ) -> usize {
     match cooldown {
         0 | 1 | 2 | 3 => {
             assert(false, 'cooldown not valid');
         },
         4 => {
-            items_cooldown4.append((item_id, belongs_to, empower_value));
+            items_cooldown4.append((item_id, belongs_to, empower_value, poison_value));
         },
         5 => {
-            items_cooldown5.append((item_id, belongs_to, empower_value));
+            items_cooldown5.append((item_id, belongs_to, empower_value, poison_value));
         },
         6 => {
-            items_cooldown6.append((item_id, belongs_to, empower_value));
+            items_cooldown6.append((item_id, belongs_to, empower_value, poison_value));
         },
         7 => {
-            items_cooldown7.append((item_id, belongs_to, empower_value));
+            items_cooldown7.append((item_id, belongs_to, empower_value, poison_value));
         },
         _ => {
             assert(false, 'cooldown not valid');
@@ -35,44 +36,44 @@ fn append_item(
 }
 
 fn combine_items(
-    ref items_cooldown4: Array<(u32, felt252, u32)>,
-    ref items_cooldown5: Array<(u32, felt252, u32)>,
-    ref items_cooldown6: Array<(u32, felt252, u32)>,
-    ref items_cooldown7: Array<(u32, felt252, u32)>,
-) -> (Array<u32>, Array<felt252>, Array<u32>) {
+    ref items_cooldown4: Array<(u32, felt252, u32, u32)>,
+    ref items_cooldown5: Array<(u32, felt252, u32, u32)>,
+    ref items_cooldown6: Array<(u32, felt252, u32, u32)>,
+    ref items_cooldown7: Array<(u32, felt252, u32, u32)>,
+) -> (Array<u32>, Array<felt252>, Array<(u32, u32)>) {
     let mut item_ids = ArrayTrait::new();
     let mut belongs_tos = ArrayTrait::new();
-    let mut empower_values = ArrayTrait::new();
+    let mut nearby_effects = ArrayTrait::new();
 
     for item in items_cooldown4.span() {
-        let (item_id, belongs_to, empower_value) = *item;
+        let (item_id, belongs_to, empower_value, poison_value) = *item;
         item_ids.append(item_id);
         belongs_tos.append(belongs_to);
-        empower_values.append(empower_value);
+        nearby_effects.append((empower_value, poison_value));
     };
 
     for item in items_cooldown5.span() {
-        let (item_id, belongs_to, empower_value) = *item;
+        let (item_id, belongs_to, empower_value, poison_value) = *item;
         item_ids.append(item_id);
         belongs_tos.append(belongs_to);
-        empower_values.append(empower_value);
+        nearby_effects.append((empower_value, poison_value));
     };
 
     for item in items_cooldown6.span() {
-        let (item_id, belongs_to, empower_value) = *item;
+        let (item_id, belongs_to, empower_value, poison_value) = *item;
         item_ids.append(item_id);
         belongs_tos.append(belongs_to);
-        empower_values.append(empower_value);
+        nearby_effects.append((empower_value, poison_value));
     };
 
     for item in items_cooldown7.span() {
-        let (item_id, belongs_to, empower_value) = *item;
+        let (item_id, belongs_to, empower_value, poison_value) = *item;
         item_ids.append(item_id);
         belongs_tos.append(belongs_to);
-        empower_values.append(empower_value);
+        nearby_effects.append((empower_value, poison_value));
     };
 
-    (item_ids, belongs_tos, empower_values)
+    (item_ids, belongs_tos, nearby_effects)
 }
 
 #[cfg(test)]
@@ -90,37 +91,37 @@ mod tests {
         let mut items_cooldown6 = ArrayTrait::new();
         let mut items_cooldown7 = ArrayTrait::new();
 
-        let mut items_length = append_item(ref items_cooldown4, ref items_cooldown5, ref items_cooldown6, ref items_cooldown7, 1, PLAYER, 4, 0);
+        let mut items_length = append_item(ref items_cooldown4, ref items_cooldown5, ref items_cooldown6, ref items_cooldown7, 1, PLAYER, 4, 0, 2, 3);
         assert(items_length == 1, 'items_length not 1');
         assert(items_cooldown4.len() == 1, 'items_cooldown4 length not 1');
         assert(items_cooldown5.len() == 0, 'items_cooldown5 length not 0');
         assert(items_cooldown6.len() == 0, 'items_cooldown6 length not 0');
 
-        let (item_id, belongs_to) = *items_cooldown4.at(0);
+        let (item_id, belongs_to, empower_effect, poison_effect) = *items_cooldown4.at(0);
         assert(item_id == 1, 'item_id not 1');
         assert(belongs_to == PLAYER, 'belongs_to not PLAYER');
 
-        items_length = append_item(ref items_cooldown4, ref items_cooldown5, ref items_cooldown6, ref items_cooldown7, 2, DUMMY, 5, items_length);
+        items_length = append_item(ref items_cooldown4, ref items_cooldown5, ref items_cooldown6, ref items_cooldown7, 2, DUMMY, 5, items_length, 0, 0);
         assert(items_length == 2, 'items_length not 2');
         assert(items_cooldown4.len() == 1, 'items_cooldown4 length not 1');
         assert(items_cooldown5.len() == 1, 'items_cooldown5 length not 1');
         assert(items_cooldown6.len() == 0, 'items_cooldown6 length not 0');
 
-        let (item_id, belongs_to) = *items_cooldown5.at(0);
+        let (item_id, belongs_to, empower_effect, poison_effect) = *items_cooldown5.at(0);
         assert(item_id == 2, 'item_id not 2');
         assert(belongs_to == DUMMY, 'belongs_to not DUMMY');
 
-        items_length = append_item(ref items_cooldown4, ref items_cooldown5, ref items_cooldown6, ref items_cooldown7, 1, DUMMY, 4, items_length);
+        items_length = append_item(ref items_cooldown4, ref items_cooldown5, ref items_cooldown6, ref items_cooldown7, 1, DUMMY, 4, items_length, 0, 0);
         assert(items_length == 3, 'items_length not 3');
         assert(items_cooldown4.len() == 2, 'items_cooldown4 length not 2');
         assert(items_cooldown5.len() == 1, 'items_cooldown5 length not 1');
         assert(items_cooldown6.len() == 0, 'items_cooldown6 length not 0');
 
-        let (item_id, belongs_to) = *items_cooldown4.at(0);
+        let (item_id, belongs_to, empower_effect, poison_effect) = *items_cooldown4.at(0);
         assert(item_id == 1, 'item_id not 1');
         assert(belongs_to == PLAYER, 'belongs_to not PLAYER');
 
-        let (item_id, belongs_to) = *items_cooldown4.at(1);
+        let (item_id, belongs_to, empower_effect, poison_effect) = *items_cooldown4.at(1);
         assert(item_id == 1, 'item_id not 1');
         assert(belongs_to == DUMMY, 'belongs_to not DUMMY');
     }
@@ -134,7 +135,7 @@ mod tests {
         let mut items_cooldown6 = ArrayTrait::new();
         let mut items_cooldown7 = ArrayTrait::new();
 
-        append_item(ref items_cooldown4, ref items_cooldown5, ref items_cooldown6, ref items_cooldown7, 1, PLAYER, 1, 0);
+        append_item(ref items_cooldown4, ref items_cooldown5, ref items_cooldown6, ref items_cooldown7, 1, PLAYER, 1, 0, 0, 0);
     }
 
     #[test]
@@ -145,13 +146,14 @@ mod tests {
         let mut items_cooldown6 = ArrayTrait::new();
         let mut items_cooldown7 = ArrayTrait::new();
 
-        append_item(ref items_cooldown4, ref items_cooldown5, ref items_cooldown6, ref items_cooldown7, 1, PLAYER, 4, 0);
-        append_item(ref items_cooldown4, ref items_cooldown5, ref items_cooldown6, ref items_cooldown7, 2, DUMMY, 5, 1);
-        append_item(ref items_cooldown4, ref items_cooldown5, ref items_cooldown6, ref items_cooldown7, 1, DUMMY, 4, 2);
+        append_item(ref items_cooldown4, ref items_cooldown5, ref items_cooldown6, ref items_cooldown7, 1, PLAYER, 4, 0, 0, 0);
+        append_item(ref items_cooldown4, ref items_cooldown5, ref items_cooldown6, ref items_cooldown7, 2, DUMMY, 5, 1, 0, 0);
+        append_item(ref items_cooldown4, ref items_cooldown5, ref items_cooldown6, ref items_cooldown7, 1, DUMMY, 4, 2, 0, 0);
 
-        let (item_ids, belongs_tos) = combine_items(ref items_cooldown4, ref items_cooldown5, ref items_cooldown6, ref items_cooldown7);
+        let (item_ids, belongs_tos, nearby_item_effects) = combine_items(ref items_cooldown4, ref items_cooldown5, ref items_cooldown6, ref items_cooldown7);
         assert(item_ids.len() == 3, 'item_ids length not 3');
         assert(belongs_tos.len() == 3, 'belongs_tos length not 3');
+        assert(nearby_item_effects.len() == 3, 'nearby_item_effects length not 3');
 
         let item_id = *item_ids.at(0);
         let belongs_to = *belongs_tos.at(0);

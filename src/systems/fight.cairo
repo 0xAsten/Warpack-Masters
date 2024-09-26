@@ -118,6 +118,7 @@ mod fight_system {
 
             // Arrays for nearby item checks
             let mut empower_item_properties = ArrayTrait::new();
+            let mut poison_item_properties = ArrayTrait::new();
 
             let inventoryItemsCounter = get!(world, player, (CharacterItemsInventoryCounter));
             let mut inventoryItemCount = inventoryItemsCounter.count;
@@ -133,12 +134,23 @@ mod fight_system {
                 // If the item has a non-zero `empower` value, add it to the array
                 if item.empower > 0 {
                     empower_item_properties.append(ItemProperties {
-                        id: charItem.id,
                         position: charItem.position,
                         rotation: charItem.rotation,
                         width: item.width,
                         height: item.height,
                         empower: item.empower,
+                        poison: 0,
+                    });
+                }
+
+                if item.poison > 0 {
+                    poison_item_properties.append(ItemProperties {
+                        position: charItem.position,
+                        rotation: charItem.rotation,
+                        width: item.width,
+                        height: item.height,
+                        empower: 0,
+                        poison: item.poison,
                     });
                 }
 
@@ -160,20 +172,17 @@ mod fight_system {
                     continue;
                 }
                 let cooldown = item.cooldown;
-                // Initially, empower is set to 0
-                let mut empower_value = 0; 
+
+                let mut empower_value: usize = 0; 
+                let mut poison_value: usize = 0;
 
 
-                // If this item is a weapon, we need to check if there are nearby empower items
+                // If this item is a weapon, we need to check if there are nearby empower or poison items
                 if item.itemType == 1 || item.itemType == 2 {
-                    let weapon = ItemProperties {
-                        id: charItem.id,
-                        position: charItem.position,
-                        rotation: charItem.rotation,
-                        width: item.width,
-                        height: item.height,
-                        empower: 0, // Initially no empower applied
-                    };
+                    let weapon_position = charItem.position;
+                    let weapon_width = item.width;
+                    let weapon_height = item.height;
+                    let weapon_rotation = charItem.rotation;
 
                     // Check for nearby items with non-zero empower
                     let mut j = 0;
@@ -186,13 +195,32 @@ mod fight_system {
                         let empower_item = *empower_item_properties.at(j);
             
                         if are_items_nearby(
-                            weapon.position, weapon.width, weapon.height, weapon.rotation,
+                            weapon_position, weapon_width, weapon_height, weapon_rotation,
                             empower_item.position, empower_item.width, empower_item.height, empower_item.rotation
                         ) {
-                            empower_value = empower_item.empower; // Apply empower if nearby
+                            empower_value += empower_item.empower; 
                         }
             
                         j += 1;
+                    };
+
+                    // Check nearby poison items
+                    let mut k = 0;
+                    let poison_items_len = poison_item_properties.len();
+                    loop {
+                        if k >= poison_items_len {
+                            break;
+                        }
+
+                        let poison_item = *poison_item_properties.at(k);
+                        if are_items_nearby(
+                            weapon_position, weapon_width, weapon_height, weapon_rotation,
+                            poison_item.position, poison_item.width, poison_item.height, poison_item.rotation
+                        ) {
+                            poison_value += poison_item.poison;
+                        }
+
+                        k += 1;
                     }
                 }
 
@@ -206,7 +234,8 @@ mod fight_system {
                         PLAYER,
                         cooldown,
                         items_length,
-                        empower_value,
+                        empower_value, 
+                        poison_value,
                     );
                 } else if cooldown == 0 {
                     // ====== `on start / on hit / on attack` to plus stacks ======
@@ -240,17 +269,16 @@ mod fight_system {
                     } else if item.empowerActivation == 2 {
                         char_on_hit_items.append((EFFECT_EMPOWER, item.chance, item.empower));
                     } else if item.empowerActivation == 4 {
-                        char_on_attack_items.append((EFFECT_EMPOWER, item.chance, item.empower));
+                        char_on_attack_items.append((EFFECT_EMPOWER, item.chance, item.empower + empower_value));
                     }
 
-                    char_empower += empower_value;
                     // debuff
                     if item.poisonActivation == 1 {
                         dummy_poison += item.poison;
                     } else if item.poisonActivation == 2 {
                         char_on_hit_items.append((EFFECT_POISON, item.chance, item.poison));
                     } else if item.poisonActivation == 4 {
-                        char_on_attack_items.append((EFFECT_POISON, item.chance, item.poison));
+                        char_on_attack_items.append((EFFECT_POISON, item.chance, item.poison + poison_value));
                     }
                     // ====== plus stacks end ======} 
                 }
@@ -265,6 +293,10 @@ mod fight_system {
             );
             let mut dummy_item_count = dummyCharItemsCounter.count;
 
+            // Arrays for nearby item checks
+            let mut empower_item_properties = ArrayTrait::new();
+            let mut poison_item_properties = ArrayTrait::new();
+
             loop {
                 if dummy_item_count == 0 {
                     break;
@@ -276,12 +308,23 @@ mod fight_system {
                 // If the item has a non-zero `empower` value, add it to the array
                 if item.empower > 0 {
                     empower_item_properties.append(ItemProperties {
-                        id: charItem.id,
                         position: charItem.position,
                         rotation: charItem.rotation,
                         width: item.width,
                         height: item.height,
                         empower: item.empower,
+                        poison: 0,
+                    });
+                }
+
+                if item.poison > 0 {
+                    poison_item_properties.append(ItemProperties {
+                        position: charItem.position,
+                        rotation: charItem.rotation,
+                        width: item.width,
+                        height: item.height,
+                        empower: 0,
+                        poison: item.poison,
                     });
                 }
 
@@ -305,19 +348,15 @@ mod fight_system {
                 }
                 let cooldown = item.cooldown;
 
-                // Initially, empower is set to 0
-                let mut empower_value = 0; 
+                let mut empower_value: usize = 0;
+                let mut poison_value: usize = 0; 
 
-                // If this item is a weapon, we need to check if there are nearby empower items
+                // If this item is a weapon, we need to check if there are nearby empower or poison items
                 if item.itemType == 1 || item.itemType == 2 {
-                    let weapon = ItemProperties {
-                        id: item.id,
-                        position: dummy_item.position,
-                        rotation: dummy_item.rotation,
-                        width: item.width,
-                        height: item.height,
-                        empower: 0, // Initially no empower applied
-                    };
+                    let weapon_position = dummy_item.position;
+                    let weapon_width = item.width;
+                    let weapon_height = item.height;
+                    let weapon_rotation = dummy_item.rotation;
 
                     // Check for nearby items with non-zero empower
                     let mut j = 0;
@@ -330,14 +369,34 @@ mod fight_system {
                         let empower_item = *empower_item_properties.at(j);
             
                         if are_items_nearby(
-                            weapon.position, weapon.width, weapon.height, weapon.rotation,
+                            weapon_position, weapon_width, weapon_height, weapon_rotation,
                             empower_item.position, empower_item.width, empower_item.height, empower_item.rotation
                         ) {
-                            empower_value = empower_item.empower; // Apply empower if nearby
+                            empower_value += empower_item.empower; // Apply empower if nearby
                         }
             
                         j += 1;
-                    }
+                    };
+
+                    // Check nearby poison items
+                    let mut k = 0;
+                    let poison_items_len = poison_item_properties.len();
+                    loop {
+                        if k >= poison_items_len {
+                            break;
+                        }
+
+                        let poison_item = *poison_item_properties.at(k);
+                        if are_items_nearby(
+                            weapon_position, weapon_width, weapon_height, weapon_rotation,
+                            poison_item.position, poison_item.width, poison_item.height, poison_item.rotation
+                        ) {
+                            poison_value += poison_item.poison;
+                        }
+
+                        k += 1;
+                    };
+
                 }
 
                 if cooldown > 0 {
@@ -351,6 +410,7 @@ mod fight_system {
                         cooldown,
                         items_length,
                         empower_value,
+                        poison_value,
                     );
                 } else if cooldown == 0 {
                     // ====== `on start / on hit / on attack` to plus stacks ======
@@ -402,7 +462,7 @@ mod fight_system {
             };
 
             // combine items
-            let (item_ids, belongs_tos, empower_values) = combine_items(
+            let (item_ids, belongs_tos, nearby_item_effects) = combine_items(
                 ref items_cooldown4,
                 ref items_cooldown5,
                 ref items_cooldown6,
@@ -426,7 +486,7 @@ mod fight_system {
                 dummy_on_hit_items: dummy_on_hit_items.span(),
                 char_on_attack_items: char_on_attack_items.span(),
                 dummy_on_attack_items: dummy_on_attack_items.span(),
-                empower_values: empower_values.span(),
+                nearby_item_effects: nearby_item_effects.span(),
                 winner: 0,
                 seconds: 0,
             };
@@ -458,7 +518,6 @@ mod fight_system {
 
             let item_ids = battleLog.item_ids;
             let belongs_tos = battleLog.belongs_tos;
-            let empower_values = battleLog.empower_values;
             let items_length = battleLog.items_length;
 
             let char_on_hit_items_span = battleLog.char_on_hit_items;
@@ -482,6 +541,8 @@ mod fight_system {
             let mut dummy_empower = *dummy_buffs.at(3);
             let mut dummy_poison = *dummy_buffs.at(4);
             let mut dummy_vampirism = *dummy_buffs.at(5);
+
+            let nearby_item_effects = battleLog.nearby_item_effects;
 
             // record the battle log
             let battleLogCounter = get!(world, player, (BattleLogCounter));
@@ -564,9 +625,8 @@ mod fight_system {
 
                     let curr_item_index = *item_ids.at(i);
                     let curr_item_belongs = *belongs_tos.at(i.into());
-                    let empower_value = *empower_values.at(i.into());
-                    // if item is nearby items with non-zero empower values, increase char_empower
-                    char_empower += empower_value;
+
+                    let (empower_effect, poison_effect) = *nearby_item_effects.at(i.into());
 
                     let curr_item_data = get!(world, curr_item_index, (Item));
 
@@ -584,6 +644,13 @@ mod fight_system {
                         if rand < chance {
                             if curr_item_belongs == PLAYER {
                                 // ====== on cooldown to plus stacks, all use the same randomness ======
+
+                                // Apply empower effect to the player
+                                char_empower += empower_effect;
+
+                                // Apply poison to the dummy
+                                dummy_poison += poison_effect;
+
                                 if curr_item_data.armorActivation == 3 {
                                     char_armor += curr_item_data.armor;
                                 }
@@ -855,6 +922,13 @@ mod fight_system {
                                 }
                             } else {
                                 // ====== on cooldown to plus stacks, all use the same randomness ======
+                                
+                                 // Apply empower effect to the dummy
+                                 dummy_empower += empower_effect;
+
+                                 // Apply poison to the player
+                                 char_poison += poison_effect;
+
                                 if curr_item_data.armorActivation == 3 {
                                     dummy_armor += curr_item_data.armor;
                                 }
