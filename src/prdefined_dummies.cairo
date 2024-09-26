@@ -1265,7 +1265,7 @@ mod Dummy14 {
 
         items.append(PredefinedItem {
             itemId: Bow::id,
-            position: Position{ x:3, y:2 },
+            position: Position{ x:2, y:2 },
             rotation: 0,
             plugins: array![].span(),
         });
@@ -1314,14 +1314,14 @@ mod Dummy14 {
 
         items.append(PredefinedItem {
             itemId: HealingPotion::id,
-            position: Position{ x:2, y:2 },
+            position: Position{ x:3, y:2 },
             rotation: 0,
             plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: MagicWater::id,
-            position: Position{ x:2, y:3 },
+            position: Position{ x:2, y:5 },
             rotation: 0,
             plugins: array![].span(),
         });
@@ -1394,7 +1394,7 @@ mod Dummy15 {
 
         items.append(PredefinedItem {
             itemId: PlagueFlower::id,
-            position: Position{ x:4, y:2 },
+            position: Position{ x:2, y:4 },
             rotation: 0,
             plugins: array![].span(),
         });
