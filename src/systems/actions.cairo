@@ -35,7 +35,7 @@ mod actions {
         Item::Item,
         Character::{Characters, NameRecord},
         Shop::Shop,
-        BattleLog::{BattleLog, BattleLogCounter}
+        Fight::{BattleLog, BattleLogCounter}
     };
 
     use warpack_masters::items::{Backpack, Pack};

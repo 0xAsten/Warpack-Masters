@@ -49,6 +49,12 @@ mod item_system {
             energyCost: u8,
             isPlugin: bool,
         ) {
+            // TODO: effectStacks can't be 0
+            // TODO: Cooldown can't be 0 when effectActivationType is cooldown
+            // TODO: The possible value of effectActivationType is 0, 1, 2, 3, 4
+            // TODO: The possible value of effectType is 1, 2, 3, 4, 5, 6, 7, 8, 9
+            // TODO: The possible value of itemType is 1, 2, 3, 4
+
             let player = get_caller_address();
 
             assert(ViewImpl::is_world_owner(world, player), 'player not world owner');
