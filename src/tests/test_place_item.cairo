@@ -76,7 +76,7 @@ mod tests {
 
         add_items(ref item_system);
         let item = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
-        assert(item.count == 17, 'total item count mismatch');
+        assert(item.count == 34, 'total item count mismatch');
 
         set_contract_address(alice);
         action_system.spawn('Alice', WMClass::Warlock);
@@ -484,7 +484,7 @@ mod tests {
 
         add_items(ref item_system);
         let item = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
-        assert(item.count == 17, 'total item count mismatch');
+        assert(item.count == 34, 'total item count mismatch');
 
         set_contract_address(alice);
         action_system.spawn('Alice', WMClass::Warlock);

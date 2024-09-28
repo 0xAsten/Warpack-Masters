@@ -36,9 +36,9 @@ mod tests {
             dummy_character_items_counter
         },
         models::Shop::{Shop, shop},
-        models::BattleLog::{BattleLog, battle_log, BattleLogCounter, battle_log_counter},
+        models::Fight::{BattleLog, battle_log, BattleLogCounter, battle_log_counter},
         utils::{test_utils::{add_items}},
-        constants::constants::{INIT_STAMINA, EFFECT_ARMOR, EFFECT_REFLECT, INIT_GOLD, INIT_HEALTH}
+        constants::constants::{INIT_STAMINA, EFFECT_REFLECT, INIT_GOLD, INIT_HEALTH}
     };
 
     fn get_systems(
@@ -198,6 +198,7 @@ mod tests {
             itemId: 5,
             position: Position { x: 0, y: 0 },
             rotation: 0,
+            plugins: array![],
         };
         // add Dagger id 6, damage 3, cooldown 4
         inventoryCounter.count += 1;
@@ -207,6 +208,7 @@ mod tests {
             itemId: 6,
             position: Position { x: 0, y: 0 },
             rotation: 0,
+            plugins: array![],
         };
         // add Spike id 8, on start +1 reflect
         inventoryCounter.count += 1;
@@ -216,6 +218,7 @@ mod tests {
             itemId: 8,
             position: Position { x: 0, y: 0 },
             rotation: 0,
+            plugins: array![],
         };
         // add SpikeShield id 16, chance 75, on hit +2 reflect
         inventoryCounter.count += 1;
@@ -225,6 +228,7 @@ mod tests {
             itemId: 16,
             position: Position { x: 0, y: 0 },
             rotation: 0,
+            plugins: array![],
         };
 
         set!(world, (inventoryCounter, item1, item2, item3, item4));
@@ -246,6 +250,7 @@ mod tests {
             itemId: 7,
             position: Position { x: 0, y: 0 },
             rotation: 0,
+            plugins: array![],
         };
         // add Shield id 9, on start +15 armor
         inventoryCounter.count += 1;
@@ -255,6 +260,7 @@ mod tests {
             itemId: 9,
             position: Position { x: 0, y: 0 },
             rotation: 0,
+            plugins: array![],
         };
         // add Helmet id 10, chance 50, on hit +3 armor
         inventoryCounter.count += 1;
@@ -264,6 +270,7 @@ mod tests {
             itemId: 10,
             position: Position { x: 0, y: 0 },
             rotation: 0,
+            plugins: array![],
         };
         // add Poison id 13, on start +2 posion
         inventoryCounter.count += 1;
@@ -273,6 +280,7 @@ mod tests {
             itemId: 13,
             position: Position { x: 0, y: 0 },
             rotation: 0,
+            plugins: array![],
         };
         // add Dagger id 6, damage 3, cooldown 4
         inventoryCounter.count += 1;
@@ -282,6 +290,7 @@ mod tests {
             itemId: 6,
             position: Position { x: 0, y: 0 },
             rotation: 0,
+            plugins: array![(6, 80, 2), (6, 90, 1)],
         };
 
         set!(world, (inventoryCounter, item1, item2, item3, item4, item5));
@@ -294,19 +303,27 @@ mod tests {
         let battleLog = get!(world, (bob, 1), (BattleLog));
         assert(battleLog.dummyLevel == 0, 'dummyLevel should be 0');
         assert(battleLog.dummyCharId == 1, 'dummyCharId should be 1');
-        assert(battleLog.item_ids == array![6, 6, 7].span(), 'item_ids should be [6, 6, 7]');
-        assert(battleLog.belongs_tos == array![PLAYER, DUMMY, PLAYER].span(), 'belongs_tos is incorrect');
+        assert(battleLog.sorted_items == array![
+            ('player', 6_u32, 1_u8, 1_u8, 90_u32, 3_u32, 4_u8, 20_u8, array![(6, 80, 2), (6, 90, 1)].span()), 
+            ('dummy', 6, 1, 1, 90, 3, 4, 20, array![].span()), 
+            ('player', 7, 1, 1, 80, 5, 5, 30, array![].span())].span(), 
+            'item_ids should be [6, 6, 7]');
         assert(battleLog.items_length == 3, 'items_length should be 3');
         // armor, regen, reflect, empower, poison, vampirism
         // itemids 6 7 9 10 13
-        assert(battleLog.char_buffs == array![12, 0, 0, 0, 0, 0].span(), 'char_buffs is incorrect');
+        // let mut str: ByteArray = "";
+        // for effect in battleLog.dummy_buffs {
+        //     str = format!("{}, {}", str, *effect);
+        // };
+        // println!("{}", str);
+        assert(battleLog.player_buffs == array![15, 0, 0, 0, 0, 0].span(), 'player_buffs is incorrect');
         // itemids 5 6 8 16
-        assert(battleLog.dummy_buffs == array![0, 1, 2, 0, 2, 0].span(), 'dummy_buffs is incorrect');
+        assert(battleLog.dummy_buffs == array![0, 1, 2, 0, 0, 0].span(), 'dummy_buffs is incorrect');
         // on hit, on attack
-        assert(battleLog.char_on_hit_items == array![(EFFECT_ARMOR, 50, 2)].span(), 'char_on_hit_items is incorrect');
-        assert(battleLog.dummy_on_hit_items == array![(EFFECT_REFLECT, 75, 2)].span(), 'dummy_on_hit_items is incorrect');
-        assert(battleLog.char_on_attack_items == array![].span(), 'on_attack_items is incorrect');
-        assert(battleLog.dummy_on_attack_items == array![].span(), 'on_attack_items is incorrect');
+        assert(battleLog.player_on_hit_items == array![(3, 50, 2)].span(), 'incorrect');
+        assert(battleLog.dummy_on_hit_items == array![(5, 75, 2)].span(), 'incorrect');
+        assert(battleLog.player_on_attack_items == array![].span(), 'incorrect');
+        assert(battleLog.dummy_on_attack_items == array![].span(), 'incorrect');
         assert(battleLog.winner == 0, 'winner should be 0');
         assert(battleLog.seconds == 0, 'seconds should be 0');
     }
@@ -377,6 +394,7 @@ mod tests {
             itemId: 5,
             position: Position { x: 0, y: 0 },
             rotation: 0,
+            plugins: array![],
         };
         // add Dagger id 6, damage 3, cooldown 4
         inventoryCounter.count += 1;
@@ -386,6 +404,7 @@ mod tests {
             itemId: 6,
             position: Position { x: 0, y: 0 },
             rotation: 0,
+            plugins: array![],
         };
         // add Spike id 8, on start +1 reflect
         inventoryCounter.count += 1;
@@ -395,6 +414,7 @@ mod tests {
             itemId: 8,
             position: Position { x: 0, y: 0 },
             rotation: 0,
+            plugins: array![],
         };
         // add SpikeShield id 16, chance 75, on hit +2 reflect
         inventoryCounter.count += 1;
@@ -404,6 +424,7 @@ mod tests {
             itemId: 16,
             position: Position { x: 0, y: 0 },
             rotation: 0,
+            plugins: array![],
         };
 
         set!(world, (inventoryCounter, item1, item2, item3, item4));
@@ -425,6 +446,7 @@ mod tests {
             itemId: 7,
             position: Position { x: 0, y: 0 },
             rotation: 0,
+            plugins: array![],
         };
         // add Shield id 9, on start +15 armor
         inventoryCounter.count += 1;
@@ -434,6 +456,7 @@ mod tests {
             itemId: 9,
             position: Position { x: 0, y: 0 },
             rotation: 0,
+            plugins: array![],
         };
         // add Helmet id 10, chance 50, on hit +3 armor
         inventoryCounter.count += 1;
@@ -443,6 +466,7 @@ mod tests {
             itemId: 10,
             position: Position { x: 0, y: 0 },
             rotation: 0,
+            plugins: array![],
         };
         // add Poison id 13, on start +2 posion
         inventoryCounter.count += 1;
@@ -452,6 +476,7 @@ mod tests {
             itemId: 13,
             position: Position { x: 0, y: 0 },
             rotation: 0,
+            plugins: array![],
         };
         // add Dagger id 6, damage 3, cooldown 4
         inventoryCounter.count += 1;
@@ -461,6 +486,7 @@ mod tests {
             itemId: 6,
             position: Position { x: 0, y: 0 },
             rotation: 0,
+            plugins: array![],
         };
 
         set!(world, (inventoryCounter, item1, item2, item3, item4, item5));
