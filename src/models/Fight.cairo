@@ -9,7 +9,7 @@ struct BattleLogDetail {
     #[key]
     battleLogId: usize,
     #[key]
-    id: usize,
+    id: u8,
     whoTriggered: felt252,
     whichItem: usize,
     isDodged: bool,
@@ -25,7 +25,7 @@ struct BattleLogDetail {
     dummy_stacks: (u32, u32, u32, u32, u32, u32),
 }
 
-#[derive(Drop, Serde)]
+#[derive(Copy, Drop, Serde)]
 struct CharStatus {
     hp: u32,
     stamina: u8,
@@ -35,6 +35,20 @@ struct CharStatus {
     empower: u32,
     poison: u32,
     vampirism: u32,
+}
+
+#[derive(Drop, Serde)]
+struct AttackStatus {
+    player: ContractAddress,
+    curr_item_belongs: felt252,
+    curr_item_index: u32,
+    item_type: u8,
+    effect_type: u8,
+    effect_stacks: u32,
+    opponent: felt252,
+    battleLogCounterCount: usize,
+    rand: u32,
+    char_health_flag: u32,
 }
 
 #[derive(Drop, Serde)]
@@ -50,12 +64,12 @@ struct BattleLog {
     sorted_items: Span<(felt252, u32, u8, u8, u32, u32, u8, u8, Span<(u8, usize, usize)>)>,
     items_length: usize,
     // armor, regen, reflect, empower, poison, vampirism
-    char_buffs: Span<u32>,
+    player_buffs: Span<u32>,
     dummy_buffs: Span<u32>,
-    char_on_hit_items: Span<(u8, usize, usize)>,
+    player_on_hit_items: Span<(u8, usize, usize)>,
     dummy_on_hit_items: Span<(u8, usize, usize)>,
     // effectType, chance, effectStacks
-    char_on_attack_items: Span<(u8, usize, usize)>,
+    player_on_attack_items: Span<(u8, usize, usize)>,
     dummy_on_attack_items: Span<(u8, usize, usize)>,
     // dummy or player
     winner: felt252,
