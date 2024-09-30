@@ -660,10 +660,26 @@ mod fight_system {
             // damage
             1 => {
                 let mut damage = *attackStatus.effect_stacks;
-                // plus empower if item is melee weapon
-                if *attackStatus.item_type == 1 && charStatus.empower > 0 {
+                // plus empower if item is melee/range weapon
+                if charStatus.empower > 0 {
                     damage += charStatus.empower;
                 }
+
+                // apply plugins
+                for plugin in plugins {
+                    let (item_type, item_chance, item_stacks) = plugin;
+                    if *item_type == 6 {
+                        if *attackStatus.rand < *item_chance {
+                            opponentStatus.poison += *item_stacks;
+                        }
+                    } else if *item_type == 7 {
+                        if *attackStatus.rand < *item_chance {
+                            damage += *item_stacks;
+                        }
+                    } else {
+                        assert(false, 'effect type not valid');
+                    }
+                };
 
                 opponentStatus.armor = if opponentStatus.armor > damage {
                     opponentStatus.armor - damage
