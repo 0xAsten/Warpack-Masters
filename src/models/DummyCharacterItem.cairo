@@ -14,6 +14,8 @@ struct DummyCharacterItem {
     position: Position,
     // 0, 90, 180, 270
     rotation: usize,
+    // effectType, chance, stacks
+    plugins: Span<(u8, usize, usize)>,
 }
 
 #[derive(Drop, Serde)]

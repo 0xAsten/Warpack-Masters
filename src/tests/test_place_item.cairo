@@ -28,6 +28,8 @@ mod tests {
 
     use warpack_masters::constants::constants::ITEMS_COUNTER_ID;
 
+    use debug::PrintTrait;
+
     fn get_systems(
         world: IWorldDispatcher
     ) -> (ContractAddress, IActionsDispatcher, ContractAddress, IItemDispatcher, ContractAddress, IShopDispatcher) {
@@ -74,7 +76,7 @@ mod tests {
 
         add_items(ref item_system);
         let item = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
-        assert(item.count == 16, 'total item count mismatch');
+        assert(item.count == 34, 'total item count mismatch');
 
         set_contract_address(alice);
         action_system.spawn('Alice', WMClass::Warlock);
@@ -101,12 +103,24 @@ mod tests {
         // (4,2) (4,3) (4,4) should be occupied
         let mut backpack_grid_data = get!(world, (alice, 4, 2), BackpackGrids);
         assert(backpack_grid_data.occupied == true, '(4,2) should be occupied');
+        assert(backpack_grid_data.inventoryItemId == 3, 'inventory item id mismatch');
+        assert(backpack_grid_data.itemId == 7, 'item id mismatch');
+        assert(backpack_grid_data.isWeapon, 'isWeapon mismatch');
+        assert(!backpack_grid_data.isPlugin, 'isPlugin mismatch');
 
         let mut backpack_grid_data = get!(world, (alice, 4, 3), BackpackGrids);
         assert(backpack_grid_data.occupied == true, '(4,3) should be occupied');
+        assert(backpack_grid_data.inventoryItemId == 3, 'inventory item id mismatch');
+        assert(backpack_grid_data.itemId == 7, 'item id mismatch');
+        assert(backpack_grid_data.isWeapon, 'isWeapon mismatch');
+        assert(!backpack_grid_data.isPlugin, 'isPlugin mismatch');
 
         let mut backpack_grid_data = get!(world, (alice, 4, 4), BackpackGrids);
         assert(backpack_grid_data.occupied == true, '(4,4) should be occupied');
+        assert(backpack_grid_data.inventoryItemId == 3, 'inventory item id mismatch');
+        assert(backpack_grid_data.itemId == 7, 'item id mismatch');
+        assert(backpack_grid_data.isWeapon, 'isWeapon mismatch');
+        assert(!backpack_grid_data.isPlugin, 'isPlugin mismatch');
 
         let storageItemCounter = get!(world, alice, CharacterItemsStorageCounter);
         assert(storageItemCounter.count == 2, 'storage item count mismatch');
@@ -122,6 +136,7 @@ mod tests {
         assert(invetoryItem.position.x == 4, 'x position mismatch');
         assert(invetoryItem.position.y == 2, 'y position mismatch');
         assert(invetoryItem.rotation == 0, 'rotation mismatch');
+        assert(invetoryItem.plugins.len() == 0, 'plugin length mismatch');
 
         shop_system.buy_item(9);
         // place a shield on (2,2)
@@ -129,15 +144,31 @@ mod tests {
         // (2,2) (3,2) (2,3) (3,3) should be occupied
         let mut backpack_grid_data = get!(world, (alice, 2, 2), BackpackGrids);
         assert(backpack_grid_data.occupied == true, '(2,2) should be occupied');
+        assert(backpack_grid_data.inventoryItemId == 4, 'inventory item id mismatch');
+        assert(backpack_grid_data.itemId == 9, 'item id mismatch');
+        assert(!backpack_grid_data.isWeapon, 'isWeapon mismatch');
+        assert(!backpack_grid_data.isPlugin, 'isPlugin mismatch');
 
         let mut backpack_grid_data = get!(world, (alice, 3, 2), BackpackGrids);
         assert(backpack_grid_data.occupied == true, '(3,2) should be occupied');
+        assert(backpack_grid_data.inventoryItemId == 4, 'inventory item id mismatch');
+        assert(backpack_grid_data.itemId == 9, 'item id mismatch');
+        assert(!backpack_grid_data.isWeapon, 'isWeapon mismatch');
+        assert(!backpack_grid_data.isPlugin, 'isPlugin mismatch');
 
         let mut backpack_grid_data = get!(world, (alice, 2, 3), BackpackGrids);
         assert(backpack_grid_data.occupied == true, '(2,3) should be occupied');
+        assert(backpack_grid_data.inventoryItemId == 4, 'inventory item id mismatch');
+        assert(backpack_grid_data.itemId == 9, 'item id mismatch');
+        assert(!backpack_grid_data.isWeapon, 'isWeapon mismatch');
+        assert(!backpack_grid_data.isPlugin, 'isPlugin mismatch');
 
         let mut backpack_grid_data = get!(world, (alice, 3, 3), BackpackGrids);
         assert(backpack_grid_data.occupied == true, '(3,3) should be occupied');
+        assert(backpack_grid_data.inventoryItemId == 4, 'inventory item id mismatch');
+        assert(backpack_grid_data.itemId == 9, 'item id mismatch');
+        assert(!backpack_grid_data.isWeapon, 'isWeapon mismatch');
+        assert(!backpack_grid_data.isPlugin, 'isPlugin mismatch');
 
         let storageItemCounter = get!(world, alice, CharacterItemsStorageCounter);
         assert(storageItemCounter.count == 2, 'storage item count mismatch');
@@ -153,6 +184,7 @@ mod tests {
         assert(invetoryItem.position.x == 2, 'x position mismatch');
         assert(invetoryItem.position.y == 2, 'y position mismatch');
         assert(invetoryItem.rotation == 0, 'rotation mismatch');
+        assert(invetoryItem.plugins.len() == 0, 'plugin length mismatch');
 
         shop_system.buy_item(8);
         // place a potion on (5,2)
@@ -160,6 +192,10 @@ mod tests {
         // (5,2) should be occupied
         let mut backpack_grid_data = get!(world, (alice, 5, 2), BackpackGrids);
         assert(backpack_grid_data.occupied == true, '(5,2) should be occupied');
+        assert(backpack_grid_data.inventoryItemId == 5, 'inventory item id mismatch');
+        assert(backpack_grid_data.itemId == 8, 'item id mismatch');
+        assert(!backpack_grid_data.isWeapon, 'isWeapon mismatch');
+        assert(!backpack_grid_data.isPlugin, 'isPlugin mismatch');
 
         let storageItemCounter = get!(world, alice, CharacterItemsStorageCounter);
         assert(storageItemCounter.count == 2, 'storage item count mismatch');
@@ -175,6 +211,7 @@ mod tests {
         assert(invetoryItem.position.x == 5, 'x position mismatch');
         assert(invetoryItem.position.y == 2, 'y position mismatch');
         assert(invetoryItem.rotation == 0, 'rotation mismatch');
+        assert(invetoryItem.plugins.len() == 0, 'plugin length mismatch');
     }
 
     #[test]
@@ -435,6 +472,65 @@ mod tests {
         assert(invetoryItem.position.x == 3, 'x position mismatch');
         assert(invetoryItem.position.y == 3, 'y position mismatch');
         assert(invetoryItem.rotation == 270, 'rotation mismatch');
+    }
+
+    #[test]
+    #[available_gas(3000000000000000)]
+    fn test_place_item_with_plugins_check() {
+        let alice = starknet::contract_address_const::<0x1337>();
+
+        let world = spawn_test_world!();
+        let (action_system_address, mut action_system, _, mut item_system, _, mut shop_system) = get_systems(world);
+
+        add_items(ref item_system);
+        let item = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
+        assert(item.count == 34, 'total item count mismatch');
+
+        set_contract_address(alice);
+        action_system.spawn('Alice', WMClass::Warlock);
+        shop_system.reroll_shop();
+
+        // mock player gold for testing
+        let mut player_data = get!(world, alice, (Characters));
+        player_data.gold = 100;
+
+        set_contract_address(action_system_address);
+        set!(world, (player_data));
+        // mock shop for testing
+        let mut shop_data = get!(world, alice, (Shop));
+        shop_data.item1 = 7; // sword weapon
+        shop_data.item2 = 13; // poison plugin
+        shop_data.item3 = 17; // PlagueFlower plugin
+        shop_data.item4 = 1;
+        set!(world, (shop_data));
+
+        set_contract_address(alice);
+
+        shop_system.buy_item(13);
+        action_system.place_item(2, 5, 2, 0);
+        // (5, 2) should be occupied
+        let mut backpack_grid_data = get!(world, (alice, 5, 2), BackpackGrids);
+        assert(backpack_grid_data.isPlugin, 'isPlugin mismatch');
+        let invetoryItem = get!(world, (alice, 3), CharacterItemInventory);
+        assert(invetoryItem.plugins.len() == 0, 'plugin length mismatch');
+
+        shop_system.buy_item(7);
+        // place a sword on (4,2)
+        action_system.place_item(2, 4, 2, 0);
+        // (4,2) (4,3) (4,4) should be occupied
+        let invetoryItem = get!(world, (alice, 4), CharacterItemInventory);
+        assert(invetoryItem.plugins.len() == 1, 'plugin length mismatch');
+        assert(*invetoryItem.plugins.at(0) == (6, 100, 2), 'plugin length mismatch');
+        
+        shop_system.buy_item(17);
+        action_system.place_item(2, 2, 2, 0);
+        let invetoryItem = get!(world, (alice, 5), CharacterItemInventory);
+        assert(invetoryItem.plugins.len() == 0, 'plugin length mismatch');
+
+        let invetoryItem = get!(world, (alice, 4), CharacterItemInventory);
+        assert(invetoryItem.plugins.len() == 2, 'plugin length mismatch');
+        assert(*invetoryItem.plugins.at(0) == (6, 100, 2), 'plugin length mismatch');
+        assert(*invetoryItem.plugins.at(1) == (6, 80, 3), 'plugin length mismatch');
     }
 }
 

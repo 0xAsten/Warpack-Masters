@@ -1,4 +1,7 @@
 use warpack_masters::models::CharacterItem::Position;
+use warpack_masters::models::Character::WMClass;
+use core::fmt::{Display, Formatter, Error};
+
 
 #[derive(Copy, Drop, Serde)]
 struct PredefinedItem {
@@ -6,7 +9,31 @@ struct PredefinedItem {
     position: Position,
     // rotation: 0, 90, 180, 270
     rotation: usize,
+    plugins: Span<(u8, usize, usize)>
 }
+
+impl PointDisplay of Display<PredefinedItem> {
+    fn fmt(self: @PredefinedItem, ref f: Formatter) -> Result<(), Error> {
+        let mut str: ByteArray = format!("{},{},{},{}", *self.itemId, *self.position.x, *self.position.y, *self.rotation);
+        let plugin_len = (*self.plugins).len();
+        str += format!(",{}", plugin_len);
+        if plugin_len > 0 {
+            let mut i = 0;
+            loop {
+                if i == plugin_len {
+                    break;
+                }
+                let (effectType, chance, stacks) = *(*self.plugins).at(i);
+                str += format!(",{},{},{}", effectType, chance, stacks);
+                i += 1;
+            }
+        }
+
+        f.buffer.append(@str);
+        Result::Ok(())
+    }
+}
+
 
 mod Dummy0 {
     use warpack_masters::models::Character::{WMClass};
@@ -16,7 +43,7 @@ mod Dummy0 {
 
     const level: usize = 0;
     const name: felt252 = 'Noobie';
-    const wmClass: u8 = 1;
+    const wmClass: WMClass = WMClass::Warlock;
     const health: usize = 25;
 
     fn get_items() -> Array<PredefinedItem> {
@@ -25,30 +52,35 @@ mod Dummy0 {
             itemId: Backpack::id,
             position: Position{ x:4, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Dagger::id,
             position: Position{ x:2, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Herb::id,
             position: Position{ x:4, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Spike::id,
             position: Position{ x:5, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items
@@ -63,7 +95,7 @@ mod Dummy1 {
 
     const level: usize = 1;
     const name: felt252 = 'Dumbie';
-    const wmClass: u8 = 0;
+    const wmClass: WMClass = WMClass::Warrior;
     const health: usize = 35;
 
     fn get_items() -> Array<PredefinedItem> {
@@ -72,30 +104,35 @@ mod Dummy1 {
             itemId: Backpack::id,
             position: Position{ x:4, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Sword::id,
             position: Position{ x:5, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Shield::id,
             position: Position{ x:2, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Spike::id,
             position: Position{ x:4, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items
@@ -111,7 +148,7 @@ mod Dummy2 {
 
     const level: usize = 2;
     const name: felt252 = 'Bertie';
-    const wmClass: u8 = 2;
+    const wmClass: WMClass = WMClass::Archer;
     const health: usize = 45;
 
     fn get_items() -> Array<PredefinedItem> {
@@ -120,30 +157,35 @@ mod Dummy2 {
             itemId: Backpack::id,
             position: Position{ x:4, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Bow::id,
             position: Position{ x:5, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Spike::id,
             position: Position{ x:4, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: HealingPotion::id,
             position: Position{ x:4, y: 3 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items
@@ -158,7 +200,7 @@ mod Dummy3 {
 
     const level: usize = 3;
     const name: felt252 = 'Jodie';
-    const wmClass: u8 = 1;
+    const wmClass: WMClass = WMClass::Warlock;
     const health: usize = 55;
 
     fn get_items() -> Array<PredefinedItem> {
@@ -167,42 +209,49 @@ mod Dummy3 {
             itemId: Backpack::id,
             position: Position{ x:4, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: AugmentedDagger::id,
             position: Position{ x:2, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Poison::id,
             position: Position{ x:4, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Spike::id,
             position: Position{ x:5, y: 4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Crossbow::id,
             position: Position{ x:3, y: 2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Shield::id,
             position: Position{ x:4, y: 2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items
@@ -217,7 +266,7 @@ mod Dummy4 {
 
     const level: usize = 4;
     const name: felt252 = 'Robertie';
-    const wmClass: u8 = 0;
+    const wmClass: WMClass = WMClass::Warrior;
     const health: usize = 65;
 
     fn get_items() -> Array<PredefinedItem> {
@@ -226,48 +275,56 @@ mod Dummy4 {
             itemId: Backpack::id,
             position: Position{ x:4, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pouch::id,
             position: Position{ x:4, y:5 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: AugmentedSword::id,
             position: Position{ x:5, y: 2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Club::id,
             position: Position{ x:4, y: 2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: SpikeShield::id,
             position: Position{ x:2, y: 2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: LeatherArmor::id,
             position: Position{ x:2, y: 4 },
             rotation: 90,
+            plugins: array![].span(),
         });
 
         items
@@ -282,7 +339,7 @@ mod Dummy5 {
 
     const level: usize = 5;
     const name: felt252 = 'Hartie';
-    const wmClass: u8 = 2;
+    const wmClass: WMClass = WMClass::Archer;
     const health: usize = 80;
 
     fn get_items() -> Array<PredefinedItem> {
@@ -291,54 +348,63 @@ mod Dummy5 {
             itemId: Backpack::id,
             position: Position{ x:4, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Bow::id,
             position: Position{ x:5, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Crossbow::id,
             position: Position{ x:2, y: 4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Crossbow::id,
             position: Position{ x:3, y: 4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Buckler::id,
             position: Position{ x:2, y: 2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: MagicWater::id,
             position: Position{ x:4, y: 4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: HealingPotion::id,
             position: Position{ x:4, y: 3 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items
@@ -353,7 +419,7 @@ mod Dummy6 {
 
     const level: usize = 6;
     const name: felt252 = 'Bardie';
-    const wmClass: u8 = 1;
+    const wmClass: WMClass = WMClass::Warlock;
     const health: usize = 80;
 
     fn get_items() -> Array<PredefinedItem> {
@@ -362,54 +428,63 @@ mod Dummy6 {
             itemId: Backpack::id,
             position: Position{ x:4, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Satchel::id,
             position: Position{ x:4, y:1 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: AugmentedDagger::id,
             position: Position{ x:4, y:3 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: AugmentedDagger::id,
             position: Position{ x:5, y:3 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Crossbow::id,
             position: Position{ x:5, y:1 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: PlagueFlower::id,
             position: Position{ x:2, y: 2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Poison::id,
             position: Position{ x:4, y: 2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Herb::id,
             position: Position{ x:4, y: 1 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items
@@ -424,7 +499,7 @@ mod Dummy7 {
 
     const level: usize = 7;
     const name: felt252 = 'Tartie';
-    const wmClass: u8 = 0;
+    const wmClass: WMClass = WMClass::Warrior;
     const health: usize = 80;
 
     fn get_items() -> Array<PredefinedItem> {
@@ -433,66 +508,77 @@ mod Dummy7 {
             itemId: Backpack::id,
             position: Position{ x:4, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:0 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Satchel::id,
             position: Position{ x:4, y:1 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Hammer::id,
             position: Position{ x:2, y:0 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: AugmentedDagger::id,
             position: Position{ x:3, y:0 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: RageGauntlet::id,
             position: Position{ x:3, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: SpikeShield::id,
             position: Position{ x:2, y: 4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: LeatherArmor::id,
             position: Position{ x:4, y: 1 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Helmet::id,
             position: Position{ x:5, y: 4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items
@@ -507,7 +593,7 @@ mod Dummy8 {
 
     const level: usize = 8;
     const name: felt252 = 'Koolie';
-    const wmClass: u8 = 2;
+    const wmClass: WMClass = WMClass::Archer;
     const health: usize = 80;
 
     fn get_items() -> Array<PredefinedItem> {
@@ -516,66 +602,77 @@ mod Dummy8 {
             itemId: Backpack::id,
             position: Position{ x:4, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Satchel::id,
             position: Position{ x:4, y:5 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Bow::id,
             position: Position{ x:4, y:3 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Bow::id,
             position: Position{ x:5, y:3 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Buckler::id,
             position: Position{ x:2, y:2 },
             rotation: 0,
+            plugins: array![].span(), 
         });
 
         items.append(PredefinedItem {
             itemId: RageGauntlet::id,
             position: Position{ x:2, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: MagicWater::id,
             position: Position{ x:3, y: 4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: HealingPotion::id,
             position: Position{ x:3, y: 5 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Poison::id,
             position: Position{ x:5, y: 2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items
@@ -590,7 +687,7 @@ mod Dummy9 {
 
     const level: usize = 9;
     const name: felt252 = 'Goobie';
-    const wmClass: u8 = 1;
+    const wmClass: WMClass = WMClass::Warlock;
     const health: usize = 80;
 
     fn get_items() -> Array<PredefinedItem> {
@@ -599,66 +696,77 @@ mod Dummy9 {
             itemId: Backpack::id,
             position: Position{ x:4, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Satchel::id,
             position: Position{ x:4, y:5 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: PlagueFlower::id,
             position: Position{ x:2, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: MailArmor::id,
             position: Position{ x:4, y:3 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Poison::id,
             position: Position{ x:2, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Poison::id,
             position: Position{ x:2, y:3 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Crossbow::id,
             position: Position{ x:3, y: 2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: MagicWater::id,
             position: Position{ x:4, y: 2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: HealingPotion::id,
             position: Position{ x:5, y: 2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items
@@ -673,7 +781,7 @@ mod Dummy10 {
 
     const level: usize = 10;
     const name: felt252 = 'Goodie';
-    const wmClass: u8 = 0;
+    const wmClass: WMClass = WMClass::Warrior;
     const health: usize = 80;
 
     fn get_items() -> Array<PredefinedItem> {
@@ -682,24 +790,28 @@ mod Dummy10 {
             itemId: Backpack::id,
             position: Position{ x:4, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:0 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
 
@@ -707,36 +819,42 @@ mod Dummy10 {
             itemId: Satchel::id,
             position: Position{ x:4, y:5 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Greatsword::id,
             position: Position{ x:2, y:0 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Buckler::id,
             position: Position{ x:2, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: KnightHelmet::id,
             position: Position{ x:4, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: MagicWater::id,
             position: Position{ x:4, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: HealingPotion::id,
             position: Position{ x:4, y: 5 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items
@@ -751,7 +869,7 @@ mod Dummy11 {
 
     const level: usize = 11;
     const name: felt252 = 'Zippie';
-    const wmClass: u8 = 2;
+    const wmClass: WMClass = WMClass::Archer;
     const health: usize = 80;
 
     fn get_items() -> Array<PredefinedItem> {
@@ -760,24 +878,28 @@ mod Dummy11 {
             itemId: Backpack::id,
             position: Position{ x:4, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:0 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
 
@@ -785,60 +907,70 @@ mod Dummy11 {
             itemId: Satchel::id,
             position: Position{ x:4, y:1 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Satchel::id,
             position: Position{ x:4, y:5 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Bow::id,
             position: Position{ x:2, y:3 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Bow::id,
             position: Position{ x:3, y:3 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Crossbow::id,
             position: Position{ x:2, y:2 },
             rotation: 90,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Buckler::id,
             position: Position{ x:4, y:1 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: KnightHelmet::id,
             position: Position{ x:5, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: MagicWater::id,
             position: Position{ x:4, y:5 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: SpikeShield::id,
             position: Position{ x:2, y:0 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: AugmentedDagger::id,
             position: Position{ x:4, y: 3 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items
@@ -853,7 +985,7 @@ mod Dummy12 {
 
     const level: usize = 12;
     const name: felt252 = 'Peppie';
-    const wmClass: u8 = 1;
+    const wmClass: WMClass = WMClass::Warlock;
     const health: usize = 80;
 
     fn get_items() -> Array<PredefinedItem> {
@@ -862,24 +994,28 @@ mod Dummy12 {
             itemId: Backpack::id,
             position: Position{ x:4, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:4, y:0 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
 
@@ -887,54 +1023,63 @@ mod Dummy12 {
             itemId: Satchel::id,
             position: Position{ x:4, y:5 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pouch::id,
             position: Position{ x:6, y:5 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: PlagueFlower::id,
             position: Position{ x:2, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: PlagueFlower::id,
             position: Position{ x:2, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: AugmentedDagger::id,
             position: Position{ x:4, y:3 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: MailArmor::id,
             position: Position{ x:4, y:0 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: HealingPotion::id,
             position: Position{ x:6, y:5 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Poison::id,
             position: Position{ x:4, y:5 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Crossbow::id,
             position: Position{ x:5, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items
@@ -949,7 +1094,7 @@ mod Dummy13 {
 
     const level: usize = 13;
     const name: felt252 = 'Bubbie';
-    const wmClass: u8 = 0;
+    const wmClass: WMClass = WMClass::Warrior;
     const health: usize = 80;
 
     fn get_items() -> Array<PredefinedItem> {
@@ -958,90 +1103,105 @@ mod Dummy13 {
             itemId: Backpack::id,
             position: Position{ x:4, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:4, y:0 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:4, y:5 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:6, y:1 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:6, y:3 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Greatsword::id,
             position: Position{ x:2, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Hammer::id,
             position: Position{ x:7, y:1 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: AugmentedSword::id,
             position: Position{ x:6, y:1 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: BladeArmor::id,
             position: Position{ x:4, y:0 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Buckler::id,
             position: Position{ x:4, y:3 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: HealingPotion::id,
             position: Position{ x:6, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: MagicWater::id,
             position: Position{ x:4, y:5 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: KnightHelmet::id,
             position: Position{ x:5, y:5 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items
@@ -1056,7 +1216,7 @@ mod Dummy14 {
 
     const level: usize = 14;
     const name: felt252 = 'Nettie';
-    const wmClass: u8 = 0;
+    const wmClass: WMClass = WMClass::Archer;
     const health: usize = 80;
 
     fn get_items() -> Array<PredefinedItem> {
@@ -1065,90 +1225,105 @@ mod Dummy14 {
             itemId: Backpack::id,
             position: Position{ x:4, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:6, y:1 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:6, y:3 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Satchel::id,
             position: Position{ x:4, y:1 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Bow::id,
-            position: Position{ x:3, y:2 },
+            position: Position{ x:2, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Bow::id,
             position: Position{ x:7, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: AugmentedSword::id,
             position: Position{ x:6, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: KnightHelmet::id,
             position: Position{ x:6, y:1 },
             rotation: 90,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: SpikeShield::id,
             position: Position{ x:4, y:1 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: MailArmor::id,
             position: Position{ x:3, y:3 },
             rotation: 90,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: AmuletOfFury::id,
             position: Position{ x:3, y:5 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: HealingPotion::id,
-            position: Position{ x:2, y:2 },
+            position: Position{ x:3, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: MagicWater::id,
-            position: Position{ x:2, y:3 },
+            position: Position{ x:2, y:5 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items
@@ -1163,7 +1338,7 @@ mod Dummy15 {
 
     const level: usize = 15;
     const name: felt252 = 'Quillie';
-    const wmClass: u8 = 0;
+    const wmClass: WMClass = WMClass::Warlock;
     const health: usize = 80;
 
     fn get_items() -> Array<PredefinedItem> {
@@ -1172,90 +1347,105 @@ mod Dummy15 {
             itemId: Backpack::id,
             position: Position{ x:4, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:6, y:1 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:6, y:3 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:4, y:0 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: PlagueFlower::id,
             position: Position{ x:2, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: PlagueFlower::id,
-            position: Position{ x:4, y:2 },
+            position: Position{ x:2, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: MailArmor::id,
             position: Position{ x:4, y:0 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Buckler::id,
             position: Position{ x:4, y:3 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Crossbow::id,
             position: Position{ x:6, y:1 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: AugmentedSword::id,
             position: Position{ x:7, y:1 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: HealingPotion::id,
             position: Position{ x:6, y:3 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Poison::id,
             position: Position{ x:6, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Poison::id,
             position: Position{ x:7, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items
@@ -1270,7 +1460,7 @@ mod Dummy16 {
 
     const level: usize = 16;
     const name: felt252 = 'Winkie';
-    const wmClass: u8 = 0;
+    const wmClass: WMClass = WMClass::Warrior;
     const health: usize = 80;
 
     fn get_items() -> Array<PredefinedItem> {
@@ -1279,96 +1469,112 @@ mod Dummy16 {
             itemId: Backpack::id,
             position: Position{ x:4, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:6, y:1 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:6, y:3 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:4, y:0 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:4, y:5 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Satchel::id,
             position: Position{ x:6, y:5 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: VampiricArmor::id,
             position: Position{ x:2, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Greatsword::id,
             position: Position{ x:4, y:0 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: AugmentedDagger::id,
             position: Position{ x:6, y:1 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: AugmentedDagger::id,
             position: Position{ x:7, y:1 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: MailArmor::id,
             position: Position{ x:6, y:3 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: SpikeShield::id,
             position: Position{ x:4, y:5 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: KnightHelmet::id,
             position: Position{ x:2, y:5 },
             rotation: 90,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: HealingPotion::id,
             position: Position{ x:4, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items
@@ -1383,7 +1589,7 @@ mod Dummy17 {
 
     const level: usize = 17;
     const name: felt252 = 'Rennie';
-    const wmClass: u8 = 0;
+    const wmClass: WMClass = WMClass::Archer;
     const health: usize = 80;
 
     fn get_items() -> Array<PredefinedItem> {
@@ -1392,102 +1598,119 @@ mod Dummy17 {
             itemId: Backpack::id,
             position: Position{ x:4, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:6, y:1 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:6, y:3 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:4, y:0 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Satchel::id,
             position: Position{ x:4, y:5 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Bow::id,
             position: Position{ x:2, y:3 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Bow::id,
             position: Position{ x:3, y:3 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: AugmentedSword::id,
             position: Position{ x:7, y:1 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: KnightHelmet::id,
             position: Position{ x:4, y:5 },
             rotation: 90,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: BladeArmor::id,
             position: Position{ x:4, y:0 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: MailArmor::id,
             position: Position{ x:4, y:3 },
             rotation: 90,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: HealingPotion::id,
             position: Position{ x:7, y:4 },
             rotation: 90,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: HealingPotion::id,
             position: Position{ x:2, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: AmuletOfFury::id,
             position: Position{ x:3, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: MagicWater::id,
             position: Position{ x:6, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items
@@ -1502,7 +1725,7 @@ mod Dummy18 {
 
     const level: usize = 18;
     const name: felt252 = 'Huggie';
-    const wmClass: u8 = 0;
+    const wmClass: WMClass = WMClass::Warlock;
     const health: usize = 80;
 
     fn get_items() -> Array<PredefinedItem> {
@@ -1511,96 +1734,112 @@ mod Dummy18 {
             itemId: Backpack::id,
             position: Position{ x:4, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:6, y:1 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:6, y:3 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:4, y:0 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:4, y:5 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Satchel::id,
             position: Position{ x:6, y:5 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: PlagueFlower::id,
             position: Position{ x:6, y:1 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: PlagueFlower::id,
             position: Position{ x:6, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: MailArmor::id,
             position: Position{ x:4, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: VampiricArmor::id,
             position: Position{ x:2, y:3 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: AugmentedSword::id,
             position: Position{ x:5, y:3 },
             rotation: 90,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Bow::id,
             position: Position{ x:2, y:2 },
             rotation: 90,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Poison::id,
             position: Position{ x:4, y:3 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: HealingPotion::id,
             position: Position{ x:5, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items
@@ -1615,7 +1854,7 @@ mod Dummy19 {
 
     const level: usize = 19;
     const name: felt252 = 'Dottie';
-    const wmClass: u8 = 0;
+    const wmClass: WMClass = WMClass::Warrior;
     const health: usize = 80;
 
     fn get_items() -> Array<PredefinedItem> {
@@ -1624,126 +1863,147 @@ mod Dummy19 {
             itemId: Backpack::id,
             position: Position{ x:4, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:4, y:5 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:6, y:1 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:6, y:3 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:4, y:0 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:0 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:6, y:5 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Greatsword::id,
             position: Position{ x:2, y:0 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: BladeArmor::id,
             position: Position{ x:4, y:0 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: AugmentedSword::id,
             position: Position{ x:6, y:1 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Hammer::id,
             position: Position{ x:7, y:1 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: KnightHelmet::id,
             position: Position{ x:2, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: RageGauntlet::id,
             position: Position{ x:3, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: AmuletOfFury::id,
             position: Position{ x:6, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Buckler::id,
             position: Position{ x:4, y:3 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: HealingPotion::id,
             position: Position{ x:4, y:5 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: HealingPotion::id,
             position: Position{ x:4, y:6 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Helmet::id,
             position: Position{ x:5, y:5 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: MagicWater::id,
             position: Position{ x:5, y:6 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items
@@ -1758,7 +2018,7 @@ mod Dummy20 {
 
     const level: usize = 20;
     const name: felt252 = 'Quackie';
-    const wmClass: u8 = 0;
+    const wmClass: WMClass = WMClass::Archer;
     const health: usize = 80;
 
     fn get_items() -> Array<PredefinedItem> {
@@ -1767,120 +2027,140 @@ mod Dummy20 {
             itemId: Backpack::id,
             position: Position{ x:4, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:4, y:5 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:6, y:1 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:6, y:3 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:4, y:0 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Pack::id,
             position: Position{ x:2, y:0 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Satchel::id,
             position: Position{ x:6, y:5 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Bow::id,
             position: Position{ x:2, y:0 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Bow::id,
             position: Position{ x:3, y:0 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: AugmentedSword::id,
             position: Position{ x:2, y:3 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: Crossbow::id,
             position: Position{ x:3, y:3 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: PlagueFlower::id,
             position: Position{ x:4, y:0 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: VampiricArmor::id,
             position: Position{ x:4, y:2 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: MailArmor::id,
             position: Position{ x:6, y:1 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: AmuletOfFury::id,
             position: Position{ x:3, y:5 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: MagicWater::id,
             position: Position{ x:7, y:4 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: MagicWater::id,
             position: Position{ x:7, y:5 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items.append(PredefinedItem {
             itemId: KnightHelmet::id,
             position: Position{ x:4, y:5 },
             rotation: 0,
+            plugins: array![].span(),
         });
 
         items

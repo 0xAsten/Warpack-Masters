@@ -1,6 +1,5 @@
 mod systems {
     mod actions;
-    // mod backpack;
     mod dummy;
     mod fight;
     mod item;
@@ -17,7 +16,7 @@ mod models {
     mod Shop;
     mod DummyCharacter;
     mod DummyCharacterItem;
-    mod BattleLog;
+    mod Fight;
     mod Recipe;
 }
 
