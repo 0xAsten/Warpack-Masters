@@ -153,7 +153,7 @@ mod tests {
         let (item_ids, belongs_tos, nearby_item_effects) = combine_items(ref items_cooldown4, ref items_cooldown5, ref items_cooldown6, ref items_cooldown7);
         assert(item_ids.len() == 3, 'item_ids length not 3');
         assert(belongs_tos.len() == 3, 'belongs_tos length not 3');
-        assert(nearby_item_effects.len() == 3, 'nearby_item_effects length not 3');
+        assert(nearby_item_effects.len() == 3, 'item_effects length not 3');
 
         let item_id = *item_ids.at(0);
         let belongs_to = *belongs_tos.at(0);

@@ -328,7 +328,7 @@ mod fight_system {
                     });
                 }
 
-                inventoryItemCount -= 1;
+                dummy_item_count -= 1;
             };
 
             let mut dummy_item_count = dummyCharItemsCounter.count;
