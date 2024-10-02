@@ -36,29 +36,21 @@ const commands = items
       id,
       name,
       itemType,
+      rarity,
       width,
       height,
       price,
-      damage,
-      cleansePoison,
+      effectType,
+      effectStacks,
+      effectActivationType,
       chance,
       cooldown,
-      rarity,
-      armor,
-      armorActivation,
-      regen,
-      regenActivation,
-      reflect,
-      reflectActivation,
-      poison,
-      poisonActivation,
-      empower,
-      empowerActivation,
-      vampirism,
-      vampirismActivation,
       energyCost,
+      isPlugin
     } = item
-    return `sozo execute --world $WORLD_ADDRESS $ITEM_STSTEM_ADDRESS add_item -c ${id},${name},${itemType},${width},${height},${price},${damage},${cleansePoison},${chance},${cooldown},${rarity},${armor},${armorActivation},${regen},${regenActivation},${reflect},${reflectActivation},${poison},${poisonActivation},${empower},${empowerActivation},${vampirism},${vampirismActivation},${energyCost} --wait --rpc-url $STARKNET_RPC_URL`
+
+    const isPluginFormatted = isPlugin === 'true' ? 1 : 0
+    return `sozo execute --world $WORLD_ADDRESS $ITEM_STSTEM_ADDRESS add_item -c ${id},${name},${itemType},${rarity},${width},${height},${price},${effectType},${effectStacks},${effectActivationType},${chance},${cooldown},${energyCost},${isPluginFormatted} --wait --rpc-url $STARKNET_RPC_URL`
   })
   .join('\n')
 
