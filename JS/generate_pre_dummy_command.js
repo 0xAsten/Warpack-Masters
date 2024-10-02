@@ -30,7 +30,13 @@ const itemDetailsRegex =
 
 const levelRegex = /const\s+level:\s+usize\s+=\s+(\d+);/
 const nameRegex = /const\s+name:\s+felt252\s+=\s+'([^']+)';/
-const wmClassRegex = /const\s+wmClass:\s+u8\s+=\s+(\d+);/
+const wmClassRegex = /const\s+wmClass:\s+WMClass\s+=\s+WMClass::([a-zA-Z]+);/
+
+const wmClassMap = {
+  'Warrior': 0,
+  'Warlock': 1,
+  'Archer': 2,
+};
 
 let commands = ''
 while ((match = dummyRegex.exec(predefinedDummiesContent)) !== null) {
@@ -42,7 +48,7 @@ while ((match = dummyRegex.exec(predefinedDummiesContent)) !== null) {
 
   const level = levelMatch ? levelMatch[1] : null
   const name = nameMatch ? nameMatch[1] : null
-  const wmClass = wmClassMatch ? wmClassMatch[1] : null
+  const wmClass = wmClassMatch ? wmClassMap[wmClassMatch[1]] : null
 
   const encodedName = shortString.encodeShortString(name)
 
@@ -56,7 +62,7 @@ while ((match = dummyRegex.exec(predefinedDummiesContent)) !== null) {
     const y = itemMatch[3]
     const rotation = itemMatch[4]
 
-    itemDetails += `${itemId},${x},${y},${rotation},`
+    itemDetails += `${itemId},${x},${y},${rotation},0,`
     itemCount++
   }
 
