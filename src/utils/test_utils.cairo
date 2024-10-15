@@ -418,5 +418,31 @@ fn add_items(ref item_system: IItemDispatcher) {
             items::SpikeShield::empowerActivation,
             items::SpikeShield::energyCost,
         );
+
+    item_system
+        .add_item(
+            items::RageGauntlet::id,
+            items::RageGauntlet::name,
+            items::RageGauntlet::itemType,
+            items::RageGauntlet::width,
+            items::RageGauntlet::height,
+            items::RageGauntlet::price,
+            items::RageGauntlet::damage,
+            items::RageGauntlet::cleansePoison,
+            items::RageGauntlet::chance,
+            items::RageGauntlet::cooldown,
+            items::RageGauntlet::rarity,
+            items::RageGauntlet::armor,
+            items::RageGauntlet::armorActivation,
+            items::RageGauntlet::regen,
+            items::RageGauntlet::regenActivation,
+            items::RageGauntlet::reflect,
+            items::RageGauntlet::reflectActivation,
+            items::RageGauntlet::poison,
+            items::RageGauntlet::poisonActivation,
+            items::RageGauntlet::empower,
+            items::RageGauntlet::empowerActivation,
+            items::RageGauntlet::energyCost,
+        );
 }
 

@@ -121,7 +121,7 @@ mod tests {
         assert(item_id == 1, 'item_id not 1');
         assert(belongs_to == PLAYER, 'belongs_to not PLAYER');
 
-        let (item_id, belongs_to, empower_effect, poison_effect) = *items_cooldown4.at(1);
+        let (item_id, belongs_to, _empower_effect, _poison_effect) = *items_cooldown4.at(1);
         assert(item_id == 1, 'item_id not 1');
         assert(belongs_to == DUMMY, 'belongs_to not DUMMY');
     }

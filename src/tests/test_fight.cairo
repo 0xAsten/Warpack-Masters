@@ -311,6 +311,265 @@ mod tests {
 
     #[test]
     #[available_gas(3000000000000000)]
+    fn test_match_dummy_nearby_items_poison_effect() {
+        let alice = starknet::contract_address_const::<0x0>();
+
+        let world =  spawn_test_world!();
+        let (action_system_address, mut action_system, _, mut item_system, _, mut fight_system, _, mut dummy_system) = get_systems(world);
+
+        add_items(ref item_system);
+
+        set_contract_address(alice);
+        action_system.spawn('alice', WMClass::Warlock);
+
+        set_contract_address(action_system_address);
+        let mut inventoryCounter = get!(world, alice, (CharacterItemsInventoryCounter));
+        // add Herb id 5, on start +1 regen
+        inventoryCounter.count += 1;
+        let item1 = CharacterItemInventory {
+            player: alice,
+            id: inventoryCounter.count,
+            itemId: 5,
+            position: Position { x: 0, y: 0 },
+            rotation: 0,
+        };
+        // add Dagger id 6, damage 3, cooldown 4
+        inventoryCounter.count += 1;
+        let item2 = CharacterItemInventory {
+            player: alice,
+            id: inventoryCounter.count,
+            itemId: 6,
+            position: Position { x: 0, y: 0 },
+            rotation: 0,
+        };
+        // add Spike id 8, on start +1 reflect
+        inventoryCounter.count += 1;
+        let item3 = CharacterItemInventory {
+            player: alice,
+            id: inventoryCounter.count,
+            itemId: 8,
+            position: Position { x: 0, y: 0 },
+            rotation: 0,
+        };
+        // add SpikeShield id 16, chance 75, on hit +2 reflect
+        inventoryCounter.count += 1;
+        let item4 = CharacterItemInventory {
+            player: alice,
+            id: inventoryCounter.count,
+            itemId: 16,
+            position: Position { x: 0, y: 0 },
+            rotation: 0,
+        };
+
+        set!(world, (inventoryCounter, item1, item2, item3, item4));
+
+        set_contract_address(alice);
+        dummy_system.create_dummy();
+
+        let bob = starknet::contract_address_const::<0x1>();
+        set_contract_address(bob);
+        action_system.spawn('bob', WMClass::Warlock);
+
+        set_contract_address(action_system_address);
+        let mut inventoryCounter = get!(world, bob, (CharacterItemsInventoryCounter));
+        // add Sward id 7, damage 5, cooldown 5
+        inventoryCounter.count += 1;
+        let item1 = CharacterItemInventory {
+            player: bob,
+            id: inventoryCounter.count,
+            itemId: 7,
+            position: Position { x: 0, y: 0 },
+            rotation: 0,
+        };
+        // add Shield id 9, on start +15 armor
+        inventoryCounter.count += 1;
+        let item2 = CharacterItemInventory {
+            player: bob,
+            id: inventoryCounter.count,
+            itemId: 9,
+            position: Position { x: 0, y: 0 },
+            rotation: 0,
+        };
+        // add Helmet id 10, chance 50, on hit +3 armor
+        inventoryCounter.count += 1;
+        let item3 = CharacterItemInventory {
+            player: bob,
+            id: inventoryCounter.count,
+            itemId: 10,
+            position: Position { x: 0, y: 0 },
+            rotation: 0,
+        };
+        // add Poison id 13, on start +2 posion
+        inventoryCounter.count += 1;
+        let item4 = CharacterItemInventory {
+            player: bob,
+            id: inventoryCounter.count,
+            itemId: 13,
+            position: Position { x: 2, y: 1 },
+            rotation: 0,
+        };
+        // add Dagger id 6, damage 3, cooldown 4
+        inventoryCounter.count += 1;
+        let item5 = CharacterItemInventory {
+            player: bob,
+            id: inventoryCounter.count,
+            itemId: 6,
+            position: Position { x: 3, y: 1 },
+            rotation: 0,
+        };
+
+        set!(world, (inventoryCounter, item1, item2, item3, item4, item5));
+
+        set_contract_address(bob);
+        dummy_system.create_dummy();
+
+        fight_system.match_dummy();
+
+        let battleLog = get!(world, (bob, 1), (BattleLog));
+        assert(battleLog.dummyLevel == 0, 'dummyLevel should be 0');
+        assert(battleLog.dummyCharId == 1, 'dummyCharId should be 1');
+        assert(battleLog.item_ids == array![6, 6, 7].span(), 'item_ids should be [6, 6, 7]');
+        assert(battleLog.belongs_tos == array![PLAYER, DUMMY, PLAYER].span(), 'belongs_tos is incorrect');
+        assert(battleLog.items_length == 3, 'items_length should be 3');
+        // armor, regen, reflect, empower, poison, vampirism
+        assert(battleLog.char_buffs == array![15, 0, 0, 0, 0, 0].span(), 'char_buffs is incorrect');
+        assert(battleLog.dummy_buffs == array![0, 1, 1, 0, 2, 0].span(), 'dummy_buffs is incorrect');
+        // on hit, on attack
+        assert(battleLog.char_on_hit_items == array![(EFFECT_ARMOR, 50, 3)].span(), 'char_on_hit_items is incorrect');
+        assert(battleLog.dummy_on_hit_items == array![(EFFECT_REFLECT, 75, 2)].span(), 'dummy_on_hit_items is incorrect');
+        assert(battleLog.char_on_attack_items == array![].span(), 'on_attack_items is incorrect');
+        assert(battleLog.dummy_on_attack_items == array![].span(), 'on_attack_items is incorrect');
+        assert(battleLog.winner == 0, 'winner should be 0');
+        assert(battleLog.seconds == 0, 'seconds should be 0');
+
+        // Dagger must have poison effect
+        assert(battleLog.nearby_item_effects == array![(0, 2), (0, 0), (0, 0)].span(), 'nearby_items are incorrect');
+    }
+
+    #[test]
+    #[available_gas(3000000000000000)]
+    fn test_match_dummy_nearby_items_empower_effect() {
+        let alice = starknet::contract_address_const::<0x0>();
+
+        let world =  spawn_test_world!();
+        let (action_system_address, mut action_system, _, mut item_system, _, mut fight_system, _, mut dummy_system) = get_systems(world);
+
+        add_items(ref item_system);
+        set_contract_address(alice);
+        action_system.spawn('alice', WMClass::Warlock);
+
+        set_contract_address(action_system_address);
+        let mut inventoryCounter = get!(world, alice, (CharacterItemsInventoryCounter));
+        // add Herb id 5, on start +1 regen
+        inventoryCounter.count += 1;
+        let item1 = CharacterItemInventory {
+            player: alice,
+            id: inventoryCounter.count,
+            itemId: 5,
+            position: Position { x: 0, y: 0 },
+            rotation: 0,
+        };
+        // add Dagger id 6, damage 3, cooldown 4
+        inventoryCounter.count += 1;
+        let item2 = CharacterItemInventory {
+            player: alice,
+            id: inventoryCounter.count,
+            itemId: 6,
+            position: Position { x: 0, y: 0 },
+            rotation: 0,
+        };
+        // add Spike id 8, on start +1 reflect
+        inventoryCounter.count += 1;
+        let item3 = CharacterItemInventory {
+            player: alice,
+            id: inventoryCounter.count,
+            itemId: 8,
+            position: Position { x: 0, y: 0 },
+            rotation: 0,
+        };
+        // add SpikeShield id 16, chance 75, on hit +2 reflect
+        inventoryCounter.count += 1;
+        let item4 = CharacterItemInventory {
+            player: alice,
+            id: inventoryCounter.count,
+            itemId: 16,
+            position: Position { x: 0, y: 0 },
+            rotation: 0,
+        };
+
+        set!(world, (inventoryCounter, item1, item2, item3, item4));
+
+        set_contract_address(alice);
+        dummy_system.create_dummy();
+
+        let bob = starknet::contract_address_const::<0x1>();
+        set_contract_address(bob);
+        action_system.spawn('bob', WMClass::Warlock);
+
+        set_contract_address(action_system_address);
+        let mut inventoryCounter = get!(world, bob, (CharacterItemsInventoryCounter));
+        // add Sword id 7, damage 5, cooldown 5
+        inventoryCounter.count += 1;
+        let item1 = CharacterItemInventory {
+            player: bob,
+            id: inventoryCounter.count,
+            itemId: 7,
+            position: Position { x: 2, y: 1 },
+            rotation: 0,
+        };
+        // add Rage Gauntlet id 27, +1 to Sword empower
+        inventoryCounter.count += 1;
+        let item2 = CharacterItemInventory {
+            player: bob,
+            id: inventoryCounter.count,
+            itemId: 27,
+            position: Position { x: 3, y: 1 },
+            rotation: 0,
+        };
+        // add Helmet id 10, chance 50, on hit +3 armor
+        inventoryCounter.count += 1;
+        let item3 = CharacterItemInventory {
+            player: bob,
+            id: inventoryCounter.count,
+            itemId: 10,
+            position: Position { x: 0, y: 0 },
+            rotation: 0,
+        };
+        // add Poison id 13, on start +2 posion
+        inventoryCounter.count += 1;
+        let item4 = CharacterItemInventory {
+            player: bob,
+            id: inventoryCounter.count,
+            itemId: 13,
+            position: Position { x: 0, y: 0 },
+            rotation: 0,
+        };
+        // add Dagger id 6, damage 3, cooldown 4
+        inventoryCounter.count += 1;
+        let item5 = CharacterItemInventory {
+            player: bob,
+            id: inventoryCounter.count,
+            itemId: 6,
+            position: Position { x: 0, y: 0 },
+            rotation: 0,
+        };
+
+        set!(world, (inventoryCounter, item1, item2, item3, item4, item5));
+
+        set_contract_address(bob);
+        dummy_system.create_dummy();
+
+        fight_system.match_dummy();
+
+        let battleLog = get!(world, (bob, 1), (BattleLog));
+     
+        assert(battleLog.item_ids == array![6, 6, 7].span(), 'item_ids should be [6, 6, 7]');
+        // Sword has 1 empower value
+        assert(battleLog.nearby_item_effects == array![(0, 0), (0, 0), (1, 0)].span(), 'nearby_items are incorrect');
+    }
+
+    #[test]
+    #[available_gas(3000000000000000)]
     #[should_panic(expected: ('dummy already created', 'ENTRYPOINT_FAILED'))]
     fn test_revert_dummy_already_created() {
         let alice = starknet::contract_address_const::<0x0>();

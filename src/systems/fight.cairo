@@ -159,7 +159,6 @@ mod fight_system {
             
             let mut inventoryItemCount = inventoryItemsCounter.count;
 
-
             let mut items_length: usize = 0;
             loop {
                 if inventoryItemCount == 0 {
@@ -179,6 +178,7 @@ mod fight_system {
 
                 // If this item is a weapon, we need to check if there are nearby empower or poison items
                 if item.itemType == 1 || item.itemType == 2 {
+
                     let weapon_position = charItem.position;
                     let weapon_width = item.width;
                     let weapon_height = item.height;
@@ -187,6 +187,7 @@ mod fight_system {
                     // Check for nearby items with non-zero empower
                     let mut j = 0;
                     let empower_items_len = empower_item_properties.len();
+                   
                     loop {
                         if j >= empower_items_len {
                             break;
