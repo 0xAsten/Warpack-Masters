@@ -628,7 +628,8 @@ mod fight_system {
                     let curr_item_belongs = *belongs_tos.at(i.into());
 
                     let (empower_effect, poison_effect) = *nearby_item_effects.at(i.into());
-
+                    println!("empower effect {:?}", empower_effect);
+                    println!("poison effect {:?}", poison_effect);
                     let curr_item_data = get!(world, curr_item_index, (Item));
 
                     let cleansePoison = curr_item_data.cleansePoison;
@@ -642,16 +643,19 @@ mod fight_system {
                     if seconds % cooldown == 0 {
                         v += seconds.into();
                         rand = random(seed2 + v, 100);
+                        println!("rand {:?}", char_empower);
                         if rand < chance {
                             if curr_item_belongs == PLAYER {
                                 // ====== on cooldown to plus stacks, all use the same randomness ======
 
                                 // Apply empower effect to the player
+                                println!("char_empower before {:?}", char_empower);
                                 char_empower += empower_effect;
+                                println!("char_empower after {:?}", char_empower);
 
                                 // Apply poison to the dummy
                                 dummy_poison += poison_effect;
-
+                                
                                 if curr_item_data.armorActivation == 3 {
                                     char_armor += curr_item_data.armor;
                                 }
