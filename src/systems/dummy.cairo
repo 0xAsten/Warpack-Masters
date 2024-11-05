@@ -31,14 +31,16 @@ mod dummy_system {
     #[abi(embed_v0)]
     impl DummyImpl of IDummy<ContractState> {
         fn create_dummy(ref self: ContractState) {
+            let mut world = self.world(@"Warpacks");
+
             let player = get_caller_address();
 
-            let mut char = get!(world, player, (Characters));
+            let mut char: Characters = world.read_model(player);
 
             assert(char.dummied == false, 'dummy already created');
             assert(char.loss < 5, 'max loss reached');
 
-            let mut dummyCharCounter = get!(world, char.wins, (DummyCharacterCounter));
+            let mut dummyCharCounter: DummyCharacterCounter = world.read_model(char.wins);
             dummyCharCounter.count += 1;
 
             let dummyChar = DummyCharacter {
@@ -53,7 +55,7 @@ mod dummy_system {
             };
             char.dummied = true;
 
-            let inventoryItemCounter = get!(world, player, (CharacterItemsInventoryCounter));
+            let inventoryItemCounter: CharacterItemsInventoryCounter = world.read_model(player);
 
             let mut count = 0;
             loop {
@@ -61,11 +63,10 @@ mod dummy_system {
                     break;
                 }
 
-                let inventoryItem = get!(world, (player, count+1), (CharacterItemInventory));
+                let inventoryItem: CharacterItemInventory = world.read_model((player, count+1));
 
-                let mut dummyCharItemsCounter = get!(
-                    world, (char.wins, dummyCharCounter.count), (DummyCharacterItemsCounter)
-                );
+                let mut dummyCharItemsCounter: DummyCharacterItemsCounter = world.read_model((char.wins, dummyCharCounter.count));
+
                 dummyCharItemsCounter.count += 1;
 
                 let dummyCharItem = DummyCharacterItem {
@@ -87,6 +88,8 @@ mod dummy_system {
         }
 
         fn prefine_dummy(ref self: ContractState, level: usize, name: felt252, wmClass: WMClass, items: Array<PredefinedItem>) {
+            let mut world = self.world(@"Warpacks");
+
             let player = get_caller_address();
             assert(ViewImpl::is_world_owner(world, player), 'player not world owner');
 
@@ -113,13 +116,13 @@ mod dummy_system {
                 }
             }
 
-            let nameRecord = get!(world, name, NameRecord);
+            let nameRecord: NameRecord = world.read_model(name);
             assert(
                 nameRecord.player == starknet::contract_address_const::<0>(),
                 'name already exists'
             );
 
-            let mut dummyCharCounter = get!(world, level, (DummyCharacterCounter));
+            let mut dummyCharCounter: DummyCharacterCounter = world.read_model(level);
             dummyCharCounter.count += 1;
             
             let player = starknet::contract_address_const::<0x1>();
@@ -134,9 +137,7 @@ mod dummy_system {
                 stamina: INIT_STAMINA,
             };
 
-            let mut dummyCharItemsCounter = get!(
-                world, (level, dummyCharCounter.count), (DummyCharacterItemsCounter)
-            );
+            let mut dummyCharItemsCounter: DummyCharacterItemsCounter = world.read_model((level, dummyCharCounter.count));
 
             let mut i = 0;
             loop {
@@ -167,6 +168,8 @@ mod dummy_system {
         }
 
         fn update_prefine_dummy(ref self: ContractState, dummyCharId: usize, level: usize, name: felt252, wmClass: WMClass, items: Array<PredefinedItem>) {
+            let mut world = self.world(@"Warpacks");
+
             let player = get_caller_address();
             assert(ViewImpl::is_world_owner(world, player), 'player not world owner');
     
@@ -193,9 +196,9 @@ mod dummy_system {
                 }
             }
             
-            let mut dummyChar = get!(world, (level, dummyCharId), (DummyCharacter));
+            let mut dummyChar: DummyCharacter = world.read_model((level, dummyCharId));
             if dummyChar.name != name {
-                let nameRecord = get!(world, name, NameRecord);
+                let nameRecord: NameRecord = world.read_model(name);
                 assert(
                     nameRecord.player == starknet::contract_address_const::<0>(),
                     'name already exists'
@@ -207,10 +210,8 @@ mod dummy_system {
             dummyChar.wmClass = wmClass;
             dummyChar.health = health;
             set!(world, (dummyChar));
-    
-            let mut dummyCharItemsCounter = get!(
-                world, (level, dummyCharId), (DummyCharacterItemsCounter)
-            );
+            
+            let mut dummyCharItemsCounter: DummyCharacterItemsCounter = world.read_model((level, dummyCharId));
             assert(dummyCharItemsCounter.count <= items.len(), 'invalid items length');
     
             let mut i = 0;

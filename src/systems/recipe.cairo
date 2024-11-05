@@ -26,16 +26,18 @@ mod recipe_system {
         fn add_recipe(
             ref self: ContractState, item1_id: u32, item2_id: u32, result_item_id: u32
         ) {
+            let mut world = self.world(@"Warpacks");
+
             let player = get_caller_address();
             assert(ViewImpl::is_world_owner(world, player), 'player not world owner');
 
-            let item1 = get!(world, item1_id, Item);
+            let item1: Item = world.read_model(item1_id);
             assert(item1.height != 0, 'item1 does not exist');
-            let item2 = get!(world, item2_id, Item);
+            let item2: Item = world.read_model(item2_id);
             assert(item2.height != 0, 'item2 does not exist');
 
             // make constructor
-            let result_item = get!(world, result_item_id, Item);
+            let result_item: Item = world.read_model(result_item_id);
             assert(result_item.height != 0, 'result item does not exist');
 
             set!(world, Recipe {
@@ -58,15 +60,17 @@ mod recipe_system {
         fn craft_item(
             ref self: ContractState, storage_item_id1: u32, storage_item_id2: u32
         ) {
+            let mut world = self.world(@"Warpacks");
+
             let player = get_caller_address();
 
-            let mut storageItem1 = get!(world, (player, storage_item_id1), (CharacterItemStorage));
+            let mut storageItem1: CharacterItemStorage = world.read_model((player, storage_item_id1));
             assert(storageItem1.itemId != 0, 'item not owned');
 
-            let mut storageItem2 = get!(world, (player, storage_item_id2), (CharacterItemStorage));
+            let mut storageItem2: CharacterItemStorage = world.read_model((player, storage_item_id2));
             assert(storageItem2.itemId != 0, 'item not owned');
 
-            let recipe = get!(world, (storageItem1.itemId, storageItem2.itemId), (Recipe));
+            let recipe: Recipe = world.read_model((storageItem1.itemId, storageItem2.itemId));
             assert(recipe.result_item_id != 0, 'No valid recipe found');
 
             storageItem1.itemId = recipe.result_item_id;

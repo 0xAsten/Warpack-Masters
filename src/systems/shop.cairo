@@ -49,11 +49,13 @@ mod shop_system {
     #[abi(embed_v0)]
     impl ShopImpl of IShop<ContractState> {
         fn buy_item(ref self: ContractState, item_id: u32) {
+            let mut world = self.world(@"Warpacks");
+
             let player = get_caller_address();
 
             assert(item_id != 0, 'invalid item_id');
 
-            let mut shop_data = get!(world, player, (Shop));
+            let mut shop_data: Shop = world.read_model(player);
             assert(
                 shop_data.item1 == item_id
                     || shop_data.item2 == item_id
@@ -62,8 +64,8 @@ mod shop_system {
                 'item not on sale'
             );
 
-            let item = get!(world, item_id, (Item));
-            let mut player_char = get!(world, player, (Characters));
+            let item: Item = world.read_model(item_id);
+            let mut player_char: Characters = world.read_model(player);
 
             assert(player_char.gold >= item.price, 'Not enough gold');
             player_char.gold -= item.price;
@@ -79,7 +81,7 @@ mod shop_system {
                 shop_data.item4 = 0
             }
 
-            let mut storageCounter = get!(world, player, (CharacterItemsStorageCounter));
+            let mut storageCounter: CharacterItemsStorageCounter = world.read_model(player);
             let mut count = storageCounter.count;
             let mut isUpdated = false;
             loop {
@@ -87,7 +89,7 @@ mod shop_system {
                     break;
                 }
 
-                let mut storageItem = get!(world, (player, count), (CharacterItemStorage));
+                let mut storageItem: CharacterItemStorage = world.read_model((player, count));
                 if storageItem.itemId == 0 {
                     storageItem.itemId = item_id;
                     isUpdated = true;
@@ -125,14 +127,16 @@ mod shop_system {
 
 
         fn sell_item(ref self: ContractState, storage_item_id: u32) {
+            let mut world = self.world(@"Warpacks");
+
             let player = get_caller_address();
 
-            let mut storageItem = get!(world, (player, storage_item_id), (CharacterItemStorage));
+            let mut storageItem: CharacterItemStorage = world.read_model((player, storage_item_id));
             let itemId = storageItem.itemId;
             assert(itemId != 0, 'invalid item_id');
 
-            let mut item = get!(world, itemId, (Item));
-            let mut playerChar = get!(world, player, (Characters));
+            let mut item: Item = world.read_model(itemId);
+            let mut playerChar = world.read_model(player);
 
             let itemPrice = item.price;
             let sellPrice = itemPrice / 2;
@@ -156,9 +160,11 @@ mod shop_system {
         }
 
         fn reroll_shop(ref self: ContractState) {
+            let mut world = self.world(@"Warpacks");
+
             let player = get_caller_address();
 
-            let mut char = get!(world, player, (Characters));
+            let mut char: Characters = world.read_model(player);
             assert(char.gold >= 1, 'Not enough gold');
 
             // TODO: Will move these arrays after Dojo supports storing array
@@ -166,7 +172,7 @@ mod shop_system {
             let mut rare: Array<usize> = ArrayTrait::new();
             let mut legendary: Array<usize> = ArrayTrait::new();
 
-            let itemsCounter = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
+            let itemsCounter: ItemsCounter = world.read_model(ITEMS_COUNTER_ID);
             let mut count = itemsCounter.count;
 
             loop {
@@ -174,7 +180,7 @@ mod shop_system {
                     break;
                 }
 
-                let item = get!(world, count, (Item));
+                let item: Item = world.read_model(count);
 
                 // skip some without images
                 // if item.id == 14 || item.id == 18 || item.id == 19 || item.id == 22 {
@@ -201,7 +207,7 @@ mod shop_system {
 
             assert(common.len() > 0, 'No common items found');
 
-            let mut shop = get!(world, player, (Shop));
+            let mut shop: Shop = world.read_model(player);
 
             let (seed1, seed2, seed3, seed4) = pseudo_seed();
 

@@ -50,11 +50,13 @@ mod actions {
             name: felt252,
             wmClass: WMClass,
         ) {
+            let mut world = self.world(@"Warpacks");
+
             let player = get_caller_address();
 
             assert(name != '', 'name cannot be empty');
 
-            let nameRecord = get!(world, name, NameRecord);
+            let nameRecord: NameRecord = world.read_model(name);
             assert(
                 nameRecord.player == starknet::contract_address_const::<0>()
                     || nameRecord.player == player,
@@ -63,14 +65,14 @@ mod actions {
 
             set!(world, (NameRecord { name, player }));
 
-            let player_exists = get!(world, player, (Characters));
+            let player_exists: Character = world.read_model(player);
             assert(player_exists.name == '', 'player already exists');
 
             // Default the player has 2 Backpacks
             // Must add two backpack items when setup the game
-            let item = get!(world, Backpack::id, (Item));
+            let item: Item = world.read_model(Backpack::id);
             assert(item.itemType == 4, 'Invalid item type');
-            let item = get!(world, Pack::id, (Item));
+            let item: Item = world.read_model(Pack::id);
             assert(item.itemType == 4, 'Invalid item type');
 
             set!(
@@ -123,9 +125,11 @@ mod actions {
             name: felt252,
             wmClass: WMClass,
         ) {
+            let mut world = self.world(@"Warpacks");
+
             let player = get_caller_address();
 
-            let mut char = get!(world, player, (Characters));
+            let mut char: Character = world.read_model(player);
 
             assert(char.loss >= 5, 'loss not reached');
 
@@ -139,7 +143,7 @@ mod actions {
             // required to calling spawn doesn't fail
             char.name = '';
 
-            let mut inventoryItemsCounter = get!(world, player, (CharacterItemsInventoryCounter));
+            let mut inventoryItemsCounter: CharacterItemsInventoryCounter = world.read_model(player);
             let mut count = inventoryItemsCounter.count;
 
             loop {
@@ -147,7 +151,7 @@ mod actions {
                     break;
                 }
 
-                let mut inventoryItem = get!(world, (player, count), (CharacterItemInventory));
+                let mut inventoryItem: CharacterItemInventory = world.read_model((player, count));
 
                 inventoryItem.itemId = 0;
                 inventoryItem.position.x = 0;
@@ -160,7 +164,7 @@ mod actions {
                 count -= 1;
             };
 
-            let mut storageItemsCounter = get!(world, player, (CharacterItemsStorageCounter));
+            let mut storageItemsCounter: CharacterItemsStorageCounter = world.read_model(player);
             let mut count = storageItemsCounter.count;
 
             loop {
@@ -168,7 +172,7 @@ mod actions {
                     break;
                 }
 
-                let mut storageItem = get!(world, (player, count), (CharacterItemStorage));
+                let mut storageItem: CharacterItemStorage = world.read_model((player, count));
 
                 storageItem.itemId = 0;
 
@@ -189,7 +193,7 @@ mod actions {
                         break;
                     }
 
-                    let player_backpack_grid_data = get!(world, (player, i, j), (BackpackGrids));
+                    let player_backpack_grid_data: BackpackGrids = world.read_model((player, i, j));
 
                     if player_backpack_grid_data.occupied || player_backpack_grid_data.enabled {
                         set!(
@@ -206,7 +210,7 @@ mod actions {
             };
 
             // clear shop
-            let mut shop = get!(world, player, (Shop));
+            let mut shop: Shop = world.read_model(player);
             shop.item1 = 0;
             shop.item2 = 0;
             shop.item3 = 0;
@@ -222,11 +226,13 @@ mod actions {
         fn place_item(
             ref self: ContractState, storage_item_id: u32, x: usize, y: usize, rotation: usize
         ) {
+            let mut world = self.world(@"Warpacks");
+
             let player = get_caller_address();
 
             // check if the player has fought the matching battle
-            let mut battleLogCounter = get!(world, player, (BattleLogCounter));
-            let latestBattleLog = get!(world, (player, battleLogCounter.count), BattleLog);
+            let mut battleLogCounter: BattleLogCounter = world.read_model(player);
+            let mut latestBattleLog: BattleLog = world.read_model((player, battleLogCounter.count));
             assert(battleLogCounter.count == 0 || latestBattleLog.winner != 0, 'battle not fought');
 
             assert(x < GRID_X, 'x out of range');
@@ -236,12 +242,12 @@ mod actions {
                 'invalid rotation'
             );
 
-            let mut storageItem = get!(world, (player, storage_item_id), (CharacterItemStorage));
+            let mut storageItem: CharacterItemStorage = world.read_model((player, storage_item_id));
 
             assert(storageItem.itemId != 0, 'item not owned');
 
             let itemId = storageItem.itemId;
-            let item = get!(world, itemId, (Item));
+            let item: Item = world.read_model(itemId);
 
             assert(item.width > 0 && item.height > 0, 'invalid item dimensions');
 
@@ -254,7 +260,7 @@ mod actions {
             };
 
             // put into inventory
-            let mut inventoryCounter = get!(world, player, (CharacterItemsInventoryCounter));
+            let mut inventoryCounter: CharacterItemsInventoryCounter = world.read_model(player);
             let mut count = inventoryCounter.count;
 
             let mut inventoryItem = CharacterItemInventory {
@@ -271,7 +277,7 @@ mod actions {
                     break;
                 }
 
-                let currentInventoryItem = get!(world, (player, count), (CharacterItemInventory));
+                let currentInventoryItem: CharacterItemInventory = world.read_model((player, count));
                 if currentInventoryItem.itemId == 0 {
                     inventoryItem.id = count;
                     break;
@@ -317,7 +323,7 @@ mod actions {
                         break;
                     }
 
-                    let playerBackpackGrids = get!(world, (player, i, j), (BackpackGrids));
+                    let playerBackpackGrids: BackpackGrids = world.read_model((player, i, j));
                     if item.itemType == 4 {
                         assert(!playerBackpackGrids.enabled, 'Already enabled');
                         set!(
@@ -340,13 +346,13 @@ mod actions {
                         if isWeapon || item.isPlugin {
                             // left
                             if i > 0 && i == x {
-                                let grid = get!(world, (player, i - 1, j), (BackpackGrids));
+                                let grid: BackpackGrids = world.read_model((player, i - 1, j));
                                 if !isHandled.get(grid.inventoryItemId.into()) {
                                     if isWeapon && grid.isPlugin {
-                                        let plugin = get!(world, grid.itemId, (Item));
+                                        let plugin: Item = world.read_model(grid.itemId);
                                         inventoryItem.plugins.append((plugin.effectType, plugin.chance, plugin.effectStacks));
                                     } else if item.isPlugin && grid.isWeapon {
-                                        let mut weapon = get!(world, (player, grid.inventoryItemId), (CharacterItemInventory));
+                                        let mut weapon: CharacterItemInventory = world.read_model((player, grid.inventoryItemId));
                                         weapon.plugins.append((item.effectType, item.chance, item.effectStacks));
                                         set!(world, (weapon));
                                     }
@@ -355,13 +361,13 @@ mod actions {
                             }
                             // top
                             if j < GRID_Y - 1 && j == yMax {
-                                let grid = get!(world, (player, i, j + 1), (BackpackGrids));
+                                let grid: BackpackGrids = world.read_model((player, i, j + 1));
                                 if !isHandled.get(grid.inventoryItemId.into()) {
                                     if isWeapon && grid.isPlugin {
-                                        let plugin = get!(world, grid.itemId, (Item));
+                                        let plugin: Item = world.read_model(grid.itemId);
                                         inventoryItem.plugins.append((plugin.effectType, plugin.chance, plugin.effectStacks));
                                     } else if item.isPlugin && grid.isWeapon {
-                                        let mut weapon = get!(world, (player, grid.inventoryItemId), (CharacterItemInventory));
+                                        let mut weapon: CharacterItemInventory = world.read_model((player, grid.inventoryItemId));
                                         weapon.plugins.append((item.effectType, item.chance, item.effectStacks));
                                         set!(world, (weapon));
                                     }
@@ -370,13 +376,13 @@ mod actions {
                             }
                             // right
                             if i < GRID_X - 1 && i == xMax {
-                                let grid = get!(world, (player, i + 1, j), (BackpackGrids));
+                                let grid: BackpackGrids = world.read_model((player, i + 1, j));
                                 if !isHandled.get(grid.inventoryItemId.into()) {
                                     if isWeapon && grid.isPlugin {
-                                        let plugin = get!(world, grid.itemId, (Item));
+                                        let plugin: Item = world.read_model(grid.itemId);
                                         inventoryItem.plugins.append((plugin.effectType, plugin.chance, plugin.effectStacks));
                                     } else if item.isPlugin && grid.isWeapon {
-                                        let mut weapon = get!(world, (player, grid.inventoryItemId), (CharacterItemInventory));
+                                        let mut weapon: CharacterItemInventory = world.read_model((player, grid.inventoryItemId));
                                         weapon.plugins.append((item.effectType, item.chance, item.effectStacks));
                                         set!(world, (weapon));
                                     }
@@ -385,13 +391,13 @@ mod actions {
                             }
                             // bottom
                             if j > 0 && j == y {
-                                let grid = get!(world, (player, i, j - 1), (BackpackGrids));
+                                let grid: BackpackGrids = world.read_model((player, i, j - 1));
                                 if !isHandled.get(grid.inventoryItemId.into()) {
                                     if isWeapon && grid.isPlugin {
-                                        let plugin = get!(world, grid.itemId, (Item));
+                                        let plugin: Item = world.read_model(grid.itemId);
                                         inventoryItem.plugins.append((plugin.effectType, plugin.chance, plugin.effectStacks));
                                     } else if item.isPlugin && grid.isWeapon {
-                                        let mut weapon = get!(world, (player, grid.inventoryItemId), (CharacterItemInventory));
+                                        let mut weapon: CharacterItemInventory = world.read_model((player, grid.inventoryItemId));
                                         weapon.plugins.append((item.effectType, item.chance, item.effectStacks));
                                         set!(world, (weapon));
                                     }
@@ -419,19 +425,19 @@ mod actions {
         }
 
         fn undo_place_item(ref self: ContractState, inventory_item_id: u32) {
+            let mut world = self.world(@"Warpacks");
+
             let player = get_caller_address();
 
             // check if the player has fought the matching battle
-            let mut battleLogCounter = get!(world, player, (BattleLogCounter));
-            let latestBattleLog = get!(world, (player, battleLogCounter.count), BattleLog);
+            let mut battleLogCounter: BattleLogCounter = world.read_model(player);
+            let latestBattleLog: BattleLog = world.read_model((player, battleLogCounter.count));
             assert(battleLogCounter.count == 0 || latestBattleLog.winner != 0, 'battle not fought');
 
-            let mut inventoryItem = get!(
-                world, (player, inventory_item_id), (CharacterItemInventory)
-            );
+            let mut inventoryItem: CharacterItemInventory = world.read_model((player, inventory_item_id));
             let itemId = inventoryItem.itemId;
             assert(itemId != 0, 'invalid inventory item id');
-            let item = get!(world, itemId, (Item));
+            let item: Item = world.read_model(itemId);
 
             let x = inventoryItem.position.x;
             let y = inventoryItem.position.y;
@@ -474,7 +480,7 @@ mod actions {
                         break;
                     }
 
-                    let mut playerBackpackGrids = get!(world, (player, i, j), (BackpackGrids));
+                    let mut playerBackpackGrids: BackpackGrids = world.read_model((player, i, j));
                     if item.itemType == 4 {
                         assert(!playerBackpackGrids.occupied, 'Already occupied');
                         playerBackpackGrids.enabled = false;
@@ -504,9 +510,9 @@ mod actions {
                         if item.isPlugin {
                             // left
                             if i > 0 && i == x {
-                                let grid = get!(world, (player, i - 1, j), (BackpackGrids));
+                                let grid: BackpackGrids = world.read_model((player, i - 1, j));
                                 if !isHandled.get(grid.inventoryItemId.into()) && grid.isWeapon {
-                                    let mut weapon = get!(world, (player, grid.inventoryItemId), (CharacterItemInventory));
+                                    let mut weapon: CharacterItemInventory = world.read_model((player, grid.inventoryItemId));
                                     let mut k = 0;
                                     let plugins = weapon.plugins;
                                     let mut newPlugins = array![];
@@ -528,9 +534,9 @@ mod actions {
                             }
                             // top
                             if j < GRID_Y - 1 && j == yMax {
-                                let grid = get!(world, (player, i, j + 1), (BackpackGrids));
+                                let grid: BackpackGrids = world.read_model((player, i, j + 1));
                                 if !isHandled.get(grid.inventoryItemId.into()) && grid.isWeapon {
-                                    let mut weapon = get!(world, (player, grid.inventoryItemId), (CharacterItemInventory));
+                                    let mut weapon: CharacterItemInventory = world.read_model((player, grid.inventoryItemId));
                                     let mut k = 0;
                                     let plugins = weapon.plugins;
                                     let mut newPlugins = array![];
@@ -552,9 +558,9 @@ mod actions {
                             }
                             // right
                             if i < GRID_X - 1 && i == xMax {
-                                let grid = get!(world, (player, i + 1, j), (BackpackGrids));
+                                let grid: BackpackGrids = world.read_model((player, i + 1, j));
                                 if !isHandled.get(grid.inventoryItemId.into()) && grid.isWeapon {
-                                    let mut weapon = get!(world, (player, grid.inventoryItemId), (CharacterItemInventory));
+                                    let mut weapon: CharacterItemInventory = world.read_model((player, grid.inventoryItemId));
                                     let mut k = 0;
                                     let plugins = weapon.plugins;
                                     let mut newPlugins = array![];
@@ -576,9 +582,9 @@ mod actions {
                             }
                             // bottom
                             if j > 0 && j == y {
-                                let grid = get!(world, (player, i, j - 1), (BackpackGrids));
+                                let grid: BackpackGrids = world.read_model((player, i, j - 1));
                                 if !isHandled.get(grid.inventoryItemId.into()) && grid.isWeapon {
-                                    let mut weapon = get!(world, (player, grid.inventoryItemId), (CharacterItemInventory));
+                                    let mut weapon: CharacterItemInventory = world.read_model((player, grid.inventoryItemId));
                                     let mut k = 0;
                                     let plugins = weapon.plugins;
                                     let mut newPlugins = array![];
@@ -607,15 +613,14 @@ mod actions {
                 i += 1;
             };
         
-
-            let mut storageCounter = get!(world, player, (CharacterItemsStorageCounter));
+            let mut storageCounter: CharacterItemsStorageCounter = world.read_model(player);
             let mut count = storageCounter.count;
             loop {
                 if count == 0 {
                     break;
                 }
 
-                let mut storageItem = get!(world, (player, count), (CharacterItemStorage));
+                let mut storageItem: CharacterItemStorage = world.read_model((player, count));
                 if storageItem.itemId == 0 {
                     storageItem.itemId = itemId;
                     set!(world, (storageItem));

@@ -27,29 +27,31 @@ mod fight_system {
     #[abi(embed_v0)]
     impl FightImpl of IFight<ContractState> {
         fn match_dummy(ref self: ContractState) {
+            let mut world = self.world(@"Warpacks");
+
             let player = get_caller_address();
 
-            let mut char = get!(world, player, (Characters));
+            let mut char: Character = world.read_model(player);
 
             assert(char.dummied == true, 'dummy not created');
             assert(char.loss < 5, 'max loss reached');
 
             let (seed1, _, _, _) = pseudo_seed();
-            let dummyCharCounter = get!(world, char.wins, (DummyCharacterCounter));
+            let dummyCharCounter: DummyCharacterCounter = world.read_model(char.wins);
             assert(dummyCharCounter.count > 1, 'only self dummy created');
 
-            let mut battleLogCounter = get!(world, player, (BattleLogCounter));
-            let latestBattleLog = get!(world, (player, battleLogCounter.count), BattleLog);
+            let mut battleLogCounter: BattleLogCounter = world.read_model(player);
+            let latestBattleLog: BattleLog = world.read_model((player, battleLogCounter.count));
             assert(battleLogCounter.count == 0 || latestBattleLog.winner != 0, 'battle not fought');
 
             let random_index = random(seed1, dummyCharCounter.count) + 1;
             let mut dummy_index = random_index;
-            let mut dummyChar = get!(world, (char.wins, dummy_index), DummyCharacter);
+            let mut dummyChar: DummyCharacter = world.read_model((char.wins, dummy_index));
 
             while dummyChar.player == player {
                 dummy_index = dummy_index % dummyCharCounter.count + 1;
                 assert(dummy_index != random_index, 'no others dummy found');
-                dummyChar = get!(world, (char.wins, dummy_index), DummyCharacter);
+                dummyChar: DummyCharacter = world.read_model((char.wins, dummy_index));
             };
 
             let mut items_cooldown4 = ArrayTrait::new();
@@ -83,7 +85,7 @@ mod fight_system {
             let mut player_on_attack_items = ArrayTrait::new();
             let mut dummy_on_attack_items = ArrayTrait::new();
 
-            let inventoryItemsCounter = get!(world, player, (CharacterItemsInventoryCounter));
+            let inventoryItemsCounter: CharacterItemsInventoryCounter = world.read_model(player);
             let mut inventoryItemCount = inventoryItemsCounter.count;
 
             let mut items_length: usize = 0;
@@ -91,9 +93,9 @@ mod fight_system {
                 if inventoryItemCount == 0 {
                     break;
                 }
-                let charItem = get!(world, (player, inventoryItemCount), (CharacterItemInventory));
+                let charItem: CharacterItemInventory = world.read_model((player, inventoryItemCount));
 
-                let item = get!(world, charItem.itemId, (Item));
+                let item: Item = world.read_model(charItem.itemId);
                 if item.itemType == 4 {
                     inventoryItemCount -= 1;
                     continue;
@@ -154,20 +156,17 @@ mod fight_system {
                 inventoryItemCount -= 1;
             };
 
-            let dummyCharItemsCounter = get!(
-                world, (char.wins, dummy_index), DummyCharacterItemsCounter
-            );
+            let dummyCharItemsCounter: DummyCharacterItemsCounter = world.read_model((char.wins, dummy_index));
+
             let mut dummy_item_count = dummyCharItemsCounter.count;
             loop {
                 if dummy_item_count == 0 {
                     break;
                 }
 
-                let dummy_item = get!(
-                    world, (char.wins, dummy_index, dummy_item_count), DummyCharacterItem
-                );
+                let dummy_item: DummyCharacterItem = world.read_model((char.wins, dummy_index, dummy_item_count));
 
-                let item = get!(world, dummy_item.itemId, (Item));
+                let item: Item = world.read_model(dummy_item.itemId);
                 if item.itemType == 4 {
                     dummy_item_count -= 1;
                     continue;
@@ -258,19 +257,22 @@ mod fight_system {
         }
 
         fn fight(ref self: ContractState) {
+            let mut world = self.world(@"Warpacks");
+
             let player = get_caller_address();
 
-            let mut char = get!(world, player, (Characters));
+            let mut char: Character = world.read_model(player);
 
-            let battleLogCounter = get!(world, player, (BattleLogCounter));
-            let mut battleLog = get!(world, (player, battleLogCounter.count), BattleLog);
+            let battleLogCounter: BattleLogCounter = world.read_model(player);
+            
+            let mut battleLog: BattleLog = world.read_model((player, battleLogCounter.count));
 
             let battleLogCounterCount = battleLogCounter.count;
 
             assert(battleLogCounterCount != 0 && battleLog.winner == 0, 'no new match found');
 
             let dummy_index = battleLog.dummyCharId;
-            let mut dummyChar = get!(world, (char.wins, dummy_index), DummyCharacter);
+            let mut dummyChar: DummyCharacter = world.read_model((char.wins, dummy_index));
 
             let player_health_flag: usize = char.health;
             let player_buffs = battleLog.player_buffs;

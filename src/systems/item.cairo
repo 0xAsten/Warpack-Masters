@@ -55,6 +55,8 @@ mod item_system {
             // TODO: The possible value of effectType is 1, 2, 3, 4, 5, 6, 7, 8, 9
             // TODO: The possible value of itemType is 1, 2, 3, 4
 
+            let mut world = self.world(@"Warpacks");
+
             let player = get_caller_address();
 
             assert(ViewImpl::is_world_owner(world, player), 'player not world owner');
@@ -74,7 +76,7 @@ mod item_system {
                 'cooldown not valid'
             );
 
-            let counter = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
+            let counter: ItemsCounter = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
             if id > counter.count {
                 set!(world, ItemsCounter { id: ITEMS_COUNTER_ID, count: id });
             }
