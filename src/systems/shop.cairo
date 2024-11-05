@@ -93,7 +93,7 @@ mod shop_system {
                 if storageItem.itemId == 0 {
                     storageItem.itemId = item_id;
                     isUpdated = true;
-                    set!(world, (storageItem));
+                    world.set_model(@storageItem);
                     break;
                 }
 
@@ -102,13 +102,8 @@ mod shop_system {
 
             if isUpdated == false {
                 storageCounter.count += 1;
-                set!(
-                    world,
-                    (
-                        CharacterItemStorage { player, id: storageCounter.count, itemId: item_id, },
-                        CharacterItemsStorageCounter { player, count: storageCounter.count },
-                    )
-                );
+                world.set_model(@CharacterItemStorage { player, id: storageCounter.count, itemId: item_id, });
+                world.set_model(@CharacterItemsStorageCounter { player, count: storageCounter.count });
             }
 
             emit!(
@@ -122,7 +117,8 @@ mod shop_system {
                 })
             );
 
-            set!(world, (player_char, shop_data));
+            world.set_model(@player_char);
+            world.set_model(@shop_data);
         }
 
 
@@ -156,7 +152,8 @@ mod shop_system {
                 })
             );
 
-            set!(world, (storageItem, playerChar));
+            world.set_model(@storageItem);
+            world.set_model(@playerChar);
         }
 
         fn reroll_shop(ref self: ContractState) {
@@ -246,7 +243,8 @@ mod shop_system {
 
             char.gold -= 1;
 
-            set!(world, (shop, char));
+            world.set_model(@shop);
+            world.set_model(@char);
         }
     }
 }

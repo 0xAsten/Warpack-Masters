@@ -79,12 +79,15 @@ mod dummy_system {
                     plugins: inventoryItem.plugins.span(),
                 };
 
-                set!(world, (dummyCharItemsCounter, dummyCharItem));
+                world.set_model(@dummyCharItemsCounter);
+                world.set_model(@dummyCharItem);
 
                 count += 1;
             };
 
-            set!(world, (char, dummyCharCounter, dummyChar));
+            world.set_model(@char);
+            world.set_model(@dummyCharCounter);
+            world.set_model(@dummyChar);
         }
 
         fn prefine_dummy(ref self: ContractState, level: usize, name: felt252, wmClass: WMClass, items: Array<PredefinedItem>) {
@@ -159,12 +162,15 @@ mod dummy_system {
                     plugins: item.plugins,
                 };
 
-                set!(world, (dummyCharItem));
+                world.set_model(@dummyCharItem);
                 
                 i += 1;
             };
 
-            set!(world, (dummyCharCounter, dummyChar, dummyCharItemsCounter, NameRecord { name, player }));
+            world.set_model(@dummyCharCounter);
+            world.set_model(@dummyChar);
+            world.set_model(@dummyCharItemsCounter);
+            world.set_model(@NameRecord{ name, player });
         }
 
         fn update_prefine_dummy(ref self: ContractState, dummyCharId: usize, level: usize, name: felt252, wmClass: WMClass, items: Array<PredefinedItem>) {
@@ -209,7 +215,7 @@ mod dummy_system {
             
             dummyChar.wmClass = wmClass;
             dummyChar.health = health;
-            set!(world, (dummyChar));
+            world.set_model(@dummyChar);
             
             let mut dummyCharItemsCounter: DummyCharacterItemsCounter = world.read_model((level, dummyCharId));
             assert(dummyCharItemsCounter.count <= items.len(), 'invalid items length');
@@ -232,12 +238,12 @@ mod dummy_system {
                     rotation: item.rotation,
                     plugins: item.plugins,
                 };
-    
-                set!(world, (dummyCharItem));
+                
+                world.set_model(@dummyCharItem);
             };
 
             dummyCharItemsCounter.count = i;
-            set!(world, (dummyCharItemsCounter));
+            world.set_model(@dummyCharItemsCounter);
         }
     }
 }

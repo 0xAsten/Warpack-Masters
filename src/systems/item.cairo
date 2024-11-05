@@ -78,7 +78,7 @@ mod item_system {
 
             let counter: ItemsCounter = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
             if id > counter.count {
-                set!(world, ItemsCounter { id: ITEMS_COUNTER_ID, count: id });
+                world.set_model(@ItemsCounter{id: ITEMS_COUNTER_ID, count: id})
             }
 
             let item = Item {
@@ -98,7 +98,7 @@ mod item_system {
                 isPlugin,
             };
 
-            set!(world, (item));
+            world.set_model(@item);
         }
     }
 }

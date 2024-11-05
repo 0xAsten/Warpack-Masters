@@ -40,20 +40,18 @@ mod recipe_system {
             let result_item: Item = world.read_model(result_item_id);
             assert(result_item.height != 0, 'result item does not exist');
 
-            set!(world, Recipe {
-                    item1_id,
-                    item2_id,
-                    result_item_id,
-                }
-            );
+            world.set_model(@Recipe {
+                item1_id,
+                item2_id,
+                result_item_id,
+            });
 
             if item1_id != item2_id {
-                set!(world, Recipe {
-                        item1_id: item2_id,
-                        item2_id: item1_id,
-                        result_item_id,
-                    }
-                );
+                world.set_model(Recipe {
+                    item1_id: item2_id,
+                    item2_id: item1_id,
+                    result_item_id,
+                });
             }
         }
 
@@ -75,7 +73,8 @@ mod recipe_system {
 
             storageItem1.itemId = recipe.result_item_id;
             storageItem2.itemId = 0;
-            set!(world, (storageItem1, storageItem2));
+            world.set_model(@storageItem1);
+            world.set_model(@storageItem2);
         }
     }
 }

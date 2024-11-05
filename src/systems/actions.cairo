@@ -63,7 +63,7 @@ mod actions {
                 'name already exists'
             );
 
-            set!(world, (NameRecord { name, player }));
+            world.set_model(@NameRecord { name, player });
 
             let player_exists: Character = world.read_model(player);
             assert(player_exists.name == '', 'player already exists');
@@ -75,14 +75,9 @@ mod actions {
             let item: Item = world.read_model(Pack::id);
             assert(item.itemType == 4, 'Invalid item type');
 
-            set!(
-                world,
-                (
-                    CharacterItemStorage { player, id: 1, itemId: Backpack::id },
-                    CharacterItemStorage { player, id: 2, itemId: Pack::id },
-                    CharacterItemsStorageCounter { player, count: 2 },
-                )
-            );
+            world.set_model(@CharacterItemStorage { player, id: 1, itemId: Backpack::id });
+            world.set_model(@CharacterItemStorage { player, id: 2, itemId: Pack::id });
+            world.set_model(@CharacterItemsStorageCounter { player, count: 2 });
 
             self.place_item(1, 4, 2, 0);
             self.place_item(2, 2, 2, 0);
@@ -95,28 +90,23 @@ mod actions {
             let updatedAt = get_block_timestamp();
 
             // add one gold for reroll shop
-            set!(
-                world,
-                (
-                    Characters {
-                        player,
-                        name,
-                        wmClass,
-                        gold: INIT_GOLD + 1,
-                        health: INIT_HEALTH,
-                        wins: 0,
-                        loss: 0,
-                        dummied: false,
-                        rating: prev_rating,
-                        totalWins: prev_total_wins,
-                        totalLoss: prev_total_loss,
-                        winStreak: 0,
-                        birthCount: prev_birth_count + 1,
-                        stamina: INIT_STAMINA,
-                        updatedAt,
-                    }
-                )
-            );
+            world.set_model(@Characters { 
+                player,
+                name,
+                wmClass,
+                gold: INIT_GOLD + 1,
+                health: INIT_HEALTH,
+                wins: 0,
+                loss: 0,
+                dummied: false,
+                rating: prev_rating,
+                totalWins: prev_total_wins,
+                totalLoss: prev_total_loss,
+                winStreak: 0,
+                birthCount: prev_birth_count + 1,
+                stamina: INIT_STAMINA,
+                updatedAt, 
+            });
         }
 
 
@@ -158,8 +148,8 @@ mod actions {
                 inventoryItem.position.y = 0;
                 inventoryItem.rotation = 0;
                 inventoryItem.plugins = array![];
-
-                set!(world, (inventoryItem));
+                
+                world.set_model(@inventoryItem);
 
                 count -= 1;
             };
@@ -176,7 +166,7 @@ mod actions {
 
                 storageItem.itemId = 0;
 
-                set!(world, (storageItem));
+                world.set_model(@storageItem);
 
                 count -= 1;
             };
@@ -196,12 +186,9 @@ mod actions {
                     let player_backpack_grid_data: BackpackGrids = world.read_model((player, i, j));
 
                     if player_backpack_grid_data.occupied || player_backpack_grid_data.enabled {
-                        set!(
-                            world,
-                            (BackpackGrids {
-                                player: player, x: i, y: j, enabled: false, occupied: false, itemId: 0, inventoryItemId: 0, isWeapon: false, isPlugin: false
-                            })
-                        );
+                        world.set_model(@BackpackGrids {
+                            player: player, x: i, y: j, enabled: false, occupied: false, itemId: 0, inventoryItemId: 0, isWeapon: false, isPlugin: false
+                        });
                     }
                     j += 1;
                 };
@@ -218,7 +205,11 @@ mod actions {
 
             inventoryItemsCounter.count = 0;
             storageItemsCounter.count = 0;
-            set!(world, (char, shop, inventoryItemsCounter, storageItemsCounter));
+
+            world.set_model(@char);
+            world.set_model(@shop);
+            world.set_model(@inventoryItemsCounter);
+            world.set_model(@storageItemsCounter);
 
             self.spawn(name, wmClass);
         }
@@ -326,21 +317,15 @@ mod actions {
                     let playerBackpackGrids: BackpackGrids = world.read_model((player, i, j));
                     if item.itemType == 4 {
                         assert(!playerBackpackGrids.enabled, 'Already enabled');
-                        set!(
-                            world,
-                            (BackpackGrids {
-                                player: player, x: i, y: j, enabled: true, occupied: false, itemId: 0, inventoryItemId: 0, isWeapon: false, isPlugin: false
-                            })
-                        );
+                        world.set_model(@BackpackGrids {
+                            player: player, x: i, y: j, enabled: true, occupied: false, itemId: 0, inventoryItemId: 0, isWeapon: false, isPlugin: false
+                        });
                     } else {
                         assert(playerBackpackGrids.enabled, 'Grid not enabled');
                         assert(!playerBackpackGrids.occupied, 'Already occupied');
-                        set!(
-                            world,
-                            (BackpackGrids {
-                                player: player, x: i, y: j, enabled: true, occupied: true, itemId: itemId, inventoryItemId: inventoryItem.id, isWeapon: isWeapon, isPlugin: item.isPlugin
-                            })
-                        );
+                        world.set_model(@BackpackGrids {
+                            player: player, x: i, y: j, enabled: true, occupied: true, itemId: itemId, inventoryItemId: inventoryItem.id, isWeapon: isWeapon, isPlugin: item.isPlugin
+                        });
 
                         // to check around if it is a weapon or plugin
                         if isWeapon || item.isPlugin {
@@ -354,7 +339,7 @@ mod actions {
                                     } else if item.isPlugin && grid.isWeapon {
                                         let mut weapon: CharacterItemInventory = world.read_model((player, grid.inventoryItemId));
                                         weapon.plugins.append((item.effectType, item.chance, item.effectStacks));
-                                        set!(world, (weapon));
+                                        world.set_model(@weapon);
                                     }
                                     isHandled.insert(grid.inventoryItemId.into(), true);
                                 }
@@ -369,7 +354,7 @@ mod actions {
                                     } else if item.isPlugin && grid.isWeapon {
                                         let mut weapon: CharacterItemInventory = world.read_model((player, grid.inventoryItemId));
                                         weapon.plugins.append((item.effectType, item.chance, item.effectStacks));
-                                        set!(world, (weapon));
+                                        world.set_model(@weapon);
                                     }
                                     isHandled.insert(grid.inventoryItemId.into(), true);
                                 }
@@ -384,7 +369,7 @@ mod actions {
                                     } else if item.isPlugin && grid.isWeapon {
                                         let mut weapon: CharacterItemInventory = world.read_model((player, grid.inventoryItemId));
                                         weapon.plugins.append((item.effectType, item.chance, item.effectStacks));
-                                        set!(world, (weapon));
+                                        world.set_model(@weapon);
                                     }
                                     isHandled.insert(grid.inventoryItemId.into(), true);
                                 }
@@ -399,7 +384,7 @@ mod actions {
                                     } else if item.isPlugin && grid.isWeapon {
                                         let mut weapon: CharacterItemInventory = world.read_model((player, grid.inventoryItemId));
                                         weapon.plugins.append((item.effectType, item.chance, item.effectStacks));
-                                        set!(world, (weapon));
+                                        world.set_model(@weapon);
                                     }
                                     isHandled.insert(grid.inventoryItemId.into(), true);
                                 }   
@@ -414,14 +399,9 @@ mod actions {
             };
 
             storageItem.itemId = 0;
-            set!(
-                world,
-                (
-                    inventoryItem,
-                    inventoryCounter,
-                    storageItem,
-                )
-            );
+            world.set_model(@inventoryItem);
+            world.set_model(@inventoryCounter);
+            world.set_model(@storageItem);
         }
 
         fn undo_place_item(ref self: ContractState, inventory_item_id: u32) {
@@ -484,10 +464,7 @@ mod actions {
                     if item.itemType == 4 {
                         assert(!playerBackpackGrids.occupied, 'Already occupied');
                         playerBackpackGrids.enabled = false;
-                        set!(
-                            world,
-                            (playerBackpackGrids)
-                        );
+                        world.set_model(@playerBackpackGrids);
                     } else {
                         assert(playerBackpackGrids.enabled, 'Grid not enabled');
                         assert(playerBackpackGrids.occupied, 'Grid not occupied');
@@ -501,10 +478,7 @@ mod actions {
                         playerBackpackGrids.inventoryItemId = 0;
                         playerBackpackGrids.isWeapon = false;
                         playerBackpackGrids.isPlugin = false;
-                        set!(
-                            world,
-                            (playerBackpackGrids)
-                        );
+                        world.set_model(@playerBackpackGrids);
 
                         // to check around if it is a plugin
                         if item.isPlugin {
@@ -528,7 +502,7 @@ mod actions {
                                         k += 1;
                                     };
                                     weapon.plugins = newPlugins;
-                                    set!(world, (weapon));
+                                    world.set_model(@weapon);
                                     isHandled.insert(grid.inventoryItemId.into(), true);
                                 }
                             }
@@ -552,7 +526,7 @@ mod actions {
                                         k += 1;
                                     };
                                     weapon.plugins = newPlugins;
-                                    set!(world, (weapon));
+                                    world.set_model(@weapon);
                                     isHandled.insert(grid.inventoryItemId.into(), true);
                                 }
                             }
@@ -576,7 +550,7 @@ mod actions {
                                         k += 1;
                                     };
                                     weapon.plugins = newPlugins;
-                                    set!(world, (weapon));
+                                    world.set_model(@weapon);
                                     isHandled.insert(grid.inventoryItemId.into(), true);
                                 }
                             }
@@ -600,7 +574,7 @@ mod actions {
                                         k += 1;
                                     };
                                     weapon.plugins = newPlugins;
-                                    set!(world, (weapon));
+                                    world.set_model(@weapon);
                                     isHandled.insert(grid.inventoryItemId.into(), true);
                                 }
                             }
@@ -623,7 +597,7 @@ mod actions {
                 let mut storageItem: CharacterItemStorage = world.read_model((player, count));
                 if storageItem.itemId == 0 {
                     storageItem.itemId = itemId;
-                    set!(world, (storageItem));
+                    world.write_model(@storageItem)
                     break;
                 }
 
@@ -632,13 +606,8 @@ mod actions {
 
             if count == 0 {
                 storageCounter.count += 1;
-                set!(
-                    world,
-                    (
-                        CharacterItemStorage { player, id: storageCounter.count, itemId: itemId, },
-                        CharacterItemsStorageCounter { player, count: storageCounter.count },
-                    )
-                );
+                world.set_model(@CharacterItemStorage { player, id: storageCounter.count, itemId: itemId, });
+                world.set_model(@CharacterItemsStorageCounter { player, count: storageCounter.count });
             }
 
             inventoryItem.itemId = 0;
@@ -646,7 +615,7 @@ mod actions {
             inventoryItem.position.y = 0;
             inventoryItem.rotation = 0;
             inventoryItem.plugins = array![];
-            set!(world, (inventoryItem));
+            world.set_model(@inventoryItem);
         }
     }
 }

@@ -253,7 +253,8 @@ mod fight_system {
                 winner: 0,
                 seconds: 0,
             };
-            set!(world, (battleLogCounter, battleLog));
+            world.set_model(@battleLogCounter);
+            world..set_model(@battleLog);
         }
 
         fn fight(ref self: ContractState) {
@@ -610,7 +611,7 @@ mod fight_system {
 
             battleLog.winner = winner;
             battleLog.seconds = seconds;
-            set!(world, (battleLog));
+            world.set_model(@battleLog);
 
             if winner == PLAYER {
                 char.wins += 1;
@@ -646,7 +647,8 @@ mod fight_system {
                 }
             }
             char.updatedAt = get_block_timestamp();
-            set!(world, (char, dummyChar));
+            world.set_model(@char);
+            world.set_model(@dummyChar);
         }
     }
 
