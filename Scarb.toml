@@ -1,12 +1,12 @@
 [package]
-cairo-version = "=2.7.0"
+cairo-version = "=2.8.4"
 name = "warpack_masters"
-version = "0.2.0"
+version = "0.2.1"
 
 [cairo]
 sierra-replace-ids = true
 
 [dependencies]
-dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.0.0-alpha.9" }
+dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.0.0-rc.1" }
 
 [[target.dojo]]

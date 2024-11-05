@@ -1,10 +1,10 @@
 use starknet::ContractAddress;
 
-#[dojo::interface]
-trait IShop {
-    fn buy_item(ref world: IWorldDispatcher, item_id: u32);
-    fn sell_item(ref world: IWorldDispatcher, storage_item_id: u32);
-    fn reroll_shop(ref world: IWorldDispatcher,);
+#[starknet::interface]
+trait IShop<T> {
+    fn buy_item(ref self: T, item_id: u32);
+    fn sell_item(ref self: T, storage_item_id: u32);
+    fn reroll_shop(ref self: T,);
 }
 
 #[dojo::contract]
@@ -48,7 +48,7 @@ mod shop_system {
 
     #[abi(embed_v0)]
     impl ShopImpl of IShop<ContractState> {
-        fn buy_item(ref world: IWorldDispatcher, item_id: u32) {
+        fn buy_item(ref self: ContractState, item_id: u32) {
             let player = get_caller_address();
 
             assert(item_id != 0, 'invalid item_id');
@@ -124,7 +124,7 @@ mod shop_system {
         }
 
 
-        fn sell_item(ref world: IWorldDispatcher, storage_item_id: u32) {
+        fn sell_item(ref self: ContractState, storage_item_id: u32) {
             let player = get_caller_address();
 
             let mut storageItem = get!(world, (player, storage_item_id), (CharacterItemStorage));
@@ -155,7 +155,7 @@ mod shop_system {
             set!(world, (storageItem, playerChar));
         }
 
-        fn reroll_shop(ref world: IWorldDispatcher) {
+        fn reroll_shop(ref self: ContractState) {
             let player = get_caller_address();
 
             let mut char = get!(world, player, (Characters));

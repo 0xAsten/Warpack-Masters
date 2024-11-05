@@ -1,21 +1,21 @@
 use warpack_masters::models::Character::WMClass;
 
-#[dojo::interface]
-trait IActions {
+#[starknet::interface]
+trait IActions<T> {
     fn spawn(
-        ref world: IWorldDispatcher,
+        ref self: T,
         name: felt252,
         wmClass: WMClass,
     );
     fn rebirth(
-        ref world: IWorldDispatcher,
+        ref self: T,
         name: felt252,
         wmClass: WMClass,
     );
     fn place_item(
-        ref world: IWorldDispatcher, storage_item_id: u32, x: usize, y: usize, rotation: usize
+        ref self: T, storage_item_id: u32, x: usize, y: usize, rotation: usize
     );
-    fn undo_place_item(ref world: IWorldDispatcher, inventory_item_id: u32);
+    fn undo_place_item(ref self: T, inventory_item_id: u32);
 }
 
 // TODO: rename the count filed in counter model
@@ -46,7 +46,7 @@ mod actions {
     #[abi(embed_v0)]
     impl ActionsImpl of IActions<ContractState> {
         fn spawn(
-            ref world: IWorldDispatcher,
+            ref self: ContractState,
             name: felt252,
             wmClass: WMClass,
         ) {
@@ -119,7 +119,7 @@ mod actions {
 
 
         fn rebirth(
-            ref world: IWorldDispatcher,
+            ref self: ContractState,
             name: felt252,
             wmClass: WMClass,
         ) {
@@ -220,7 +220,7 @@ mod actions {
         }
         
         fn place_item(
-            ref world: IWorldDispatcher, storage_item_id: u32, x: usize, y: usize, rotation: usize
+            ref self: ContractState, storage_item_id: u32, x: usize, y: usize, rotation: usize
         ) {
             let player = get_caller_address();
 
@@ -418,7 +418,7 @@ mod actions {
             );
         }
 
-        fn undo_place_item(ref world: IWorldDispatcher, inventory_item_id: u32) {
+        fn undo_place_item(ref self: ContractState, inventory_item_id: u32) {
             let player = get_caller_address();
 
             // check if the player has fought the matching battle

@@ -2,11 +2,11 @@ use warpack_masters::prdefined_dummies::PredefinedItem;
 use warpack_masters::models::Character::WMClass;
 
 
-#[dojo::interface]
-trait IDummy {
-    fn create_dummy(ref world: IWorldDispatcher);
-    fn prefine_dummy(ref world: IWorldDispatcher, level: usize, name: felt252, wmClass: WMClass, items: Array<PredefinedItem>);
-    fn update_prefine_dummy(ref world: IWorldDispatcher, dummyCharId: usize, level: usize, name: felt252, wmClass: WMClass, items: Array<PredefinedItem>);
+#[starknet::interface]
+trait IDummy<T> {
+    fn create_dummy(ref self: T,);
+    fn prefine_dummy(ref self: T, level: usize, name: felt252, wmClass: WMClass, items: Array<PredefinedItem>);
+    fn update_prefine_dummy(ref self: T, dummyCharId: usize, level: usize, name: felt252, wmClass: WMClass, items: Array<PredefinedItem>);
 }
 
 #[dojo::contract]
@@ -30,7 +30,7 @@ mod dummy_system {
 
     #[abi(embed_v0)]
     impl DummyImpl of IDummy<ContractState> {
-        fn create_dummy(ref world: IWorldDispatcher) {
+        fn create_dummy(ref self: ContractState) {
             let player = get_caller_address();
 
             let mut char = get!(world, player, (Characters));
@@ -86,7 +86,7 @@ mod dummy_system {
             set!(world, (char, dummyCharCounter, dummyChar));
         }
 
-        fn prefine_dummy(ref world: IWorldDispatcher, level: usize, name: felt252, wmClass: WMClass, items: Array<PredefinedItem>) {
+        fn prefine_dummy(ref self: ContractState, level: usize, name: felt252, wmClass: WMClass, items: Array<PredefinedItem>) {
             let player = get_caller_address();
             assert(ViewImpl::is_world_owner(world, player), 'player not world owner');
 
@@ -166,7 +166,7 @@ mod dummy_system {
             set!(world, (dummyCharCounter, dummyChar, dummyCharItemsCounter, NameRecord { name, player }));
         }
 
-        fn update_prefine_dummy(ref world: IWorldDispatcher, dummyCharId: usize, level: usize, name: felt252, wmClass: WMClass, items: Array<PredefinedItem>) {
+        fn update_prefine_dummy(ref self: ContractState, dummyCharId: usize, level: usize, name: felt252, wmClass: WMClass, items: Array<PredefinedItem>) {
             let player = get_caller_address();
             assert(ViewImpl::is_world_owner(world, player), 'player not world owner');
     

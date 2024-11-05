@@ -1,7 +1,7 @@
-#[dojo::interface]
-trait IItem {
+#[starknet::interface]
+trait IItem<T> {
     fn add_item(
-        ref world: IWorldDispatcher,
+        ref self: T,
         id: u32,
         name: felt252,
         itemType: u8,
@@ -33,7 +33,7 @@ mod item_system {
     #[abi(embed_v0)]
     impl ItemImpl of IItem<ContractState> {
         fn add_item(
-            ref world: IWorldDispatcher,
+            ref self: ContractState,
             id: u32,
             name: felt252,
             itemType: u8,

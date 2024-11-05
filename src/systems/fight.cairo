@@ -1,7 +1,7 @@
-#[dojo::interface]
-trait IFight {
-    fn match_dummy(ref world: IWorldDispatcher);
-    fn fight(ref world: IWorldDispatcher);
+#[starknet::interface]
+trait IFight<T> {
+    fn match_dummy(ref self: T);
+    fn fight(ref self: T);
 }
 
 #[dojo::contract]
@@ -26,7 +26,7 @@ mod fight_system {
 
     #[abi(embed_v0)]
     impl FightImpl of IFight<ContractState> {
-        fn match_dummy(ref world: IWorldDispatcher) {
+        fn match_dummy(ref self: ContractState) {
             let player = get_caller_address();
 
             let mut char = get!(world, player, (Characters));
@@ -257,7 +257,7 @@ mod fight_system {
             set!(world, (battleLogCounter, battleLog));
         }
 
-        fn fight(ref world: IWorldDispatcher) {
+        fn fight(ref self: ContractState) {
             let player = get_caller_address();
 
             let mut char = get!(world, player, (Characters));

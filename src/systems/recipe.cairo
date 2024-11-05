@@ -1,10 +1,10 @@
-#[dojo::interface]
-trait IRecipe {
+#[starknet::interface]
+trait IRecipe<T> {
     fn add_recipe(
-        ref world: IWorldDispatcher, item1_id: u32, item2_id: u32, result_item_id: u32
+        ref self: T, item1_id: u32, item2_id: u32, result_item_id: u32
     );
     fn craft_item(
-        ref world: IWorldDispatcher, storage_item_id1: u32, storage_item_id2: u32
+        ref self: T, storage_item_id1: u32, storage_item_id2: u32
     );
 }
 
@@ -24,7 +24,7 @@ mod recipe_system {
     #[abi(embed_v0)]
     impl RecipeImpl of IRecipe<ContractState> {
         fn add_recipe(
-            ref world: IWorldDispatcher, item1_id: u32, item2_id: u32, result_item_id: u32
+            ref self: ContractState, item1_id: u32, item2_id: u32, result_item_id: u32
         ) {
             let player = get_caller_address();
             assert(ViewImpl::is_world_owner(world, player), 'player not world owner');
@@ -56,7 +56,7 @@ mod recipe_system {
         }
 
         fn craft_item(
-            ref world: IWorldDispatcher, storage_item_id1: u32, storage_item_id2: u32
+            ref self: ContractState, storage_item_id1: u32, storage_item_id2: u32
         ) {
             let player = get_caller_address();
 
