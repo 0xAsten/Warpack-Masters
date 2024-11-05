@@ -1,10 +1,10 @@
 use starknet::ContractAddress;
 
-#[dojo::interface]
-trait IShop {
-    fn buy_item(ref world: IWorldDispatcher, item_id: u32);
-    fn sell_item(ref world: IWorldDispatcher, storage_item_id: u32);
-    fn reroll_shop(ref world: IWorldDispatcher,);
+#[starknet::interface]
+trait IShop<T> {
+    fn buy_item(ref self: T, item_id: u32);
+    fn sell_item(ref self: T, storage_item_id: u32);
+    fn reroll_shop(ref self: T,);
 }
 
 #[dojo::contract]
@@ -21,10 +21,12 @@ mod shop_system {
     use warpack_masters::utils::random::{pseudo_seed, random};
     use warpack_masters::constants::constants::{ITEMS_COUNTER_ID};
 
+    use dojo::model::{ModelStorage, ModelValueStorage};
+    use dojo::event::EventStorage;
+
 
     #[derive(Copy, Drop, Serde)]
-    #[dojo::event]
-    #[dojo::model]
+    #[dojo::event(historical: true)]
     struct BuyItem {
         #[key]
         player: ContractAddress,
@@ -35,8 +37,7 @@ mod shop_system {
     }
 
     #[derive(Copy, Drop, Serde)]
-    #[dojo::event]
-    #[dojo::model]
+    #[dojo::event(historical: true)]
     struct SellItem {
         #[key]
         player: ContractAddress,
@@ -48,12 +49,14 @@ mod shop_system {
 
     #[abi(embed_v0)]
     impl ShopImpl of IShop<ContractState> {
-        fn buy_item(ref world: IWorldDispatcher, item_id: u32) {
+        fn buy_item(ref self: ContractState, item_id: u32) {
+            let mut world = self.world(@"Warpacks");
+
             let player = get_caller_address();
 
             assert(item_id != 0, 'invalid item_id');
 
-            let mut shop_data = get!(world, player, (Shop));
+            let mut shop_data: Shop = world.read_model(player);
             assert(
                 shop_data.item1 == item_id
                     || shop_data.item2 == item_id
@@ -62,8 +65,8 @@ mod shop_system {
                 'item not on sale'
             );
 
-            let item = get!(world, item_id, (Item));
-            let mut player_char = get!(world, player, (Characters));
+            let item: Item = world.read_model(item_id);
+            let mut player_char: Characters = world.read_model(player);
 
             assert(player_char.gold >= item.price, 'Not enough gold');
             player_char.gold -= item.price;
@@ -79,7 +82,7 @@ mod shop_system {
                 shop_data.item4 = 0
             }
 
-            let mut storageCounter = get!(world, player, (CharacterItemsStorageCounter));
+            let mut storageCounter: CharacterItemsStorageCounter = world.read_model(player);
             let mut count = storageCounter.count;
             let mut isUpdated = false;
             loop {
@@ -87,11 +90,11 @@ mod shop_system {
                     break;
                 }
 
-                let mut storageItem = get!(world, (player, count), (CharacterItemStorage));
+                let mut storageItem: CharacterItemStorage = world.read_model((player, count));
                 if storageItem.itemId == 0 {
                     storageItem.itemId = item_id;
                     isUpdated = true;
-                    set!(world, (storageItem));
+                    world.write_model(@storageItem);
                     break;
                 }
 
@@ -100,39 +103,34 @@ mod shop_system {
 
             if isUpdated == false {
                 storageCounter.count += 1;
-                set!(
-                    world,
-                    (
-                        CharacterItemStorage { player, id: storageCounter.count, itemId: item_id, },
-                        CharacterItemsStorageCounter { player, count: storageCounter.count },
-                    )
-                );
+                world.write_model(@CharacterItemStorage { player, id: storageCounter.count, itemId: item_id, });
+                world.write_model(@CharacterItemsStorageCounter { player, count: storageCounter.count });
             }
 
-            emit!(
-                world,
-                (BuyItem {
-                    player,
-                    itemId: item_id,
-                    cost: item.price,
-                    itemRarity: item.rarity,
-                    birthCount: player_char.birthCount
-                })
-            );
+            world.emit_event(@BuyItem {
+                player,
+                itemId: item_id,
+                cost: item.price,
+                itemRarity: item.rarity,
+                birthCount: player_char.birthCount
+            });
 
-            set!(world, (player_char, shop_data));
+            world.write_model(@player_char);
+            world.write_model(@shop_data);
         }
 
 
-        fn sell_item(ref world: IWorldDispatcher, storage_item_id: u32) {
+        fn sell_item(ref self: ContractState, storage_item_id: u32) {
+            let mut world = self.world(@"Warpacks");
+
             let player = get_caller_address();
 
-            let mut storageItem = get!(world, (player, storage_item_id), (CharacterItemStorage));
+            let mut storageItem: CharacterItemStorage = world.read_model((player, storage_item_id));
             let itemId = storageItem.itemId;
             assert(itemId != 0, 'invalid item_id');
 
-            let mut item = get!(world, itemId, (Item));
-            let mut playerChar = get!(world, player, (Characters));
+            let mut item: Item = world.read_model(itemId);
+            let mut playerChar: Characters = world.read_model(player);
 
             let itemPrice = item.price;
             let sellPrice = itemPrice / 2;
@@ -141,24 +139,24 @@ mod shop_system {
 
             playerChar.gold += sellPrice;
 
-            emit!(
-                world,
-                (SellItem {
-                    player,
-                    itemId: itemId,
-                    price: sellPrice,
-                    itemRarity: item.rarity,
-                    birthCount: playerChar.birthCount
-                })
-            );
+            world.emit_event(@SellItem {
+                player,
+                itemId: itemId,
+                price: sellPrice,
+                itemRarity: item.rarity,
+                birthCount: playerChar.birthCount
+            });
 
-            set!(world, (storageItem, playerChar));
+            world.write_model(@storageItem);
+            world.write_model(@playerChar);
         }
 
-        fn reroll_shop(ref world: IWorldDispatcher) {
+        fn reroll_shop(ref self: ContractState) {
+            let mut world = self.world(@"Warpacks");
+
             let player = get_caller_address();
 
-            let mut char = get!(world, player, (Characters));
+            let mut char: Characters = world.read_model(player);
             assert(char.gold >= 1, 'Not enough gold');
 
             // TODO: Will move these arrays after Dojo supports storing array
@@ -166,7 +164,7 @@ mod shop_system {
             let mut rare: Array<usize> = ArrayTrait::new();
             let mut legendary: Array<usize> = ArrayTrait::new();
 
-            let itemsCounter = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
+            let itemsCounter: ItemsCounter = world.read_model(ITEMS_COUNTER_ID);
             let mut count = itemsCounter.count;
 
             loop {
@@ -174,7 +172,7 @@ mod shop_system {
                     break;
                 }
 
-                let item = get!(world, count, (Item));
+                let item: Item = world.read_model(count);
 
                 // skip some without images
                 // if item.id == 14 || item.id == 18 || item.id == 19 || item.id == 22 {
@@ -201,7 +199,7 @@ mod shop_system {
 
             assert(common.len() > 0, 'No common items found');
 
-            let mut shop = get!(world, player, (Shop));
+            let mut shop: Shop = world.read_model(player);
 
             let (seed1, seed2, seed3, seed4) = pseudo_seed();
 
@@ -240,7 +238,8 @@ mod shop_system {
 
             char.gold -= 1;
 
-            set!(world, (shop, char));
+            world.write_model(@shop);
+            world.write_model(@char);
         }
     }
 }
