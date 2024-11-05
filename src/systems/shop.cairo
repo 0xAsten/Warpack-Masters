@@ -21,10 +21,12 @@ mod shop_system {
     use warpack_masters::utils::random::{pseudo_seed, random};
     use warpack_masters::constants::constants::{ITEMS_COUNTER_ID};
 
+    use dojo::model::{ModelStorage, ModelValueStorage};
+    use dojo::event::EventStorage;
+
 
     #[derive(Copy, Drop, Serde)]
-    #[dojo::event]
-    #[dojo::model]
+    #[dojo::event(historical: true)]
     struct BuyItem {
         #[key]
         player: ContractAddress,
@@ -35,8 +37,7 @@ mod shop_system {
     }
 
     #[derive(Copy, Drop, Serde)]
-    #[dojo::event]
-    #[dojo::model]
+    #[dojo::event(historical: true)]
     struct SellItem {
         #[key]
         player: ContractAddress,
@@ -93,7 +94,7 @@ mod shop_system {
                 if storageItem.itemId == 0 {
                     storageItem.itemId = item_id;
                     isUpdated = true;
-                    world.set_model(@storageItem);
+                    world.write_model(@storageItem);
                     break;
                 }
 
@@ -102,23 +103,20 @@ mod shop_system {
 
             if isUpdated == false {
                 storageCounter.count += 1;
-                world.set_model(@CharacterItemStorage { player, id: storageCounter.count, itemId: item_id, });
-                world.set_model(@CharacterItemsStorageCounter { player, count: storageCounter.count });
+                world.write_model(@CharacterItemStorage { player, id: storageCounter.count, itemId: item_id, });
+                world.write_model(@CharacterItemsStorageCounter { player, count: storageCounter.count });
             }
 
-            emit!(
-                world,
-                (BuyItem {
-                    player,
-                    itemId: item_id,
-                    cost: item.price,
-                    itemRarity: item.rarity,
-                    birthCount: player_char.birthCount
-                })
-            );
+            world.emit_event(@BuyItem {
+                player,
+                itemId: item_id,
+                cost: item.price,
+                itemRarity: item.rarity,
+                birthCount: player_char.birthCount
+            });
 
-            world.set_model(@player_char);
-            world.set_model(@shop_data);
+            world.write_model(@player_char);
+            world.write_model(@shop_data);
         }
 
 
@@ -132,7 +130,7 @@ mod shop_system {
             assert(itemId != 0, 'invalid item_id');
 
             let mut item: Item = world.read_model(itemId);
-            let mut playerChar = world.read_model(player);
+            let mut playerChar: Characters = world.read_model(player);
 
             let itemPrice = item.price;
             let sellPrice = itemPrice / 2;
@@ -141,19 +139,16 @@ mod shop_system {
 
             playerChar.gold += sellPrice;
 
-            emit!(
-                world,
-                (SellItem {
-                    player,
-                    itemId: itemId,
-                    price: sellPrice,
-                    itemRarity: item.rarity,
-                    birthCount: playerChar.birthCount
-                })
-            );
+            world.emit_event(@SellItem {
+                player,
+                itemId: itemId,
+                price: sellPrice,
+                itemRarity: item.rarity,
+                birthCount: playerChar.birthCount
+            });
 
-            world.set_model(@storageItem);
-            world.set_model(@playerChar);
+            world.write_model(@storageItem);
+            world.write_model(@playerChar);
         }
 
         fn reroll_shop(ref self: ContractState) {
@@ -243,8 +238,8 @@ mod shop_system {
 
             char.gold -= 1;
 
-            world.set_model(@shop);
-            world.set_model(@char);
+            world.write_model(@shop);
+            world.write_model(@char);
         }
     }
 }

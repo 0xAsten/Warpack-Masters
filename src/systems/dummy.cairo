@@ -24,9 +24,10 @@ mod dummy_system {
     };
     use warpack_masters::prdefined_dummies::PredefinedItem;
 
-    use warpack_masters::systems::view::view::ViewImpl;
-
     use warpack_masters::constants::constants::{INIT_HEALTH, INIT_STAMINA};
+
+    use dojo::model::{ModelStorage, ModelValueStorage};
+    use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait, Resource};
 
     #[abi(embed_v0)]
     impl DummyImpl of IDummy<ContractState> {
@@ -79,22 +80,22 @@ mod dummy_system {
                     plugins: inventoryItem.plugins.span(),
                 };
 
-                world.set_model(@dummyCharItemsCounter);
-                world.set_model(@dummyCharItem);
+                world.write_model(@dummyCharItemsCounter);
+                world.write_model(@dummyCharItem);
 
                 count += 1;
             };
 
-            world.set_model(@char);
-            world.set_model(@dummyCharCounter);
-            world.set_model(@dummyChar);
+            world.write_model(@char);
+            world.write_model(@dummyCharCounter);
+            world.write_model(@dummyChar);
         }
 
         fn prefine_dummy(ref self: ContractState, level: usize, name: felt252, wmClass: WMClass, items: Array<PredefinedItem>) {
             let mut world = self.world(@"Warpacks");
 
             let player = get_caller_address();
-            assert(ViewImpl::is_world_owner(world, player), 'player not world owner');
+            assert(world.dispatcher.is_owner(0, player), 'player not world owner');
 
             let mut health: usize = INIT_HEALTH;
 
@@ -162,22 +163,22 @@ mod dummy_system {
                     plugins: item.plugins,
                 };
 
-                world.set_model(@dummyCharItem);
+                world.write_model(@dummyCharItem);
                 
                 i += 1;
             };
 
-            world.set_model(@dummyCharCounter);
-            world.set_model(@dummyChar);
-            world.set_model(@dummyCharItemsCounter);
-            world.set_model(@NameRecord{ name, player });
+            world.write_model(@dummyCharCounter);
+            world.write_model(@dummyChar);
+            world.write_model(@dummyCharItemsCounter);
+            world.write_model(@NameRecord{ name, player });
         }
 
         fn update_prefine_dummy(ref self: ContractState, dummyCharId: usize, level: usize, name: felt252, wmClass: WMClass, items: Array<PredefinedItem>) {
             let mut world = self.world(@"Warpacks");
 
             let player = get_caller_address();
-            assert(ViewImpl::is_world_owner(world, player), 'player not world owner');
+            assert(world.dispatcher.is_owner(0, player), 'player not world owner');
     
             let mut health: usize = INIT_HEALTH;
         
@@ -215,7 +216,7 @@ mod dummy_system {
             
             dummyChar.wmClass = wmClass;
             dummyChar.health = health;
-            world.set_model(@dummyChar);
+            world.write_model(@dummyChar);
             
             let mut dummyCharItemsCounter: DummyCharacterItemsCounter = world.read_model((level, dummyCharId));
             assert(dummyCharItemsCounter.count <= items.len(), 'invalid items length');
@@ -239,11 +240,11 @@ mod dummy_system {
                     plugins: item.plugins,
                 };
                 
-                world.set_model(@dummyCharItem);
+                world.write_model(@dummyCharItem);
             };
 
             dummyCharItemsCounter.count = i;
-            world.set_model(@dummyCharItemsCounter);
+            world.write_model(@dummyCharItemsCounter);
         }
     }
 }

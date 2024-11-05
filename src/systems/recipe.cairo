@@ -19,7 +19,8 @@ mod recipe_system {
         Recipe::Recipe,
     };
 
-    use warpack_masters::systems::view::view::ViewImpl;
+    use dojo::model::{ModelStorage, ModelValueStorage};
+    use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait, Resource};
 
     #[abi(embed_v0)]
     impl RecipeImpl of IRecipe<ContractState> {
@@ -29,7 +30,7 @@ mod recipe_system {
             let mut world = self.world(@"Warpacks");
 
             let player = get_caller_address();
-            assert(ViewImpl::is_world_owner(world, player), 'player not world owner');
+            assert(world.dispatcher.is_owner(0, player), 'player not world owner');
 
             let item1: Item = world.read_model(item1_id);
             assert(item1.height != 0, 'item1 does not exist');
@@ -40,14 +41,14 @@ mod recipe_system {
             let result_item: Item = world.read_model(result_item_id);
             assert(result_item.height != 0, 'result item does not exist');
 
-            world.set_model(@Recipe {
+            world.write_model(@Recipe {
                 item1_id,
                 item2_id,
                 result_item_id,
             });
 
             if item1_id != item2_id {
-                world.set_model(Recipe {
+                world.write_model(@Recipe {
                     item1_id: item2_id,
                     item2_id: item1_id,
                     result_item_id,
@@ -73,8 +74,8 @@ mod recipe_system {
 
             storageItem1.itemId = recipe.result_item_id;
             storageItem2.itemId = 0;
-            world.set_model(@storageItem1);
-            world.set_model(@storageItem2);
+            world.write_model(@storageItem1);
+            world.write_model(@storageItem2);
         }
     }
 }

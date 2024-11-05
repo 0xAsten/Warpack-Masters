@@ -1,8 +1,7 @@
 use starknet::ContractAddress;
 
 #[derive(Copy, Drop, Serde)]
-#[dojo::model]
-#[dojo::event]
+#[dojo::event(historical: true)]
 struct BattleLogDetail {
     #[key]
     player: ContractAddress,

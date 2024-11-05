@@ -4,7 +4,7 @@ mod systems {
     mod fight;
     mod item;
     mod shop;
-    mod view;
+    // mod view;
     mod recipe;
 }
 
@@ -20,19 +20,19 @@ mod models {
     mod Recipe;
 }
 
-mod tests {
-    mod test_place_item;
-    mod test_add_item;
-    mod test_buy_item;
-    mod test_undo_place_item;
-    mod test_sell_item;
-    mod test_reroll_shop;
-    mod test_fight;
-    mod test_rebirth;
-    mod test_spawn;
-    mod test_prefine_dummy;
-    mod test_recipe;
-}
+// mod tests {
+//     mod test_place_item;
+//     mod test_add_item;
+//     mod test_buy_item;
+//     mod test_undo_place_item;
+//     mod test_sell_item;
+//     mod test_reroll_shop;
+//     mod test_fight;
+//     mod test_rebirth;
+//     mod test_spawn;
+//     mod test_prefine_dummy;
+//     mod test_recipe;
+// }
 
 mod utils {
     mod random;

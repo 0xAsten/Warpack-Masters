@@ -28,7 +28,8 @@ mod item_system {
 
     use warpack_masters::constants::constants::{GRID_X, GRID_Y, ITEMS_COUNTER_ID};
 
-    use warpack_masters::systems::view::view::ViewImpl;
+    use dojo::model::{ModelStorage, ModelValueStorage};
+    use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait, Resource};
 
     #[abi(embed_v0)]
     impl ItemImpl of IItem<ContractState> {
@@ -59,7 +60,7 @@ mod item_system {
 
             let player = get_caller_address();
 
-            assert(ViewImpl::is_world_owner(world, player), 'player not world owner');
+            assert(world.dispatcher.is_owner(0, player), 'player not world owner');
 
             assert(width > 0 && width <= GRID_X, 'width not in range');
             assert(height > 0 && height <= GRID_Y, 'height not in range');
@@ -76,9 +77,9 @@ mod item_system {
                 'cooldown not valid'
             );
 
-            let counter: ItemsCounter = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
+            let counter: ItemsCounter = world.read_model(ITEMS_COUNTER_ID);
             if id > counter.count {
-                world.set_model(@ItemsCounter{id: ITEMS_COUNTER_ID, count: id})
+                world.write_model(@ItemsCounter{id: ITEMS_COUNTER_ID, count: id})
             }
 
             let item = Item {
@@ -98,7 +99,7 @@ mod item_system {
                 isPlugin,
             };
 
-            world.set_model(@item);
+            world.write_model(@item);
         }
     }
 }
