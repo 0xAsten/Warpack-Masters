@@ -26,6 +26,7 @@ mod fight_system {
 
     use dojo::model::{ModelStorage, ModelValueStorage};
     use dojo::event::EventStorage;
+    use dojo::world::WorldStorage;
 
     #[abi(embed_v0)]
     impl FightImpl of IFight<ContractState> {
@@ -637,7 +638,7 @@ mod fight_system {
         }
     }
 
-    fn attack(ref world: ModelStorage, attackStatus: @AttackStatus, ref charStatus: CharStatus, ref opponentStatus: CharStatus, plugins: Span<(u8, usize, usize)>, char_on_attack_items_span: Span<(u8, usize, usize)>, opponent_on_hit_items_span: Span<(u8, usize, usize)>, ref battleLogsCount: u8) -> felt252 {
+    fn attack(ref world: WorldStorage, attackStatus: @AttackStatus, ref charStatus: CharStatus, ref opponentStatus: CharStatus, plugins: Span<(u8, usize, usize)>, char_on_attack_items_span: Span<(u8, usize, usize)>, opponent_on_hit_items_span: Span<(u8, usize, usize)>, ref battleLogsCount: u8) -> felt252 {
         let mut damageCaused = 0;
         match *attackStatus.effect_type {
             0 => {
