@@ -6,52 +6,55 @@ mod tests {
     use starknet::class_hash::Felt252TryIntoClassHash;
     use starknet::testing::set_contract_address;
 
-    use dojo::model::{Model, ModelTest, ModelIndex, ModelEntityTest};
-    // import world dispatcher
-    use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
+    use dojo::model::{ModelStorage, ModelValueStorage, ModelStorageTest};
+    use dojo::world::WorldStorageTrait;
+    use dojo_cairo_test::{spawn_test_world, NamespaceDef, TestResource, ContractDefTrait, ContractDef, WorldStorageTestTrait};
 
-    // import test utils
-    use dojo::utils::test::{spawn_test_world, deploy_contract};
-
-    // import test utils
     use warpack_masters::{
         systems::{dummy::{dummy_system, IDummyDispatcher, IDummyDispatcherTrait}},
         systems::{item::{item_system, IItemDispatcher, IItemDispatcherTrait}},
-        models::backpack::{BackpackGrids, backpack_grids},
-        models::Character::{NameRecord, name_record, WMClass}, models::CharacterItem::{Position},
+        models::backpack::{BackpackGrids, m_BackpackGrids},
+        models::Character::{NameRecord, m_NameRecord, WMClass},
+        models::CharacterItem::{Position},
         models::DummyCharacter::{
-            DummyCharacter, dummy_character, DummyCharacterCounter, dummy_character_counter
+            DummyCharacter, m_DummyCharacter, DummyCharacterCounter, m_DummyCharacterCounter
         },
         models::DummyCharacterItem::{
-            DummyCharacterItem, dummy_character_item, DummyCharacterItemsCounter,
-            dummy_character_items_counter
+            DummyCharacterItem, m_DummyCharacterItem, DummyCharacterItemsCounter,
+            m_DummyCharacterItemsCounter
         },
-        models::Item::{Item, item, ItemsCounter, items_counter}, utils::{test_utils::{add_items}}
+        models::Item::{Item, m_Item, ItemsCounter, m_ItemsCounter},
+        utils::{test_utils::{add_items}}
     };
 
     use warpack_masters::prdefined_dummies::{PredefinedItem, Dummy0, Dummy1};
 
-    fn get_systems(
-        world: IWorldDispatcher
-    ) -> (ContractAddress, IItemDispatcher, ContractAddress, IDummyDispatcher) {
-        let item_system_address = world
-            .deploy_contract('salt2', item_system::TEST_CLASS_HASH.try_into().unwrap());
-        let mut item_system = IItemDispatcher { contract_address: item_system_address };
+    fn namespace_def() -> NamespaceDef {
+        let ndef = NamespaceDef {
+            namespace: "Warpacks",
+            resources: [
+                TestResource::Model(m_BackpackGrids::TEST_CLASS_HASH.try_into().unwrap()),
+                TestResource::Model(m_Item::TEST_CLASS_HASH.try_into().unwrap()),
+                TestResource::Model(m_ItemsCounter::TEST_CLASS_HASH.try_into().unwrap()),
+                TestResource::Model(m_DummyCharacter::TEST_CLASS_HASH.try_into().unwrap()),
+                TestResource::Model(m_DummyCharacterCounter::TEST_CLASS_HASH.try_into().unwrap()),
+                TestResource::Model(m_DummyCharacterItem::TEST_CLASS_HASH.try_into().unwrap()),
+                TestResource::Model(m_DummyCharacterItemsCounter::TEST_CLASS_HASH.try_into().unwrap()),
+                TestResource::Model(m_NameRecord::TEST_CLASS_HASH.try_into().unwrap()),
+                TestResource::Contract(item_system::TEST_CLASS_HASH),
+                TestResource::Contract(dummy_system::TEST_CLASS_HASH),
+            ].span()
+        };
+        ndef
+    }
 
-        world.grant_writer(Model::<Item>::selector(), item_system_address);
-        world.grant_writer(Model::<ItemsCounter>::selector(), item_system_address);
-
-        let dummy_system_address = world
-            .deploy_contract('salt4', dummy_system::TEST_CLASS_HASH.try_into().unwrap());
-        let mut dummy_system = IDummyDispatcher { contract_address: dummy_system_address };
-
-        world.grant_writer(Model::<DummyCharacterItem>::selector(), dummy_system_address);
-        world.grant_writer(Model::<DummyCharacterItemsCounter>::selector(), dummy_system_address);
-        world.grant_writer(Model::<DummyCharacter>::selector(), dummy_system_address);
-        world.grant_writer(Model::<DummyCharacterCounter>::selector(), dummy_system_address);
-        world.grant_writer(Model::<NameRecord>::selector(), dummy_system_address);
-
-        (item_system_address, item_system, dummy_system_address, dummy_system)
+    fn contract_defs() -> Span<ContractDef> {
+        [
+            ContractDefTrait::new(@"Warpacks", @"item_system")
+                .with_writer_of([dojo::utils::bytearray_hash(@"Warpacks")].span()),
+            ContractDefTrait::new(@"Warpacks", @"dummy_system")
+                .with_writer_of([dojo::utils::bytearray_hash(@"Warpacks")].span()),
+        ].span()
     }
 
     #[test]
@@ -59,9 +62,16 @@ mod tests {
     #[should_panic(expected: ('player not world owner', 'ENTRYPOINT_FAILED'))]
     fn test_prefine_dummy_non_admin() {
         let alice = starknet::contract_address_const::<0x1>();
+        
+        let ndef = namespace_def();
+        let mut world = spawn_test_world([ndef].span());
+        world.sync_perms_and_inits(contract_defs());
 
-        let world = spawn_test_world!();
-        let (_, mut item_system, _, mut dummy_system) = get_systems(world);
+        let (contract_address, _) = world.dns(@"item_system").unwrap();
+        let mut item_system = IItemDispatcher { contract_address };
+
+        let (contract_address, _) = world.dns(@"dummy_system").unwrap();
+        let mut dummy_system = IDummyDispatcher { contract_address };
 
         add_items(ref item_system);
 
@@ -73,18 +83,25 @@ mod tests {
     #[test]
     #[available_gas(3000000000000000)]
     fn test_prefine_dummy() {
-        let world = spawn_test_world!();
-        let (_, mut item_system, _, mut dummy_system) = get_systems(world);
+        let ndef = namespace_def();
+        let mut world = spawn_test_world([ndef].span());
+        world.sync_perms_and_inits(contract_defs());
+
+        let (contract_address, _) = world.dns(@"item_system").unwrap();
+        let mut item_system = IItemDispatcher { contract_address };
+
+        let (contract_address, _) = world.dns(@"dummy_system").unwrap();
+        let mut dummy_system = IDummyDispatcher { contract_address };
 
         add_items(ref item_system);
 
         let mut level = 0;
         dummy_system.prefine_dummy(level, Dummy0::name, WMClass::Warrior, Dummy0::get_items());
 
-        let dummyCharCounter = get!(world, level, DummyCharacterCounter);
+        let dummyCharCounter: DummyCharacterCounter = world.read_model(level);
         assert(dummyCharCounter.count == 1, 'Should be equal 1');
 
-        let dummyChar = get!(world, (level, 1), DummyCharacter);
+        let dummyChar: DummyCharacter = world.read_model((level, 1));
         assert(dummyChar.level == level, 'Should be equal 0');
         assert(dummyChar.id == 1, 'Should be equal 1');
         assert(dummyChar.name == Dummy0::name, 'Should be equal Dummy0::name');
@@ -95,7 +112,7 @@ mod tests {
         );
         assert(dummyChar.rating == 0, 'Should be equal 0');
 
-        let dummyCharItemsCounter = get!(world, (level, dummyChar.id), DummyCharacterItemsCounter);
+        let dummyCharItemsCounter: DummyCharacterItemsCounter = world.read_model((level, dummyChar.id));
         let mut items = Dummy0::get_items();
         assert(dummyCharItemsCounter.count == items.len(), 'Should be equal items length');
 
@@ -105,7 +122,7 @@ mod tests {
                 break;
             }
             let item = items.pop_front().unwrap();
-            let dummyCharItem = get!(world, (level, dummyChar.id, i), DummyCharacterItem);
+            let dummyCharItem: DummyCharacterItem = world.read_model((level, dummyChar.id, i));
 
             assert(dummyCharItem.itemId == item.itemId, 'Should be equal item.itemId');
             assert(dummyCharItem.position.x == item.position.x, 'Should be equal item.position.x');

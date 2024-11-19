@@ -292,15 +292,15 @@ mod tests {
         set_contract_address(alice);
         action_system.spawn('alice', WMClass::Warlock);
 
-        let bob = starknet::contract_address_const::<0x2>();
-        set_contract_address(bob);
-        action_system.spawn('bob', WMClass::Warlock);
+        let alice = starknet::contract_address_const::<0x0>();
+        set_contract_address(alice);
+        action_system.spawn('alice', WMClass::Warlock);
 
-        let mut char: Characters = world.read_model(bob);
+        let mut char: Characters = world.read_model(alice);
         char.loss = 5;
         world.write_model(@char);
 
-        set_contract_address(bob);
+        set_contract_address(alice);
         action_system.rebirth('alice', WMClass::Warlock);
     }
 
@@ -319,22 +319,20 @@ mod tests {
 
         add_items(ref item_system);
 
-        let bob = starknet::contract_address_const::<0x2>();
-        set_contract_address(bob);
-        action_system.spawn('bob', WMClass::Warlock);
+        let alice = starknet::contract_address_const::<0x0>();
+        action_system.spawn('alice', WMClass::Warlock);
 
-        let nameRecord: NameRecord = world.read_model('bob');
-        assert(nameRecord.player == bob, 'player should be bob');
+        let nameRecord: NameRecord = world.read_model('alice');
+        assert(nameRecord.player == alice, 'player should be alice');
 
-        let mut char: Characters = world.read_model(bob);
+        let mut char: Characters = world.read_model(alice);
         char.loss = 5;
         world.write_model(@char);
 
-        set_contract_address(bob);
-        action_system.rebirth('bob', WMClass::Warlock);
+        action_system.rebirth('alice', WMClass::Warlock);
 
-        let nameRecord: NameRecord = world.read_model('bob');
-        assert(nameRecord.player == bob, 'player should be bob');
+        let nameRecord: NameRecord = world.read_model('alice');
+        assert(nameRecord.player == alice, 'player should be alice');
     }
 
     #[test]
@@ -352,27 +350,27 @@ mod tests {
 
         add_items(ref item_system);
 
-        let bob = starknet::contract_address_const::<0x2>();
-        set_contract_address(bob);
-        action_system.spawn('bob', WMClass::Warlock);
+        let alice = starknet::contract_address_const::<0x0>();
+        set_contract_address(alice);
+        action_system.spawn('alice', WMClass::Warlock);
 
-        let nameRecord: NameRecord = world.read_model('bob');
-        assert(nameRecord.player == bob, 'player should be bob');
+        let nameRecord: NameRecord = world.read_model('alice');
+        assert(nameRecord.player == alice, 'player should be alice');
 
-        let mut char: Characters = world.read_model(bob);
+        let mut char: Characters = world.read_model(alice);
         char.loss = 5;
         world.write_model(@char);
 
-        set_contract_address(bob);
+        set_contract_address(alice);
         action_system.rebirth('Alice', WMClass::Warlock);
 
         let nameRecord: NameRecord = world.read_model('Alice');
-        assert(nameRecord.player == bob, 'player should be bob');
+        assert(nameRecord.player == alice, 'player should be alice');
 
-        let nameRecord: NameRecord = world.read_model('bob');
+        let nameRecord: NameRecord = world.read_model('alice');
         assert(
-            nameRecord.player == starknet::contract_address_const::<0x2>(), 
-            'player should be 0x2'
+            nameRecord.player == starknet::contract_address_const::<0x0>(), 
+            'player should be 0x0'
         );
     }
 }
