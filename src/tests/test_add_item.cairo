@@ -2,49 +2,82 @@
 mod tests {
     use core::starknet::contract_address::ContractAddress;
     use starknet::class_hash::Felt252TryIntoClassHash;
-    use starknet::testing::set_contract_address;
+    use starknet::testing::{set_contract_address, set_block_timestamp};
 
-    use dojo::model::{Model, ModelTest, ModelIndex, ModelEntityTest};
-    // import world dispatcher
-    use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
+    use dojo::model::{ModelStorage, ModelValueStorage, ModelStorageTest};
+    use dojo::world::WorldStorageTrait;
+    use dojo_cairo_test::{spawn_test_world, NamespaceDef, TestResource, ContractDefTrait, ContractDef, WorldStorageTestTrait};
 
-    // import test utils
-    use dojo::utils::test::{spawn_test_world, deploy_contract};
-
-    // import test utils
     use warpack_masters::{
+        systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait}},
         systems::{item::{item_system, IItemDispatcher, IItemDispatcherTrait}},
-        models::Item::{Item, item, ItemsCounter, items_counter}, utils::{test_utils::{add_items}}
+        systems::{shop::{shop_system, IShopDispatcher, IShopDispatcherTrait}},
+        models::backpack::{BackpackGrids, m_BackpackGrids},
+        models::Item::{Item, m_Item, ItemsCounter, m_ItemsCounter},
+        models::CharacterItem::{
+            Position, CharacterItemStorage, m_CharacterItemStorage, CharacterItemsStorageCounter,
+            m_CharacterItemsStorageCounter, CharacterItemInventory, m_CharacterItemInventory,
+            CharacterItemsInventoryCounter, m_CharacterItemsInventoryCounter
+        },
+        models::Character::{Characters, m_Characters, NameRecord, m_NameRecord, WMClass},
+        models::Shop::{Shop, m_Shop}, utils::{test_utils::{add_items}}
     };
 
     use warpack_masters::constants::constants::ITEMS_COUNTER_ID;
     use warpack_masters::{items};
 
-
-    fn get_systems(world: IWorldDispatcher) -> (ContractAddress, IItemDispatcher,) {
-        let item_system_address = world
-            .deploy_contract('salt1', item_system::TEST_CLASS_HASH.try_into().unwrap());
-        let mut item_system = IItemDispatcher { contract_address: item_system_address };
-
-        world.grant_writer(Model::<Item>::selector(), item_system_address);
-        world.grant_writer(Model::<ItemsCounter>::selector(), item_system_address);
-
-        (item_system_address, item_system,)
+    fn namespace_def() -> NamespaceDef {
+        let ndef = NamespaceDef {
+            namespace: "Warpacks", 
+            resources: [
+                TestResource::Model(m_BackpackGrids::TEST_CLASS_HASH.try_into().unwrap()),
+                TestResource::Model(m_Item::TEST_CLASS_HASH.try_into().unwrap()),
+                TestResource::Model(m_ItemsCounter::TEST_CLASS_HASH.try_into().unwrap()),
+                TestResource::Model(m_CharacterItemStorage::TEST_CLASS_HASH.try_into().unwrap()),
+                TestResource::Model(m_CharacterItemsStorageCounter::TEST_CLASS_HASH.try_into().unwrap()),
+                TestResource::Model(m_CharacterItemInventory::TEST_CLASS_HASH.try_into().unwrap()),
+                TestResource::Model(m_CharacterItemsInventoryCounter::TEST_CLASS_HASH.try_into().unwrap()),
+                TestResource::Model(m_Characters::TEST_CLASS_HASH.try_into().unwrap()),
+                TestResource::Model(m_NameRecord::TEST_CLASS_HASH.try_into().unwrap()),
+                TestResource::Model(m_Shop::TEST_CLASS_HASH.try_into().unwrap()),
+                TestResource::Contract(actions::TEST_CLASS_HASH),
+                TestResource::Contract(item_system::TEST_CLASS_HASH),
+                TestResource::Contract(shop_system::TEST_CLASS_HASH),
+                TestResource::Event(shop_system::e_BuyItem::TEST_CLASS_HASH),
+                TestResource::Event(shop_system::e_SellItem::TEST_CLASS_HASH),
+            ].span()
+        };
+ 
+        ndef
     }
 
+    fn contract_defs() -> Span<ContractDef> {
+        [
+            ContractDefTrait::new(@"Warpacks", @"actions")
+                .with_writer_of([dojo::utils::bytearray_hash(@"Warpacks")].span()),
+            ContractDefTrait::new(@"Warpacks", @"item_system")
+                .with_writer_of([dojo::utils::bytearray_hash(@"Warpacks")].span()),
+            ContractDefTrait::new(@"Warpacks", @"shop_system")
+                .with_writer_of([dojo::utils::bytearray_hash(@"Warpacks")].span()),
+        ].span()
+    }
 
     #[test]
     #[available_gas(3000000000000000)]
     fn test_add_item() {
-        let world = spawn_test_world!();
-        let (_, mut item_system,) = get_systems(world);
+        let ndef = namespace_def();
+        let mut world = spawn_test_world([ndef].span());
+        world.sync_perms_and_inits(contract_defs());
+
+        let (contract_address, _) = world.dns(@"item_system").unwrap();
+        let mut item_system = IItemDispatcher { contract_address };
 
         add_items(ref item_system);
 
-        let item = get!(world, ITEMS_COUNTER_ID, ItemsCounter);
+        let item: ItemsCounter = world.read_model(ITEMS_COUNTER_ID);
         assert(item.count == 34, 'total item count mismatch');
 
-        let item_six_data = get!(world, 6, (Item));
+        let item_six_data: Item = world.read_model(6);
         assert(item_six_data.id == items::Dagger::id, 'I6 id mismatch');
         assert(item_six_data.name == items::Dagger::name, 'I6 name mismatch');
         assert(item_six_data.itemType == items::Dagger::itemType, 'I6 itemType mismatch');
@@ -60,7 +93,7 @@ mod tests {
         assert(item_six_data.energyCost == items::Dagger::energyCost, 'I6 energyCost mismatch');
         assert(item_six_data.isPlugin == items::Dagger::isPlugin, 'I6 isPlugin mismatch');
 
-        let item_nine_data = get!(world, 9, (Item));
+        let item_nine_data: Item = world.read_model(9);
         assert(item_nine_data.id == items::Shield::id, 'I9 id mismatch');
         assert(item_nine_data.name == items::Shield::name, 'I9 name mismatch');
         assert(item_nine_data.itemType == items::Shield::itemType, 'I9 itemType mismatch');
@@ -76,7 +109,7 @@ mod tests {
         assert(item_nine_data.energyCost == items::Shield::energyCost, 'I9 energyCost mismatch');
         assert(item_nine_data.isPlugin == items::Shield::isPlugin, 'I9 isPlugin mismatch');
 
-        let item_eleven_data = get!(world, 11, (Item));
+        let item_eleven_data: Item = world.read_model(11);
         assert(item_eleven_data.id == items::HealingPotion::id, 'I11 id mismatch');
         assert(item_eleven_data.name == items::HealingPotion::name, 'I11 name mismatch');
         assert(item_eleven_data.itemType == items::HealingPotion::itemType, 'I11 itemType mismatch');
@@ -92,7 +125,7 @@ mod tests {
         assert(item_eleven_data.energyCost == items::HealingPotion::energyCost, 'I11 energyCost mismatch');
         assert(item_eleven_data.isPlugin == items::HealingPotion::isPlugin, 'I11 isPlugin mismatch');
 
-        let item_fifteen_data = get!(world, 15, (Item));
+        let item_fifteen_data: Item = world.read_model(15);
         assert(item_fifteen_data.id == items::AugmentedDagger::id, 'I15 id mismatch');
         assert(item_fifteen_data.name == items::AugmentedDagger::name, 'I15 name mismatch');
         assert(item_fifteen_data.itemType == items::AugmentedDagger::itemType, 'I15 itemType mismatch');
@@ -113,14 +146,16 @@ mod tests {
     #[available_gas(3000000000000000)]
     #[should_panic(expected: ('player not world owner', 'ENTRYPOINT_FAILED'))]
     fn test_add_item_revert_not_world_owner() {
-        let alice = starknet::contract_address_const::<0x1337>();
+        let ndef = namespace_def();
+        let mut world = spawn_test_world([ndef].span());
+        world.sync_perms_and_inits(contract_defs());
 
-        let world = spawn_test_world!();
-        let (_, mut item_system,) = get_systems(world);
+        let (contract_address, _) = world.dns(@"item_system").unwrap();
+        let mut item_system = IItemDispatcher { contract_address };
 
-        add_items(ref item_system);
-
+        let alice = starknet::contract_address_const::<0x1>();
         set_contract_address(alice);
+        add_items(ref item_system);
 
         item_system
             .add_item(
@@ -145,8 +180,12 @@ mod tests {
     #[available_gas(3000000000000000)]
     #[should_panic(expected: ('width not in range', 'ENTRYPOINT_FAILED'))]
     fn test_add_item_revert_width_not_in_range() {
-        let world = spawn_test_world!();
-        let (_, mut item_system,) = get_systems(world);
+        let ndef = namespace_def();
+        let mut world = spawn_test_world([ndef].span());
+        world.sync_perms_and_inits(contract_defs());
+
+        let (contract_address, _) = world.dns(@"item_system").unwrap();
+        let mut item_system = IItemDispatcher { contract_address };
 
         item_system
             .add_item(
@@ -171,8 +210,12 @@ mod tests {
     #[available_gas(3000000000000000)]
     #[should_panic(expected: ('height not in range', 'ENTRYPOINT_FAILED'))]
     fn test_add_item_revert_height_not_in_range() {
-        let world = spawn_test_world!();
-        let (_, mut item_system,) = get_systems(world);
+        let ndef = namespace_def();
+        let mut world = spawn_test_world([ndef].span());
+        world.sync_perms_and_inits(contract_defs());
+
+        let (contract_address, _) = world.dns(@"item_system").unwrap();
+        let mut item_system = IItemDispatcher { contract_address };
 
         item_system
             .add_item(
@@ -197,8 +240,12 @@ mod tests {
     #[available_gas(3000000000000000)]
     #[should_panic(expected: ('price must be greater than 0', 'ENTRYPOINT_FAILED'))]
     fn test_add_item_revert_price_not_valid() {
-        let world = spawn_test_world!();
-        let (_, mut item_system,) = get_systems(world);
+        let ndef = namespace_def();
+        let mut world = spawn_test_world([ndef].span());
+        world.sync_perms_and_inits(contract_defs());
+
+        let (contract_address, _) = world.dns(@"item_system").unwrap();
+        let mut item_system = IItemDispatcher { contract_address };
 
         item_system
             .add_item(
@@ -223,8 +270,12 @@ mod tests {
     #[available_gas(3000000000000000)]
     #[should_panic(expected: ('rarity not valid', 'ENTRYPOINT_FAILED'))]
     fn test_add_item_revert_invalid_rarity() {
-        let world = spawn_test_world!();
-        let (_, mut item_system,) = get_systems(world);
+        let ndef = namespace_def();
+        let mut world = spawn_test_world([ndef].span());
+        world.sync_perms_and_inits(contract_defs());
+
+        let (contract_address, _) = world.dns(@"item_system").unwrap();
+        let mut item_system = IItemDispatcher { contract_address };
 
         item_system
             .add_item(

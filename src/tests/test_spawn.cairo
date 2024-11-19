@@ -211,91 +211,108 @@ mod tests {
     }
 
 
-    // #[test]
-    // #[available_gas(3000000000000000)]
-    // #[should_panic(expected: ('name cannot be empty', 'ENTRYPOINT_FAILED'))]
-    // fn test_name_is_empty() {
-    //     let alice = starknet::contract_address_const::<0x0>();
+    #[test]
+    #[available_gas(3000000000000000)]
+    #[should_panic(expected: ('name cannot be empty', 'ENTRYPOINT_FAILED'))]
+    fn test_name_is_empty() {
+        let ndef = namespace_def();
+        let mut world = spawn_test_world([ndef].span());
+        world.sync_perms_and_inits(contract_defs());
 
-    //     let world = spawn_test_world!();
-    //     let (_, mut action_system, _, _) = get_systems(world);
+        let (contract_address, _) = world.dns(@"actions").unwrap();
+        let action_system = IActionsDispatcher { contract_address };
 
-    //     set_contract_address(alice);
-
-    //     action_system.spawn('', WMClass::Warlock);
-    // }
-
-
-    // #[test]
-    // #[available_gas(3000000000000000)]
-    // #[should_panic(expected: ('player already exists', 'ENTRYPOINT_FAILED'))]
-    // fn test_player_already_exists() {
-    //     let alice = starknet::contract_address_const::<0x0>();
-
-    //     let world = spawn_test_world!();
-    //     let (_, mut action_system, _, mut item_system) = get_systems(world);
-
-    //     add_items(ref item_system);
-
-    //     set_contract_address(alice);
-
-    //     action_system.spawn('alice', WMClass::Warlock);
-    //     action_system.spawn('bob', WMClass::Warlock);
-    // }
+        action_system.spawn('', WMClass::Warlock);
+    }
 
 
-    // #[test]
-    // #[available_gas(3000000000000000)]
-    // #[should_panic(expected: ('name already exists', 'ENTRYPOINT_FAILED'))]
-    // fn test_name_already_exists() {
-    //     let world = spawn_test_world!();
-    //     let (_, mut action_system, _, mut item_system) = get_systems(world);
+    #[test]
+    #[available_gas(3000000000000000)]
+    #[should_panic(expected: ('player already exists', 'ENTRYPOINT_FAILED'))]
+    fn test_player_already_exists() {
+        let ndef = namespace_def();
+        let mut world = spawn_test_world([ndef].span());
+        world.sync_perms_and_inits(contract_defs());
 
-    //     add_items(ref item_system);
+        let (contract_address, _) = world.dns(@"actions").unwrap();
+        let action_system = IActionsDispatcher { contract_address };
 
-    //     let alice = starknet::contract_address_const::<0x1>();
-    //     set_contract_address(alice);
-    //     action_system.spawn('alice', WMClass::Warlock);
+        let (contract_address, _) = world.dns(@"item_system").unwrap();
+        let mut item_system = IItemDispatcher { contract_address };
 
-    //     let bob = starknet::contract_address_const::<0x2>();
-    //     set_contract_address(bob);
-    //     action_system.spawn('alice', WMClass::Warlock);
-    // }
+        add_items(ref item_system);
+
+        action_system.spawn('alice', WMClass::Warlock);
+        action_system.spawn('bob', WMClass::Warlock);
+    }
 
 
-    // #[test]
-    // #[available_gas(3000000000000000)]
-    // fn test_spawn_a_Archer() {
-    //     let world = spawn_test_world!();
-    //     let (_, mut action_system, _, mut item_system) = get_systems(world);
+    #[test]
+    #[available_gas(3000000000000000)]
+    #[should_panic(expected: ('name already exists', 'ENTRYPOINT_FAILED'))]
+    fn test_name_already_exists() {
+        let ndef = namespace_def();
+        let mut world = spawn_test_world([ndef].span());
+        world.sync_perms_and_inits(contract_defs());
 
-    //     add_items(ref item_system);
+        let (contract_address, _) = world.dns(@"actions").unwrap();
+        let action_system = IActionsDispatcher { contract_address };
 
-    //     let alice = starknet::contract_address_const::<0x1>();
+        let (contract_address, _) = world.dns(@"item_system").unwrap();
+        let mut item_system = IItemDispatcher { contract_address };
 
-    //     // mocking timestamp for testing
-    //     let timestamp = 1716770021;
-    //     set_block_timestamp(timestamp);
+        add_items(ref item_system);
 
-    //     set_contract_address(alice);
+        let alice = starknet::contract_address_const::<0x1>();
+        set_contract_address(alice);
+        action_system.spawn('alice', WMClass::Warlock);
 
-    //     action_system.spawn('alice', WMClass::Archer);
+        let bob = starknet::contract_address_const::<0x2>();
+        set_contract_address(bob);
+        action_system.spawn('alice', WMClass::Warlock);
+    }
 
-    //     let char = get!(world, (alice), Characters);
-    //     assert(!char.dummied, 'Should be false');
-    //     assert(char.wins == 0, 'wins count should be 0');
-    //     assert(char.loss == 0, 'loss count should be 0');
-    //     assert(char.wmClass == WMClass::Archer, 'class should be Warlock');
-    //     assert(char.name == 'alice', 'name should be bob');
-    //     assert(char.gold == INIT_GOLD + 1, 'gold should be init');
-    //     assert(char.health == INIT_HEALTH, 'health should be init');
-    //     assert(char.rating == 0, 'Rating mismatch');
-    //     assert(char.totalWins == 0, 'total wins should be 0');
-    //     assert(char.totalLoss == 0, 'total loss should be 0');
-    //     assert(char.winStreak == 0, 'win streak should be 0');
-    //     assert(char.birthCount == 1, 'birth count should be 1');
-    //     assert(char.updatedAt == timestamp, 'updatedAt mismatch');
-    //     assert(char.stamina == INIT_STAMINA, 'stamina mismatch');
-    // }
+
+    #[test]
+    #[available_gas(3000000000000000)]
+    fn test_spawn_a_Archer() {
+        let ndef = namespace_def();
+        let mut world = spawn_test_world([ndef].span());
+        world.sync_perms_and_inits(contract_defs());
+
+        let (contract_address, _) = world.dns(@"actions").unwrap();
+        let action_system = IActionsDispatcher { contract_address };
+
+        let (contract_address, _) = world.dns(@"item_system").unwrap();
+        let mut item_system = IItemDispatcher { contract_address };
+
+        add_items(ref item_system);
+
+        let alice = starknet::contract_address_const::<0x1>();
+
+        // mocking timestamp for testing
+        let timestamp = 1716770021;
+        set_block_timestamp(timestamp);
+
+        set_contract_address(alice);
+
+        action_system.spawn('alice', WMClass::Archer);
+
+        let char: Characters = world.read_model(alice);
+        assert(!char.dummied, 'Should be false');
+        assert(char.wins == 0, 'wins count should be 0');
+        assert(char.loss == 0, 'loss count should be 0');
+        assert(char.wmClass == WMClass::Archer, 'class should be Warlock');
+        assert(char.name == 'alice', 'name should be bob');
+        assert(char.gold == INIT_GOLD + 1, 'gold should be init');
+        assert(char.health == INIT_HEALTH, 'health should be init');
+        assert(char.rating == 0, 'Rating mismatch');
+        assert(char.totalWins == 0, 'total wins should be 0');
+        assert(char.totalLoss == 0, 'total loss should be 0');
+        assert(char.winStreak == 0, 'win streak should be 0');
+        assert(char.birthCount == 1, 'birth count should be 1');
+        assert(char.updatedAt == timestamp, 'updatedAt mismatch');
+        assert(char.stamina == INIT_STAMINA, 'stamina mismatch');
+    }
 }
 
