@@ -20,7 +20,10 @@ mod tests {
         models::DummyCharacterItem::{
             DummyCharacterItem, m_DummyCharacterItem, DummyCharacterItemsCounter, m_DummyCharacterItemsCounter
         },
-        models::CharacterItem::{CharacterItemInventory, CharacterItemsInventoryCounter, m_CharacterItemInventory, m_CharacterItemsInventoryCounter, Position},
+        models::CharacterItem::{CharacterItemInventory, CharacterItemsInventoryCounter, m_CharacterItemInventory, m_CharacterItemsInventoryCounter, 
+            CharacterItemStorage, m_CharacterItemStorage, CharacterItemsStorageCounter, m_CharacterItemsStorageCounter,
+            Position
+        },
         models::Fight::{BattleLog, m_BattleLog, BattleLogCounter, m_BattleLogCounter, BattleLogDetail, e_BattleLogDetail},
         utils::{test_utils::{add_items}},
         constants::constants::{INIT_STAMINA, EFFECT_REFLECT, INIT_GOLD, INIT_HEALTH}
@@ -43,6 +46,8 @@ mod tests {
                 TestResource::Model(m_BattleLogCounter::TEST_CLASS_HASH.try_into().unwrap()),
                 TestResource::Model(m_CharacterItemInventory::TEST_CLASS_HASH.try_into().unwrap()),
                 TestResource::Model(m_CharacterItemsInventoryCounter::TEST_CLASS_HASH.try_into().unwrap()),
+                TestResource::Model(m_CharacterItemStorage::TEST_CLASS_HASH.try_into().unwrap()),
+                TestResource::Model(m_CharacterItemsStorageCounter::TEST_CLASS_HASH.try_into().unwrap()),
                 TestResource::Event(e_BattleLogDetail::TEST_CLASS_HASH),
                 TestResource::Contract(actions::TEST_CLASS_HASH),
                 TestResource::Contract(item_system::TEST_CLASS_HASH),
@@ -85,7 +90,6 @@ mod tests {
         add_items(ref item_system);
 
         let alice = starknet::contract_address_const::<0x0>();
-        set_contract_address(alice);
         
         action_system.spawn('alice', WMClass::Warlock);
         dummy_system.create_dummy();
@@ -407,9 +411,6 @@ mod tests {
         let (contract_address, _) = world.dns(@"dummy_system").unwrap();
         let mut dummy_system = IDummyDispatcher { contract_address };
 
-        let alice = starknet::contract_address_const::<0x0>();
-        set_contract_address(alice);
-
         add_items(ref item_system);
 
         action_system.spawn('alice', WMClass::Warlock);
@@ -438,7 +439,6 @@ mod tests {
         let mut dummy_system = IDummyDispatcher { contract_address };
 
         let alice = starknet::contract_address_const::<0x0>();
-        set_contract_address(alice);
 
         add_items(ref item_system);
         action_system.spawn('alice', WMClass::Warlock);
@@ -472,7 +472,6 @@ mod tests {
         let mut dummy_system = IDummyDispatcher { contract_address };
 
         let alice = starknet::contract_address_const::<0x0>();
-        set_contract_address(alice);
 
         add_items(ref item_system);
         action_system.spawn('alice', WMClass::Warlock);
