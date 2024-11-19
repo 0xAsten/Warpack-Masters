@@ -24,7 +24,7 @@ source = "git+https://github.com/dojoengine/dojo?tag=v1.0.1#d7335e6f5c76a1dda887
 
 [[package]]
 name = "warpack_masters"
-version = "0.2.1"
+version = "0.2.2"
 dependencies = [
  "dojo",
  "dojo_cairo_test",
