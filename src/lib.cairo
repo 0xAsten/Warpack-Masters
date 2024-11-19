@@ -4,7 +4,6 @@ mod systems {
     mod fight;
     mod item;
     mod shop;
-    // mod view;
     mod recipe;
 }
 
