@@ -80,7 +80,6 @@ mod tests {
 
         add_items(ref item_system);
 
-        set_contract_address(alice);
         action_system.spawn('alice', WMClass::Warlock);
 
         // mock shop for testing
@@ -111,7 +110,6 @@ mod tests {
         let timestamp = 1717770021;
         set_block_timestamp(timestamp);
 
-        set_contract_address(alice);
         action_system.rebirth('bob', WMClass::Warrior);
 
         let char: Characters = world.read_model(alice);
@@ -261,14 +259,12 @@ mod tests {
 
         add_items(ref item_system);
 
-        set_contract_address(alice);
         action_system.spawn('alice', WMClass::Warlock);
 
         let mut char: Characters = world.read_model(alice);
         char.loss = 4;
         world.write_model(@char);
 
-        set_contract_address(alice);
         action_system.rebirth('bob', WMClass::Warlock);
     }
 

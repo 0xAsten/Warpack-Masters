@@ -79,7 +79,6 @@ mod tests {
         let mut shop_system = IShopDispatcher { contract_address };
 
         let alice = starknet::contract_address_const::<0x0>();
-        set_contract_address(alice);
 
         add_items(ref item_system);
 
@@ -89,8 +88,6 @@ mod tests {
         let mut shop_data: Shop = world.read_model(alice);
         shop_data.item1 = 5;
         world.write_model(@shop_data);
-
-        set_contract_address(alice);
 
         shop_system.buy_item(5);
 

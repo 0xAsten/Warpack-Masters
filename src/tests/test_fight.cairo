@@ -363,6 +363,7 @@ mod tests {
             plugins: array![(6, 80, 2), (6, 90, 1)],
         };
 
+        set_contract_address(alice);
         world.write_model(@inventoryCounter);
         world.write_model(@item1);
         world.write_model(@item2);
@@ -593,6 +594,7 @@ mod tests {
             plugins: array![],
         };
 
+        set_contract_address(alice);
         world.write_model(@inventoryCounter);
         world.write_model(@item1);
         world.write_model(@item2);
@@ -600,6 +602,7 @@ mod tests {
         world.write_model(@item4);
         world.write_model(@item5);
 
+        set_contract_address(bob);
         dummy_system.create_dummy();
         fight_system.match_dummy();
         fight_system.fight();
