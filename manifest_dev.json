@@ -1,9 +1,32 @@
 {
   "world": {
-    "class_hash": "0x139239a99d627697b19b9856beaef7896fc75375caf3d750dd76982a7afeb78",
-    "address": "0x33703415f3d79bdb106210a406e3bb9d0f89a1c03d278b13887bd17487ddd8f",
+    "class_hash": "0x79d9ce84b97bcc2a631996c3100d57966fc2f5b061fb1ec4dfd0040976bcac6",
+    "address": "0x7ff44e861dddc971e2b5efdd200c0d2d98af888b885ce219db0a4721eecc147",
     "seed": "dev",
     "name": "Warpack Masters",
+    "entrypoints": [
+      "uuid",
+      "set_metadata",
+      "register_namespace",
+      "register_event",
+      "register_model",
+      "register_contract",
+      "init_contract",
+      "upgrade_event",
+      "upgrade_model",
+      "upgrade_contract",
+      "emit_event",
+      "emit_events",
+      "set_entity",
+      "set_entities",
+      "delete_entity",
+      "delete_entities",
+      "grant_owner",
+      "revoke_owner",
+      "grant_writer",
+      "revoke_writer",
+      "upgrade"
+    ],
     "abi": [
       {
         "type": "impl",
@@ -83,16 +106,12 @@
         ]
       },
       {
-        "type": "enum",
-        "name": "core::bool",
-        "variants": [
+        "type": "struct",
+        "name": "core::array::Span::<core::array::Span::<core::felt252>>",
+        "members": [
           {
-            "name": "False",
-            "type": "()"
-          },
-          {
-            "name": "True",
-            "type": "()"
+            "name": "snapshot",
+            "type": "@core::array::Array::<core::array::Span::<core::felt252>>"
           }
         ]
       },
@@ -185,6 +204,30 @@
           {
             "name": "Enum",
             "type": "core::array::Span::<dojo::meta::layout::FieldLayout>"
+          }
+        ]
+      },
+      {
+        "type": "struct",
+        "name": "core::array::Span::<dojo::model::definition::ModelIndex>",
+        "members": [
+          {
+            "name": "snapshot",
+            "type": "@core::array::Array::<dojo::model::definition::ModelIndex>"
+          }
+        ]
+      },
+      {
+        "type": "enum",
+        "name": "core::bool",
+        "variants": [
+          {
+            "name": "False",
+            "type": "()"
+          },
+          {
+            "name": "True",
+            "type": "()"
           }
         ]
       },
@@ -398,10 +441,26 @@
               {
                 "name": "values",
                 "type": "core::array::Span::<core::felt252>"
+              }
+            ],
+            "outputs": [],
+            "state_mutability": "external"
+          },
+          {
+            "type": "function",
+            "name": "emit_events",
+            "inputs": [
+              {
+                "name": "event_selector",
+                "type": "core::felt252"
               },
               {
-                "name": "historical",
-                "type": "core::bool"
+                "name": "keys",
+                "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+              },
+              {
+                "name": "values",
+                "type": "core::array::Span::<core::array::Span::<core::felt252>>"
               }
             ],
             "outputs": [],
@@ -433,6 +492,30 @@
           },
           {
             "type": "function",
+            "name": "entities",
+            "inputs": [
+              {
+                "name": "model_selector",
+                "type": "core::felt252"
+              },
+              {
+                "name": "indexes",
+                "type": "core::array::Span::<dojo::model::definition::ModelIndex>"
+              },
+              {
+                "name": "layout",
+                "type": "dojo::meta::layout::Layout"
+              }
+            ],
+            "outputs": [
+              {
+                "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+              }
+            ],
+            "state_mutability": "view"
+          },
+          {
+            "type": "function",
             "name": "set_entity",
             "inputs": [
               {
@@ -457,6 +540,30 @@
           },
           {
             "type": "function",
+            "name": "set_entities",
+            "inputs": [
+              {
+                "name": "model_selector",
+                "type": "core::felt252"
+              },
+              {
+                "name": "indexes",
+                "type": "core::array::Span::<dojo::model::definition::ModelIndex>"
+              },
+              {
+                "name": "values",
+                "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+              },
+              {
+                "name": "layout",
+                "type": "dojo::meta::layout::Layout"
+              }
+            ],
+            "outputs": [],
+            "state_mutability": "external"
+          },
+          {
+            "type": "function",
             "name": "delete_entity",
             "inputs": [
               {
@@ -466,6 +573,26 @@
               {
                 "name": "index",
                 "type": "dojo::model::definition::ModelIndex"
+              },
+              {
+                "name": "layout",
+                "type": "dojo::meta::layout::Layout"
+              }
+            ],
+            "outputs": [],
+            "state_mutability": "external"
+          },
+          {
+            "type": "function",
+            "name": "delete_entities",
+            "inputs": [
+              {
+                "name": "model_selector",
+                "type": "core::felt252"
+              },
+              {
+                "name": "indexes",
+                "type": "core::array::Span::<dojo::model::definition::ModelIndex>"
               },
               {
                 "name": "layout",
@@ -850,11 +977,6 @@
             "kind": "key"
           },
           {
-            "name": "historical",
-            "type": "core::bool",
-            "kind": "key"
-          },
-          {
             "name": "keys",
             "type": "core::array::Span::<core::felt252>",
             "kind": "data"
@@ -1121,13 +1243,23 @@
   },
   "contracts": [
     {
-      "address": "0x353a08448f9038ca7b51531cedb75dd79f7e89ee69da7b52b6464e02e244a9",
-      "class_hash": "0xf28a5354c75b349e594ad253467a193c78cf407ea474de56c3b18ac84e831a",
+      "address": "0x42b7d473b188dcef2727c21191e8210a5460fc70fdd2f09b5aee78048b97724",
+      "class_hash": "0x38e0eaa7393157bb42e6e7b5bb715eee726ff39af187ca696b0b0891696ff2c",
       "abi": [
         {
           "type": "impl",
           "name": "actions__ContractImpl",
           "interface_name": "dojo::contract::interface::IContract"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::interface::IContract",
+          "items": []
+        },
+        {
+          "type": "impl",
+          "name": "actions__DeployedContractImpl",
+          "interface_name": "dojo::meta::interface::IDeployedResource"
         },
         {
           "type": "struct",
@@ -1149,7 +1281,7 @@
         },
         {
           "type": "interface",
-          "name": "dojo::contract::interface::IContract",
+          "name": "dojo::meta::interface::IDeployedResource",
           "items": [
             {
               "type": "function",
@@ -1378,16 +1510,33 @@
       ],
       "init_calldata": [],
       "tag": "Warpacks-actions",
-      "systems": []
+      "selector": "0x72c10aa5b1ff0c1599517beb7189673c59fa924c4753b33bab057a8c6200cb1",
+      "systems": [
+        "spawn",
+        "rebirth",
+        "place_item",
+        "undo_place_item",
+        "upgrade"
+      ]
     },
     {
-      "address": "0x52645ff234753b3c37cda683ce4ec4a55a0f7f3015b122616fdef1d802d35ab",
-      "class_hash": "0x4149ff2e23c7f89c0c9f42850ec4aaafb6fd24fbe3b8b9e7738f27181e74495",
+      "address": "0x5cf13e747bd6cd1de806f21cd3105c6e3efa60b2a4525fdce3dfda10d6d0e03",
+      "class_hash": "0x7d5c9547d34a5714223fe5d6e2d4725103f12d2489b40a6630b3ba0e1c4192",
       "abi": [
         {
           "type": "impl",
           "name": "dummy_system__ContractImpl",
           "interface_name": "dojo::contract::interface::IContract"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::interface::IContract",
+          "items": []
+        },
+        {
+          "type": "impl",
+          "name": "dummy_system__DeployedContractImpl",
+          "interface_name": "dojo::meta::interface::IDeployedResource"
         },
         {
           "type": "struct",
@@ -1409,7 +1558,7 @@
         },
         {
           "type": "interface",
-          "name": "dojo::contract::interface::IContract",
+          "name": "dojo::meta::interface::IDeployedResource",
           "items": [
             {
               "type": "function",
@@ -1675,16 +1824,32 @@
       ],
       "init_calldata": [],
       "tag": "Warpacks-dummy_system",
-      "systems": []
+      "selector": "0x7681287c4e556e3720525417a49926b5cebd94a26abca05bb47cbc85abb3ab8",
+      "systems": [
+        "create_dummy",
+        "prefine_dummy",
+        "update_prefine_dummy",
+        "upgrade"
+      ]
     },
     {
-      "address": "0x6b805b46af9bbad2a96a00cce37766bd16f2ff3936f546ed93677b2f099687e",
-      "class_hash": "0x4bcce49d8448a4f9abe9a550210143024ff191ea35d4f7292660bb9838de8e6",
+      "address": "0x6f4b5d76bab37aa4a87157a6a4f82fba31627e5654f620898598571f82e38d0",
+      "class_hash": "0x181fbb2658dd383f2efde2d835538597af5a76225559944448f87c80a38bddc",
       "abi": [
         {
           "type": "impl",
           "name": "fight_system__ContractImpl",
           "interface_name": "dojo::contract::interface::IContract"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::interface::IContract",
+          "items": []
+        },
+        {
+          "type": "impl",
+          "name": "fight_system__DeployedContractImpl",
+          "interface_name": "dojo::meta::interface::IDeployedResource"
         },
         {
           "type": "struct",
@@ -1706,7 +1871,7 @@
         },
         {
           "type": "interface",
-          "name": "dojo::contract::interface::IContract",
+          "name": "dojo::meta::interface::IDeployedResource",
           "items": [
             {
               "type": "function",
@@ -1863,16 +2028,31 @@
       ],
       "init_calldata": [],
       "tag": "Warpacks-fight_system",
-      "systems": []
+      "selector": "0x7627186b5551a815f66c9d473067aa0639a516500356edd8a655b0bada60e3c",
+      "systems": [
+        "match_dummy",
+        "fight",
+        "upgrade"
+      ]
     },
     {
-      "address": "0x615e5ac23ef7bb2564288faa2e738c125254fc4ebed2c02cb418ce9ef14653e",
-      "class_hash": "0x31593cea6be59f152f874ec5a885ca041b9361f4991baf1c5af77ebf9705e48",
+      "address": "0x40749d6d13eda453f48d0343e9f62227f5acfcb5e06b2a527c4bc6ee7c8ac",
+      "class_hash": "0x6e07d87e633321eda94214990509e2ee3cd0dc81a1e0c2b7f70e2219be85045",
       "abi": [
         {
           "type": "impl",
           "name": "item_system__ContractImpl",
           "interface_name": "dojo::contract::interface::IContract"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::interface::IContract",
+          "items": []
+        },
+        {
+          "type": "impl",
+          "name": "item_system__DeployedContractImpl",
+          "interface_name": "dojo::meta::interface::IDeployedResource"
         },
         {
           "type": "struct",
@@ -1894,7 +2074,7 @@
         },
         {
           "type": "interface",
-          "name": "dojo::contract::interface::IContract",
+          "name": "dojo::meta::interface::IDeployedResource",
           "items": [
             {
               "type": "function",
@@ -2115,16 +2295,30 @@
       ],
       "init_calldata": [],
       "tag": "Warpacks-item_system",
-      "systems": []
+      "selector": "0x751ea9e8a6e94c7a6f55b05d4658b934ec62a17cfacbb4d859826e79d290cf1",
+      "systems": [
+        "add_item",
+        "upgrade"
+      ]
     },
     {
-      "address": "0xa9ed97acae26bdd24120442c568a8994e6bb12b7183d60b13117c6df6e108",
-      "class_hash": "0xc157009e1d327e16dcdabfa764648b3a9a96e4ab0994e572bcea676f909d63",
+      "address": "0x3bf707a11a49543adc6e1ec2695ded7f269456b6bfce2e14da5e4914870260a",
+      "class_hash": "0x21c7e03449206be7cf1d849992f9f6a6ead14d0a683174cb1cae1f3b6d7a387",
       "abi": [
         {
           "type": "impl",
           "name": "recipe_system__ContractImpl",
           "interface_name": "dojo::contract::interface::IContract"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::interface::IContract",
+          "items": []
+        },
+        {
+          "type": "impl",
+          "name": "recipe_system__DeployedContractImpl",
+          "interface_name": "dojo::meta::interface::IDeployedResource"
         },
         {
           "type": "struct",
@@ -2146,7 +2340,7 @@
         },
         {
           "type": "interface",
-          "name": "dojo::contract::interface::IContract",
+          "name": "dojo::meta::interface::IDeployedResource",
           "items": [
             {
               "type": "function",
@@ -2325,16 +2519,31 @@
       ],
       "init_calldata": [],
       "tag": "Warpacks-recipe_system",
-      "systems": []
+      "selector": "0x50e7fbb7b06f98479b3360e5e61dbc63d249552de73a8b797e3ebafccc5730d",
+      "systems": [
+        "add_recipe",
+        "craft_item",
+        "upgrade"
+      ]
     },
     {
-      "address": "0xb58671a6634fc65634ad8adcc144d19bb6f4f816b589501ab6733e66872e5a",
-      "class_hash": "0x2cb9545879d1b0b205fa66443302bbc4215b83a7374e0618c435b98a241a80a",
+      "address": "0x5429a390bee40c2718cad173f90152e626c97ed9dcdc5003cd7a3c9f3207462",
+      "class_hash": "0x6230f032f4d74b34f2da569484fdb893c8e29af71f9bb43bc2c73e7340979d6",
       "abi": [
         {
           "type": "impl",
           "name": "shop_system__ContractImpl",
           "interface_name": "dojo::contract::interface::IContract"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::interface::IContract",
+          "items": []
+        },
+        {
+          "type": "impl",
+          "name": "shop_system__DeployedContractImpl",
+          "interface_name": "dojo::meta::interface::IDeployedResource"
         },
         {
           "type": "struct",
@@ -2356,7 +2565,7 @@
         },
         {
           "type": "interface",
-          "name": "dojo::contract::interface::IContract",
+          "name": "dojo::meta::interface::IDeployedResource",
           "items": [
             {
               "type": "function",
@@ -2530,111 +2739,137 @@
       ],
       "init_calldata": [],
       "tag": "Warpacks-shop_system",
-      "systems": []
+      "selector": "0x4fc6e53062bad497f56645e733043df064f1a4d8bb0ce745f62942d893b8dd",
+      "systems": [
+        "buy_item",
+        "sell_item",
+        "reroll_shop",
+        "upgrade"
+      ]
     }
   ],
   "models": [
     {
       "members": [],
-      "class_hash": "0x5d56fe63fdc4c63a3699a4a59e54a16d0f9a7c1cfe71d01fa98e07ab4e53f4f",
-      "tag": "BackpackGrids"
+      "class_hash": "0x6a0528e5682d15a4d644b3ab6de0443d2abc2df8651748c7e8a7d61d78e49c4",
+      "tag": "Warpacks-BackpackGrids",
+      "selector": "0x986c2508988b7609b021c5d073d387121acac96ff97c8450118dec41a2ef38"
     },
     {
       "members": [],
-      "class_hash": "0x21b56a7972cbd916c7f981681f53840779fc0b7abc3989f6277b266d233fad3",
-      "tag": "BattleLog"
+      "class_hash": "0x797279bddd6419a236ce2260c1900286d1abe8e92223ead8792c22fbcca2403",
+      "tag": "Warpacks-BattleLog",
+      "selector": "0x35d6bf7b6d49c2c5793d540953d4679fec20c49df24789cd4fbe7b04f05092"
     },
     {
       "members": [],
-      "class_hash": "0xb803d6ebd98ac265ce8aea23b4c24dfbd34b55309993b2cb39915c3706c570",
-      "tag": "BattleLogCounter"
+      "class_hash": "0x1e9b46c31bbd00da168087fe967b8785f24e8d817e7581e4e27d03a0411a640",
+      "tag": "Warpacks-BattleLogCounter",
+      "selector": "0x66bc89dc8dab6ea7e056ab976525032353059f15f1a73facb9b83248b2db7b2"
     },
     {
       "members": [],
-      "class_hash": "0x70f5fb0126f58cb2b769b2b61d33447abc28098dbbed527de0890d30a11e835",
-      "tag": "CharacterItemInventory"
+      "class_hash": "0x1c5645b2efb8af1921c0552e91a94179e673d7e655b19590336c8471fbb9765",
+      "tag": "Warpacks-CharacterItemInventory",
+      "selector": "0x1632514579c4437e669a668419344f2d169b924d07dd494375f6fec64fcb65b"
     },
     {
       "members": [],
-      "class_hash": "0x4b967d6a2b78eff0f1851379f359304ab408f539d198acd46c21615a03dbb28",
-      "tag": "CharacterItemStorage"
+      "class_hash": "0x168e0478ca29ad3b0aae40cf658ff191a650d5d949be27cc6f86f296667399b",
+      "tag": "Warpacks-CharacterItemStorage",
+      "selector": "0x78dd8941886ca5871dc537c26180418406dd70b89ec7712357e547c6cdcd68e"
     },
     {
       "members": [],
-      "class_hash": "0x7a5cc2d4615c0ebd414c60b3e62174968a047425e6c4a13c9a8fc8ce1a63e27",
-      "tag": "CharacterItemsInventoryCounter"
+      "class_hash": "0x735e6e35d07eb29abe5b05e90f7f53a5d94d1a98e69bf3a652ccb672a6637f3",
+      "tag": "Warpacks-CharacterItemsInventoryCounter",
+      "selector": "0x590aad75b0af5c025a4e2113d2eac8fc8f62b72a4638b1ad7cb35f91d3e0ecc"
     },
     {
       "members": [],
-      "class_hash": "0x383ace52d05a214959b4c08e1f6dc30ed3bf5ffe77332f82e2121eac9a5f758",
-      "tag": "CharacterItemsStorageCounter"
+      "class_hash": "0x1d0f666bf6c82593a82d2b19f013c205ed03f09366c670b1a47fd67ac8bbd85",
+      "tag": "Warpacks-CharacterItemsStorageCounter",
+      "selector": "0x5749580b0f3ef7182388b94bf7a1c7bb0f8b5280d7ffa12e787c3c3bb732090"
     },
     {
       "members": [],
-      "class_hash": "0x26bec1dcb745f9e0dcb0474c2645c21b3bc5892d08d62d8ac7936233bb1c9f0",
-      "tag": "Characters"
+      "class_hash": "0x19355853676f753f4a429054b9a1be2f7dfa9bab34fad244e07549ec58ec977",
+      "tag": "Warpacks-Characters",
+      "selector": "0x225c72460b858c42925da651112b0e08f4ec3c9bdbc5a618798a4e6420cf063"
     },
     {
       "members": [],
-      "class_hash": "0x46e9e0fee04010ead17894a49e34a8a22a31ae3786f4338069154d4722823b1",
-      "tag": "DummyCharacter"
+      "class_hash": "0x71497b4eea66b04e9cfff1c0de2ab15631e5263465dba487586ab7f8b86ca20",
+      "tag": "Warpacks-DummyCharacter",
+      "selector": "0x1870dbfed5e68287ac805cfb3a424086af7e3885914032041f9442f62f8c24e"
     },
     {
       "members": [],
-      "class_hash": "0x3dcd767b1406ceed8515b3ebf78b3ccacf8e0792042c82d50292dd2fdcc0089",
-      "tag": "DummyCharacterCounter"
+      "class_hash": "0x33b7502880e93455ca9f66d6f94c130053d2b4ac7c64f613972f8f211fe4e16",
+      "tag": "Warpacks-DummyCharacterCounter",
+      "selector": "0x52126e21b1ed0a7932ae073f48a6963182edf4788f74821202348ffb73d329c"
     },
     {
       "members": [],
-      "class_hash": "0x75d3b7d0ebc23c126d3f7d00075f7bab597787cb3ecea01b680fabbbee648a",
-      "tag": "DummyCharacterItem"
+      "class_hash": "0x3e80c3d661284f833e030293d5579cf77d200c9d0184a47ca1d334343b56ee7",
+      "tag": "Warpacks-DummyCharacterItem",
+      "selector": "0x2f6c06f25cf5f2aaa2ffe26cdf56c038339085616267d66385e6bd14c2f9f17"
     },
     {
       "members": [],
-      "class_hash": "0x13828d8c3e011ccfcb1a55700a08cee72256da68b571a6d094d06c3e6eb9ef2",
-      "tag": "DummyCharacterItemsCounter"
+      "class_hash": "0x2ee69868cb232078160b5eb360286fbb1a957a7430fe062cc5815ea5af55926",
+      "tag": "Warpacks-DummyCharacterItemsCounter",
+      "selector": "0x2d45ca9a5d3d2f9fb0d7731ddb1e0210fcd9adb42fa80a55607732277864da3"
     },
     {
       "members": [],
-      "class_hash": "0x7f796ee2a3e49b96ad898620814f0f9633c1052f1c81eee3b59b24e9b934347",
-      "tag": "Item"
+      "class_hash": "0x49c3328917292c723cc24d35119a9de0f63076d30d6c7277e64f21301115502",
+      "tag": "Warpacks-Item",
+      "selector": "0x7de0a1a6e53c8570967a20ee3f8af0c328eec4f3203d197b95d163e363862d6"
     },
     {
       "members": [],
-      "class_hash": "0x58f4042325604fcf020dd6241408df97b8659a45be3cffa5c5a8ba5ba268d71",
-      "tag": "ItemsCounter"
+      "class_hash": "0x7d8c584babb384a12155fe1ec6cdc105f818edc76aa5ba2fb8a774e6604b5d0",
+      "tag": "Warpacks-ItemsCounter",
+      "selector": "0x37ea17be1edf854d4c5941a21d7752746a2903ca919377df8e5f863b890bd5f"
     },
     {
       "members": [],
-      "class_hash": "0x473d3b9f13fd281e58e2cbdd90ac2cb684290220603e86cc56af5e04eb0dae2",
-      "tag": "NameRecord"
+      "class_hash": "0x7e6c59a7262f4bdff5a0db42ac339388dea78c8daf84e01281d5e65230b5c6f",
+      "tag": "Warpacks-NameRecord",
+      "selector": "0x61e170353fd373dbba8b02bbde1fdfbb74fb50629c1f9c5fec6361e8bf3fa53"
     },
     {
       "members": [],
-      "class_hash": "0x77ca521ab3e1251f0cc56d710ec6244fc81e5771cdf02e81ea13cdb1b1f1e7d",
-      "tag": "Recipe"
+      "class_hash": "0x433c30ace88680049b98c67135ef409d1a39db6b6bfada76d9ceadab099d8b9",
+      "tag": "Warpacks-Recipe",
+      "selector": "0x708e34d0df14f6ad4ab428ed5e5b8dec9c32f88d71cebd7c1ed9063a0771dcb"
     },
     {
       "members": [],
-      "class_hash": "0xdfaf4c5c883cd9b3c539c6820c3335a80fa90851b86257e12d6699d28a438d",
-      "tag": "Shop"
+      "class_hash": "0x282f698614cb80b67ef248f14e9457fcaf7f410504bdc62791e6f889fac29e6",
+      "tag": "Warpacks-Shop",
+      "selector": "0x78fb8e91ceb3682be44b8916bb3c07f016bdb8bbf1bc1cad81eca46f300e361"
     }
   ],
   "events": [
     {
       "members": [],
-      "class_hash": "0x54ee1cb6d9f24e431efeadbcf6effaefcbaf5683c874986c935836bcb349def",
-      "tag": "BattleLogDetail"
+      "class_hash": "0x46a884e84064cbb76c73e1b2c0805f815c430cc1b03426cde74068ffdee2316",
+      "tag": "Warpacks-BattleLogDetail",
+      "selector": "0x59f2a3726f025bd9295ee0e3f58ec2237849b9038d7adbe8567d5aab906429e"
     },
     {
       "members": [],
-      "class_hash": "0x2901e7a3c29041d66db94833b0395f49fe7646f1268408a681ce40f9400f249",
-      "tag": "BuyItem"
+      "class_hash": "0x5f1c4336358afe5d3cd66302ec4420ed88cc3d3067d960726a13bcce6976acd",
+      "tag": "Warpacks-BuyItem",
+      "selector": "0x222c957197f3def390ba92afb039775d6feeca9d6048ef5585392fbb8a5ab9"
     },
     {
       "members": [],
-      "class_hash": "0x4ddd44d3334b1a25f507f43d7c854c2fbb1d3fafb926d55104a04074c515b73",
-      "tag": "SellItem"
+      "class_hash": "0x6e8bf14b31538036c902418363f1515fa969fe0ff526b96dad0df89cd6dd868",
+      "tag": "Warpacks-SellItem",
+      "selector": "0x17d7432b9e7cbae7e6d2920ef19d5a96f6ce2f428f22d820a7298f1864d7dff"
     }
   ]
 }

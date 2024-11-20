@@ -4,9 +4,9 @@ pushd $(dirname "$0")/..
 
 : "${STARKNET_RPC_URL:?Environment variable STARKNET_RPC_URL must be set}"
 
-export WORLD_ADDRESS=$(cat ./manifests/release/deployment/manifest.json | jq -r '.world.address')
+export WORLD_ADDRESS=$(cat ./manifest_dev.json | jq -r '.world.address')
 
-export DUMMY_STSTEM_ADDRESS=$(cat ./manifests/release/deployment/manifest.json | jq -r '.contracts[] | select(.tag == "Warpacks-dummy_system" and .kind == "DojoContract").address')
+export DUMMY_STSTEM_ADDRESS=$(cat ./manifest_dev.json | jq -r '.contracts[] | select(.tag == "Warpacks-dummy_system").address')
 
 echo "---------------------------------------------------------------------------"
 echo world : $WORLD_ADDRESS
@@ -16,8 +16,8 @@ echo "--------------------------------------------------------------------------
 
 
 # Generated pre dummies commands
-# sozo execute --world $WORLD_ADDRESS $DUMMY_STSTEM_ADDRESS prefine_dummy -c 0,0x4e6f6f626965,1,5,1,4,2,0,0,2,2,2,0,0,6,2,2,0,0,5,4,4,0,0,8,5,4,0,0 --wait --rpc-url $STARKNET_RPC_URL
-# sozo execute --world $WORLD_ADDRESS $DUMMY_STSTEM_ADDRESS prefine_dummy -c 1,0x44756d626965,0,5,1,4,2,0,0,2,2,2,0,0,7,5,2,0,0,9,2,2,0,0,8,4,4,0,0 --wait --rpc-url $STARKNET_RPC_URL
+sozo execute --world $WORLD_ADDRESS $DUMMY_STSTEM_ADDRESS prefine_dummy -c 0,0x4e6f6f626965,1,5,1,4,2,0,0,2,2,2,0,0,6,2,2,0,0,5,4,4,0,0,8,5,4,0,0 --wait --rpc-url $STARKNET_RPC_URL
+sozo execute --world $WORLD_ADDRESS $DUMMY_STSTEM_ADDRESS prefine_dummy -c 1,0x44756d626965,0,5,1,4,2,0,0,2,2,2,0,0,7,5,2,0,0,9,2,2,0,0,8,4,4,0,0 --wait --rpc-url $STARKNET_RPC_URL
 sozo execute --world $WORLD_ADDRESS $DUMMY_STSTEM_ADDRESS prefine_dummy -c 2,0x426572746965,2,5,1,4,2,0,0,2,2,2,0,0,23,5,2,0,0,8,4,4,0,0,11,4,3,0,0 --wait --rpc-url $STARKNET_RPC_URL
 sozo execute --world $WORLD_ADDRESS $DUMMY_STSTEM_ADDRESS prefine_dummy -c 3,0x4a6f646965,1,7,1,4,2,0,0,2,2,2,0,0,15,2,2,0,0,13,4,4,0,0,8,5,4,0,0,24,3,2,0,0,9,4,2,0,0 --wait --rpc-url $STARKNET_RPC_URL
 sozo execute --world $WORLD_ADDRESS $DUMMY_STSTEM_ADDRESS prefine_dummy -c 4,0x526f626572746965,0,8,1,4,2,0,0,2,2,2,0,0,2,2,4,0,0,4,4,5,0,0,14,5,2,0,0,30,4,2,0,0,16,2,2,0,0,12,2,4,90,0 --wait --rpc-url $STARKNET_RPC_URL
