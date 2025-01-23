@@ -1,7 +1,7 @@
 [package]
 cairo-version = "=2.8.4"
 name = "warpack_masters"
-version = "0.2.3"
+version = "0.2.4"
 
 [cairo]
 sierra-replace-ids = true
