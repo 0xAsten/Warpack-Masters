@@ -26,28 +26,28 @@ echo "--------------------------------------------------------------------------
 
 # Generated add recipes commands
 # Pouch,Pouch,Satchel
-sozo execute --world $WORLD_ADDRESS $RECIPE_STSTEM_ADDRESS add_recipe -c 4,4,3 --wait --rpc-url $STARKNET_RPC_URL
+sozo execute --world $WORLD_ADDRESS $RECIPE_STSTEM_ADDRESS add_recipe -c 4,4,3 --wait --rpc-url $STARKNET_RPC_URL --fee ETH
 # Pack,Satchel,Backpack
-sozo execute --world $WORLD_ADDRESS $RECIPE_STSTEM_ADDRESS add_recipe -c 2,3,1 --wait --rpc-url $STARKNET_RPC_URL
+sozo execute --world $WORLD_ADDRESS $RECIPE_STSTEM_ADDRESS add_recipe -c 2,3,1 --wait --rpc-url $STARKNET_RPC_URL --fee ETH
 # Herb,Herb,Healing Potion
-sozo execute --world $WORLD_ADDRESS $RECIPE_STSTEM_ADDRESS add_recipe -c 5,5,11 --wait --rpc-url $STARKNET_RPC_URL
+sozo execute --world $WORLD_ADDRESS $RECIPE_STSTEM_ADDRESS add_recipe -c 5,5,11 --wait --rpc-url $STARKNET_RPC_URL --fee ETH
 # Dagger,Dagger,Augmented Dagger
-sozo execute --world $WORLD_ADDRESS $RECIPE_STSTEM_ADDRESS add_recipe -c 6,6,15 --wait --rpc-url $STARKNET_RPC_URL
+sozo execute --world $WORLD_ADDRESS $RECIPE_STSTEM_ADDRESS add_recipe -c 6,6,15 --wait --rpc-url $STARKNET_RPC_URL --fee ETH
 # Sword,Sword,Augmented Sword
-sozo execute --world $WORLD_ADDRESS $RECIPE_STSTEM_ADDRESS add_recipe -c 7,7,14 --wait --rpc-url $STARKNET_RPC_URL
+sozo execute --world $WORLD_ADDRESS $RECIPE_STSTEM_ADDRESS add_recipe -c 7,7,14 --wait --rpc-url $STARKNET_RPC_URL --fee ETH
 # Shield,Spike,Spike Shield
-sozo execute --world $WORLD_ADDRESS $RECIPE_STSTEM_ADDRESS add_recipe -c 9,8,16 --wait --rpc-url $STARKNET_RPC_URL
+sozo execute --world $WORLD_ADDRESS $RECIPE_STSTEM_ADDRESS add_recipe -c 9,8,16 --wait --rpc-url $STARKNET_RPC_URL --fee ETH
 # Shield,Helmet,Buckler
-sozo execute --world $WORLD_ADDRESS $RECIPE_STSTEM_ADDRESS add_recipe -c 9,10,19 --wait --rpc-url $STARKNET_RPC_URL
+sozo execute --world $WORLD_ADDRESS $RECIPE_STSTEM_ADDRESS add_recipe -c 9,10,19 --wait --rpc-url $STARKNET_RPC_URL --fee ETH
 # Leather Armor,Shield,Mail Armor
-sozo execute --world $WORLD_ADDRESS $RECIPE_STSTEM_ADDRESS add_recipe -c 12,9,18 --wait --rpc-url $STARKNET_RPC_URL
+sozo execute --world $WORLD_ADDRESS $RECIPE_STSTEM_ADDRESS add_recipe -c 12,9,18 --wait --rpc-url $STARKNET_RPC_URL --fee ETH
 # Leather Armor,Spike Shield,Blade Armor
-sozo execute --world $WORLD_ADDRESS $RECIPE_STSTEM_ADDRESS add_recipe -c 12,16,29 --wait --rpc-url $STARKNET_RPC_URL
+sozo execute --world $WORLD_ADDRESS $RECIPE_STSTEM_ADDRESS add_recipe -c 12,16,29 --wait --rpc-url $STARKNET_RPC_URL --fee ETH
 # Leather Armor,Scarlet Cloak,Vampiric Armor
-sozo execute --world $WORLD_ADDRESS $RECIPE_STSTEM_ADDRESS add_recipe -c 12,32,21 --wait --rpc-url $STARKNET_RPC_URL
+sozo execute --world $WORLD_ADDRESS $RECIPE_STSTEM_ADDRESS add_recipe -c 12,32,21 --wait --rpc-url $STARKNET_RPC_URL --fee ETH
 # Bow,Bow,Longbow
-sozo execute --world $WORLD_ADDRESS $RECIPE_STSTEM_ADDRESS add_recipe -c 23,23,34 --wait --rpc-url $STARKNET_RPC_URL
+sozo execute --world $WORLD_ADDRESS $RECIPE_STSTEM_ADDRESS add_recipe -c 23,23,34 --wait --rpc-url $STARKNET_RPC_URL --fee ETH
 # Rage Gauntlet,Helmet,Knight Helmet
-sozo execute --world $WORLD_ADDRESS $RECIPE_STSTEM_ADDRESS add_recipe -c 27,10,28 --wait --rpc-url $STARKNET_RPC_URL
+sozo execute --world $WORLD_ADDRESS $RECIPE_STSTEM_ADDRESS add_recipe -c 27,10,28 --wait --rpc-url $STARKNET_RPC_URL --fee ETH
 # Club,Club,Hammer
-sozo execute --world $WORLD_ADDRESS $RECIPE_STSTEM_ADDRESS add_recipe -c 30,30,25 --wait --rpc-url $STARKNET_RPC_URL
+sozo execute --world $WORLD_ADDRESS $RECIPE_STSTEM_ADDRESS add_recipe -c 30,30,25 --wait --rpc-url $STARKNET_RPC_URL --fee ETH
