@@ -19,6 +19,12 @@ mod models {
     mod Recipe;
 }
 
+mod externals {
+    mod ERC20 {
+        mod interface;
+    }
+}
+
 mod tests {
     mod test_place_item;
     mod test_add_item;

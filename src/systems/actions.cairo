@@ -14,6 +14,8 @@ trait IActions<T> {
         ref self: T, storage_item_id: u32, x: u32, y: u32, rotation: u32
     );
     fn undo_place_item(ref self: T, inventory_item_id: u32);
+    fn get_balance(self: @T) -> u256;
+    fn withdraw_strk(ref self: T, amount: u256);
 }
 
 // TODO: rename the count filed in counter model
@@ -38,9 +40,14 @@ mod actions {
     };
 
     use warpack_masters::items::{Backpack, Pack};
-    use warpack_masters::constants::constants::{GRID_X, GRID_Y, INIT_GOLD, INIT_HEALTH, INIT_STAMINA};
+    use warpack_masters::constants::constants::{GRID_X, GRID_Y, INIT_GOLD, INIT_HEALTH, INIT_STAMINA, REBIRTH_FEE};
 
     use dojo::model::{ModelStorage, ModelValueStorage};
+
+    use warpack_masters::externals::ERC20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
+
+    use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait, Resource};
+
 
     // use debug::PrintTrait;
 
@@ -126,6 +133,10 @@ mod actions {
 
             assert(char.loss >= 5, 'loss not reached');
 
+            let STRK_ADDRESS: ContractAddress = starknet::contract_address_const::<0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d>();
+            IERC20Dispatcher { contract_address: STRK_ADDRESS }
+                .transfer_from(player, starknet::get_contract_address(), REBIRTH_FEE);
+
             let prev_name = char.name;
             // required to calling spawn doesn't fail
             char.name = '';
@@ -209,6 +220,25 @@ mod actions {
             world.write_model(@storageItemsCounter);
 
             self.spawn(prev_name, char.wmClass);
+        }
+
+        fn withdraw_strk(ref self: ContractState, amount: u256) {
+            let mut world = self.world(@"Warpacks");
+
+            let player = get_caller_address();
+            assert(world.dispatcher.is_owner(0, player), 'player not world owner');
+
+            let STRK_ADDRESS: ContractAddress = starknet::contract_address_const::<0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d>();
+            IERC20Dispatcher { contract_address: STRK_ADDRESS }
+                .transfer(player, amount);
+        }
+
+        fn get_balance(self: @ContractState) -> u256 {
+            let player = get_caller_address();
+
+            let STRK_ADDRESS: ContractAddress = starknet::contract_address_const::<0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d>();
+            return IERC20Dispatcher { contract_address: STRK_ADDRESS }
+                .balance_of(player);
         }
         
         fn place_item(

@@ -1,4 +1,6 @@
 mod constants {
+    use starknet::ContractAddress;
+
     const GRID_X: u32 = 9;
     const GRID_Y: u32 = 7;
     const INIT_GOLD: u32 = 8;
@@ -22,4 +24,6 @@ mod constants {
     const EFFECT_REFLECT: u8 = 5;
     const EFFECT_POISON: u8 = 6;
     const EFFECT_VAMPIRISM: u8 = 8;
+
+    const REBIRTH_FEE: u256 = 10000000000000000000;
 }
