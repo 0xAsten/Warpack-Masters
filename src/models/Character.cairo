@@ -12,7 +12,6 @@ struct Characters {
     health: u32,
     wins: u32,
     loss: u32,
-    dummied: bool,
     rating: u32,
     totalWins: u32,
     totalLoss: u32,

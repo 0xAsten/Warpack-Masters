@@ -9,8 +9,6 @@ trait IActions<T> {
     );
     fn rebirth(
         ref self: T,
-        name: felt252,
-        wmClass: WMClass,
     );
     fn place_item(
         ref self: T, storage_item_id: u32, x: u32, y: u32, rotation: u32
@@ -22,6 +20,7 @@ trait IActions<T> {
 
 #[dojo::contract]
 mod actions {
+    use to_byte_array::FormatAsByteArray;
     use super::{IActions, WMClass};
     use starknet::ContractAddress;
 
@@ -56,7 +55,13 @@ mod actions {
 
             let player = get_caller_address();
 
-            assert(name != '', 'name cannot be empty');
+            let name_bytes = name.format_as_byte_array(16);
+            assert(name_bytes.len() <= 12 && name_bytes.len() > 3, 'name size is invalid');
+
+            let first_char = name_bytes[0];
+            let is_uppercase = first_char >= 65 && first_char <= 90;
+            let is_lowercase = first_char >= 97 && first_char <= 122;
+            assert(is_uppercase || is_lowercase, 'name must start with a letter');
 
             let nameRecord: NameRecord = world.read_model(name);
             assert(
@@ -100,7 +105,6 @@ mod actions {
                 health: INIT_HEALTH,
                 wins: 0,
                 loss: 0,
-                dummied: false,
                 rating: prev_rating,
                 totalWins: prev_total_wins,
                 totalLoss: prev_total_loss,
@@ -111,11 +115,8 @@ mod actions {
             });
         }
 
-
         fn rebirth(
             ref self: ContractState,
-            name: felt252,
-            wmClass: WMClass,
         ) {
             let mut world = self.world(@"Warpacks");
 
@@ -125,13 +126,7 @@ mod actions {
 
             assert(char.loss >= 5, 'loss not reached');
 
-            // To allow others to use the player's privous name
-            // if char.name != name {
-            //     let mut nameRecord = get!(world, char.name, NameRecord);
-            //     nameRecord.player = starknet::contract_address_const::<0>();
-            //     set!(world, (nameRecord));
-            // }
-
+            let prev_name = char.name;
             // required to calling spawn doesn't fail
             char.name = '';
 
@@ -213,7 +208,7 @@ mod actions {
             world.write_model(@inventoryItemsCounter);
             world.write_model(@storageItemsCounter);
 
-            self.spawn(name, wmClass);
+            self.spawn(prev_name, char.wmClass);
         }
         
         fn place_item(

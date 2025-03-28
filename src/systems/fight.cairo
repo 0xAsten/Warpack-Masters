@@ -37,26 +37,16 @@ mod fight_system {
 
             let mut char: Characters = world.read_model(player);
 
-            assert(char.dummied == true, 'dummy not created');
             assert(char.loss < 5, 'max loss reached');
 
-            let (seed1, _, _, _) = pseudo_seed();
             let dummyCharCounter: DummyCharacterCounter = world.read_model(char.wins);
-            assert(dummyCharCounter.count > 1, 'only self dummy created');
+            assert(dummyCharCounter.count > 0, 'no dummy created');
 
             let mut battleLogCounter: BattleLogCounter = world.read_model(player);
             let latestBattleLog: BattleLog = world.read_model((player, battleLogCounter.count));
             assert(battleLogCounter.count == 0 || latestBattleLog.winner != 0, 'battle not fought');
 
-            let random_index = random(seed1, dummyCharCounter.count) + 1;
-            let mut dummy_index = random_index;
-            let mut dummyChar: DummyCharacter = world.read_model((char.wins, dummy_index));
-
-            while dummyChar.player == player {
-                dummy_index = dummy_index % dummyCharCounter.count + 1;
-                assert(dummy_index != random_index, 'no others dummy found');
-                dummyChar = world.read_model((char.wins, dummy_index));
-            };
+            let mut dummy_index = 1;
 
             let mut items_cooldown4 = ArrayTrait::new();
             let mut items_cooldown5 = ArrayTrait::new();
@@ -603,7 +593,6 @@ mod fight_system {
                 char.wins += 1;
                 char.totalWins += 1;
                 char.winStreak += 1;
-                char.dummied = false;
                 char.gold += 5;
                 if char.wins < 5 {
                     char.health += 10;
@@ -611,7 +600,20 @@ mod fight_system {
                     char.health += 15;
                 }
 
-                char.rating += 25;
+                let base_rating = 25;
+                let mut bonus_rating = 0;
+                
+                if char.winStreak >= 2 && char.winStreak < 5 {
+                    bonus_rating = 15;
+                } else if char.winStreak >= 5 && char.winStreak < 10 {
+                    bonus_rating = 35;
+                } else if char.winStreak >= 10 && char.winStreak < 20 {
+                    bonus_rating = 50;
+                } else if char.winStreak >= 20 {
+                    bonus_rating = 75;
+                }
+                
+                char.rating += base_rating + bonus_rating;
 
                 if (dummyChar.rating < 10) {
                     dummyChar.rating = 0;
@@ -622,7 +624,7 @@ mod fight_system {
                 char.loss += 1;
                 char.totalLoss += 1;
                 char.winStreak = 0;
-                char.gold += 5;
+                char.gold += 2;
 
                 dummyChar.rating += 25;
 

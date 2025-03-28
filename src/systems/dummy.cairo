@@ -4,7 +4,7 @@ use warpack_masters::models::Character::WMClass;
 
 #[starknet::interface]
 trait IDummy<T> {
-    fn create_dummy(ref self: T,);
+    // fn create_dummy(ref self: T,);
     fn prefine_dummy(ref self: T, level: u32, name: felt252, wmClass: WMClass, items: Array<PredefinedItem>);
     fn update_prefine_dummy(ref self: T, dummyCharId: u32, level: u32, name: felt252, wmClass: WMClass, items: Array<PredefinedItem>);
 }
@@ -31,65 +31,65 @@ mod dummy_system {
 
     #[abi(embed_v0)]
     impl DummyImpl of IDummy<ContractState> {
-        fn create_dummy(ref self: ContractState) {
-            let mut world = self.world(@"Warpacks");
+        // fn create_dummy(ref self: ContractState) {
+        //     let mut world = self.world(@"Warpacks");
 
-            let player = get_caller_address();
+        //     let player = get_caller_address();
 
-            let mut char: Characters = world.read_model(player);
+        //     let mut char: Characters = world.read_model(player);
 
-            assert(char.dummied == false, 'dummy already created');
-            assert(char.loss < 5, 'max loss reached');
+        //     assert(char.dummied == false, 'dummy already created');
+        //     assert(char.loss < 5, 'max loss reached');
 
-            let mut dummyCharCounter: DummyCharacterCounter = world.read_model(char.wins);
-            dummyCharCounter.count += 1;
+        //     let mut dummyCharCounter: DummyCharacterCounter = world.read_model(char.wins);
+        //     dummyCharCounter.count += 1;
 
-            let dummyChar = DummyCharacter {
-                level: char.wins,
-                id: dummyCharCounter.count,
-                name: char.name,
-                wmClass: char.wmClass,
-                health: char.health,
-                player: player,
-                rating: char.rating,
-                stamina: INIT_STAMINA,
-            };
-            char.dummied = true;
+        //     let dummyChar = DummyCharacter {
+        //         level: char.wins,
+        //         id: dummyCharCounter.count,
+        //         name: char.name,
+        //         wmClass: char.wmClass,
+        //         health: char.health,
+        //         player: player,
+        //         rating: char.rating,
+        //         stamina: INIT_STAMINA,
+        //     };
+        //     char.dummied = true;
 
-            let inventoryItemCounter: CharacterItemsInventoryCounter = world.read_model(player);
+        //     let inventoryItemCounter: CharacterItemsInventoryCounter = world.read_model(player);
 
-            let mut count = 0;
-            loop {
-                if count == inventoryItemCounter.count {
-                    break;
-                }
+        //     let mut count = 0;
+        //     loop {
+        //         if count == inventoryItemCounter.count {
+        //             break;
+        //         }
 
-                let inventoryItem: CharacterItemInventory = world.read_model((player, count+1));
+        //         let inventoryItem: CharacterItemInventory = world.read_model((player, count+1));
 
-                let mut dummyCharItemsCounter: DummyCharacterItemsCounter = world.read_model((char.wins, dummyCharCounter.count));
+        //         let mut dummyCharItemsCounter: DummyCharacterItemsCounter = world.read_model((char.wins, dummyCharCounter.count));
 
-                dummyCharItemsCounter.count += 1;
+        //         dummyCharItemsCounter.count += 1;
 
-                let dummyCharItem = DummyCharacterItem {
-                    level: char.wins,
-                    dummyCharId: dummyCharCounter.count,
-                    counterId: dummyCharItemsCounter.count,
-                    itemId: inventoryItem.itemId,
-                    position: inventoryItem.position,
-                    rotation: inventoryItem.rotation,
-                    plugins: inventoryItem.plugins.span(),
-                };
+        //         let dummyCharItem = DummyCharacterItem {
+        //             level: char.wins,
+        //             dummyCharId: dummyCharCounter.count,
+        //             counterId: dummyCharItemsCounter.count,
+        //             itemId: inventoryItem.itemId,
+        //             position: inventoryItem.position,
+        //             rotation: inventoryItem.rotation,
+        //             plugins: inventoryItem.plugins.span(),
+        //         };
 
-                world.write_model(@dummyCharItemsCounter);
-                world.write_model(@dummyCharItem);
+        //         world.write_model(@dummyCharItemsCounter);
+        //         world.write_model(@dummyCharItem);
 
-                count += 1;
-            };
+        //         count += 1;
+        //     };
 
-            world.write_model(@char);
-            world.write_model(@dummyCharCounter);
-            world.write_model(@dummyChar);
-        }
+        //     world.write_model(@char);
+        //     world.write_model(@dummyCharCounter);
+        //     world.write_model(@dummyChar);
+        // }
 
         fn prefine_dummy(ref self: ContractState, level: u32, name: felt252, wmClass: WMClass, items: Array<PredefinedItem>) {
             let mut world = self.world(@"Warpacks");
