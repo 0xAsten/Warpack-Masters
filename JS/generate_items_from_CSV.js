@@ -78,17 +78,17 @@ function generateCairoFile(csvFilePath, cairoFilePath) {
 
           return `
 mod ${modName} {
-    const id: usize = ${item.id};
+    const id: u32 = ${item.id};
     const name: felt252 = '${item.name}';
     const itemType: u8 = ${itemType};
     const rarity: u8 = ${rarity};
-    const width: usize = ${item.width};
-    const height: usize = ${item.height};
-    const price: usize = ${item.price};
+    const width: u32 = ${item.width};
+    const height: u32 = ${item.height};
+    const price: u32 = ${item.price};
     const effectType: u8 = ${effectType};
     const effectStacks: u32 = ${item.effectStacks};
     const effectActivationType: u8 = ${effectActivationType};
-    const chance: usize = ${chance};
+    const chance: u32 = ${chance};
     const cooldown: u8 = ${item.cooldown.replace(' sec', '')};
     const energyCost: u8 = ${item.energyCost};
     const isPlugin: bool = ${item.isPlugin === 'TRUE' ? 'true' : 'false'};

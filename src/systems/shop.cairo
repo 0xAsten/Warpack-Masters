@@ -30,8 +30,8 @@ mod shop_system {
     struct BuyItem {
         #[key]
         player: ContractAddress,
-        itemId: usize,
-        cost: usize,
+        itemId: u32,
+        cost: u32,
         itemRarity: u8,
         birthCount: u32,
     }
@@ -41,8 +41,8 @@ mod shop_system {
     struct SellItem {
         #[key]
         player: ContractAddress,
-        itemId: usize,
-        price: usize,
+        itemId: u32,
+        price: u32,
         itemRarity: u8,
         birthCount: u32,
     }
@@ -160,9 +160,9 @@ mod shop_system {
             assert(char.gold >= 1, 'Not enough gold');
 
             // TODO: Will move these arrays after Dojo supports storing array
-            let mut common: Array<usize> = ArrayTrait::new();
-            let mut rare: Array<usize> = ArrayTrait::new();
-            let mut legendary: Array<usize> = ArrayTrait::new();
+            let mut common: Array<u32> = ArrayTrait::new();
+            let mut rare: Array<u32> = ArrayTrait::new();
+            let mut legendary: Array<u32> = ArrayTrait::new();
 
             let itemsCounter: ItemsCounter = world.read_model(ITEMS_COUNTER_ID);
             let mut count = itemsCounter.count;

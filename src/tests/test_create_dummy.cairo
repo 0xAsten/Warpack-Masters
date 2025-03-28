@@ -154,7 +154,7 @@ mod tests {
     fn create_dummy(world: IWorldDispatcher, action_system_address: ContractAddress, 
             action_system: IActionsDispatcher, item_system: IItemDispatcher, 
             dummy_system: IDummyDispatcher, dummy0: ContractAddress, 
-            level: usize, name: felt252, wmClass: WMClass, health: usize, items:Array<PredefinedItem> ) 
+            level: u32, name: felt252, wmClass: WMClass, health: u32, items:Array<PredefinedItem> ) 
     {
         set_contract_address(dummy0);
         action_system.spawn(name, wmClass);

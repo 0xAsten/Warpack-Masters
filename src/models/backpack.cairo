@@ -7,13 +7,13 @@ struct BackpackGrids {
     #[key]
     player: ContractAddress,
     #[key]
-    x: usize,
+    x: u32,
     #[key]
-    y: usize,
+    y: u32,
     enabled: bool,
     occupied: bool,
-    inventoryItemId: usize,
-    itemId: usize,
+    inventoryItemId: u32,
+    itemId: u32,
     isWeapon: bool,
     isPlugin: bool,
 }

@@ -1,12 +1,12 @@
 mod constants {
-    const GRID_X: usize = 9;
-    const GRID_Y: usize = 7;
-    const INIT_GOLD: usize = 8;
-    const INIT_HEALTH: usize = 25;
+    const GRID_X: u32 = 9;
+    const GRID_Y: u32 = 7;
+    const INIT_GOLD: u32 = 8;
+    const INIT_HEALTH: u32 = 25;
     const INIT_STAMINA: u8 = 100;
 
     const ITEMS_COUNTER_ID: felt252 = 'ITEMS_COUNTER_ID';
-    const STORAGE_FLAG: usize = 999;
+    const STORAGE_FLAG: u32 = 999;
 
     // const EFFECT_ARMOR: felt252 = 'armor';
     // const EFFECT_REGEN: felt252 = 'regen';

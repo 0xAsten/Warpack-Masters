@@ -16,7 +16,7 @@ const predefinedDummiesContent = fs.readFileSync(
 const itemsContent = fs.readFileSync('../src/items.cairo', 'utf-8')
 
 const itemIds = {}
-const itemRegex = /mod (\w+) \{[\s\S]+?const id: usize = (\d+);/g
+const itemRegex = /mod (\w+) \{[\s\S]+?const id: u32 = (\d+);/g
 let match
 while ((match = itemRegex.exec(itemsContent)) !== null) {
   itemIds[match[1]] = match[2]
@@ -28,7 +28,7 @@ const dummyRegex =
 const itemDetailsRegex =
   /items.append\(PredefinedItem\s*{\s*itemId:\s*(\w+)::id,[\s\S]+?position:\s*Position\s*{\s*x:\s*(\d+),\s*y:\s*(\d+)\s*},[\s\S]+?rotation:\s*(\d+)/g
 
-const levelRegex = /const\s+level:\s+usize\s+=\s+(\d+);/
+const levelRegex = /const\s+level:\s+u32\s+=\s+(\d+);/
 const nameRegex = /const\s+name:\s+felt252\s+=\s+'([^']+)';/
 const wmClassRegex = /const\s+wmClass:\s+WMClass\s+=\s+WMClass::([a-zA-Z]+);/
 

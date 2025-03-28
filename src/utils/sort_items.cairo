@@ -1,8 +1,8 @@
 use warpack_masters::models::Item::Item;
 
 fn append_item(
-    ref items_cooldown: Array<(felt252, u32, u8, u8, u32, u32, u8, u8, Span<(u8, usize, usize)>)>,
-    plugins: Span<(u8, usize, usize)>,
+    ref items_cooldown: Array<(felt252, u32, u8, u8, u32, u32, u8, u8, Span<(u8, u32, u32)>)>,
+    plugins: Span<(u8, u32, u32)>,
     item : @Item,
     belongs_to: felt252,
 ) {
@@ -12,11 +12,11 @@ fn append_item(
 }
 
 fn order_items(
-    ref items_cooldown4: Array<(felt252, u32, u8, u8, u32, u32, u8, u8, Span<(u8, usize, usize)>)>,
-    ref items_cooldown5: Array<(felt252, u32, u8, u8, u32, u32, u8, u8, Span<(u8, usize, usize)>)>,
-    ref items_cooldown6: Array<(felt252, u32, u8, u8, u32, u32, u8, u8, Span<(u8, usize, usize)>)>,
-    ref items_cooldown7: Array<(felt252, u32, u8, u8, u32, u32, u8, u8, Span<(u8, usize, usize)>)>,
-) -> Array<(felt252, u32, u8, u8, u32, u32, u8, u8, Span<(u8, usize, usize)>)> {
+    ref items_cooldown4: Array<(felt252, u32, u8, u8, u32, u32, u8, u8, Span<(u8, u32, u32)>)>,
+    ref items_cooldown5: Array<(felt252, u32, u8, u8, u32, u32, u8, u8, Span<(u8, u32, u32)>)>,
+    ref items_cooldown6: Array<(felt252, u32, u8, u8, u32, u32, u8, u8, Span<(u8, u32, u32)>)>,
+    ref items_cooldown7: Array<(felt252, u32, u8, u8, u32, u32, u8, u8, Span<(u8, u32, u32)>)>,
+) -> Array<(felt252, u32, u8, u8, u32, u32, u8, u8, Span<(u8, u32, u32)>)> {
     let mut sorted_items = ArrayTrait::new();
 
     for item in items_cooldown4.span() {

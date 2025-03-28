@@ -64,23 +64,23 @@ mod fight_system {
             let mut items_cooldown7 = ArrayTrait::new();
 
             // =========  buffs/debuffs stacks ========= 
-            let mut char_armor: usize = 0;
-            let mut dummy_armor: usize = 0;
+            let mut char_armor: u32 = 0;
+            let mut dummy_armor: u32 = 0;
 
-            let mut char_regen: usize = 0;
-            let mut dummy_regen: usize = 0;
+            let mut char_regen: u32 = 0;
+            let mut dummy_regen: u32 = 0;
 
-            let mut char_reflect: usize = 0;
-            let mut dummy_reflect: usize = 0;
+            let mut char_reflect: u32 = 0;
+            let mut dummy_reflect: u32 = 0;
 
-            let mut char_empower: usize = 0;
-            let mut dummy_empower: usize = 0;
+            let mut char_empower: u32 = 0;
+            let mut dummy_empower: u32 = 0;
 
-            let mut char_vampirism: usize = 0;
-            let mut dummy_vampirism: usize = 0;
+            let mut char_vampirism: u32 = 0;
+            let mut dummy_vampirism: u32 = 0;
 
-            let mut char_poison: usize = 0;
-            let mut dummy_poison: usize = 0;
+            let mut char_poison: u32 = 0;
+            let mut dummy_poison: u32 = 0;
             // =========  end =========
 
             let mut player_on_hit_items = ArrayTrait::new();
@@ -92,7 +92,7 @@ mod fight_system {
             let inventoryItemsCounter: CharacterItemsInventoryCounter = world.read_model(player);
             let mut inventoryItemCount = inventoryItemsCounter.count;
 
-            let mut items_length: usize = 0;
+            let mut items_length: u32 = 0;
             loop {
                 if inventoryItemCount == 0 {
                     break;
@@ -279,7 +279,7 @@ mod fight_system {
             let dummy_index = battleLog.dummyCharId;
             let mut dummyChar: DummyCharacter = world.read_model((char.wins, dummy_index));
 
-            let player_health_flag: usize = char.health;
+            let player_health_flag: u32 = char.health;
             let player_buffs = battleLog.player_buffs;
             let mut playerStatus = CharStatus {
                 hp: char.health,
@@ -292,7 +292,7 @@ mod fight_system {
                 vampirism: *player_buffs.at(5),
             };
 
-            let dummy_health_flag: usize = dummyChar.health;
+            let dummy_health_flag: u32 = dummyChar.health;
             let dummy_buffs = battleLog.dummy_buffs;
             let mut dummyStatus = CharStatus {
                 hp: dummyChar.health,
@@ -352,7 +352,7 @@ mod fight_system {
                     break;
                 }
 
-                let mut i: usize = 0;
+                let mut i: u32 = 0;
 
                 // Skip stamina regeneration on the first second
                 if seconds > 1 {
@@ -638,7 +638,7 @@ mod fight_system {
         }
     }
 
-    fn attack(ref world: WorldStorage, attackStatus: @AttackStatus, ref charStatus: CharStatus, ref opponentStatus: CharStatus, plugins: Span<(u8, usize, usize)>, char_on_attack_items_span: Span<(u8, usize, usize)>, opponent_on_hit_items_span: Span<(u8, usize, usize)>, ref battleLogsCount: u8) -> felt252 {
+    fn attack(ref world: WorldStorage, attackStatus: @AttackStatus, ref charStatus: CharStatus, ref opponentStatus: CharStatus, plugins: Span<(u8, u32, u32)>, char_on_attack_items_span: Span<(u8, u32, u32)>, opponent_on_hit_items_span: Span<(u8, u32, u32)>, ref battleLogsCount: u8) -> felt252 {
         let mut damageCaused = 0;
         match *attackStatus.effect_type {
             0 => {

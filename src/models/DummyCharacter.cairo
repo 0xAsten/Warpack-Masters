@@ -6,14 +6,14 @@ use warpack_masters::models::Character::WMClass;
 #[dojo::model]
 struct DummyCharacter {
     #[key]
-    level: usize,
+    level: u32,
     #[key]
     id: u32,
     name: felt252,
     wmClass: WMClass,
-    health: usize,
+    health: u32,
     player: ContractAddress,
-    rating: usize,
+    rating: u32,
     stamina: u8,
 }
 
@@ -21,6 +21,6 @@ struct DummyCharacter {
 #[dojo::model]
 struct DummyCharacterCounter {
     #[key]
-    level: usize,
-    count: usize,
+    level: u32,
+    count: u32,
 }

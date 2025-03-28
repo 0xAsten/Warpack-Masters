@@ -5,25 +5,25 @@ use warpack_masters::models::CharacterItem::Position;
 #[dojo::model]
 struct DummyCharacterItem {
     #[key]
-    level: usize,
+    level: u32,
     #[key]
     dummyCharId: u32,
     #[key]
-    counterId: usize,
-    itemId: usize,
+    counterId: u32,
+    itemId: u32,
     position: Position,
     // 0, 90, 180, 270
-    rotation: usize,
+    rotation: u32,
     // effectType, chance, stacks
-    plugins: Span<(u8, usize, usize)>,
+    plugins: Span<(u8, u32, u32)>,
 }
 
 #[derive(Drop, Serde)]
 #[dojo::model]
 struct DummyCharacterItemsCounter {
     #[key]
-    level: usize,
+    level: u32,
     #[key]
     dummyCharId: u32,
-    count: usize,
+    count: u32,
 }

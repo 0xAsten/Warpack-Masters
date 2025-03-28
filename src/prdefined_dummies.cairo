@@ -5,11 +5,11 @@ use core::fmt::{Display, Formatter, Error};
 
 #[derive(Copy, Drop, Serde)]
 struct PredefinedItem {
-    itemId: usize,
+    itemId: u32,
     position: Position,
     // rotation: 0, 90, 180, 270
-    rotation: usize,
-    plugins: Span<(u8, usize, usize)>
+    rotation: u32,
+    plugins: Span<(u8, u32, u32)>
 }
 
 impl PointDisplay of Display<PredefinedItem> {
@@ -41,10 +41,10 @@ mod Dummy0 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Dagger, Herb, Spike};
 
-    const level: usize = 0;
+    const level: u32 = 0;
     const name: felt252 = 'Noobie';
     const wmClass: WMClass = WMClass::Warlock;
-    const health: usize = 25;
+    const health: u32 = 25;
 
     fn get_items() -> Array<PredefinedItem> {
         let mut items: Array<PredefinedItem> = array![];
@@ -93,10 +93,10 @@ mod Dummy1 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Sword, Shield, Spike};
 
-    const level: usize = 1;
+    const level: u32 = 1;
     const name: felt252 = 'Dumbie';
     const wmClass: WMClass = WMClass::Warrior;
-    const health: usize = 35;
+    const health: u32 = 35;
 
     fn get_items() -> Array<PredefinedItem> {
         let mut items: Array<PredefinedItem> = array![];
@@ -146,10 +146,10 @@ mod Dummy2 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Bow, Spike, HealingPotion};
 
-    const level: usize = 2;
+    const level: u32 = 2;
     const name: felt252 = 'Bertie';
     const wmClass: WMClass = WMClass::Archer;
-    const health: usize = 45;
+    const health: u32 = 45;
 
     fn get_items() -> Array<PredefinedItem> {
         let mut items: Array<PredefinedItem> = array![];
@@ -198,10 +198,10 @@ mod Dummy3 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, AugmentedDagger, Poison, Spike, Crossbow, Shield};
 
-    const level: usize = 3;
+    const level: u32 = 3;
     const name: felt252 = 'Jodie';
     const wmClass: WMClass = WMClass::Warlock;
-    const health: usize = 55;
+    const health: u32 = 55;
 
     fn get_items() -> Array<PredefinedItem> {
         let mut items: Array<PredefinedItem> = array![];
@@ -264,10 +264,10 @@ mod Dummy4 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Pouch, AugmentedSword, Club, SpikeShield, LeatherArmor};
 
-    const level: usize = 4;
+    const level: u32 = 4;
     const name: felt252 = 'Robertie';
     const wmClass: WMClass = WMClass::Warrior;
-    const health: usize = 65;
+    const health: u32 = 65;
 
     fn get_items() -> Array<PredefinedItem> {
         let mut items: Array<PredefinedItem> = array![];
@@ -337,10 +337,10 @@ mod Dummy5 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Bow, Crossbow, Buckler, MagicWater, HealingPotion};
 
-    const level: usize = 5;
+    const level: u32 = 5;
     const name: felt252 = 'Hartie';
     const wmClass: WMClass = WMClass::Archer;
-    const health: usize = 80;
+    const health: u32 = 80;
 
     fn get_items() -> Array<PredefinedItem> {
         let mut items: Array<PredefinedItem> = array![];
@@ -417,10 +417,10 @@ mod Dummy6 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Satchel, AugmentedDagger, Crossbow, PlagueFlower, Poison, Herb};
 
-    const level: usize = 6;
+    const level: u32 = 6;
     const name: felt252 = 'Bardie';
     const wmClass: WMClass = WMClass::Warlock;
-    const health: usize = 80;
+    const health: u32 = 80;
 
     fn get_items() -> Array<PredefinedItem> {
         let mut items: Array<PredefinedItem> = array![];
@@ -497,10 +497,10 @@ mod Dummy7 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Satchel, Hammer, AugmentedDagger, RageGauntlet, SpikeShield, LeatherArmor, Helmet};
 
-    const level: usize = 7;
+    const level: u32 = 7;
     const name: felt252 = 'Tartie';
     const wmClass: WMClass = WMClass::Warrior;
-    const health: usize = 80;
+    const health: u32 = 80;
 
     fn get_items() -> Array<PredefinedItem> {
         let mut items: Array<PredefinedItem> = array![];
@@ -591,10 +591,10 @@ mod Dummy8 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Satchel, Bow, Buckler, RageGauntlet, MagicWater, HealingPotion, Poison};
 
-    const level: usize = 8;
+    const level: u32 = 8;
     const name: felt252 = 'Koolie';
     const wmClass: WMClass = WMClass::Archer;
-    const health: usize = 80;
+    const health: u32 = 80;
 
     fn get_items() -> Array<PredefinedItem> {
         let mut items: Array<PredefinedItem> = array![];
@@ -685,10 +685,10 @@ mod Dummy9 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Satchel, PlagueFlower, MailArmor, Poison, Crossbow, MagicWater, HealingPotion};
 
-    const level: usize = 9;
+    const level: u32 = 9;
     const name: felt252 = 'Goobie';
     const wmClass: WMClass = WMClass::Warlock;
-    const health: usize = 80;
+    const health: u32 = 80;
 
     fn get_items() -> Array<PredefinedItem> {
         let mut items: Array<PredefinedItem> = array![];
@@ -779,10 +779,10 @@ mod Dummy10 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Satchel, Greatsword, Buckler, KnightHelmet, MagicWater, HealingPotion};
 
-    const level: usize = 10;
+    const level: u32 = 10;
     const name: felt252 = 'Goodie';
     const wmClass: WMClass = WMClass::Warrior;
-    const health: usize = 80;
+    const health: u32 = 80;
 
     fn get_items() -> Array<PredefinedItem> {
         let mut items: Array<PredefinedItem> = array![];
@@ -867,10 +867,10 @@ mod Dummy11 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Satchel, Bow, Crossbow, Buckler, KnightHelmet, MagicWater, SpikeShield, AugmentedDagger};
 
-    const level: usize = 11;
+    const level: u32 = 11;
     const name: felt252 = 'Zippie';
     const wmClass: WMClass = WMClass::Archer;
-    const health: usize = 80;
+    const health: u32 = 80;
 
     fn get_items() -> Array<PredefinedItem> {
         let mut items: Array<PredefinedItem> = array![];
@@ -983,10 +983,10 @@ mod Dummy12 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Satchel, Pouch, PlagueFlower, AugmentedDagger, MailArmor, HealingPotion, Poison, Crossbow};
 
-    const level: usize = 12;
+    const level: u32 = 12;
     const name: felt252 = 'Peppie';
     const wmClass: WMClass = WMClass::Warlock;
-    const health: usize = 80;
+    const health: u32 = 80;
 
     fn get_items() -> Array<PredefinedItem> {
         let mut items: Array<PredefinedItem> = array![];
@@ -1092,10 +1092,10 @@ mod Dummy13 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Greatsword, Hammer, AugmentedSword, BladeArmor, Buckler, HealingPotion, MagicWater, KnightHelmet};
 
-    const level: usize = 13;
+    const level: u32 = 13;
     const name: felt252 = 'Bubbie';
     const wmClass: WMClass = WMClass::Warrior;
-    const health: usize = 80;
+    const health: u32 = 80;
 
     fn get_items() -> Array<PredefinedItem> {
         let mut items: Array<PredefinedItem> = array![];
@@ -1214,10 +1214,10 @@ mod Dummy14 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Satchel, Bow, AugmentedSword, KnightHelmet, SpikeShield, MailArmor, AmuletOfFury, HealingPotion, MagicWater};
 
-    const level: usize = 14;
+    const level: u32 = 14;
     const name: felt252 = 'Nettie';
     const wmClass: WMClass = WMClass::Archer;
-    const health: usize = 80;
+    const health: u32 = 80;
 
     fn get_items() -> Array<PredefinedItem> {
         let mut items: Array<PredefinedItem> = array![];
@@ -1336,10 +1336,10 @@ mod Dummy15 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, PlagueFlower, MailArmor, Buckler, Crossbow, AugmentedSword, HealingPotion, Poison};
 
-    const level: usize = 15;
+    const level: u32 = 15;
     const name: felt252 = 'Quillie';
     const wmClass: WMClass = WMClass::Warlock;
-    const health: usize = 80;
+    const health: u32 = 80;
 
     fn get_items() -> Array<PredefinedItem> {
         let mut items: Array<PredefinedItem> = array![];
@@ -1458,10 +1458,10 @@ mod Dummy16 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Satchel, VampiricArmor, Greatsword, AugmentedDagger, MailArmor, SpikeShield, KnightHelmet, HealingPotion};
 
-    const level: usize = 16;
+    const level: u32 = 16;
     const name: felt252 = 'Winkie';
     const wmClass: WMClass = WMClass::Warrior;
-    const health: usize = 80;
+    const health: u32 = 80;
 
     fn get_items() -> Array<PredefinedItem> {
         let mut items: Array<PredefinedItem> = array![];
@@ -1587,10 +1587,10 @@ mod Dummy17 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Satchel, Bow, AugmentedSword, KnightHelmet, BladeArmor, MailArmor, HealingPotion, AmuletOfFury, MagicWater};
 
-    const level: usize = 17;
+    const level: u32 = 17;
     const name: felt252 = 'Rennie';
     const wmClass: WMClass = WMClass::Archer;
-    const health: usize = 80;
+    const health: u32 = 80;
 
     fn get_items() -> Array<PredefinedItem> {
         let mut items: Array<PredefinedItem> = array![];
@@ -1723,10 +1723,10 @@ mod Dummy18 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Satchel, PlagueFlower, MailArmor, VampiricArmor, AugmentedSword, Bow, Poison, HealingPotion};
 
-    const level: usize = 18;
+    const level: u32 = 18;
     const name: felt252 = 'Huggie';
     const wmClass: WMClass = WMClass::Warlock;
-    const health: usize = 80;
+    const health: u32 = 80;
 
     fn get_items() -> Array<PredefinedItem> {
         let mut items: Array<PredefinedItem> = array![];
@@ -1852,10 +1852,10 @@ mod Dummy19 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Greatsword, BladeArmor, AugmentedSword, Hammer, KnightHelmet, RageGauntlet, AmuletOfFury, Buckler, HealingPotion, Helmet, MagicWater};
 
-    const level: usize = 19;
+    const level: u32 = 19;
     const name: felt252 = 'Dottie';
     const wmClass: WMClass = WMClass::Warrior;
-    const health: usize = 80;
+    const health: u32 = 80;
 
     fn get_items() -> Array<PredefinedItem> {
         let mut items: Array<PredefinedItem> = array![];
@@ -2016,10 +2016,10 @@ mod Dummy20 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Satchel, Bow, AugmentedSword, Crossbow, PlagueFlower, VampiricArmor, MailArmor, AmuletOfFury, MagicWater, KnightHelmet};
 
-    const level: usize = 20;
+    const level: u32 = 20;
     const name: felt252 = 'Quackie';
     const wmClass: WMClass = WMClass::Archer;
-    const health: usize = 80;
+    const health: u32 = 80;
 
     fn get_items() -> Array<PredefinedItem> {
         let mut items: Array<PredefinedItem> = array![];

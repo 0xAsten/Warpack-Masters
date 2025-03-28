@@ -5,8 +5,8 @@ use warpack_masters::models::Character::WMClass;
 #[starknet::interface]
 trait IDummy<T> {
     fn create_dummy(ref self: T,);
-    fn prefine_dummy(ref self: T, level: usize, name: felt252, wmClass: WMClass, items: Array<PredefinedItem>);
-    fn update_prefine_dummy(ref self: T, dummyCharId: usize, level: usize, name: felt252, wmClass: WMClass, items: Array<PredefinedItem>);
+    fn prefine_dummy(ref self: T, level: u32, name: felt252, wmClass: WMClass, items: Array<PredefinedItem>);
+    fn update_prefine_dummy(ref self: T, dummyCharId: u32, level: u32, name: felt252, wmClass: WMClass, items: Array<PredefinedItem>);
 }
 
 #[dojo::contract]
@@ -91,13 +91,13 @@ mod dummy_system {
             world.write_model(@dummyChar);
         }
 
-        fn prefine_dummy(ref self: ContractState, level: usize, name: felt252, wmClass: WMClass, items: Array<PredefinedItem>) {
+        fn prefine_dummy(ref self: ContractState, level: u32, name: felt252, wmClass: WMClass, items: Array<PredefinedItem>) {
             let mut world = self.world(@"Warpacks");
 
             let player = get_caller_address();
             assert(world.dispatcher.is_owner(0, player), 'player not world owner');
 
-            let mut health: usize = INIT_HEALTH;
+            let mut health: u32 = INIT_HEALTH;
 
             match level {
                 0 => {
@@ -174,13 +174,13 @@ mod dummy_system {
             world.write_model(@NameRecord{ name, player });
         }
 
-        fn update_prefine_dummy(ref self: ContractState, dummyCharId: usize, level: usize, name: felt252, wmClass: WMClass, items: Array<PredefinedItem>) {
+        fn update_prefine_dummy(ref self: ContractState, dummyCharId: u32, level: u32, name: felt252, wmClass: WMClass, items: Array<PredefinedItem>) {
             let mut world = self.world(@"Warpacks");
 
             let player = get_caller_address();
             assert(world.dispatcher.is_owner(0, player), 'player not world owner');
     
-            let mut health: usize = INIT_HEALTH;
+            let mut health: u32 = INIT_HEALTH;
         
             match level {
                 0 => {

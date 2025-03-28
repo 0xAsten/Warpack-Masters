@@ -2,8 +2,8 @@ use starknet::ContractAddress;
 
 #[derive(Copy, Drop, Serde, Introspect)]
 struct Position {
-    x: usize,
-    y: usize
+    x: u32,
+    y: u32
 }
 
 #[derive(Drop, Serde)]
@@ -12,8 +12,8 @@ struct CharacterItemStorage {
     #[key]
     player: ContractAddress,
     #[key]
-    id: usize,
-    itemId: usize,
+    id: u32,
+    itemId: u32,
 }
 
 #[derive(Drop, Serde)]
@@ -21,7 +21,7 @@ struct CharacterItemStorage {
 struct CharacterItemsStorageCounter {
     #[key]
     player: ContractAddress,
-    count: usize,
+    count: u32,
 }
 
 #[derive(Drop, Serde)]
@@ -30,13 +30,13 @@ struct CharacterItemInventory {
     #[key]
     player: ContractAddress,
     #[key]
-    id: usize,
-    itemId: usize,
+    id: u32,
+    itemId: u32,
     position: Position,
     // 0, 90, 180, 270
-    rotation: usize,
+    rotation: u32,
     // effectType, chance, stacks
-    plugins: Array<(u8, usize, usize)>,
+    plugins: Array<(u8, u32, u32)>,
 }
 
 #[derive(Drop, Serde)]
@@ -44,10 +44,10 @@ struct CharacterItemInventory {
 struct CharacterItemsInventoryCounter {
     #[key]
     player: ContractAddress,
-    count: usize,
+    count: u32,
 }
 
-pub fn are_items_nearby(pos1: Position, width1: usize, height1: usize, rotation1: usize, pos2: Position, width2: usize, height2: usize, rotation2: usize) -> bool {
+pub fn are_items_nearby(pos1: Position, width1: u32, height1: u32, rotation1: u32, pos2: Position, width2: u32, height2: u32, rotation2: u32) -> bool {
     // Calculate item dimensions considering rotation
     let (final_width1, final_height1) = if rotation1 == 90 || rotation1 == 270 {
         (height1, width1)

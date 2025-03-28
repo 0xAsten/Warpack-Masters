@@ -13,7 +13,7 @@ trait IActions<T> {
         wmClass: WMClass,
     );
     fn place_item(
-        ref self: T, storage_item_id: u32, x: usize, y: usize, rotation: usize
+        ref self: T, storage_item_id: u32, x: u32, y: u32, rotation: u32
     );
     fn undo_place_item(ref self: T, inventory_item_id: u32);
 }
@@ -217,7 +217,7 @@ mod actions {
         }
         
         fn place_item(
-            ref self: ContractState, storage_item_id: u32, x: usize, y: usize, rotation: usize
+            ref self: ContractState, storage_item_id: u32, x: u32, y: u32, rotation: u32
         ) {
             let mut world = self.world(@"Warpacks");
 

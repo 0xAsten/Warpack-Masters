@@ -5,8 +5,8 @@ use starknet::ContractAddress;
 struct Shop {
     #[key]
     player: ContractAddress,
-    item1: usize,
-    item2: usize,
-    item3: usize,
-    item4: usize,
+    item1: u32,
+    item2: u32,
+    item3: u32,
+    item4: u32,
 }
