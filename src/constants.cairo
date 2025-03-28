@@ -26,4 +26,6 @@ mod constants {
     const EFFECT_VAMPIRISM: u8 = 8;
 
     const REBIRTH_FEE: u256 = 10000000000000000000;
+
+    const GAME_CONFIG_ID: felt252 = 'GAME_CONFIG_ID';
 }

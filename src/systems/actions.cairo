@@ -36,11 +36,12 @@ mod actions {
         Item::Item,
         Character::{Characters, NameRecord},
         Shop::Shop,
-        Fight::{BattleLog, BattleLogCounter}
+        Fight::{BattleLog, BattleLogCounter},
+        Game::GameConfig
     };
 
     use warpack_masters::items::{Backpack, Pack};
-    use warpack_masters::constants::constants::{GRID_X, GRID_Y, INIT_GOLD, INIT_HEALTH, INIT_STAMINA, REBIRTH_FEE};
+    use warpack_masters::constants::constants::{GRID_X, GRID_Y, INIT_GOLD, INIT_HEALTH, INIT_STAMINA, REBIRTH_FEE, GAME_CONFIG_ID};
 
     use dojo::model::{ModelStorage, ModelValueStorage};
 
@@ -132,8 +133,9 @@ mod actions {
             let mut char: Characters = world.read_model(player);
 
             assert(char.loss >= 5, 'loss not reached');
-
-            let STRK_ADDRESS: ContractAddress = starknet::contract_address_const::<0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d>();
+            
+            let gameConfig: GameConfig = world.read_model(GAME_CONFIG_ID);
+            let STRK_ADDRESS: ContractAddress = gameConfig.strk_address;
             IERC20Dispatcher { contract_address: STRK_ADDRESS }
                 .transfer_from(player, starknet::get_contract_address(), REBIRTH_FEE);
 
@@ -228,15 +230,19 @@ mod actions {
             let player = get_caller_address();
             assert(world.dispatcher.is_owner(0, player), 'player not world owner');
 
-            let STRK_ADDRESS: ContractAddress = starknet::contract_address_const::<0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d>();
+            let gameConfig: GameConfig = world.read_model(GAME_CONFIG_ID);
+            let STRK_ADDRESS: ContractAddress = gameConfig.strk_address;
             IERC20Dispatcher { contract_address: STRK_ADDRESS }
                 .transfer(player, amount);
         }
 
         fn get_balance(self: @ContractState) -> u256 {
+            let mut world = self.world(@"Warpacks");
+
             let player = get_caller_address();
 
-            let STRK_ADDRESS: ContractAddress = starknet::contract_address_const::<0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d>();
+            let gameConfig: GameConfig = world.read_model(GAME_CONFIG_ID);
+            let STRK_ADDRESS: ContractAddress = gameConfig.strk_address;
             return IERC20Dispatcher { contract_address: STRK_ADDRESS }
                 .balance_of(player);
         }

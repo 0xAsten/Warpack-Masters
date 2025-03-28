@@ -5,6 +5,7 @@ mod systems {
     mod item;
     mod shop;
     mod recipe;
+    mod config;
 }
 
 mod models {
@@ -17,6 +18,7 @@ mod models {
     mod DummyCharacterItem;
     mod Fight;
     mod Recipe;
+    mod Game;
 }
 
 mod externals {
