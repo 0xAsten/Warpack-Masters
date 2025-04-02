@@ -1,0 +1,38 @@
+---
+layout: default
+---
+
+<div class="tutorial">
+  <div class="tutorial-sidebar">
+    <h3>Tutorials</h3>
+    <ul>
+      {% for tutorial in site.tutorials %}
+        <li {% if page.url == tutorial.url %}class="active"{% endif %}>
+          <a href="{{ tutorial.url | relative_url }}">{{ tutorial.title }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div class="tutorial-content">
+    <h1>{{ page.title }}</h1>
+    
+    {% if page.description %}
+    <p class="description">{{ page.description }}</p>
+    {% endif %}
+
+    <div class="tutorial-body">
+      {{ content }}
+    </div>
+
+    <div class="tutorial-navigation">
+      {% if page.prev_tutorial %}
+        <a href="{{ site.baseurl }}/tutorials/{{ page.prev_tutorial }}" class="prev">&laquo; Previous</a>
+      {% endif %}
+      
+      {% if page.next_tutorial %}
+        <a href="{{ site.baseurl }}/tutorials/{{ page.next_tutorial }}" class="next">Next &raquo;</a>
+      {% endif %}
+    </div>
+  </div>
+</div>

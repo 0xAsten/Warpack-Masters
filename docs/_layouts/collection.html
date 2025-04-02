@@ -1,0 +1,40 @@
+---
+layout: default
+---
+
+<div class="collection-header">
+<h1>{{ page.title }}</h1>
+<p class="collection-description">{{ page.description }}</p>
+</div>
+
+<div class="collection-content">
+{{ content }}
+</div>
+
+<style>
+  .tutorial-card, .mechanic-card {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    border-radius: 8px;
+    background-color: #3f4a55;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .tutorial-card:hover, .mechanic-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  }
+  
+  .tutorial-card h2, .mechanic-card h2 {
+    margin-top: 0;
+  }
+  
+  .tutorial-card a, .mechanic-card a {
+    color: var(--primary-color);
+    text-decoration: none;
+  }
+  
+  .tutorial-card a:hover, .mechanic-card a:hover {
+    text-decoration: underline;
+  }
+</style> 

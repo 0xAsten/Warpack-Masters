@@ -1,0 +1,43 @@
+---
+layout: default
+---
+
+<div class="mechanic">
+  <div class="mechanic-sidebar">
+    <h3>Game Mechanics</h3>
+    <ul>
+      {% for mechanic in site.mechanics %}
+        <li {% if page.url == mechanic.url %}class="active"{% endif %}>
+          <a href="{{ mechanic.url | relative_url }}">{{ mechanic.title }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div class="mechanic-content">
+    <h1>{{ page.title }}</h1>
+    
+    {% if page.description %}
+    <p class="description">{{ page.description }}</p>
+    {% endif %}
+
+    <div class="mechanic-body">
+      {{ content }}
+    </div>
+    
+    {% if page.related_mechanics %}
+    <div class="related-mechanics">
+      <h3>Related Mechanics</h3>
+      <ul>
+      {% for related in page.related_mechanics %}
+        {% for mechanic in site.mechanics %}
+          {% if mechanic.slug == related %}
+            <li><a href="{{ mechanic.url | relative_url }}">{{ mechanic.title }}</a></li>
+          {% endif %}
+        {% endfor %}
+      {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+</div>

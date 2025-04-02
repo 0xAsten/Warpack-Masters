@@ -1,0 +1,15 @@
+<div class="container">
+  <a class="site-title" href="{{ '/' | relative_url }}">
+    <img src="{{ '/assets/images/logo.png' | relative_url }}" alt="{{ site.title }}" class="logo">
+    {{ site.title }}
+  </a>
+  
+  <nav class="site-nav">
+    <ul>
+      <li><a href="{{ '/' | relative_url }}" {% if page.url == '/' %}class="active"{% endif %}>Home</a></li>
+      <li><a href="{{ '/tutorials' | relative_url }}" {% if page.url contains '/tutorials' %}class="active"{% endif %}>Tutorials</a></li>
+      <li><a href="{{ '/mechanics' | relative_url }}" {% if page.url contains '/mechanics' %}class="active"{% endif %}>Game Mechanics</a></li>
+      <li><a href="{{ '/about' | relative_url }}" {% if page.url == '/about' %}class="active"{% endif %}>About</a></li>
+    </ul>
+  </nav>
+</div>
