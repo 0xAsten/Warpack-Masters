@@ -1,16 +1,16 @@
 [package]
-cairo-version = "=2.9.2"
+cairo-version = "=2.9.4"
 name = "warpack_masters"
-version = "0.2.5"
+version = "0.3.1"
 
 [cairo]
 sierra-replace-ids = true
 
 [dependencies]
-dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.3.1" }
+dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.4.0" }
 
 [dev-dependencies]
-dojo_cairo_test = { git = "https://github.com/dojoengine/dojo.git", tag = "v1.3.1" }
+dojo_cairo_test = { git = "https://github.com/dojoengine/dojo.git", tag = "v1.4.0" }
 
 [[target.starknet-contract]]
 
