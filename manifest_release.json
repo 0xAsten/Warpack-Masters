@@ -1,7 +1,7 @@
 {
   "world": {
-    "class_hash": "0x45575a88cc5cef1e444c77ce60b7b4c9e73a01cbbe20926d5a4c72a94011410",
-    "address": "0x73760e29cfd7d8b903117965629d5d4af504749734c20f35a659f290ddfabf0",
+    "class_hash": "0x75fc75bcd1a7f8b4bf64b74978b0f89c8cee44bb755c1dae6f82284756451ec",
+    "address": "0x4be4a6c909de192d49b479dab5bdebda7300db188fd3b18006a2f53342e155",
     "seed": "warpack_masters",
     "name": "Warpack Masters",
     "entrypoints": [
@@ -11,6 +11,7 @@
       "register_event",
       "register_model",
       "register_contract",
+      "register_library",
       "init_contract",
       "upgrade_event",
       "upgrade_model",
@@ -78,6 +79,10 @@
           {
             "name": "Unregistered",
             "type": "()"
+          },
+          {
+            "name": "Library",
+            "type": "(core::starknet::class_hash::ClassHash, core::felt252)"
           }
         ]
       },
@@ -358,6 +363,34 @@
             "outputs": [
               {
                 "type": "core::starknet::contract_address::ContractAddress"
+              }
+            ],
+            "state_mutability": "external"
+          },
+          {
+            "type": "function",
+            "name": "register_library",
+            "inputs": [
+              {
+                "name": "namespace",
+                "type": "core::byte_array::ByteArray"
+              },
+              {
+                "name": "class_hash",
+                "type": "core::starknet::class_hash::ClassHash"
+              },
+              {
+                "name": "name",
+                "type": "core::byte_array::ByteArray"
+              },
+              {
+                "name": "version",
+                "type": "core::byte_array::ByteArray"
+              }
+            ],
+            "outputs": [
+              {
+                "type": "core::starknet::class_hash::ClassHash"
               }
             ],
             "state_mutability": "external"
@@ -967,6 +1000,28 @@
       },
       {
         "type": "event",
+        "name": "dojo::world::world_contract::world::LibraryRegistered",
+        "kind": "struct",
+        "members": [
+          {
+            "name": "name",
+            "type": "core::byte_array::ByteArray",
+            "kind": "key"
+          },
+          {
+            "name": "namespace",
+            "type": "core::byte_array::ByteArray",
+            "kind": "key"
+          },
+          {
+            "name": "class_hash",
+            "type": "core::starknet::class_hash::ClassHash",
+            "kind": "data"
+          }
+        ]
+      },
+      {
+        "type": "event",
         "name": "dojo::world::world_contract::world::EventEmitted",
         "kind": "struct",
         "members": [
@@ -1207,6 +1262,11 @@
             "kind": "nested"
           },
           {
+            "name": "LibraryRegistered",
+            "type": "dojo::world::world_contract::world::LibraryRegistered",
+            "kind": "nested"
+          },
+          {
             "name": "EventEmitted",
             "type": "dojo::world::world_contract::world::EventEmitted",
             "kind": "nested"
@@ -1252,8 +1312,8 @@
   },
   "contracts": [
     {
-      "address": "0x58ccf59375950f5f918131e82e50e2980e367f71a952754610a335ab0bb526d",
-      "class_hash": "0x38e0eaa7393157bb42e6e7b5bb715eee726ff39af187ca696b0b0891696ff2c",
+      "address": "0x1bff5480cdec23e46199a0df5aa148e6e66b02fd005dad22bda35ab2d76d0d8",
+      "class_hash": "0x61798b351afd1714543ff5c9ddc7b4265a97562f59dd9df73cf3de8ccabd50c",
       "abi": [
         {
           "type": "impl",
@@ -1329,6 +1389,20 @@
           ]
         },
         {
+          "type": "struct",
+          "name": "core::integer::u256",
+          "members": [
+            {
+              "name": "low",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "high",
+              "type": "core::integer::u128"
+            }
+          ]
+        },
+        {
           "type": "interface",
           "name": "warpack_masters::systems::actions::IActions",
           "items": [
@@ -1351,16 +1425,7 @@
             {
               "type": "function",
               "name": "rebirth",
-              "inputs": [
-                {
-                  "name": "name",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "wmClass",
-                  "type": "warpack_masters::models::Character::WMClass"
-                }
-              ],
+              "inputs": [],
               "outputs": [],
               "state_mutability": "external"
             },
@@ -1395,6 +1460,29 @@
                 {
                   "name": "inventory_item_id",
                   "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "get_balance",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::integer::u256"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "withdraw_strk",
+              "inputs": [
+                {
+                  "name": "amount",
+                  "type": "core::integer::u256"
                 }
               ],
               "outputs": [],
@@ -1525,12 +1613,197 @@
         "rebirth",
         "place_item",
         "undo_place_item",
+        "withdraw_strk",
         "upgrade"
       ]
     },
     {
-      "address": "0xba65647b1cf79712f9679c2c7a325a982aaf900b318d5ae52ea9b1b5eff741",
-      "class_hash": "0x7d5c9547d34a5714223fe5d6e2d4725103f12d2489b40a6630b3ba0e1c4192",
+      "address": "0x654db47b5d61afe21261d1f9121f0904ed54cb72869118d603ed8f71a2b67a0",
+      "class_hash": "0x58047ec2695e81baf36660fba2d9bd39fa8bfb8d4b584ebd7c9b1285703bd46",
+      "abi": [
+        {
+          "type": "impl",
+          "name": "config_system__ContractImpl",
+          "interface_name": "dojo::contract::interface::IContract"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::interface::IContract",
+          "items": []
+        },
+        {
+          "type": "impl",
+          "name": "config_system__DeployedContractImpl",
+          "interface_name": "dojo::meta::interface::IDeployedResource"
+        },
+        {
+          "type": "struct",
+          "name": "core::byte_array::ByteArray",
+          "members": [
+            {
+              "name": "data",
+              "type": "core::array::Array::<core::bytes_31::bytes31>"
+            },
+            {
+              "name": "pending_word",
+              "type": "core::felt252"
+            },
+            {
+              "name": "pending_word_len",
+              "type": "core::integer::u32"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "dojo::meta::interface::IDeployedResource",
+          "items": [
+            {
+              "type": "function",
+              "name": "dojo_name",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "function",
+          "name": "dojo_init",
+          "inputs": [
+            {
+              "name": "contract_address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "impl",
+          "name": "WorldProviderImpl",
+          "interface_name": "dojo::contract::components::world_provider::IWorldProvider"
+        },
+        {
+          "type": "struct",
+          "name": "dojo::world::iworld::IWorldDispatcher",
+          "members": [
+            {
+              "name": "contract_address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::components::world_provider::IWorldProvider",
+          "items": [
+            {
+              "type": "function",
+              "name": "world_dispatcher",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "dojo::world::iworld::IWorldDispatcher"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "UpgradeableImpl",
+          "interface_name": "dojo::contract::components::upgradeable::IUpgradeable"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::components::upgradeable::IUpgradeable",
+          "items": [
+            {
+              "type": "function",
+              "name": "upgrade",
+              "inputs": [
+                {
+                  "name": "new_class_hash",
+                  "type": "core::starknet::class_hash::ClassHash"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "constructor",
+          "name": "constructor",
+          "inputs": []
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "class_hash",
+              "type": "core::starknet::class_hash::ClassHash",
+              "kind": "data"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "Upgraded",
+              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
+              "kind": "nested"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::world_provider::world_provider_cpt::Event",
+          "kind": "enum",
+          "variants": []
+        },
+        {
+          "type": "event",
+          "name": "warpack_masters::systems::config::config_system::Event",
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "UpgradeableEvent",
+              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
+              "kind": "nested"
+            },
+            {
+              "name": "WorldProviderEvent",
+              "type": "dojo::contract::components::world_provider::world_provider_cpt::Event",
+              "kind": "nested"
+            }
+          ]
+        }
+      ],
+      "init_calldata": [
+        "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"
+      ],
+      "tag": "Warpacks-config_system",
+      "selector": "0x6a040c0928ffc6a945e7efcd3576d8b6cbdb914afac47c911f85d89616c2dcb",
+      "systems": [
+        "dojo_init",
+        "upgrade"
+      ]
+    },
+    {
+      "address": "0x4edd4be2b4f4d98c19e34d8d6874bb8ec60bcc09a2700a74fe6552886e536e2",
+      "class_hash": "0x68aa30ee6e4184ad096bd85bd229aa56058c8fac28cf57bccb5b9f1389bf06",
       "abi": [
         {
           "type": "impl",
@@ -1655,13 +1928,6 @@
           "type": "interface",
           "name": "warpack_masters::systems::dummy::IDummy",
           "items": [
-            {
-              "type": "function",
-              "name": "create_dummy",
-              "inputs": [],
-              "outputs": [],
-              "state_mutability": "external"
-            },
             {
               "type": "function",
               "name": "prefine_dummy",
@@ -1835,15 +2101,14 @@
       "tag": "Warpacks-dummy_system",
       "selector": "0x7681287c4e556e3720525417a49926b5cebd94a26abca05bb47cbc85abb3ab8",
       "systems": [
-        "create_dummy",
         "prefine_dummy",
         "update_prefine_dummy",
         "upgrade"
       ]
     },
     {
-      "address": "0x476f6e0b180e45eb9f29937d14a4ab14f331057260d2688f3509a3dcf0c247a",
-      "class_hash": "0xe2f8c35e61e8b5fea2ff0c70b8681a87974b7df0d2eed5240c3635af613275",
+      "address": "0x6dca0628433c053c8ba1ede1ad3d658128aacdbbf95a86e2d2de0beb95e2689",
+      "class_hash": "0x1a2380578f535cb95010b8d46ace0c000fc78d9bded0085f64eb5aa15e5c292",
       "abi": [
         {
           "type": "impl",
@@ -2045,8 +2310,8 @@
       ]
     },
     {
-      "address": "0x2a7de026df1fb66a215090cff2d1bcefb617d12166e4d43e718a9defb20911",
-      "class_hash": "0x6e07d87e633321eda94214990509e2ee3cd0dc81a1e0c2b7f70e2219be85045",
+      "address": "0x14eb2ebbefc23558b18b6c8029bfd43373cb55243a21a38719781f3aed679d",
+      "class_hash": "0x256c168ceaca9bc9811a31e4a849e2a23112013017400bb6c5b5a235eb67b6d",
       "abi": [
         {
           "type": "impl",
@@ -2311,8 +2576,8 @@
       ]
     },
     {
-      "address": "0x5015fcce2deff17dca9c1b79c30601fd9bde5eb83feb646f6b502c6d5c0b365",
-      "class_hash": "0x21c7e03449206be7cf1d849992f9f6a6ead14d0a683174cb1cae1f3b6d7a387",
+      "address": "0x1d6ccec89d8eb0de0e274ba9ff5aa33d3b1edd4b3eb56ddad8bd1b23192fda3",
+      "class_hash": "0x1e9547de2edc1a826b19beb735c67f96c55e041f993614f6404e53d4bab54d6",
       "abi": [
         {
           "type": "impl",
@@ -2536,8 +2801,8 @@
       ]
     },
     {
-      "address": "0x5c141f6fd35d13da0a590c6eb0a5ee3448a7fa492e97f529c498c901d653393",
-      "class_hash": "0x6230f032f4d74b34f2da569484fdb893c8e29af71f9bb43bc2c73e7340979d6",
+      "address": "0x3c837307cbd252410033caa5873f91fdb5994774aed6965ba9884ea801715bb",
+      "class_hash": "0x2841964fd1763c550daa396e2f9f28ff039552c3c0509c0fba52e138000b27d",
       "abi": [
         {
           "type": "impl",
@@ -2757,106 +3022,113 @@
       ]
     }
   ],
+  "libraries": [],
   "models": [
     {
       "members": [],
-      "class_hash": "0x6a0528e5682d15a4d644b3ab6de0443d2abc2df8651748c7e8a7d61d78e49c4",
+      "class_hash": "0x2f74d2541e923309c2a80023c648d1f919857d506837eff047dc289a4bf5f65",
       "tag": "Warpacks-BackpackGrids",
       "selector": "0x986c2508988b7609b021c5d073d387121acac96ff97c8450118dec41a2ef38"
     },
     {
       "members": [],
-      "class_hash": "0x797279bddd6419a236ce2260c1900286d1abe8e92223ead8792c22fbcca2403",
+      "class_hash": "0x7a558a2b684899787b7340c49c4b05d35b8078dde99463d137dcf29d8188189",
       "tag": "Warpacks-BattleLog",
       "selector": "0x35d6bf7b6d49c2c5793d540953d4679fec20c49df24789cd4fbe7b04f05092"
     },
     {
       "members": [],
-      "class_hash": "0x1e9b46c31bbd00da168087fe967b8785f24e8d817e7581e4e27d03a0411a640",
+      "class_hash": "0x1c2fee03340bc9e1bfe29b4368bdd55e4e898ee30ea9513c974ff8a6212db99",
       "tag": "Warpacks-BattleLogCounter",
       "selector": "0x66bc89dc8dab6ea7e056ab976525032353059f15f1a73facb9b83248b2db7b2"
     },
     {
       "members": [],
-      "class_hash": "0x1c5645b2efb8af1921c0552e91a94179e673d7e655b19590336c8471fbb9765",
+      "class_hash": "0x723f24535805b69281f34ab3f589ea2a33498e41ab08789a800f2425322080",
       "tag": "Warpacks-CharacterItemInventory",
       "selector": "0x1632514579c4437e669a668419344f2d169b924d07dd494375f6fec64fcb65b"
     },
     {
       "members": [],
-      "class_hash": "0x168e0478ca29ad3b0aae40cf658ff191a650d5d949be27cc6f86f296667399b",
+      "class_hash": "0x3055049e81b57632695e90169f327b7793a9cc6267e13769c6574919cb3a002",
       "tag": "Warpacks-CharacterItemStorage",
       "selector": "0x78dd8941886ca5871dc537c26180418406dd70b89ec7712357e547c6cdcd68e"
     },
     {
       "members": [],
-      "class_hash": "0x735e6e35d07eb29abe5b05e90f7f53a5d94d1a98e69bf3a652ccb672a6637f3",
+      "class_hash": "0x4cc63f5b0012afb919d95261b84679682c696d6a8378ecf3cfa636ea1a11592",
       "tag": "Warpacks-CharacterItemsInventoryCounter",
       "selector": "0x590aad75b0af5c025a4e2113d2eac8fc8f62b72a4638b1ad7cb35f91d3e0ecc"
     },
     {
       "members": [],
-      "class_hash": "0x1d0f666bf6c82593a82d2b19f013c205ed03f09366c670b1a47fd67ac8bbd85",
+      "class_hash": "0x1db69a8c864efb0ab55803161e4cf588e6ffa1811a00e1c1cab1d45dfb677bc",
       "tag": "Warpacks-CharacterItemsStorageCounter",
       "selector": "0x5749580b0f3ef7182388b94bf7a1c7bb0f8b5280d7ffa12e787c3c3bb732090"
     },
     {
       "members": [],
-      "class_hash": "0x19355853676f753f4a429054b9a1be2f7dfa9bab34fad244e07549ec58ec977",
+      "class_hash": "0x545a3919354339a962f4f6aa8863cb8a0637403b873c19da70dc156001f6f0d",
       "tag": "Warpacks-Characters",
       "selector": "0x225c72460b858c42925da651112b0e08f4ec3c9bdbc5a618798a4e6420cf063"
     },
     {
       "members": [],
-      "class_hash": "0x71497b4eea66b04e9cfff1c0de2ab15631e5263465dba487586ab7f8b86ca20",
+      "class_hash": "0x3998753af55d44ede40c560bedc22551a7f18077006cf2595c7473ad2c37409",
       "tag": "Warpacks-DummyCharacter",
       "selector": "0x1870dbfed5e68287ac805cfb3a424086af7e3885914032041f9442f62f8c24e"
     },
     {
       "members": [],
-      "class_hash": "0x33b7502880e93455ca9f66d6f94c130053d2b4ac7c64f613972f8f211fe4e16",
+      "class_hash": "0x68eb9a9b1f4de66a6b062568675edb83a6765504389ceb99d4de46562f16811",
       "tag": "Warpacks-DummyCharacterCounter",
       "selector": "0x52126e21b1ed0a7932ae073f48a6963182edf4788f74821202348ffb73d329c"
     },
     {
       "members": [],
-      "class_hash": "0x3e80c3d661284f833e030293d5579cf77d200c9d0184a47ca1d334343b56ee7",
+      "class_hash": "0x77bcfe95b6ab3fc16d9cc59775d8d3f5d04c01c0a451d3654b63059ef06cdc",
       "tag": "Warpacks-DummyCharacterItem",
       "selector": "0x2f6c06f25cf5f2aaa2ffe26cdf56c038339085616267d66385e6bd14c2f9f17"
     },
     {
       "members": [],
-      "class_hash": "0x2ee69868cb232078160b5eb360286fbb1a957a7430fe062cc5815ea5af55926",
+      "class_hash": "0x45ae0ea4acc1b8072cd0f748ebb483eb885ec92be79be0f5955d651066973ea",
       "tag": "Warpacks-DummyCharacterItemsCounter",
       "selector": "0x2d45ca9a5d3d2f9fb0d7731ddb1e0210fcd9adb42fa80a55607732277864da3"
     },
     {
       "members": [],
-      "class_hash": "0x49c3328917292c723cc24d35119a9de0f63076d30d6c7277e64f21301115502",
+      "class_hash": "0x610e8124238961989f302bdda6ed1b53cf956c878bc408bca64cc64ceedd695",
+      "tag": "Warpacks-GameConfig",
+      "selector": "0x28b5af007fcc24010d8f1ae72d7baf968817c5c7b5e8c5b54cd13da9175eb9e"
+    },
+    {
+      "members": [],
+      "class_hash": "0x34fb9fd71ab05c202bf9aee1f41cd4435f7cf4fcd96ed344292bc6a5811e6ed",
       "tag": "Warpacks-Item",
       "selector": "0x7de0a1a6e53c8570967a20ee3f8af0c328eec4f3203d197b95d163e363862d6"
     },
     {
       "members": [],
-      "class_hash": "0x7d8c584babb384a12155fe1ec6cdc105f818edc76aa5ba2fb8a774e6604b5d0",
+      "class_hash": "0x5fb7beefb6dc53b10e48216a588525fb3327a92b4550eba644b0a3c9ebc663c",
       "tag": "Warpacks-ItemsCounter",
       "selector": "0x37ea17be1edf854d4c5941a21d7752746a2903ca919377df8e5f863b890bd5f"
     },
     {
       "members": [],
-      "class_hash": "0x7e6c59a7262f4bdff5a0db42ac339388dea78c8daf84e01281d5e65230b5c6f",
+      "class_hash": "0x361c952a261614a0024fbfc7de6a69caf8482c7a1dcff03cb53ed3f4e04af4d",
       "tag": "Warpacks-NameRecord",
       "selector": "0x61e170353fd373dbba8b02bbde1fdfbb74fb50629c1f9c5fec6361e8bf3fa53"
     },
     {
       "members": [],
-      "class_hash": "0x433c30ace88680049b98c67135ef409d1a39db6b6bfada76d9ceadab099d8b9",
+      "class_hash": "0x3d262b9dce8be618bff40cef48225a23e14db4421606a691f36858844f1d9f9",
       "tag": "Warpacks-Recipe",
       "selector": "0x708e34d0df14f6ad4ab428ed5e5b8dec9c32f88d71cebd7c1ed9063a0771dcb"
     },
     {
       "members": [],
-      "class_hash": "0x282f698614cb80b67ef248f14e9457fcaf7f410504bdc62791e6f889fac29e6",
+      "class_hash": "0x50555b5f47324470a8add65e969d579732ce2abdbbdd0843a5afc44a2e8eb99",
       "tag": "Warpacks-Shop",
       "selector": "0x78fb8e91ceb3682be44b8916bb3c07f016bdb8bbf1bc1cad81eca46f300e361"
     }
@@ -2864,21 +3136,22 @@
   "events": [
     {
       "members": [],
-      "class_hash": "0x46a884e84064cbb76c73e1b2c0805f815c430cc1b03426cde74068ffdee2316",
+      "class_hash": "0x1db5692b20e1a75a91052b3216fff3c5ad17d0fd4f4c7c9ba56b81010e71690",
       "tag": "Warpacks-BattleLogDetail",
       "selector": "0x59f2a3726f025bd9295ee0e3f58ec2237849b9038d7adbe8567d5aab906429e"
     },
     {
       "members": [],
-      "class_hash": "0x5f1c4336358afe5d3cd66302ec4420ed88cc3d3067d960726a13bcce6976acd",
+      "class_hash": "0x4f2c1c3bc6273ed503dbf2607f21e4cb5682cc149634529011f41e443ebbfe9",
       "tag": "Warpacks-BuyItem",
       "selector": "0x222c957197f3def390ba92afb039775d6feeca9d6048ef5585392fbb8a5ab9"
     },
     {
       "members": [],
-      "class_hash": "0x6e8bf14b31538036c902418363f1515fa969fe0ff526b96dad0df89cd6dd868",
+      "class_hash": "0x62aa6c7b2f177bfe7cedc39e13b7a3dc9cb9cde374190b4a46b714b9634801e",
       "tag": "Warpacks-SellItem",
       "selector": "0x17d7432b9e7cbae7e6d2920ef19d5a96f6ce2f428f22d820a7298f1864d7dff"
     }
-  ]
+  ],
+  "external_contracts": []
 }
