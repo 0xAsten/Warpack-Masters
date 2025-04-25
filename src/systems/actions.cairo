@@ -24,8 +24,8 @@ pub trait IActions<T> {
 mod actions {
     use super::{IActions, WMClass};
     use starknet::ContractAddress;
-    use core::to_byte_array::FormatAsByteArray;
     use core::dict::Felt252Dict;
+    use core::bytes_31::bytes31;
 
     use starknet::{get_caller_address, get_block_timestamp};
     use warpack_masters::models::{backpack::{BackpackGrids}};
@@ -64,13 +64,16 @@ mod actions {
 
             let player = get_caller_address();
 
-            let name_bytes = name.format_as_byte_array(16);
-            assert(name_bytes.len() <= 12 && name_bytes.len() > 3, 'name size is invalid');
+            let name_bytes: bytes31 = name.try_into().unwrap();
 
-            let first_char = name_bytes[0];
-            let is_uppercase = first_char >= 65 && first_char <= 90;
-            let is_lowercase = first_char >= 97 && first_char <= 122;
-            assert(is_uppercase || is_lowercase, 'name must start with a letter');
+            let mut len = 0;
+            loop {
+                if name_bytes.at(len) == 0 {
+                    break;
+                }
+                len += 1;
+            };
+            assert(len <= 12 && len > 3, 'name size is invalid');
 
             let nameRecord: NameRecord = world.read_model(name);
             assert(

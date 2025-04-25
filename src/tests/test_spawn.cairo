@@ -210,7 +210,7 @@ mod tests {
 
     #[test]
     #[available_gas(3000000000000000)]
-    #[should_panic(expected: ('name cannot be empty', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected: ('name size is invalid', 'ENTRYPOINT_FAILED'))]
     fn test_name_is_empty() {
         let ndef = namespace_def();
         let mut world = spawn_test_world([ndef].span());
@@ -222,6 +222,33 @@ mod tests {
         action_system.spawn('', WMClass::Warlock);
     }
 
+    #[test]
+    #[available_gas(3000000000000000)]
+    #[should_panic(expected: ('name size is invalid', 'ENTRYPOINT_FAILED'))]
+    fn test_name_is_too_long() {
+        let ndef = namespace_def();
+        let mut world = spawn_test_world([ndef].span());
+        world.sync_perms_and_inits(contract_defs());
+
+        let (contract_address, _) = world.dns(@"actions").unwrap();
+        let action_system = IActionsDispatcher { contract_address };
+
+        action_system.spawn('1234567890123', WMClass::Warlock);
+    }
+
+    #[test]
+    #[available_gas(3000000000000000)]
+    #[should_panic(expected: ('name size is invalid', 'ENTRYPOINT_FAILED'))]
+    fn test_name_is_too_short() {
+        let ndef = namespace_def();
+        let mut world = spawn_test_world([ndef].span());
+        world.sync_perms_and_inits(contract_defs());
+
+        let (contract_address, _) = world.dns(@"actions").unwrap();
+        let action_system = IActionsDispatcher { contract_address };
+
+        action_system.spawn('123', WMClass::Warlock);
+    }
 
     #[test]
     #[available_gas(3000000000000000)]
@@ -240,7 +267,7 @@ mod tests {
         add_items(ref item_system);
 
         action_system.spawn('alice', WMClass::Warlock);
-        action_system.spawn('bob', WMClass::Warlock);
+        action_system.spawn('bobo', WMClass::Warlock);
     }
 
 
@@ -296,7 +323,7 @@ mod tests {
         action_system.spawn('alice', WMClass::Archer);
 
         let char: Characters = world.read_model(alice);
-    assert(char.wins == 0, 'wins count should be 0');
+        assert(char.wins == 0, 'wins count should be 0');
         assert(char.loss == 0, 'loss count should be 0');
         assert(char.wmClass == WMClass::Archer, 'class should be Warlock');
         assert(char.name == 'alice', 'name should be bob');
