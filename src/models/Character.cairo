@@ -2,27 +2,27 @@ use starknet::ContractAddress;
 
 #[derive(Drop, Serde)]
 #[dojo::model]
-struct Characters {
+pub struct Characters {
     #[key]
-    player: ContractAddress,
+    pub player: ContractAddress,
     // must be less than 31 ASCII characters
-    name: felt252,
-    wmClass: WMClass,
-    gold: u32,
-    health: u32,
-    wins: u32,
-    loss: u32,
-    rating: u32,
-    totalWins: u32,
-    totalLoss: u32,
-    winStreak: u32,
-    stamina: u8,
-    birthCount: u32,
-    updatedAt: u64
+    pub name: felt252,
+    pub wmClass: WMClass,
+    pub gold: u32,
+    pub health: u32,
+    pub wins: u32,
+    pub loss: u32,
+    pub rating: u32,
+    pub totalWins: u32,
+    pub totalLoss: u32,
+    pub winStreak: u32,
+    pub stamina: u8,
+    pub birthCount: u32,
+    pub updatedAt: u64
 }
 
 #[derive(Serde, Copy, Drop, Introspect, PartialEq)]
-enum WMClass {
+pub enum WMClass {
     Warrior,
     Warlock,
     Archer,
@@ -30,11 +30,11 @@ enum WMClass {
 
 #[derive(Drop, Serde)]
 #[dojo::model]
-struct NameRecord {
+pub struct NameRecord {
     #[key]
-    name: felt252,
-    player: ContractAddress,
+    pub name: felt252,
+    pub player: ContractAddress,
 }
 
-const PLAYER: felt252 = 'player';
-const DUMMY: felt252 = 'dummy';
+pub const PLAYER: felt252 = 'player';
+pub const DUMMY: felt252 = 'dummy';

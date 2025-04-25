@@ -1,15 +1,14 @@
 use warpack_masters::models::CharacterItem::Position;
-use warpack_masters::models::Character::WMClass;
 use core::fmt::{Display, Formatter, Error};
 
 
 #[derive(Copy, Drop, Serde)]
-struct PredefinedItem {
-    itemId: u32,
-    position: Position,
+pub struct PredefinedItem {
+    pub itemId: u32,
+    pub position: Position,
     // rotation: 0, 90, 180, 270
-    rotation: u32,
-    plugins: Span<(u8, u32, u32)>
+    pub rotation: u32,
+    pub plugins: Span<(u8, u32, u32)>
 }
 
 impl PointDisplay of Display<PredefinedItem> {
@@ -35,7 +34,7 @@ impl PointDisplay of Display<PredefinedItem> {
 }
 
 
-mod Dummy0 {
+pub mod Dummy0 {
     use warpack_masters::models::Character::{WMClass};
     use warpack_masters::models::CharacterItem::Position;
     use super::PredefinedItem;
@@ -87,7 +86,7 @@ mod Dummy0 {
     }
 }
 
-mod Dummy1 {
+pub mod Dummy1 {
     use warpack_masters::models::Character::{WMClass};
     use warpack_masters::models::CharacterItem::Position;
     use super::PredefinedItem;
@@ -140,7 +139,7 @@ mod Dummy1 {
 }
 
 
-mod Dummy2 {
+pub mod Dummy2 {
     use warpack_masters::models::Character::{WMClass};
     use warpack_masters::models::CharacterItem::Position;
     use super::PredefinedItem;
@@ -192,7 +191,7 @@ mod Dummy2 {
     }
 }
 
-mod Dummy3 {
+pub mod Dummy3 {
     use warpack_masters::models::Character::{WMClass};
     use warpack_masters::models::CharacterItem::Position;
     use super::PredefinedItem;
@@ -258,7 +257,7 @@ mod Dummy3 {
     }
 }
 
-mod Dummy4 {
+pub mod Dummy4 {
     use warpack_masters::models::Character::{WMClass};
     use warpack_masters::models::CharacterItem::Position;
     use super::PredefinedItem;
@@ -331,7 +330,7 @@ mod Dummy4 {
     }
 }
 
-mod Dummy5 {
+pub mod Dummy5 {
     use warpack_masters::models::Character::{WMClass};
     use warpack_masters::models::CharacterItem::Position;
     use super::PredefinedItem;
@@ -411,7 +410,7 @@ mod Dummy5 {
     }
 }
 
-mod Dummy6 {
+pub mod Dummy6 {
     use warpack_masters::models::Character::{WMClass};
     use warpack_masters::models::CharacterItem::Position;
     use super::PredefinedItem;
@@ -491,7 +490,7 @@ mod Dummy6 {
     }
 }
 
-mod Dummy7 {
+pub mod Dummy7 {
     use warpack_masters::models::Character::{WMClass};
     use warpack_masters::models::CharacterItem::Position;
     use super::PredefinedItem;
@@ -585,7 +584,7 @@ mod Dummy7 {
     }
 }
 
-mod Dummy8 {
+pub mod Dummy8 {
     use warpack_masters::models::Character::{WMClass};
     use warpack_masters::models::CharacterItem::Position;
     use super::PredefinedItem;
@@ -679,7 +678,7 @@ mod Dummy8 {
     }
 }
 
-mod Dummy9 {
+pub mod Dummy9 {
     use warpack_masters::models::Character::{WMClass};
     use warpack_masters::models::CharacterItem::Position;
     use super::PredefinedItem;
@@ -773,7 +772,7 @@ mod Dummy9 {
     }
 }
 
-mod Dummy10 {
+pub mod Dummy10 {
     use warpack_masters::models::Character::{WMClass};
     use warpack_masters::models::CharacterItem::Position;
     use super::PredefinedItem;
@@ -861,7 +860,7 @@ mod Dummy10 {
     }
 }
 
-mod Dummy11 {
+pub mod Dummy11 {
     use warpack_masters::models::Character::{WMClass};
     use warpack_masters::models::CharacterItem::Position;
     use super::PredefinedItem;
@@ -977,7 +976,7 @@ mod Dummy11 {
     }
 }
 
-mod Dummy12 {
+pub mod Dummy12 {
     use warpack_masters::models::Character::{WMClass};
     use warpack_masters::models::CharacterItem::Position;
     use super::PredefinedItem;
@@ -1086,7 +1085,7 @@ mod Dummy12 {
     }
 }
 
-mod Dummy13 {
+pub mod Dummy13 {
     use warpack_masters::models::Character::{WMClass};
     use warpack_masters::models::CharacterItem::Position;
     use super::PredefinedItem;
@@ -1208,7 +1207,7 @@ mod Dummy13 {
     }
 }
 
-mod Dummy14 {
+pub mod Dummy14 {
     use warpack_masters::models::Character::{WMClass};
     use warpack_masters::models::CharacterItem::Position;
     use super::PredefinedItem;
@@ -1330,7 +1329,7 @@ mod Dummy14 {
     }
 }
 
-mod Dummy15 {
+pub mod Dummy15 {
     use warpack_masters::models::Character::{WMClass};
     use warpack_masters::models::CharacterItem::Position;
     use super::PredefinedItem;
@@ -1452,7 +1451,7 @@ mod Dummy15 {
     }
 }
 
-mod Dummy16 {
+pub mod Dummy16 {
     use warpack_masters::models::Character::{WMClass};
     use warpack_masters::models::CharacterItem::Position;
     use super::PredefinedItem;
@@ -1581,7 +1580,7 @@ mod Dummy16 {
     }
 }
 
-mod Dummy17 {
+pub mod Dummy17 {
     use warpack_masters::models::Character::{WMClass};
     use warpack_masters::models::CharacterItem::Position;
     use super::PredefinedItem;
@@ -1717,7 +1716,7 @@ mod Dummy17 {
     }
 }
 
-mod Dummy18 {
+pub mod Dummy18 {
     use warpack_masters::models::Character::{WMClass};
     use warpack_masters::models::CharacterItem::Position;
     use super::PredefinedItem;
@@ -1846,7 +1845,7 @@ mod Dummy18 {
     }
 }
 
-mod Dummy19 {
+pub mod Dummy19 {
     use warpack_masters::models::Character::{WMClass};
     use warpack_masters::models::CharacterItem::Position;
     use super::PredefinedItem;
@@ -2010,7 +2009,7 @@ mod Dummy19 {
     }
 }
 
-mod Dummy20 {
+pub mod Dummy20 {
     use warpack_masters::models::Character::{WMClass};
     use warpack_masters::models::CharacterItem::Position;
     use super::PredefinedItem;

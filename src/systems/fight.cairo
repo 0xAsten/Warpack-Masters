@@ -8,12 +8,12 @@ trait IFight<T> {
 mod fight_system {
     use super::IFight;
 
-    use starknet::{ContractAddress, get_caller_address, get_block_timestamp};
+    use starknet::{get_caller_address, get_block_timestamp};
     use warpack_masters::models::{
-        CharacterItem::{Position, CharacterItemInventory, CharacterItemsInventoryCounter},
+        CharacterItem::{CharacterItemInventory, CharacterItemsInventoryCounter},
         Item::Item
     };
-    use warpack_masters::models::Character::{Characters, WMClass, PLAYER, DUMMY};
+    use warpack_masters::models::Character::{Characters, PLAYER, DUMMY};
 
     use warpack_masters::utils::random::{pseudo_seed, random};
     use warpack_masters::utils::sort_items::{append_item, order_items};
@@ -22,9 +22,9 @@ mod fight_system {
         DummyCharacterItem, DummyCharacterItemsCounter
     };
     use warpack_masters::models::Fight::{BattleLog, BattleLogCounter, CharStatus, AttackStatus, BattleLogDetail};
-    use warpack_masters::constants::constants::{EFFECT_DAMAGE, EFFECT_CLEANSE_POISON, EFFECT_REGEN, EFFECT_REFLECT, EFFECT_POISON, EFFECT_VAMPIRISM, INIT_STAMINA};
+    use warpack_masters::constants::constants::{EFFECT_REGEN, EFFECT_REFLECT, EFFECT_POISON, EFFECT_VAMPIRISM, INIT_STAMINA};
 
-    use dojo::model::{ModelStorage, ModelValueStorage};
+    use dojo::model::{ModelStorage};
     use dojo::event::EventStorage;
     use dojo::world::WorldStorage;
 

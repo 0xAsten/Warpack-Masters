@@ -21,7 +21,7 @@ mod shop_system {
     use warpack_masters::utils::random::{pseudo_seed, random};
     use warpack_masters::constants::constants::{ITEMS_COUNTER_ID};
 
-    use dojo::model::{ModelStorage, ModelValueStorage};
+    use dojo::model::{ModelStorage};
     use dojo::event::EventStorage;
 
 

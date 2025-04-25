@@ -1,4 +1,4 @@
-use warpack_masters::systems::item::{item_system, IItemDispatcher, IItemDispatcherTrait};
+use warpack_masters::systems::item::{IItemDispatcher, IItemDispatcherTrait};
 use warpack_masters::{items};
 
 fn add_items(ref item_system: IItemDispatcher) {

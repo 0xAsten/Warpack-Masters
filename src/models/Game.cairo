@@ -2,8 +2,8 @@ use starknet::ContractAddress;
 
 #[derive(Drop, Serde)]
 #[dojo::model]
-struct GameConfig {
+pub struct GameConfig {
     #[key]
-    id: felt252,
-    strk_address: ContractAddress,
+    pub id: felt252,
+    pub strk_address: ContractAddress,
 }

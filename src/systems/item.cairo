@@ -1,5 +1,5 @@
 #[starknet::interface]
-trait IItem<T> {
+pub trait IItem<T> {
     fn add_item(
         ref self: T,
         id: u32,
@@ -28,8 +28,8 @@ mod item_system {
 
     use warpack_masters::constants::constants::{GRID_X, GRID_Y, ITEMS_COUNTER_ID};
 
-    use dojo::model::{ModelStorage, ModelValueStorage};
-    use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait, Resource};
+    use dojo::model::{ModelStorage};
+    use dojo::world::{IWorldDispatcherTrait};
 
     #[abi(embed_v0)]
     impl ItemImpl of IItem<ContractState> {

@@ -1,52 +1,50 @@
-mod systems {
-    mod actions;
-    mod dummy;
-    mod fight;
-    mod item;
-    mod shop;
-    mod recipe;
-    mod config;
+pub mod systems {
+    pub mod actions;
+    pub mod dummy;
+    pub mod fight;
+    pub mod item;
+    pub mod shop;
+    pub mod recipe;
+    pub mod config;
 }
 
-mod models {
-    mod backpack;
-    mod CharacterItem;
-    mod Item;
-    mod Character;
-    mod Shop;
-    mod DummyCharacter;
-    mod DummyCharacterItem;
-    mod Fight;
-    mod Recipe;
-    mod Game;
+pub mod models {
+    pub mod backpack;
+    pub mod CharacterItem;
+    pub mod Item;
+    pub mod Character;
+    pub mod Shop;
+    pub mod DummyCharacter;
+    pub mod DummyCharacterItem;
+    pub mod Fight;
+    pub mod Recipe;
+    pub mod Game;
 }
 
-mod externals {
-    mod ERC20 {
-        mod interface;
-    }
+pub mod externals {
+        pub mod interface;
 }
 
-mod tests {
-    mod test_place_item;
-    mod test_add_item;
-    mod test_buy_item;
-    mod test_undo_place_item;
-    mod test_sell_item;
-    mod test_reroll_shop;
-    mod test_fight;
-    mod test_rebirth;
-    mod test_spawn;
-    mod test_prefine_dummy;
-    mod test_recipe;
+pub mod tests {
+    pub mod test_place_item;
+    pub mod test_add_item;
+    pub mod test_buy_item;
+    pub mod test_undo_place_item;
+    pub mod test_sell_item;
+    pub mod test_reroll_shop;
+    pub mod test_fight;
+    pub mod test_rebirth;
+    pub mod test_spawn;
+    pub mod test_prefine_dummy;
+    pub mod test_recipe;
 }
 
-mod utils {
-    mod random;
-    mod test_utils;
-    mod sort_items;
+pub mod utils {
+    pub mod random;
+    pub mod test_utils;
+    pub mod sort_items;
 }
 
-mod items;
-mod prdefined_dummies;
-mod constants;
+pub mod items;
+pub mod prdefined_dummies;
+pub mod constants;

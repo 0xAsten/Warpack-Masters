@@ -2,84 +2,84 @@ use starknet::ContractAddress;
 
 #[derive(Copy, Drop, Serde)]
 #[dojo::event(historical: true)]
-struct BattleLogDetail {
+pub struct BattleLogDetail {
     #[key]
-    player: ContractAddress,
+    pub player: ContractAddress,
     #[key]
-    battleLogId: u32,
+    pub battleLogId: u32,
     #[key]
-    id: u8,
-    whoTriggered: felt252,
-    whichItem: u32,
-    isDodged: bool,
+    pub id: u8,
+    pub whoTriggered: felt252,
+    pub whichItem: u32,
+    pub isDodged: bool,
     // // 0 - None, 1 - Damage, 2 - Cleanse Poison, 3 - Armor, 4 - Regen, 5 - Reflect, 6 - Poison, 7 - Empower, 8 - Vampirism, 9 - Expand pack
-    effectType: u8,
-    effectStacks: u32,
-    player_remaining_health: u32,
-    dummy_remaining_health: u32,
-    player_stamina: u8,
-    dummy_stamina: u8,
+    pub effectType: u8,
+    pub effectStacks: u32,
+    pub player_remaining_health: u32,
+    pub dummy_remaining_health: u32,
+    pub player_stamina: u8,
+    pub dummy_stamina: u8,
     // armor, regen, reflect, empower, poison, vampirism
-    player_stacks: (u32, u32, u32, u32, u32, u32),
-    dummy_stacks: (u32, u32, u32, u32, u32, u32),
+    pub player_stacks: (u32, u32, u32, u32, u32, u32),
+    pub dummy_stacks: (u32, u32, u32, u32, u32, u32),
 }
 
 #[derive(Copy, Drop, Serde)]
-struct CharStatus {
-    hp: u32,
-    stamina: u8,
-    armor: u32,
-    regen: u32,
-    reflect: u32,
-    empower: u32,
-    poison: u32,
-    vampirism: u32,
+pub struct CharStatus {
+    pub hp: u32,
+    pub stamina: u8,
+    pub armor: u32,
+    pub regen: u32,
+    pub reflect: u32,
+    pub empower: u32,
+    pub poison: u32,
+    pub vampirism: u32,
 }
 
 #[derive(Drop, Serde)]
-struct AttackStatus {
-    player: ContractAddress,
-    curr_item_belongs: felt252,
-    curr_item_index: u32,
-    item_type: u8,
-    effect_type: u8,
-    effect_stacks: u32,
-    opponent: felt252,
-    battleLogCounterCount: u32,
-    rand: u32,
-    char_health_flag: u32,
+pub struct AttackStatus {
+    pub player: ContractAddress,
+    pub curr_item_belongs: felt252,
+    pub curr_item_index: u32,
+    pub item_type: u8,
+    pub effect_type: u8,
+    pub effect_stacks: u32,
+    pub opponent: felt252,
+    pub battleLogCounterCount: u32,
+    pub rand: u32,
+    pub char_health_flag: u32,
 }
 
 #[derive(Drop, Serde)]
 #[dojo::model]
-struct BattleLog {
+pub struct BattleLog {
     #[key]
-    player: ContractAddress,
+    pub player: ContractAddress,
     #[key]
-    id: u32,
-    dummyLevel: u32,
-    dummyCharId: u32,
+    pub id: u32,
+    pub dummyLevel: u32,
+    pub dummyCharId: u32,
     // Player/Dummy, itemId, itemType, effectType, chance, effectStacks, cooldown, energyCost, plugins
-    sorted_items: Span<(felt252, u32, u8, u8, u32, u32, u8, u8, Span<(u8, u32, u32)>)>,
-    items_length: u32,
+    pub sorted_items: Span<(felt252, u32, u8, u8, u32, u32, u8, u8, Span<(u8, u32, u32)>)>,
+    pub items_length: u32,
     // armor, regen, reflect, empower, poison, vampirism
-    player_buffs: Span<u32>,
-    dummy_buffs: Span<u32>,
-    player_on_hit_items: Span<(u8, u32, u32)>,
-    dummy_on_hit_items: Span<(u8, u32, u32)>,
+    pub player_buffs: Span<u32>,
+    pub dummy_buffs: Span<u32>,
+    pub player_on_hit_items: Span<(u8, u32, u32)>,
+    pub dummy_on_hit_items: Span<(u8, u32, u32)>,
     // effectType, chance, effectStacks
-    player_on_attack_items: Span<(u8, u32, u32)>,
-    dummy_on_attack_items: Span<(u8, u32, u32)>,
+    pub player_on_attack_items: Span<(u8, u32, u32)>,
+    pub dummy_on_attack_items: Span<(u8, u32, u32)>,
     // dummy or player
-    winner: felt252,
-    seconds: u8
+    pub winner: felt252,
+    pub seconds: u8
 }
 
 
 #[derive(Drop, Serde)]
 #[dojo::model]
-struct BattleLogCounter {
+pub struct BattleLogCounter {
     #[key]
-    player: ContractAddress,
-    count: u32,
+    pub player: ContractAddress,
+    pub count: u32,
 }

@@ -14,10 +14,7 @@ mod dummy_system {
     use super::IDummy;
 
     use starknet::{get_caller_address};
-    use warpack_masters::models::Character::{Characters, WMClass, NameRecord};
-    use warpack_masters::models::CharacterItem::{
-        CharacterItemsInventoryCounter, CharacterItemInventory
-    };
+    use warpack_masters::models::Character::{WMClass, NameRecord};
     use warpack_masters::models::DummyCharacter::{DummyCharacter, DummyCharacterCounter};
     use warpack_masters::models::DummyCharacterItem::{
         DummyCharacterItem, DummyCharacterItemsCounter
@@ -26,8 +23,8 @@ mod dummy_system {
 
     use warpack_masters::constants::constants::{INIT_HEALTH, INIT_STAMINA};
 
-    use dojo::model::{ModelStorage, ModelValueStorage};
-    use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait, Resource};
+    use dojo::model::{ModelStorage};
+    use dojo::world::{IWorldDispatcherTrait};
 
     #[abi(embed_v0)]
     impl DummyImpl of IDummy<ContractState> {

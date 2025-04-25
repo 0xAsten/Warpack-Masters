@@ -3,19 +3,19 @@ use starknet::ContractAddress;
 
 #[derive(Drop, Serde)]
 #[dojo::model]
-struct BackpackGrids {
+pub struct BackpackGrids {
     #[key]
-    player: ContractAddress,
+    pub player: ContractAddress,
     #[key]
-    x: u32,
+    pub x: u32,
     #[key]
-    y: u32,
-    enabled: bool,
-    occupied: bool,
-    inventoryItemId: u32,
-    itemId: u32,
-    isWeapon: bool,
-    isPlugin: bool,
+    pub y: u32,
+    pub enabled: bool,
+    pub occupied: bool,
+    pub inventoryItemId: u32,
+    pub itemId: u32,
+    pub isWeapon: bool,
+    pub isPlugin: bool,
 }
 
 #[cfg(test)]

@@ -4,23 +4,23 @@ use warpack_masters::models::Character::WMClass;
 
 #[derive(Drop, Serde)]
 #[dojo::model]
-struct DummyCharacter {
+pub struct DummyCharacter {
     #[key]
-    level: u32,
+    pub level: u32,
     #[key]
-    id: u32,
-    name: felt252,
-    wmClass: WMClass,
-    health: u32,
-    player: ContractAddress,
-    rating: u32,
-    stamina: u8,
+    pub id: u32,
+    pub name: felt252,
+    pub wmClass: WMClass,
+    pub health: u32,
+    pub player: ContractAddress,
+    pub rating: u32,
+    pub stamina: u8,
 }
 
 #[derive(Drop, Serde)]
 #[dojo::model]
-struct DummyCharacterCounter {
+pub struct DummyCharacterCounter {
     #[key]
-    level: u32,
-    count: u32,
+    pub level: u32,
+    pub count: u32,
 }

@@ -1,14 +1,12 @@
-mod constants {
-    use starknet::ContractAddress;
+pub mod constants {
+    pub const GRID_X: u32 = 9;
+    pub const GRID_Y: u32 = 7;
+    pub const INIT_GOLD: u32 = 8;
+    pub const INIT_HEALTH: u32 = 25;
+    pub const INIT_STAMINA: u8 = 100;
 
-    const GRID_X: u32 = 9;
-    const GRID_Y: u32 = 7;
-    const INIT_GOLD: u32 = 8;
-    const INIT_HEALTH: u32 = 25;
-    const INIT_STAMINA: u8 = 100;
-
-    const ITEMS_COUNTER_ID: felt252 = 'ITEMS_COUNTER_ID';
-    const STORAGE_FLAG: u32 = 999;
+    pub const ITEMS_COUNTER_ID: felt252 = 'ITEMS_COUNTER_ID';
+    pub const STORAGE_FLAG: u32 = 999;
 
     // const EFFECT_ARMOR: felt252 = 'armor';
     // const EFFECT_REGEN: felt252 = 'regen';
@@ -18,14 +16,14 @@ mod constants {
     // const EFFECT_CLEANSE_POISON: felt252 = 'cleanse_poison';
     // const EFFECT_VAMPIRISM: felt252 = 'vampirism';
 
-    const EFFECT_DAMAGE: u8 = 1;
-    const EFFECT_CLEANSE_POISON: u8 = 2;
-    const EFFECT_REGEN: u8 = 4;
-    const EFFECT_REFLECT: u8 = 5;
-    const EFFECT_POISON: u8 = 6;
-    const EFFECT_VAMPIRISM: u8 = 8;
+    pub const EFFECT_DAMAGE: u8 = 1;
+    pub const EFFECT_CLEANSE_POISON: u8 = 2;
+    pub const EFFECT_REGEN: u8 = 4;
+    pub const EFFECT_REFLECT: u8 = 5;
+    pub const EFFECT_POISON: u8 = 6;
+    pub const EFFECT_VAMPIRISM: u8 = 8;
 
-    const REBIRTH_FEE: u256 = 10000000000000000000;
+    pub const REBIRTH_FEE: u256 = 10000000000000000000;
 
-    const GAME_CONFIG_ID: felt252 = 'GAME_CONFIG_ID';
+    pub const GAME_CONFIG_ID: felt252 = 'GAME_CONFIG_ID';
 }

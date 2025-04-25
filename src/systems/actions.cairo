@@ -22,9 +22,10 @@ trait IActions<T> {
 
 #[dojo::contract]
 mod actions {
-    use to_byte_array::FormatAsByteArray;
     use super::{IActions, WMClass};
     use starknet::ContractAddress;
+    use core::to_byte_array::FormatAsByteArray;
+    use core::dict::Felt252Dict;
 
     use starknet::{get_caller_address, get_block_timestamp};
     use warpack_masters::models::{backpack::{BackpackGrids}};
@@ -43,11 +44,11 @@ mod actions {
     use warpack_masters::items::{Backpack, Pack};
     use warpack_masters::constants::constants::{GRID_X, GRID_Y, INIT_GOLD, INIT_HEALTH, INIT_STAMINA, REBIRTH_FEE, GAME_CONFIG_ID};
 
-    use dojo::model::{ModelStorage, ModelValueStorage};
+    use dojo::model::{ModelStorage};
 
-    use warpack_masters::externals::ERC20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
+    use warpack_masters::externals::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
 
-    use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait, Resource};
+    use dojo::world::{IWorldDispatcherTrait};
 
 
     // use debug::PrintTrait;

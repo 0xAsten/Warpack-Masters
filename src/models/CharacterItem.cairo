@@ -1,50 +1,50 @@
 use starknet::ContractAddress;
 
 #[derive(Copy, Drop, Serde, Introspect)]
-struct Position {
-    x: u32,
-    y: u32
+pub struct Position {
+    pub x: u32,
+    pub y: u32
 }
 
 #[derive(Drop, Serde)]
 #[dojo::model]
-struct CharacterItemStorage {
+pub struct CharacterItemStorage {
     #[key]
-    player: ContractAddress,
+    pub player: ContractAddress,
     #[key]
-    id: u32,
-    itemId: u32,
+    pub id: u32,
+    pub itemId: u32,
 }
 
 #[derive(Drop, Serde)]
 #[dojo::model]
-struct CharacterItemsStorageCounter {
+pub struct CharacterItemsStorageCounter {
     #[key]
-    player: ContractAddress,
-    count: u32,
+    pub player: ContractAddress,
+    pub count: u32,
 }
 
 #[derive(Drop, Serde)]
 #[dojo::model]
-struct CharacterItemInventory {
+pub struct CharacterItemInventory {
     #[key]
-    player: ContractAddress,
+    pub player: ContractAddress,
     #[key]
-    id: u32,
-    itemId: u32,
-    position: Position,
+    pub id: u32,
+    pub itemId: u32,
+    pub position: Position,
     // 0, 90, 180, 270
-    rotation: u32,
+    pub rotation: u32,
     // effectType, chance, stacks
-    plugins: Array<(u8, u32, u32)>,
+    pub plugins: Array<(u8, u32, u32)>,
 }
 
 #[derive(Drop, Serde)]
 #[dojo::model]
-struct CharacterItemsInventoryCounter {
+pub struct CharacterItemsInventoryCounter {
     #[key]
-    player: ContractAddress,
-    count: u32,
+    pub player: ContractAddress,
+    pub count: u32,
 }
 
 pub fn are_items_nearby(pos1: Position, width1: u32, height1: u32, rotation1: u32, pos2: Position, width2: u32, height2: u32, rotation2: u32) -> bool {

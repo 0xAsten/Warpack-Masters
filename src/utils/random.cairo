@@ -1,7 +1,7 @@
 use core::traits::Into;
 use core::box::BoxTrait;
 
-fn pseudo_seed() -> (u128, u128, u128, u128) {
+pub fn pseudo_seed() -> (u128, u128, u128, u128) {
     let txinfo = starknet::get_tx_info().unbox();
     let tx: u256 = txinfo.transaction_hash.into();
 
@@ -13,7 +13,7 @@ fn pseudo_seed() -> (u128, u128, u128, u128) {
 }
 
 
-fn random(seed: u128, num: u32) -> u32 {
+pub fn random(seed: u128, num: u32) -> u32 {
     let result = seed % num.into();
     result.try_into().unwrap()
 }
