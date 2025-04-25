@@ -1,5 +1,5 @@
 #[starknet::interface]
-trait IRecipe<T> {
+pub trait IRecipe<T> {
     fn add_recipe(
         ref self: T, item1_id: u32, item2_id: u32, result_item_id: u32
     );

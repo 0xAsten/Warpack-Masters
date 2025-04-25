@@ -1,24 +1,22 @@
 #[cfg(test)]
 mod tests {
-    use core::starknet::contract_address::ContractAddress;
-    use starknet::class_hash::Felt252TryIntoClassHash;
     use starknet::testing::{set_contract_address, set_block_timestamp};
 
-    use dojo::model::{ModelStorage, ModelValueStorage, ModelStorageTest};
+    use dojo::model::{ModelStorage};
     use dojo::world::WorldStorageTrait;
     use dojo_cairo_test::{spawn_test_world, NamespaceDef, TestResource, ContractDefTrait, ContractDef, WorldStorageTestTrait};
 
     use warpack_masters::{
         systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait}},
-        systems::{item::{item_system, IItemDispatcher, IItemDispatcherTrait}},
+        systems::{item::{item_system, IItemDispatcher}},
         models::backpack::{BackpackGrids, m_BackpackGrids},
-        models::Item::{Item, m_Item, ItemsCounter, m_ItemsCounter},
+        models::Item::{m_Item, m_ItemsCounter},
         models::CharacterItem::{
-            Position, CharacterItemStorage, m_CharacterItemStorage, CharacterItemsStorageCounter,
+            CharacterItemStorage, m_CharacterItemStorage, CharacterItemsStorageCounter,
             m_CharacterItemsStorageCounter, CharacterItemInventory, m_CharacterItemInventory,
             CharacterItemsInventoryCounter, m_CharacterItemsInventoryCounter
         },
-        models::Character::{Characters, m_Characters, NameRecord, m_NameRecord, WMClass},
+        models::Character::{Characters, m_Characters, m_NameRecord, WMClass},
         models::Shop::{Shop, m_Shop}, utils::{test_utils::{add_items}}
     };
 
@@ -79,7 +77,6 @@ mod tests {
         action_system.spawn('alice', WMClass::Warlock);
 
         let char: Characters = world.read_model(alice);
-        assert(!char.dummied, 'Should be false');
         assert(char.wins == 0, 'wins count should be 0');
         assert(char.loss == 0, 'loss count should be 0');
         assert(char.wmClass == WMClass::Warlock, 'class should be Warlock');
@@ -299,8 +296,7 @@ mod tests {
         action_system.spawn('alice', WMClass::Archer);
 
         let char: Characters = world.read_model(alice);
-        assert(!char.dummied, 'Should be false');
-        assert(char.wins == 0, 'wins count should be 0');
+    assert(char.wins == 0, 'wins count should be 0');
         assert(char.loss == 0, 'loss count should be 0');
         assert(char.wmClass == WMClass::Archer, 'class should be Warlock');
         assert(char.name == 'alice', 'name should be bob');

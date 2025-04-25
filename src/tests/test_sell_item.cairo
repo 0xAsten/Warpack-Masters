@@ -1,25 +1,22 @@
 #[cfg(test)]
 mod tests {
-    use core::starknet::contract_address::ContractAddress;
-    use starknet::class_hash::Felt252TryIntoClassHash;
-    use starknet::testing::set_contract_address;
 
-    use dojo::model::{ModelStorage, ModelValueStorage, ModelStorageTest};
+    use dojo::model::{ModelStorage};
     use dojo::world::WorldStorageTrait;
     use dojo_cairo_test::{spawn_test_world, NamespaceDef, TestResource, ContractDefTrait, ContractDef, WorldStorageTestTrait};
 
     use warpack_masters::{
         systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait}},
-        systems::{item::{item_system, IItemDispatcher, IItemDispatcherTrait}},
+        systems::{item::{item_system, IItemDispatcher}},
         systems::{shop::{shop_system, IShopDispatcher, IShopDispatcherTrait}},
-        models::backpack::{BackpackGrids, m_BackpackGrids},
-        models::Item::{Item, m_Item, ItemsCounter, m_ItemsCounter},
-        models::Character::{Characters, m_Characters, NameRecord, m_NameRecord, WMClass},
+        models::backpack::{m_BackpackGrids},
+        models::Item::{m_Item, m_ItemsCounter},
+        models::Character::{Characters, m_Characters, m_NameRecord, WMClass},
         models::Shop::{Shop, m_Shop},
         models::CharacterItem::{
-            Position, CharacterItemStorage, m_CharacterItemStorage, CharacterItemsStorageCounter,
-            m_CharacterItemsStorageCounter, CharacterItemInventory, m_CharacterItemInventory,
-            CharacterItemsInventoryCounter, m_CharacterItemsInventoryCounter
+            CharacterItemStorage, m_CharacterItemStorage, CharacterItemsStorageCounter,
+            m_CharacterItemsStorageCounter, m_CharacterItemInventory,
+            m_CharacterItemsInventoryCounter
         },
         utils::{test_utils::{add_items}}
     };

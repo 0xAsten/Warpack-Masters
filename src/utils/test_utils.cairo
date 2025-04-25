@@ -1,7 +1,7 @@
 use warpack_masters::systems::item::{IItemDispatcher, IItemDispatcherTrait};
 use warpack_masters::{items};
 
-fn add_items(ref item_system: IItemDispatcher) {
+pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::Backpack::id,

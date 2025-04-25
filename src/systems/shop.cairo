@@ -1,7 +1,7 @@
 use starknet::ContractAddress;
 
 #[starknet::interface]
-trait IShop<T> {
+pub trait IShop<T> {
     fn buy_item(ref self: T, item_id: u32);
     fn sell_item(ref self: T, storage_item_id: u32);
     fn reroll_shop(ref self: T,);

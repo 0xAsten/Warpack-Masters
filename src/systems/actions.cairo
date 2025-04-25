@@ -1,7 +1,7 @@
 use warpack_masters::models::Character::WMClass;
 
 #[starknet::interface]
-trait IActions<T> {
+pub trait IActions<T> {
     fn spawn(
         ref self: T,
         name: felt252,

@@ -1,32 +1,30 @@
 #[cfg(test)]
 mod tests {
-    use core::starknet::contract_address::ContractAddress;
-    use starknet::class_hash::Felt252TryIntoClassHash;
     use starknet::testing::set_contract_address;
 
-    use dojo::model::{ModelStorage, ModelValueStorage, ModelStorageTest};
+    use dojo::model::{ModelStorage};
     use dojo::world::WorldStorageTrait;
     use dojo_cairo_test::{spawn_test_world, NamespaceDef, TestResource, ContractDefTrait, ContractDef, WorldStorageTestTrait};
 
     use warpack_masters::{
         systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait}},
-        systems::{item::{item_system, IItemDispatcher, IItemDispatcherTrait}},
+        systems::{item::{item_system, IItemDispatcher}},
         systems::{fight::{fight_system, IFightDispatcher, IFightDispatcherTrait}},
-        systems::{dummy::{dummy_system, IDummyDispatcher, IDummyDispatcherTrait}},
-        models::backpack::{BackpackGrids, m_BackpackGrids},
-        models::Item::{Item, m_Item, ItemsCounter, m_ItemsCounter},
-        models::Character::{Characters, m_Characters, NameRecord, m_NameRecord, WMClass, PLAYER, DUMMY},
-        models::DummyCharacter::{DummyCharacter, m_DummyCharacter, DummyCharacterCounter, m_DummyCharacterCounter},
+        systems::{dummy::{dummy_system}},
+        models::backpack::{m_BackpackGrids},
+        models::Item::{m_Item, m_ItemsCounter},
+        models::Character::{Characters, m_Characters, m_NameRecord, WMClass, PLAYER},
+        models::DummyCharacter::{m_DummyCharacter, m_DummyCharacterCounter},
         models::DummyCharacterItem::{
-            DummyCharacterItem, m_DummyCharacterItem, DummyCharacterItemsCounter, m_DummyCharacterItemsCounter
+            m_DummyCharacterItem, m_DummyCharacterItemsCounter
         },
         models::CharacterItem::{CharacterItemInventory, CharacterItemsInventoryCounter, m_CharacterItemInventory, m_CharacterItemsInventoryCounter, 
-            CharacterItemStorage, m_CharacterItemStorage, CharacterItemsStorageCounter, m_CharacterItemsStorageCounter,
+            m_CharacterItemStorage, m_CharacterItemsStorageCounter,
             Position
         },
-        models::Fight::{BattleLog, m_BattleLog, BattleLogCounter, m_BattleLogCounter, BattleLogDetail, e_BattleLogDetail},
+        models::Fight::{BattleLog, m_BattleLog, m_BattleLogCounter, e_BattleLogDetail},
         utils::{test_utils::{add_items}},
-        constants::constants::{INIT_STAMINA, EFFECT_REFLECT, INIT_GOLD, INIT_HEALTH}
+        constants::constants::{INIT_GOLD, INIT_HEALTH}
     };
 
     fn namespace_def() -> NamespaceDef {
@@ -73,42 +71,6 @@ mod tests {
 
     #[test]
     #[available_gas(3000000000000000)]
-    fn test_create_dummy() {
-        let ndef = namespace_def();
-        let mut world = spawn_test_world([ndef].span());
-        world.sync_perms_and_inits(contract_defs());
-
-        let (contract_address, _) = world.dns(@"actions").unwrap();
-        let action_system = IActionsDispatcher { contract_address };
-
-        let (contract_address, _) = world.dns(@"item_system").unwrap();
-        let mut item_system = IItemDispatcher { contract_address };
-
-        let (contract_address, _) = world.dns(@"dummy_system").unwrap();
-        let mut dummy_system = IDummyDispatcher { contract_address };
-
-        add_items(ref item_system);
-
-        let alice = starknet::contract_address_const::<0x0>();
-        
-        action_system.spawn('alice', WMClass::Warlock);
-        dummy_system.create_dummy();
-
-        let char: Characters = world.read_model(alice);
-        let dummyChar: DummyCharacter = world.read_model((char.wins, 1));
-        
-        assert(dummyChar.level == char.wins, 'Should be equal');
-        assert(dummyChar.name == 'alice', 'name should be alice');
-        assert(dummyChar.wmClass == WMClass::Warlock, 'class should be Warlock');
-        assert(dummyChar.health == char.health, 'health should be equal');
-        assert(dummyChar.player == alice, 'player should be alice');
-        assert(dummyChar.rating == char.rating, 'rating should be equal');
-        assert(dummyChar.rating == 0, 'rating should be 0');
-        assert(dummyChar.stamina == INIT_STAMINA, 'stamina should be INIT_STAMINA');
-    }
-
-    #[test]
-    #[available_gas(3000000000000000)]
     #[should_panic(expected: ('no new match found', 'ENTRYPOINT_FAILED'))]
     fn test_no_new_matching_battle() {
         let ndef = namespace_def();
@@ -124,13 +86,9 @@ mod tests {
         let (contract_address, _) = world.dns(@"fight_system").unwrap();
         let mut fight_system = IFightDispatcher { contract_address };
 
-        let (contract_address, _) = world.dns(@"dummy_system").unwrap();
-        let mut dummy_system = IDummyDispatcher { contract_address };
-
         add_items(ref item_system);
 
         action_system.spawn('alice', WMClass::Warlock);
-        dummy_system.create_dummy();
 
         fight_system.fight();
     }
@@ -176,13 +134,9 @@ mod tests {
         let (contract_address, _) = world.dns(@"fight_system").unwrap();
         let mut fight_system = IFightDispatcher { contract_address };
 
-        let (contract_address, _) = world.dns(@"dummy_system").unwrap();
-        let mut dummy_system = IDummyDispatcher { contract_address };
-
         add_items(ref item_system);
 
         action_system.spawn('alice', WMClass::Warlock);
-        dummy_system.create_dummy();
 
         fight_system.match_dummy();
     }
@@ -204,18 +158,13 @@ mod tests {
         let (contract_address, _) = world.dns(@"fight_system").unwrap();
         let mut fight_system = IFightDispatcher { contract_address };
 
-        let (contract_address, _) = world.dns(@"dummy_system").unwrap();
-        let mut dummy_system = IDummyDispatcher { contract_address };
-
         add_items(ref item_system);
 
         action_system.spawn('alice', WMClass::Warlock);
-        dummy_system.create_dummy();
 
         let bob = starknet::contract_address_const::<0x1>();
         set_contract_address(bob);
         action_system.spawn('bob', WMClass::Warlock);
-        dummy_system.create_dummy();
 
         fight_system.match_dummy();
         fight_system.match_dummy();
@@ -236,9 +185,6 @@ mod tests {
 
         let (contract_address, _) = world.dns(@"fight_system").unwrap();
         let mut fight_system = IFightDispatcher { contract_address };
-
-        let (contract_address, _) = world.dns(@"dummy_system").unwrap();
-        let mut dummy_system = IDummyDispatcher { contract_address };
 
         let alice = starknet::contract_address_const::<0x0>();
         set_contract_address(alice);
@@ -298,8 +244,6 @@ mod tests {
         world.write_model(@item2);
         world.write_model(@item3);
         world.write_model(@item4);
-
-        dummy_system.create_dummy();
 
         // Add items for Bob
         let bob = starknet::contract_address_const::<0x1>();
@@ -372,7 +316,6 @@ mod tests {
         world.write_model(@item5);
 
         set_contract_address(bob);
-        dummy_system.create_dummy();
 
         fight_system.match_dummy();
 
@@ -409,14 +352,9 @@ mod tests {
         let (contract_address, _) = world.dns(@"item_system").unwrap();
         let mut item_system = IItemDispatcher { contract_address };
 
-        let (contract_address, _) = world.dns(@"dummy_system").unwrap();
-        let mut dummy_system = IDummyDispatcher { contract_address };
-
         add_items(ref item_system);
 
         action_system.spawn('alice', WMClass::Warlock);
-        dummy_system.create_dummy();
-        dummy_system.create_dummy();
     }
 
     #[test]
@@ -436,9 +374,6 @@ mod tests {
         let (contract_address, _) = world.dns(@"fight_system").unwrap();
         let mut fight_system = IFightDispatcher { contract_address };
 
-        let (contract_address, _) = world.dns(@"dummy_system").unwrap();
-        let mut dummy_system = IDummyDispatcher { contract_address };
-
         let alice = starknet::contract_address_const::<0x0>();
 
         add_items(ref item_system);
@@ -449,7 +384,6 @@ mod tests {
         char.loss = 5;
         world.write_model(@char);
 
-        dummy_system.create_dummy();
         fight_system.match_dummy();
     }
 
@@ -468,9 +402,6 @@ mod tests {
 
         let (contract_address, _) = world.dns(@"fight_system").unwrap();
         let mut fight_system = IFightDispatcher { contract_address };
-
-        let (contract_address, _) = world.dns(@"dummy_system").unwrap();
-        let mut dummy_system = IDummyDispatcher { contract_address };
 
         let alice = starknet::contract_address_const::<0x0>();
 
@@ -529,8 +460,6 @@ mod tests {
         world.write_model(@item2);
         world.write_model(@item3);
         world.write_model(@item4);
-
-        dummy_system.create_dummy();
 
         // Add items for Bob
         let bob = starknet::contract_address_const::<0x1>();
@@ -603,7 +532,6 @@ mod tests {
         world.write_model(@item5);
 
         set_contract_address(bob);
-        dummy_system.create_dummy();
         fight_system.match_dummy();
         fight_system.fight();
 
@@ -617,7 +545,6 @@ mod tests {
             assert(char.wins == 1, 'wins should be 1');
             assert(char.totalWins == 1, 'totalWins should be 1');
             assert(char.winStreak == 1, 'winStreak should be 1');
-            assert(char.dummied == false, 'dummied should be false');
             assert(char.gold == INIT_GOLD + 6, 'gold should be INIT_GOLD + 6');
             assert(char.health == INIT_HEALTH + 10, 'health be INIT_HEALTH + 10');
             assert(char.rating == 25, 'rating should be 25');
@@ -627,7 +554,6 @@ mod tests {
             assert(char.wins == 0, 'wins should be 0');
             assert(char.totalWins == 0, 'totalWins should be 0');
             assert(char.winStreak == 0, 'winStreak should be 0');
-            assert(char.dummied == false, 'dummied should be false');
             assert(char.gold == INIT_GOLD + 6, 'gold be INIT_GOLD + 6');
             assert(char.health == INIT_HEALTH, 'health be INIT_HEALTH');
             assert(char.rating == 0, 'rating should be 25');

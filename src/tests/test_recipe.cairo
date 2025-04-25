@@ -1,19 +1,17 @@
 #[cfg(test)]
 mod tests {
-    use core::starknet::contract_address::ContractAddress;
-    use starknet::class_hash::Felt252TryIntoClassHash;
-    use starknet::testing::{set_contract_address, set_block_timestamp};
+    use starknet::testing::{set_contract_address};
 
-    use dojo::model::{ModelStorage, ModelValueStorage, ModelStorageTest};
+    use dojo::model::{ModelStorage};
     use dojo::world::WorldStorageTrait;
     use dojo_cairo_test::{spawn_test_world, NamespaceDef, TestResource, ContractDefTrait, ContractDef, WorldStorageTestTrait};
 
     use warpack_masters::{
         systems::{recipe::{recipe_system, IRecipeDispatcher, IRecipeDispatcherTrait}},
-        systems::{item::{item_system, IItemDispatcher, IItemDispatcherTrait}},
-        models::Item::{Item, m_Item, ItemsCounter, m_ItemsCounter},
+        systems::{item::{item_system, IItemDispatcher}},
+        models::Item::{m_Item, m_ItemsCounter},
         models::CharacterItem::{
-            Position, CharacterItemStorage, m_CharacterItemStorage
+            CharacterItemStorage, m_CharacterItemStorage
         },
         models::Recipe::{Recipe, m_Recipe},
         utils::test_utils::add_items

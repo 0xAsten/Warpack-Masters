@@ -1,21 +1,19 @@
 #[cfg(test)]
 mod tests {
-    use core::starknet::contract_address::ContractAddress;
-    use starknet::class_hash::Felt252TryIntoClassHash;
     use starknet::testing::{set_contract_address, set_block_timestamp};
 
-    use dojo::model::{ModelStorage, ModelValueStorage, ModelStorageTest};
+    use dojo::model::{ModelStorage};
     use dojo::world::WorldStorageTrait;
     use dojo_cairo_test::{spawn_test_world, NamespaceDef, TestResource, ContractDefTrait, ContractDef, WorldStorageTestTrait};
 
     use warpack_masters::{
         systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait}},
-        systems::{item::{item_system, IItemDispatcher, IItemDispatcherTrait}},
+        systems::{item::{item_system, IItemDispatcher}},
         systems::{shop::{shop_system, IShopDispatcher, IShopDispatcherTrait}},
         models::backpack::{BackpackGrids, m_BackpackGrids},
-        models::Item::{Item, m_Item, ItemsCounter, m_ItemsCounter},
+        models::Item::{m_Item, m_ItemsCounter},
         models::CharacterItem::{
-            Position, CharacterItemStorage, m_CharacterItemStorage, CharacterItemsStorageCounter,
+            CharacterItemStorage, m_CharacterItemStorage, CharacterItemsStorageCounter,
             m_CharacterItemsStorageCounter, CharacterItemInventory, m_CharacterItemInventory,
             CharacterItemsInventoryCounter, m_CharacterItemsInventoryCounter
         },
@@ -23,7 +21,7 @@ mod tests {
         models::Shop::{Shop, m_Shop}, utils::{test_utils::{add_items}}
     };
 
-    use warpack_masters::constants::constants::{INIT_HEALTH, INIT_GOLD, INIT_STAMINA};
+    use warpack_masters::constants::constants::{INIT_HEALTH, INIT_GOLD};
 
     fn namespace_def() -> NamespaceDef {
         let ndef = NamespaceDef {
@@ -110,14 +108,13 @@ mod tests {
         let timestamp = 1717770021;
         set_block_timestamp(timestamp);
 
-        action_system.rebirth('bob', WMClass::Warrior);
+        action_system.rebirth();
 
         let char: Characters = world.read_model(alice);
         let inventoryItemsCounter: CharacterItemsInventoryCounter = world.read_model(alice);
         let storageItemsCounter: CharacterItemsStorageCounter = world.read_model(alice);
         let playerShopData: Shop = world.read_model(alice);
 
-        assert(!char.dummied, 'Should be false');
         assert(char.wins == 0, 'wins count should be 0');
         assert(char.loss == 0, 'loss count should be 0');
         assert(char.wmClass == WMClass::Warrior, 'class should be Warrior');
@@ -265,7 +262,7 @@ mod tests {
         char.loss = 4;
         world.write_model(@char);
 
-        action_system.rebirth('bob', WMClass::Warlock);
+        action_system.rebirth();
     }
 
     #[test]
@@ -297,7 +294,7 @@ mod tests {
         world.write_model(@char);
 
         set_contract_address(alice);
-        action_system.rebirth('alice', WMClass::Warlock);
+        action_system.rebirth();
     }
 
     #[test]
@@ -325,7 +322,7 @@ mod tests {
         char.loss = 5;
         world.write_model(@char);
 
-        action_system.rebirth('alice', WMClass::Warlock);
+        action_system.rebirth();
 
         let nameRecord: NameRecord = world.read_model('alice');
         assert(nameRecord.player == alice, 'player should be alice');
@@ -358,7 +355,7 @@ mod tests {
         world.write_model(@char);
 
         set_contract_address(alice);
-        action_system.rebirth('Alice', WMClass::Warlock);
+        action_system.rebirth();
 
         let nameRecord: NameRecord = world.read_model('Alice');
         assert(nameRecord.player == alice, 'player should be alice');

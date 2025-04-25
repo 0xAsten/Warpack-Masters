@@ -21,16 +21,16 @@ pub fn random(seed: u128, num: u32) -> u32 {
 
 #[cfg(test)]
 mod tests {
-    use super::{pseudo_seed};
-    use debug::PrintTrait;
+    // use super::{pseudo_seed};
+    // use debug::PrintTrait;
 
-    #[test]
-    #[available_gas(100000)]
-    fn test_grid_is_zero() {
-        let (seed1, seed2, seed3, seed4) = pseudo_seed();
-        seed1.print();
-        seed2.print();
-        seed3.print();
-        seed4.print();
-    }
+    // #[test]
+    // #[available_gas(100000)]
+    // fn test_grid_is_zero() {
+        // let (seed1, seed2, seed3, seed4) = pseudo_seed();
+        // seed1.print();
+        // seed2.print();
+        // seed3.print();
+        // seed4.print();
+    // }
 }

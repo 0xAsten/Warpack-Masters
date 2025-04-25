@@ -3,7 +3,6 @@ mod tests {
     use core::starknet::contract_address::ContractAddress;
     use core::option::OptionTrait;
     use core::array::ArrayTrait;
-    use starknet::class_hash::Felt252TryIntoClassHash;
     use starknet::testing::set_contract_address;
 
     use dojo::model::{Model, ModelTest, ModelIndex, ModelEntityTest};

@@ -1,21 +1,18 @@
 #[cfg(test)]
 mod tests {
-    use core::starknet::contract_address::ContractAddress;
     use core::option::OptionTrait;
     use core::array::ArrayTrait;
-    use starknet::class_hash::Felt252TryIntoClassHash;
     use starknet::testing::set_contract_address;
 
-    use dojo::model::{ModelStorage, ModelValueStorage, ModelStorageTest};
+    use dojo::model::{ModelStorage};
     use dojo::world::WorldStorageTrait;
     use dojo_cairo_test::{spawn_test_world, NamespaceDef, TestResource, ContractDefTrait, ContractDef, WorldStorageTestTrait};
 
     use warpack_masters::{
         systems::{dummy::{dummy_system, IDummyDispatcher, IDummyDispatcherTrait}},
-        systems::{item::{item_system, IItemDispatcher, IItemDispatcherTrait}},
-        models::backpack::{BackpackGrids, m_BackpackGrids},
-        models::Character::{NameRecord, m_NameRecord, WMClass},
-        models::CharacterItem::{Position},
+        systems::{item::{item_system, IItemDispatcher}},
+        models::backpack::{m_BackpackGrids},
+        models::Character::{m_NameRecord, WMClass},
         models::DummyCharacter::{
             DummyCharacter, m_DummyCharacter, DummyCharacterCounter, m_DummyCharacterCounter
         },
@@ -23,11 +20,11 @@ mod tests {
             DummyCharacterItem, m_DummyCharacterItem, DummyCharacterItemsCounter,
             m_DummyCharacterItemsCounter
         },
-        models::Item::{Item, m_Item, ItemsCounter, m_ItemsCounter},
+        models::Item::{m_Item, m_ItemsCounter},
         utils::{test_utils::{add_items}}
     };
 
-    use warpack_masters::prdefined_dummies::{PredefinedItem, Dummy0, Dummy1};
+    use warpack_masters::prdefined_dummies::{Dummy0};
 
     fn namespace_def() -> NamespaceDef {
         let ndef = NamespaceDef {

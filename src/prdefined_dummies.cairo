@@ -40,12 +40,12 @@ pub mod Dummy0 {
     use super::PredefinedItem;
     use warpack_masters::items::{Backpack, Pack, Dagger, Herb, Spike};
 
-    const level: u32 = 0;
-    const name: felt252 = 'Noobie';
-    const wmClass: WMClass = WMClass::Warlock;
-    const health: u32 = 25;
+    pub const level: u32 = 0;
+    pub const name: felt252 = 'Noobie';
+    pub const wmClass: WMClass = WMClass::Warlock;
+    pub const health: u32 = 25;
 
-    fn get_items() -> Array<PredefinedItem> {
+    pub fn get_items() -> Array<PredefinedItem> {
         let mut items: Array<PredefinedItem> = array![];
         items.append(PredefinedItem {
             itemId: Backpack::id,

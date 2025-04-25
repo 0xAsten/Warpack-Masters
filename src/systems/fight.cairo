@@ -1,5 +1,5 @@
 #[starknet::interface]
-trait IFight<T> {
+pub trait IFight<T> {
     fn match_dummy(ref self: T);
     fn fight(ref self: T);
 }

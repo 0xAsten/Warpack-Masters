@@ -3,7 +3,7 @@ use warpack_masters::models::Character::WMClass;
 
 
 #[starknet::interface]
-trait IDummy<T> {
+pub trait IDummy<T> {
     // fn create_dummy(ref self: T,);
     fn prefine_dummy(ref self: T, level: u32, name: felt252, wmClass: WMClass, items: Array<PredefinedItem>);
     fn update_prefine_dummy(ref self: T, dummyCharId: u32, level: u32, name: felt252, wmClass: WMClass, items: Array<PredefinedItem>);
