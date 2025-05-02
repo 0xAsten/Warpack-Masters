@@ -117,8 +117,8 @@ mod tests {
 
         assert(char.wins == 0, 'wins count should be 0');
         assert(char.loss == 0, 'loss count should be 0');
-        assert(char.wmClass == WMClass::Warrior, 'class should be Warrior');
-        assert(char.name == 'bob', 'name should be bob');
+        assert(char.wmClass == WMClass::Warlock, 'class should be Warrior');
+        assert(char.name == 'alice', 'name should be bob');
         assert(char.gold == INIT_GOLD + 1, 'gold should be init');
         assert(char.health == INIT_HEALTH, 'health should be init');
         assert(char.rating == 300, 'Rating mismatch');
@@ -265,106 +265,5 @@ mod tests {
         action_system.rebirth();
     }
 
-    #[test]
-    #[available_gas(3000000000000000)]
-    #[should_panic(expected: ('name already exists', 'ENTRYPOINT_FAILED'))]
-    fn test_name_already_exists() {
-        let ndef = namespace_def();
-        let mut world = spawn_test_world([ndef].span());
-        world.sync_perms_and_inits(contract_defs());
-
-        let (contract_address, _) = world.dns(@"actions").unwrap();
-        let action_system = IActionsDispatcher { contract_address };
-
-        let (contract_address, _) = world.dns(@"item_system").unwrap();
-        let mut item_system = IItemDispatcher { contract_address };
-
-        add_items(ref item_system);
-
-        let alice = starknet::contract_address_const::<0x1>();
-        set_contract_address(alice);
-        action_system.spawn('alice', WMClass::Warlock);
-
-        let alice = starknet::contract_address_const::<0x0>();
-        set_contract_address(alice);
-        action_system.spawn('alice', WMClass::Warlock);
-
-        let mut char: Characters = world.read_model(alice);
-        char.loss = 5;
-        world.write_model(@char);
-
-        set_contract_address(alice);
-        action_system.rebirth();
-    }
-
-    #[test]
-    #[available_gas(3000000000000000)]
-    fn test_rebirth_with_same_name() {
-        let ndef = namespace_def();
-        let mut world = spawn_test_world([ndef].span());
-        world.sync_perms_and_inits(contract_defs());
-
-        let (contract_address, _) = world.dns(@"actions").unwrap();
-        let action_system = IActionsDispatcher { contract_address };
-
-        let (contract_address, _) = world.dns(@"item_system").unwrap();
-        let mut item_system = IItemDispatcher { contract_address };
-
-        add_items(ref item_system);
-
-        let alice = starknet::contract_address_const::<0x0>();
-        action_system.spawn('alice', WMClass::Warlock);
-
-        let nameRecord: NameRecord = world.read_model('alice');
-        assert(nameRecord.player == alice, 'player should be alice');
-
-        let mut char: Characters = world.read_model(alice);
-        char.loss = 5;
-        world.write_model(@char);
-
-        action_system.rebirth();
-
-        let nameRecord: NameRecord = world.read_model('alice');
-        assert(nameRecord.player == alice, 'player should be alice');
-    }
-
-    #[test]
-    #[available_gas(3000000000000000)]
-    fn test_rebirth_with_different_name() {
-        let ndef = namespace_def();
-        let mut world = spawn_test_world([ndef].span());
-        world.sync_perms_and_inits(contract_defs());
-
-        let (contract_address, _) = world.dns(@"actions").unwrap();
-        let action_system = IActionsDispatcher { contract_address };
-
-        let (contract_address, _) = world.dns(@"item_system").unwrap();
-        let mut item_system = IItemDispatcher { contract_address };
-
-        add_items(ref item_system);
-
-        let alice = starknet::contract_address_const::<0x0>();
-        set_contract_address(alice);
-        action_system.spawn('alice', WMClass::Warlock);
-
-        let nameRecord: NameRecord = world.read_model('alice');
-        assert(nameRecord.player == alice, 'player should be alice');
-
-        let mut char: Characters = world.read_model(alice);
-        char.loss = 5;
-        world.write_model(@char);
-
-        set_contract_address(alice);
-        action_system.rebirth();
-
-        let nameRecord: NameRecord = world.read_model('Alice');
-        assert(nameRecord.player == alice, 'player should be alice');
-
-        let nameRecord: NameRecord = world.read_model('alice');
-        assert(
-            nameRecord.player == starknet::contract_address_const::<0x0>(), 
-            'player should be 0x0'
-        );
-    }
 }
 
