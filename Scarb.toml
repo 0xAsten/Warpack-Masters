@@ -1,5 +1,5 @@
 [package]
-cairo-version = "=2.9.4"
+cairo-version = "=2.10.1"
 name = "warpack_masters"
 version = "1.0.0"
 edition = "2024_07"
@@ -8,11 +8,11 @@ edition = "2024_07"
 sierra-replace-ids = true
 
 [dependencies]
-dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.4.0" }
+dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.5.1" }
 
 [dev-dependencies]
-cairo_test = "=2.9.4"
-dojo_cairo_test = { git = "https://github.com/dojoengine/dojo.git", tag = "v1.4.0" }
+cairo_test = "=2.10.1"
+dojo_cairo_test = { git = "https://github.com/dojoengine/dojo.git", tag = "v1.5.1" }
 
 [[target.starknet-contract]]
 build-external-contracts = ["dojo::world::world_contract::world"]
