@@ -17,8 +17,11 @@ pub mod storage_bridge_system {
         TokenRegistry::{TokenRegistry, BridgeDeposit, BridgeDepositCounter},
         Item::{Item}
     };
-    use warpack_masters::systems::token::{IERC20Dispatcher, IERC20DispatcherTrait, IItemTokenDispatcher, IItemTokenDispatcherTrait};
-    use dojo::model::{ModelStorage};
+    use warpack_masters::systems::token::{
+        IERC20Dispatcher, IERC20DispatcherTrait, 
+        ItemTokenDispatcher, ItemTokenDispatcherTrait
+    };
+    use dojo::model::{ModelStorage, ModelValueStorage};
     use dojo::event::EventStorage;
 
     #[derive(Copy, Drop, Serde)]
@@ -46,7 +49,7 @@ pub mod storage_bridge_system {
     #[abi(embed_v0)]
     impl StorageBridgeImpl of IStorageBridge<ContractState> {
         fn deposit_item_for_tokens(ref self: ContractState, storage_slot_id: u32) {
-            let mut world = self.world_default();
+            let mut world = self.world(@"warpack_masters");
 
             let player = get_caller_address();
 
@@ -71,7 +74,7 @@ pub mod storage_bridge_system {
 
             // Mint 1 token (items are 1:1 with tokens)
             let token_amount: u256 = 1;
-            let token_dispatcher = IItemTokenDispatcher { contract_address: token_registry.token_address };
+            let token_dispatcher = ItemTokenDispatcher { contract_address: token_registry.token_address };
             token_dispatcher.mint(player, token_amount);
 
             // Record the deposit
@@ -101,7 +104,7 @@ pub mod storage_bridge_system {
         }
 
         fn withdraw_tokens_for_item(ref self: ContractState, item_id: u32, token_amount: u256) {
-            let mut world = self.world_default();
+            let mut world = self.world(@"warpack_masters");
 
             let player = get_caller_address();
 
@@ -120,7 +123,7 @@ pub mod storage_bridge_system {
             assert(player_balance >= token_amount, 'Insufficient token balance');
 
             // Burn the tokens
-            let token_dispatcher = IItemTokenDispatcher { contract_address: token_registry.token_address };
+            let token_dispatcher = ItemTokenDispatcher { contract_address: token_registry.token_address };
             token_dispatcher.burn(player, token_amount);
 
             // Add items back to storage
@@ -161,7 +164,7 @@ pub mod storage_bridge_system {
         }
 
         fn get_deposited_amount(self: @ContractState, player: ContractAddress, item_id: u32) -> u256 {
-            let world = self.world_default();
+            let world = self.world(@"warpack_masters");
             
             // Get token registry
             let token_registry: TokenRegistry = world.read_model(item_id);

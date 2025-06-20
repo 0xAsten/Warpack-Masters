@@ -10,14 +10,17 @@ pub trait ITokenFactory<T> {
 #[dojo::contract]
 pub mod token_factory_system {
     use super::{ITokenFactory, ContractAddress};
-    use starknet::{get_caller_address, get_block_timestamp, deploy_syscall, ClassHash};
+    use starknet::{
+        get_caller_address, get_block_timestamp, 
+        syscalls::deploy_syscall, ClassHash
+    };
     use warpack_masters::models::{
         TokenRegistry::{TokenRegistry, TokenRegistryCounter},
         Item::{Item}
     };
     use warpack_masters::systems::token::{ItemTokenContract};
     use warpack_masters::constants::constants::{ITEMS_COUNTER_ID};
-    use dojo::model::{ModelStorage};
+    use dojo::model::{ModelStorage, ModelValueStorage};
     use dojo::event::EventStorage;
 
     #[derive(Copy, Drop, Serde)]
@@ -34,7 +37,7 @@ pub mod token_factory_system {
     #[abi(embed_v0)]
     impl TokenFactoryImpl of ITokenFactory<ContractState> {
         fn create_token_for_item(ref self: ContractState, item_id: u32) -> ContractAddress {
-            let mut world = self.world_default();
+            let mut world = self.world(@"warpack_masters");
 
             // Validate item exists
             let item: Item = world.read_model(item_id);
@@ -100,14 +103,14 @@ pub mod token_factory_system {
         }
 
         fn get_token_address(self: @ContractState, item_id: u32) -> ContractAddress {
-            let world = self.world_default();
+            let world = self.world(@"warpack_masters");
             let registry: TokenRegistry = world.read_model(item_id);
             assert(registry.item_id != 0, 'Token not registered');
             registry.token_address
         }
 
         fn is_token_registered(self: @ContractState, item_id: u32) -> bool {
-            let world = self.world_default();
+            let world = self.world(@"warpack_masters");
             let registry: TokenRegistry = world.read_model(item_id);
             registry.item_id != 0 && registry.is_active
         }

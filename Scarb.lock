@@ -23,7 +23,7 @@ version = "2.10.1"
 source = "git+https://github.com/dojoengine/dojo.git?tag=v1.5.1#986c3b0c6d647b23847c70ddceb1d33ddac86ead"
 
 [[package]]
-name = "w"
+name = "warpack_masters"
 version = "1.0.0"
 dependencies = [
  "dojo",

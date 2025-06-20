@@ -25,7 +25,13 @@ pub trait IItemToken<TContractState> {
 
 #[starknet::contract]
 pub mod ItemTokenContract {
-    use starknet::{ContractAddress, get_caller_address};
+    use starknet::{
+        ContractAddress, get_caller_address, contract_address_const
+    };
+    use starknet::storage::{
+        StoragePointerReadAccess, StoragePointerWriteAccess, 
+        StorageMapReadAccess, StorageMapWriteAccess, Map
+    };
 
     #[storage]
     struct Storage {
@@ -33,8 +39,8 @@ pub mod ItemTokenContract {
         symbol: felt252,
         decimals: u8,
         total_supply: u256,
-        balances: LegacyMap<ContractAddress, u256>,
-        allowances: LegacyMap<(ContractAddress, ContractAddress), u256>,
+        balances: Map<ContractAddress, u256>,
+        allowances: Map<(ContractAddress, ContractAddress), u256>,
         minter: ContractAddress,
         item_id: u32,
     }
@@ -114,12 +120,12 @@ pub mod ItemTokenContract {
         }
 
         fn transfer_from(ref self: ContractState, sender: ContractAddress, recipient: ContractAddress, amount: u256) -> bool {
-            let caller = get_caller_address();
-            let current_allowance = self.allowances.read((sender, caller));
+            let _caller = get_caller_address();
+            let current_allowance = self.allowances.read((sender, _caller));
             assert(current_allowance >= amount, 'Insufficient allowance');
             
             // Update allowance
-            self.allowances.write((sender, caller), current_allowance - amount);
+            self.allowances.write((sender, _caller), current_allowance - amount);
             
             // Perform transfer
             self._transfer(sender, recipient, amount);
@@ -148,7 +154,7 @@ pub mod ItemTokenContract {
             
             // Emit Transfer event (from zero address = mint)
             self.emit(Event::Transfer(Transfer {
-                from: starknet::contract_address_const::<0>(),
+                from: contract_address_const::<0>(),
                 to: recipient,
                 value: amount
             }));
@@ -168,7 +174,7 @@ pub mod ItemTokenContract {
             // Emit Transfer event (to zero address = burn)
             self.emit(Event::Transfer(Transfer {
                 from: account,
-                to: starknet::contract_address_const::<0>(),
+                to: contract_address_const::<0>(),
                 value: amount
             }));
         }
@@ -185,8 +191,10 @@ pub mod ItemTokenContract {
     #[generate_trait]
     impl InternalImpl of InternalTrait {
         fn _transfer(ref self: ContractState, sender: ContractAddress, recipient: ContractAddress, amount: u256) {
-            assert(!sender.is_zero(), 'Transfer from zero address');
-            assert(!recipient.is_zero(), 'Transfer to zero address');
+            // Check for zero addresses
+            let zero_address = contract_address_const::<0>();
+            assert(sender != zero_address, 'Transfer from zero address');
+            assert(recipient != zero_address, 'Transfer to zero address');
             
             let sender_balance = self.balances.read(sender);
             assert(sender_balance >= amount, 'Insufficient balance');
@@ -205,8 +213,10 @@ pub mod ItemTokenContract {
         }
 
         fn _approve(ref self: ContractState, owner: ContractAddress, spender: ContractAddress, amount: u256) {
-            assert(!owner.is_zero(), 'Approve from zero address');
-            assert(!spender.is_zero(), 'Approve to zero address');
+            // Check for zero addresses
+            let zero_address = contract_address_const::<0>();
+            assert(owner != zero_address, 'Approve from zero address');
+            assert(spender != zero_address, 'Approve to zero address');
             
             self.allowances.write((owner, spender), amount);
             
@@ -220,30 +230,39 @@ pub mod ItemTokenContract {
     }
 }
 
-// Dispatcher traits for interacting with deployed token contracts
+// Dispatcher for interacting with deployed token contracts
 #[derive(Copy, Drop)]
 pub struct ItemTokenDispatcher {
     pub contract_address: ContractAddress,
 }
 
-impl ItemTokenDispatcherImpl of super::IItemToken<ItemTokenDispatcher> {
-    fn mint(ref self: ItemTokenDispatcher, recipient: ContractAddress, amount: u256) {
-        // This would call the deployed contract
-        // Implementation depends on how you want to handle dispatchers
+pub trait ItemTokenDispatcherTrait {
+    fn mint(self: ItemTokenDispatcher, recipient: ContractAddress, amount: u256);
+    fn burn(self: ItemTokenDispatcher, account: ContractAddress, amount: u256);
+    fn get_item_id(self: ItemTokenDispatcher) -> u32;
+    fn get_minter(self: ItemTokenDispatcher) -> ContractAddress;
+}
+
+impl ItemTokenDispatcherImpl of ItemTokenDispatcherTrait {
+    fn mint(self: ItemTokenDispatcher, recipient: ContractAddress, amount: u256) {
+        // This would use the generated dispatcher from the interface
+        // For now, placeholder implementation
     }
 
-    fn burn(ref self: ItemTokenDispatcher, account: ContractAddress, amount: u256) {
-        // This would call the deployed contract  
-        // Implementation depends on how you want to handle dispatchers
+    fn burn(self: ItemTokenDispatcher, account: ContractAddress, amount: u256) {
+        // This would use the generated dispatcher from the interface
+        // For now, placeholder implementation  
     }
 
-    fn get_item_id(self: @ItemTokenDispatcher) -> u32 {
-        // This would call the deployed contract
-        0 // Placeholder
+    fn get_item_id(self: ItemTokenDispatcher) -> u32 {
+        // This would use the generated dispatcher from the interface
+        // For now, placeholder implementation
+        0
     }
 
-    fn get_minter(self: @ItemTokenDispatcher) -> ContractAddress {
-        // This would call the deployed contract
-        starknet::contract_address_const::<0>() // Placeholder
+    fn get_minter(self: ItemTokenDispatcher) -> ContractAddress {
+        // This would use the generated dispatcher from the interface
+        // For now, placeholder implementation
+        starknet::contract_address_const::<0>()
     }
 } 

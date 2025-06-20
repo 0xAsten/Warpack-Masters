@@ -1,6 +1,6 @@
 [package]
 cairo-version = "2.10.1"
-name = "w"
+name = "warpack_masters"
 version = "1.0.0"
 edition = "2024_07"
 
