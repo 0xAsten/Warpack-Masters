@@ -6,7 +6,6 @@ pub mod systems {
     pub mod shop;
     pub mod recipe;
     pub mod config;
-    pub mod token;
     pub mod token_factory;
     pub mod storage_bridge;
 }

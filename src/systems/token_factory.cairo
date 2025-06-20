@@ -1,129 +1,104 @@
-use starknet::ContractAddress;
+use starknet::{ContractAddress, ClassHash, contract_address_const};
+
+// Standard ERC-20 interface that Ekubo expects
+#[starknet::interface]
+pub trait IERC20<TContractState> {
+    fn total_supply(self: @TContractState) -> u256;
+    fn balance_of(self: @TContractState, account: ContractAddress) -> u256;
+    fn allowance(self: @TContractState, owner: ContractAddress, spender: ContractAddress) -> u256;
+    fn transfer(ref self: TContractState, recipient: ContractAddress, amount: u256) -> bool;
+    fn transfer_from(ref self: TContractState, sender: ContractAddress, recipient: ContractAddress, amount: u256) -> bool;
+    fn approve(ref self: TContractState, spender: ContractAddress, amount: u256) -> bool;
+    fn name(self: @TContractState) -> ByteArray;
+    fn symbol(self: @TContractState) -> ByteArray;
+    fn decimals(self: @TContractState) -> u8;
+}
 
 #[starknet::interface]
-pub trait ITokenFactory<T> {
-    fn create_token_for_item(ref self: T, item_id: u32) -> ContractAddress;
-    fn get_token_address(self: @T, item_id: u32) -> ContractAddress;
-    fn is_token_registered(self: @T, item_id: u32) -> bool;
+pub trait ITokenFactory<TContractState> {
+    fn create_token_for_item(ref self: TContractState, item_id: u32, name: ByteArray, symbol: ByteArray) -> ContractAddress;
+    fn get_token_address(self: @TContractState, item_id: u32) -> ContractAddress;
+    fn set_erc20_class_hash(ref self: TContractState, class_hash: ClassHash);
 }
 
 #[dojo::contract]
-pub mod token_factory_system {
-    use super::{ITokenFactory, ContractAddress};
+pub mod token_factory {
+    use super::ITokenFactory;
     use starknet::{
-        get_caller_address, get_block_timestamp, 
-        syscalls::deploy_syscall, ClassHash
+        ContractAddress, ClassHash, get_contract_address, contract_address_const,
+        syscalls::deploy_syscall
     };
+    use dojo::model::{ModelStorage};
+    
     use warpack_masters::models::{
-        TokenRegistry::{TokenRegistry, TokenRegistryCounter},
-        Item::{Item}
+        TokenRegistry::{TokenRegistry},
     };
-    use warpack_masters::systems::token::{ItemTokenContract};
-    use warpack_masters::constants::constants::{ITEMS_COUNTER_ID};
-    use dojo::model::{ModelStorage, ModelValueStorage};
-    use dojo::event::EventStorage;
-
-    #[derive(Copy, Drop, Serde)]
-    #[dojo::event(historical: true)]
-    struct TokenCreated {
-        #[key]
-        item_id: u32,
-        token_address: ContractAddress,
-        creator: ContractAddress,
-        token_name: felt252,
-        token_symbol: felt252,
-    }
 
     #[abi(embed_v0)]
     impl TokenFactoryImpl of ITokenFactory<ContractState> {
-        fn create_token_for_item(ref self: ContractState, item_id: u32) -> ContractAddress {
+        fn create_token_for_item(ref self: ContractState, item_id: u32, name: ByteArray, symbol: ByteArray) -> ContractAddress {
             let mut world = self.world(@"warpack_masters");
-
-            // Validate item exists
-            let item: Item = world.read_model(item_id);
-            assert(item.id != 0, 'Item does not exist');
-
+            
             // Check if token already exists
             let existing_registry: TokenRegistry = world.read_model(item_id);
-            assert(existing_registry.item_id == 0, 'Token already exists');
-
-            let caller = get_caller_address();
-
-            // Generate token name and symbol from item name
-            let token_name = item.name;
-            // Create a simple symbol by prefixing with 'WP'
-            let token_symbol = item.name; // In production, you'd want better symbol generation
-
-            // Deploy the token contract
-            // NOTE: You'll need to provide the actual class hash of your deployed ItemTokenContract
-            // This is typically obtained when you declare the contract
-            let token_class_hash: ClassHash = get_token_contract_class_hash(); // Helper function needed
+            assert(existing_registry.token_address == contract_address_const::<0>(), 'Token already exists');
             
-            let mut constructor_calldata = array![];
-            constructor_calldata.append(token_name);
-            constructor_calldata.append(token_symbol);
-            constructor_calldata.append(caller.into()); // minter address (should be storage bridge)
-            constructor_calldata.append(item_id.into());
-
+            // Get the stored class hash for ERC-20 tokens
+            let config_registry: TokenRegistry = world.read_model(0);
+            assert(config_registry.token_address != contract_address_const::<0>(), 'ERC20 class hash not set');
+            
+            // Convert the stored address back to class hash
+            let class_hash_felt: felt252 = config_registry.token_address.into();
+            let class_hash: ClassHash = class_hash_felt.try_into().unwrap();
+            
+            // Deploy the ERC-20 token contract
+            let mut constructor_calldata = ArrayTrait::new();
+            name.serialize(ref constructor_calldata);
+            symbol.serialize(ref constructor_calldata);
+            18_u8.serialize(ref constructor_calldata); // decimals
+            0_u256.serialize(ref constructor_calldata); // initial_supply
+            get_contract_address().serialize(ref constructor_calldata); // recipient (this contract)
+            
             let (token_address, _) = deploy_syscall(
-                token_class_hash,
-                0, // salt - you might want to use item_id for uniqueness
+                class_hash,
+                item_id.into(), // salt
                 constructor_calldata.span(),
-                false // deploy_from_zero
-            ).expect('Token deployment failed');
-
+                false
+            ).unwrap();
+            
             // Register the token
             let token_registry = TokenRegistry {
                 item_id,
                 token_address,
-                token_name,
-                token_symbol,
                 is_active: true,
-                total_supply: 0,
-                created_at: get_block_timestamp(),
             };
-
+            
             world.write_model(@token_registry);
-
-            // Update counter
-            let mut counter: TokenRegistryCounter = world.read_model(ITEMS_COUNTER_ID);
-            counter.count += 1;
-            world.write_model(@counter);
-
-            // Emit event
-            world.emit_event(@TokenCreated {
-                item_id,
-                token_address,
-                creator: caller,
-                token_name,
-                token_symbol,
-            });
-
+            
             token_address
         }
-
+        
         fn get_token_address(self: @ContractState, item_id: u32) -> ContractAddress {
             let world = self.world(@"warpack_masters");
             let registry: TokenRegistry = world.read_model(item_id);
-            assert(registry.item_id != 0, 'Token not registered');
             registry.token_address
         }
-
-        fn is_token_registered(self: @ContractState, item_id: u32) -> bool {
-            let world = self.world(@"warpack_masters");
-            let registry: TokenRegistry = world.read_model(item_id);
-            registry.item_id != 0 && registry.is_active
-        }
-    }
-
-    // Helper function to get the token contract class hash
-    // You'll need to implement this based on how you deploy/declare contracts
-    fn get_token_contract_class_hash() -> ClassHash {
-        // TODO: Replace with actual class hash of deployed ItemTokenContract
-        // This should be obtained when you declare the contract
-        // Example: starknet::class_hash::class_hash_const::<0x...actual_hash...>()
         
-        // For now, return a placeholder - you MUST replace this before deployment
-        starknet::class_hash::class_hash_const::<0x1>()
+        fn set_erc20_class_hash(ref self: ContractState, class_hash: ClassHash) {
+            let mut world = self.world(@"warpack_masters");
+            
+            // Store class hash as a special config entry with item_id = 0
+            // Convert ClassHash to ContractAddress for storage
+            let class_hash_felt: felt252 = class_hash.into();
+            let class_hash_as_address: ContractAddress = class_hash_felt.try_into().unwrap();
+            
+            let config_registry = TokenRegistry {
+                item_id: 0,
+                token_address: class_hash_as_address,
+                is_active: true,
+            };
+            
+            world.write_model(@config_registry);
+        }
     }
 } 

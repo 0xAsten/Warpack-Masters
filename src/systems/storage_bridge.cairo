@@ -1,185 +1,100 @@
-use starknet::ContractAddress;
+use starknet::{ContractAddress, get_caller_address, contract_address_const};
+
+// Import standard ERC-20 interface
+#[starknet::interface]
+pub trait IERC20<TContractState> {
+    fn balance_of(self: @TContractState, account: ContractAddress) -> u256;
+}
 
 #[starknet::interface]
-pub trait IStorageBridge<T> {
-    fn deposit_item_for_tokens(ref self: T, storage_slot_id: u32);
-    fn withdraw_tokens_for_item(ref self: T, item_id: u32, token_amount: u256);
-    fn get_deposited_amount(self: @T, player: ContractAddress, item_id: u32) -> u256;
-    fn get_token_balance(self: @T, player: ContractAddress, item_id: u32) -> u256;
+pub trait IERC20Extended<TContractState> {
+    fn mint(ref self: TContractState, recipient: ContractAddress, amount: u256);
+    fn burn_from(ref self: TContractState, account: ContractAddress, amount: u256);
+}
+
+#[starknet::interface]
+pub trait IStorageBridge<TContractState> {
+    fn deposit_item(ref self: TContractState, item_id: u32, quantity: u32) -> u256;
+    fn withdraw_item(ref self: TContractState, item_id: u32, token_amount: u256) -> u32;
 }
 
 #[dojo::contract]
-pub mod storage_bridge_system {
-    use super::{IStorageBridge, ContractAddress};
-    use starknet::{get_caller_address, get_block_timestamp};
+pub mod storage_bridge {
+    use super::{IStorageBridge, IERC20Dispatcher, IERC20DispatcherTrait, IERC20ExtendedDispatcher, IERC20ExtendedDispatcherTrait};
+    use starknet::{ContractAddress, get_caller_address, contract_address_const};
+    use dojo::model::{ModelStorage};
     use warpack_masters::models::{
-        CharacterItem::{CharacterItemStorage, CharacterItemsStorageCounter},
-        TokenRegistry::{TokenRegistry, BridgeDeposit, BridgeDepositCounter},
-        Item::{Item}
+        TokenRegistry::{TokenRegistry},
+        backpack::{BridgeDeposit},
     };
-    use warpack_masters::systems::token::{
-        IERC20Dispatcher, IERC20DispatcherTrait, 
-        ItemTokenDispatcher, ItemTokenDispatcherTrait
-    };
-    use dojo::model::{ModelStorage, ModelValueStorage};
-    use dojo::event::EventStorage;
-
-    #[derive(Copy, Drop, Serde)]
-    #[dojo::event(historical: true)]
-    struct ItemDeposited {
-        #[key]
-        player: ContractAddress,
-        item_id: u32,
-        storage_slot_id: u32,
-        token_amount: u256,
-        token_address: ContractAddress,
-    }
-
-    #[derive(Copy, Drop, Serde)]
-    #[dojo::event(historical: true)]
-    struct ItemWithdrawn {
-        #[key]
-        player: ContractAddress,
-        item_id: u32,
-        token_amount: u256,
-        new_storage_slot_id: u32,
-        token_address: ContractAddress,
-    }
 
     #[abi(embed_v0)]
     impl StorageBridgeImpl of IStorageBridge<ContractState> {
-        fn deposit_item_for_tokens(ref self: ContractState, storage_slot_id: u32) {
+        fn deposit_item(ref self: ContractState, item_id: u32, quantity: u32) -> u256 {
             let mut world = self.world(@"warpack_masters");
-
-            let player = get_caller_address();
-
-            // Validate storage slot ownership and get item
-            let mut storage_item: CharacterItemStorage = world.read_model((player, storage_slot_id));
-            assert(storage_item.itemId != 0, 'Storage slot is empty');
-
-            let item_id = storage_item.itemId;
-
-            // Get item details to validate
-            let item: Item = world.read_model(item_id);
-            assert(item.id != 0, 'Item does not exist');
-
-            // Get token address for this item
-            let token_registry: TokenRegistry = world.read_model(item_id);
-            assert(token_registry.item_id != 0, 'Token not registered for item');
-            assert(token_registry.is_active, 'Token is not active');
-
-            // Remove item from storage
-            storage_item.itemId = 0;
-            world.write_model(@storage_item);
-
-            // Mint 1 token (items are 1:1 with tokens)
-            let token_amount: u256 = 1;
-            let token_dispatcher = ItemTokenDispatcher { contract_address: token_registry.token_address };
-            token_dispatcher.mint(player, token_amount);
-
+            let caller = get_caller_address();
+            
+            // Verify caller has the item in sufficient quantity
+            // TODO: Add proper item ownership verification
+            // For now, we'll assume the caller owns the items
+            
+            // Get the token address for this item
+            let registry: TokenRegistry = world.read_model(item_id);
+            assert(registry.token_address != contract_address_const::<0>(), 'Token not registered');
+            assert(registry.is_active, 'Token not active');
+            
+            // Calculate token amount (1:1 ratio for now, could be configurable)
+            let token_amount: u256 = quantity.into();
+            
+            // Remove item from player's inventory
+            // TODO: Implement proper item removal logic
+            // This would interact with the Character/CharacterItem models
+            
+            // Mint tokens to the player
+            let token_contract = IERC20ExtendedDispatcher { contract_address: registry.token_address };
+            token_contract.mint(caller, token_amount);
+            
             // Record the deposit
-            let mut deposit_counter: BridgeDepositCounter = world.read_model(player);
-            deposit_counter.count += 1;
+            let deposit = BridgeDeposit {
+                player: caller,
+                item_id,
+                quantity,
+                token_amount,
+                token_address: registry.token_address,
+                timestamp: starknet::get_block_timestamp(),
+            };
             
-            let bridge_deposit = BridgeDeposit {
-                player,
-                deposit_id: deposit_counter.count,
-                item_id,
-                storage_slot_id,
-                token_amount,
-                deposited_at: get_block_timestamp(),
-            };
-
-            world.write_model(@bridge_deposit);
-            world.write_model(@deposit_counter);
-
-            // Emit event
-            world.emit_event(@ItemDeposited {
-                player,
-                item_id,
-                storage_slot_id,
-                token_amount,
-                token_address: token_registry.token_address,
-            });
+            world.write_model(@deposit);
+            
+            token_amount
         }
-
-        fn withdraw_tokens_for_item(ref self: ContractState, item_id: u32, token_amount: u256) {
-            let mut world = self.world(@"warpack_masters");
-
-            let player = get_caller_address();
-
-            // Validate item exists
-            let item: Item = world.read_model(item_id);
-            assert(item.id != 0, 'Item does not exist');
-
-            // Get token address for this item
-            let token_registry: TokenRegistry = world.read_model(item_id);
-            assert(token_registry.item_id != 0, 'Token not registered for item');
-            assert(token_registry.is_active, 'Token is not active');
-
-            // Check if player has enough tokens using standard ERC-20 interface
-            let erc20_dispatcher = IERC20Dispatcher { contract_address: token_registry.token_address };
-            let player_balance = erc20_dispatcher.balance_of(player);
-            assert(player_balance >= token_amount, 'Insufficient token balance');
-
-            // Burn the tokens
-            let token_dispatcher = ItemTokenDispatcher { contract_address: token_registry.token_address };
-            token_dispatcher.burn(player, token_amount);
-
-            // Add items back to storage
-            let mut storage_counter: CharacterItemsStorageCounter = world.read_model(player);
-            let mut items_added = 0;
-            let mut new_storage_slot_id = 0;
-
-            // Add each token as an individual item (since tokens represent individual items)
-            loop {
-                if items_added >= token_amount {
-                    break;
-                }
-
-                // Find next available storage slot or create new one
-                storage_counter.count += 1;
-                new_storage_slot_id = storage_counter.count;
-
-                let new_storage_item = CharacterItemStorage {
-                    player,
-                    id: new_storage_slot_id,
-                    itemId: item_id,
-                };
-
-                world.write_model(@new_storage_item);
-                items_added += 1;
-            };
-
-            world.write_model(@storage_counter);
-
-            // Emit event
-            world.emit_event(@ItemWithdrawn {
-                player,
-                item_id,
-                token_amount,
-                new_storage_slot_id,
-                token_address: token_registry.token_address,
-            });
-        }
-
-        fn get_deposited_amount(self: @ContractState, player: ContractAddress, item_id: u32) -> u256 {
+        
+        fn withdraw_item(ref self: ContractState, item_id: u32, token_amount: u256) -> u32 {
             let world = self.world(@"warpack_masters");
+            let caller = get_caller_address();
             
-            // Get token registry
-            let token_registry: TokenRegistry = world.read_model(item_id);
-            if token_registry.item_id == 0 {
-                return 0;
-            }
-
-            // Get player's token balance using standard ERC-20 interface
-            let erc20_dispatcher = IERC20Dispatcher { contract_address: token_registry.token_address };
-            erc20_dispatcher.balance_of(player)
-        }
-
-        fn get_token_balance(self: @ContractState, player: ContractAddress, item_id: u32) -> u256 {
-            // Same as get_deposited_amount for simplicity
-            self.get_deposited_amount(player, item_id)
+            // Get the token address for this item
+            let registry: TokenRegistry = world.read_model(item_id);
+            assert(registry.token_address != contract_address_const::<0>(), 'Token not registered');
+            assert(registry.is_active, 'Token not active');
+            
+            // Verify caller has sufficient tokens
+            let token_contract = IERC20Dispatcher { contract_address: registry.token_address };
+            let balance = token_contract.balance_of(caller);
+            assert(balance >= token_amount, 'Insufficient token balance');
+            
+            // Calculate item quantity (1:1 ratio for now)
+            let quantity: u32 = token_amount.try_into().unwrap();
+            
+            // Burn the tokens
+            let extended_token = IERC20ExtendedDispatcher { contract_address: registry.token_address };
+            extended_token.burn_from(caller, token_amount);
+            
+            // Add item to player's inventory
+            // TODO: Implement proper item addition logic
+            // This would interact with the Character/CharacterItem models
+            
+            quantity
         }
     }
 } 
