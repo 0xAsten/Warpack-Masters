@@ -37,7 +37,7 @@ pub mod token_factory {
     #[abi(embed_v0)]
     impl TokenFactoryImpl of ITokenFactory<ContractState> {
         fn create_token_for_item(ref self: ContractState, item_id: u32, name: ByteArray, symbol: ByteArray) -> ContractAddress {
-            let mut world = self.world(@"warpack_masters");
+            let mut world = self.world(@"Warpacks");
             
             // Check if token already exists
             let existing_registry: TokenRegistry = world.read_model(item_id);
@@ -79,13 +79,13 @@ pub mod token_factory {
         }
         
         fn get_token_address(self: @ContractState, item_id: u32) -> ContractAddress {
-            let world = self.world(@"warpack_masters");
+            let world = self.world(@"Warpacks");
             let registry: TokenRegistry = world.read_model(item_id);
             registry.token_address
         }
         
         fn set_erc20_class_hash(ref self: ContractState, class_hash: ClassHash) {
-            let mut world = self.world(@"warpack_masters");
+            let mut world = self.world(@"Warpacks");
             
             // Store class hash as a special config entry with item_id = 0
             // Convert ClassHash to ContractAddress for storage
