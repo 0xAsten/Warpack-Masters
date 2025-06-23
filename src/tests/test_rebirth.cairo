@@ -142,7 +142,7 @@ mod tests {
         assert(char.wins == 0, 'wins count should be 0');
         assert(char.loss == 0, 'loss count should be 0');
         assert(char.wmClass == WMClass::Warlock, 'class should be Warlock');
-        assert(char.name == 'bob', 'name should be bob');
+        assert(char.name == 'alice', 'name should be alice');
         assert(char.gold == INIT_GOLD + 1, 'gold should be init');
         assert(char.health == INIT_HEALTH, 'health should be init');
         assert(char.rating == 300, 'Rating mismatch');
