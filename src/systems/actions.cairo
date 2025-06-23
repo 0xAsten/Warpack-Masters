@@ -46,7 +46,7 @@ mod actions {
 
     use dojo::model::{ModelStorage};
 
-    use warpack_masters::externals::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
+    use openzeppelin_token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
 
     use dojo::world::{IWorldDispatcherTrait};
 
@@ -130,6 +130,7 @@ mod actions {
         fn rebirth(
             ref self: ContractState,
         ) {
+            println!("rebirth");
             let mut world = self.world(@"Warpacks");
 
             let player = get_caller_address();
@@ -140,6 +141,7 @@ mod actions {
             
             let gameConfig: GameConfig = world.read_model(GAME_CONFIG_ID);
             let STRK_ADDRESS: ContractAddress = gameConfig.strk_address;
+            
             IERC20Dispatcher { contract_address: STRK_ADDRESS }
                 .transfer_from(player, starknet::get_contract_address(), REBIRTH_FEE);
 

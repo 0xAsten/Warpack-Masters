@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod integration_tests {
     use starknet::testing::{set_contract_address};
-    use starknet::{ContractAddress, contract_address_const};
+    use starknet::{contract_address_const};
 
     use dojo::model::{ModelStorage};
     use dojo::world::WorldStorageTrait;
@@ -13,8 +13,8 @@ mod integration_tests {
             CharacterItemStorage, CharacterItemsStorageCounter,
             m_CharacterItemStorage, m_CharacterItemsStorageCounter
         },
-        models::TokenRegistry::{TokenRegistry, m_TokenRegistry},
-        models::backpack::{BridgeDeposit, m_BridgeDeposit},
+        models::TokenRegistry::{m_TokenRegistry},
+        models::backpack::{m_BridgeDeposit},
         systems::storage_bridge::{storage_bridge, IStorageBridgeDispatcher, IStorageBridgeDispatcherTrait},
         systems::token_factory::{token_factory, ITokenFactoryDispatcher, ITokenFactoryDispatcherTrait},
     };

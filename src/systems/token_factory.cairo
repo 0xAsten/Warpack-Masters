@@ -1,4 +1,4 @@
-use starknet::{ContractAddress, ClassHash, contract_address_const};
+use starknet::{ContractAddress, ClassHash};
 
 // Standard ERC-20 interface that Ekubo expects
 #[starknet::interface]

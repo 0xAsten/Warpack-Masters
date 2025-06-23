@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use starknet::testing::set_contract_address;
+    use starknet::testing::{set_contract_address};
 
     use dojo::model::{ModelStorage};
     use dojo::world::WorldStorageTrait;
@@ -10,7 +10,7 @@ mod tests {
         systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait}},
         systems::{item::{item_system, IItemDispatcher}},
         systems::{fight::{fight_system, IFightDispatcher, IFightDispatcherTrait}},
-        systems::{dummy::{dummy_system, IDummyDispatcher, IDummyDispatcherTrait}},
+        systems::{dummy::{dummy_system, IDummyDispatcher}},
         models::backpack::{m_BackpackGrids},
         models::Item::{m_Item, m_ItemsCounter},
         models::Character::{Characters, m_Characters, m_NameRecord, WMClass, PLAYER},
@@ -114,9 +114,6 @@ mod tests {
         let (contract_address, _) = world.dns(@"fight_system").unwrap();
         let mut fight_system = IFightDispatcher { contract_address };
 
-        let (contract_address, _) = world.dns(@"dummy_system").unwrap();
-        let mut dummy_system = IDummyDispatcher { contract_address };
-
         add_items(ref item_system);
 
         action_system.spawn('alice', WMClass::Warlock);
@@ -178,10 +175,10 @@ mod tests {
         let (contract_address, _) = world.dns(@"dummy_system").unwrap();
         let mut dummy_system = IDummyDispatcher { contract_address };
 
-        let alice = starknet::contract_address_const::<0x0>();
-
         add_items(ref item_system);
         add_dummy(ref dummy_system);
+
+        let alice = starknet::contract_address_const::<0x0>();
 
         action_system.spawn('alice', WMClass::Warlock);
 

@@ -1,14 +1,13 @@
 #[cfg(test)]
 mod tests {
-    use starknet::testing::{set_contract_address};
-    use starknet::{ContractAddress, contract_address_const};
+    use starknet::{contract_address_const};
 
     use dojo::model::{ModelStorage};
     use dojo::world::WorldStorageTrait;
     use dojo_cairo_test::{spawn_test_world, NamespaceDef, TestResource, ContractDefTrait, ContractDef, WorldStorageTestTrait};
 
     use warpack_masters::{
-        models::Item::{Item, m_Item},
+        models::Item::{m_Item},
         models::CharacterItem::{
             CharacterItemStorage, CharacterItemsStorageCounter,
             m_CharacterItemStorage, m_CharacterItemsStorageCounter

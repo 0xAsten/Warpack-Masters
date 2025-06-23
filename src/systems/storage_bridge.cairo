@@ -1,4 +1,4 @@
-use starknet::{ContractAddress, get_caller_address, contract_address_const};
+use starknet::{ContractAddress};
 
 // Import standard ERC-20 interface
 #[starknet::interface]
