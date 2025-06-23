@@ -1,4 +1,7 @@
+use warpack_masters::prdefined_dummies::Dummy0;
+use warpack_masters::models::Character::WMClass;
 use warpack_masters::systems::item::{IItemDispatcher, IItemDispatcherTrait};
+use warpack_masters::systems::dummy::{IDummyDispatcher, IDummyDispatcherTrait};
 use warpack_masters::{items};
 
 pub fn add_items(ref item_system: IItemDispatcher) {
@@ -615,3 +618,6 @@ pub fn add_items(ref item_system: IItemDispatcher) {
         );
 }
 
+pub fn add_dummy(ref dummy_system: IDummyDispatcher) {
+    dummy_system.prefine_dummy(0, 'Dummy', WMClass::Warlock, Dummy0::get_items());
+}

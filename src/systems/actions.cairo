@@ -73,7 +73,7 @@ mod actions {
                 }
                 len += 1;
             };
-            assert(len <= 12 && len > 3, 'name size is invalid');
+            assert(len <= 12 && len >= 3, 'name size is invalid');
 
             let nameRecord: NameRecord = world.read_model(name);
             assert(
