@@ -23,13 +23,12 @@ pub mod constants {
     pub const EFFECT_POISON: u8 = 6;
     pub const EFFECT_VAMPIRISM: u8 = 8;
 
-    pub const REBIRTH_FEE: u256 = 10;
+    pub const REBIRTH_FEE: u256 = 10 * 1_000_000_000_000_000_000;
 
     pub const GAME_CONFIG_ID: felt252 = 'GAME_CONFIG_ID';
 
     pub const ERC20_SIERRA_CLASS_HASH: felt252 = 0x65daa9c6005dcbccb0571ffdf530e2e263d1ff00eac2cbd66b2d0fa0871dafa;
     
     // Token supply: 10 million tokens with 18 decimals
-    pub const TOKEN_SUPPLY_BASE: u256 = 10_000_000; // 10 million
-    pub const TOKEN_DECIMALS: u256 = 18;
+    pub const TOKEN_SUPPLY_BASE: u256 = 10_000_000 * 1_000_000_000_000_000_000; // 10 million
 }

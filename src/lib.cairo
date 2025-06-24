@@ -41,7 +41,7 @@ pub mod tests {
     pub mod test_spawn;
     pub mod test_prefine_dummy;
     pub mod test_recipe;
-    // pub mod test_token_factory;  // Temporarily disabled due to compilation issues
+    pub mod test_token_factory;
     pub mod test_storage_bridge;
     pub mod test_integration_storage_token;
 }

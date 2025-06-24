@@ -1,7 +1,8 @@
-
 pub mod Backpack {
     pub const id: u32 = 1;
-    pub const name: felt252 = 'Backpack';
+    pub fn name() -> ByteArray {
+        "Backpack"
+    }
     pub const itemType: u8 = 4;
     pub const rarity: u8 = 0;
     pub const width: u32 = 2;
@@ -19,7 +20,9 @@ pub mod Backpack {
 
 pub mod Pack {
     pub const id: u32 = 2;
-    pub const name: felt252 = 'Pack';
+    pub fn name() -> ByteArray {
+        "Pack"
+    }
     pub const itemType: u8 = 4;
     pub const rarity: u8 = 2;
     pub const width: u32 = 2;
@@ -37,7 +40,9 @@ pub mod Pack {
 
 pub mod Satchel {
     pub const id: u32 = 3;
-    pub const name: felt252 = 'Satchel';
+    pub fn name() -> ByteArray {
+        "Satchel"
+    }
     pub const itemType: u8 = 4;
     pub const rarity: u8 = 1;
     pub const width: u32 = 2;
@@ -55,7 +60,9 @@ pub mod Satchel {
 
 pub mod Pouch {
     pub const id: u32 = 4;
-    pub const name: felt252 = 'Pouch';
+    pub fn name() -> ByteArray {
+        "Pouch"
+    }
     pub const itemType: u8 = 4;
     pub const rarity: u8 = 1;
     pub const width: u32 = 1;
@@ -73,7 +80,9 @@ pub mod Pouch {
 
 pub mod Herb {
     pub const id: u32 = 5;
-    pub const name: felt252 = 'Herb';
+    pub fn name() -> ByteArray {
+        "Herb"
+    }
     pub const itemType: u8 = 3;
     pub const rarity: u8 = 1;
     pub const width: u32 = 1;
@@ -91,7 +100,9 @@ pub mod Herb {
 
 pub mod Dagger {
     pub const id: u32 = 6;
-    pub const name: felt252 = 'Dagger';
+    pub fn name() -> ByteArray {
+        "Dagger"
+    }
     pub const itemType: u8 = 1;
     pub const rarity: u8 = 1;
     pub const width: u32 = 1;
@@ -109,7 +120,9 @@ pub mod Dagger {
 
 pub mod Sword {
     pub const id: u32 = 7;
-    pub const name: felt252 = 'Sword';
+    pub fn name() -> ByteArray {
+        "Sword"
+    }
     pub const itemType: u8 = 1;
     pub const rarity: u8 = 1;
     pub const width: u32 = 1;
@@ -127,7 +140,9 @@ pub mod Sword {
 
 pub mod Spike {
     pub const id: u32 = 8;
-    pub const name: felt252 = 'Spike';
+    pub fn name() -> ByteArray {
+        "Spike"
+    }
     pub const itemType: u8 = 3;
     pub const rarity: u8 = 1;
     pub const width: u32 = 1;
@@ -145,7 +160,9 @@ pub mod Spike {
 
 pub mod Shield {
     pub const id: u32 = 9;
-    pub const name: felt252 = 'Shield';
+    pub fn name() -> ByteArray {
+        "Shield"
+    }
     pub const itemType: u8 = 3;
     pub const rarity: u8 = 1;
     pub const width: u32 = 2;
@@ -163,7 +180,9 @@ pub mod Shield {
 
 pub mod Helmet {
     pub const id: u32 = 10;
-    pub const name: felt252 = 'Helmet';
+    pub fn name() -> ByteArray {
+        "Helmet"
+    }
     pub const itemType: u8 = 3;
     pub const rarity: u8 = 1;
     pub const width: u32 = 1;
@@ -181,7 +200,9 @@ pub mod Helmet {
 
 pub mod HealingPotion {
     pub const id: u32 = 11;
-    pub const name: felt252 = 'Healing Potion';
+    pub fn name() -> ByteArray {
+        "Healing Potion"
+    }
     pub const itemType: u8 = 3;
     pub const rarity: u8 = 2;
     pub const width: u32 = 1;
@@ -199,7 +220,9 @@ pub mod HealingPotion {
 
 pub mod LeatherArmor {
     pub const id: u32 = 12;
-    pub const name: felt252 = 'Leather Armor';
+    pub fn name() -> ByteArray {
+        "Leather Armor"
+    }
     pub const itemType: u8 = 3;
     pub const rarity: u8 = 2;
     pub const width: u32 = 2;
@@ -217,7 +240,9 @@ pub mod LeatherArmor {
 
 pub mod Poison {
     pub const id: u32 = 13;
-    pub const name: felt252 = 'Poison';
+    pub fn name() -> ByteArray {
+        "Poison"
+    }
     pub const itemType: u8 = 3;
     pub const rarity: u8 = 2;
     pub const width: u32 = 1;
@@ -235,7 +260,9 @@ pub mod Poison {
 
 pub mod AugmentedSword {
     pub const id: u32 = 14;
-    pub const name: felt252 = 'Augmented Sword';
+    pub fn name() -> ByteArray {
+        "Augmented Sword"
+    }
     pub const itemType: u8 = 1;
     pub const rarity: u8 = 2;
     pub const width: u32 = 1;
@@ -253,7 +280,9 @@ pub mod AugmentedSword {
 
 pub mod AugmentedDagger {
     pub const id: u32 = 15;
-    pub const name: felt252 = 'Augmented Dagger';
+    pub fn name() -> ByteArray {
+        "Augmented Dagger"
+    }
     pub const itemType: u8 = 1;
     pub const rarity: u8 = 2;
     pub const width: u32 = 1;
@@ -271,7 +300,9 @@ pub mod AugmentedDagger {
 
 pub mod SpikeShield {
     pub const id: u32 = 16;
-    pub const name: felt252 = 'Spike Shield';
+    pub fn name() -> ByteArray {
+        "Spike Shield"
+    }
     pub const itemType: u8 = 3;
     pub const rarity: u8 = 2;
     pub const width: u32 = 2;
@@ -289,7 +320,9 @@ pub mod SpikeShield {
 
 pub mod PlagueFlower {
     pub const id: u32 = 17;
-    pub const name: felt252 = 'Plague Flower';
+    pub fn name() -> ByteArray {
+        "Plague Flower"
+    }
     pub const itemType: u8 = 3;
     pub const rarity: u8 = 3;
     pub const width: u32 = 2;
@@ -307,7 +340,9 @@ pub mod PlagueFlower {
 
 pub mod MailArmor {
     pub const id: u32 = 18;
-    pub const name: felt252 = 'Mail Armor';
+    pub fn name() -> ByteArray {
+        "Mail Armor"
+    }
     pub const itemType: u8 = 3;
     pub const rarity: u8 = 3;
     pub const width: u32 = 2;
@@ -325,7 +360,9 @@ pub mod MailArmor {
 
 pub mod Buckler {
     pub const id: u32 = 19;
-    pub const name: felt252 = 'Buckler';
+    pub fn name() -> ByteArray {
+        "Buckler"
+    }
     pub const itemType: u8 = 3;
     pub const rarity: u8 = 2;
     pub const width: u32 = 2;
@@ -343,7 +380,9 @@ pub mod Buckler {
 
 pub mod MagicWater {
     pub const id: u32 = 20;
-    pub const name: felt252 = 'Magic Water';
+    pub fn name() -> ByteArray {
+        "Magic Water"
+    }
     pub const itemType: u8 = 3;
     pub const rarity: u8 = 2;
     pub const width: u32 = 1;
@@ -361,7 +400,9 @@ pub mod MagicWater {
 
 pub mod VampiricArmor {
     pub const id: u32 = 21;
-    pub const name: felt252 = 'Vampiric Armor';
+    pub fn name() -> ByteArray {
+        "Vampiric Armor"
+    }
     pub const itemType: u8 = 3;
     pub const rarity: u8 = 3;
     pub const width: u32 = 2;
@@ -379,7 +420,9 @@ pub mod VampiricArmor {
 
 pub mod Greatsword {
     pub const id: u32 = 22;
-    pub const name: felt252 = 'Greatsword';
+    pub fn name() -> ByteArray {
+        "Greatsword"
+    }
     pub const itemType: u8 = 1;
     pub const rarity: u8 = 2;
     pub const width: u32 = 2;
@@ -397,7 +440,9 @@ pub mod Greatsword {
 
 pub mod Bow {
     pub const id: u32 = 23;
-    pub const name: felt252 = 'Bow';
+    pub fn name() -> ByteArray {
+        "Bow"
+    }
     pub const itemType: u8 = 2;
     pub const rarity: u8 = 2;
     pub const width: u32 = 1;
@@ -415,7 +460,9 @@ pub mod Bow {
 
 pub mod Crossbow {
     pub const id: u32 = 24;
-    pub const name: felt252 = 'Crossbow';
+    pub fn name() -> ByteArray {
+        "Crossbow"
+    }
     pub const itemType: u8 = 2;
     pub const rarity: u8 = 1;
     pub const width: u32 = 1;
@@ -433,7 +480,9 @@ pub mod Crossbow {
 
 pub mod Hammer {
     pub const id: u32 = 25;
-    pub const name: felt252 = 'Hammer';
+    pub fn name() -> ByteArray {
+        "Hammer"
+    }
     pub const itemType: u8 = 1;
     pub const rarity: u8 = 1;
     pub const width: u32 = 1;
@@ -451,7 +500,9 @@ pub mod Hammer {
 
 pub mod AmuletOfFury {
     pub const id: u32 = 26;
-    pub const name: felt252 = 'Amulet of Fury';
+    pub fn name() -> ByteArray {
+        "Amulet of Fury"
+    }
     pub const itemType: u8 = 3;
     pub const rarity: u8 = 1;
     pub const width: u32 = 1;
@@ -469,7 +520,9 @@ pub mod AmuletOfFury {
 
 pub mod RageGauntlet {
     pub const id: u32 = 27;
-    pub const name: felt252 = 'Rage Gauntlet';
+    pub fn name() -> ByteArray {
+        "Rage Gauntlet"
+    }
     pub const itemType: u8 = 3;
     pub const rarity: u8 = 2;
     pub const width: u32 = 1;
@@ -487,7 +540,9 @@ pub mod RageGauntlet {
 
 pub mod KnightHelmet {
     pub const id: u32 = 28;
-    pub const name: felt252 = 'Knight Helmet';
+    pub fn name() -> ByteArray {
+        "Knight Helmet"
+    }
     pub const itemType: u8 = 3;
     pub const rarity: u8 = 3;
     pub const width: u32 = 1;
@@ -505,7 +560,9 @@ pub mod KnightHelmet {
 
 pub mod BladeArmor {
     pub const id: u32 = 29;
-    pub const name: felt252 = 'Blade Armor';
+    pub fn name() -> ByteArray {
+        "Blade Armor"
+    }
     pub const itemType: u8 = 3;
     pub const rarity: u8 = 3;
     pub const width: u32 = 2;
@@ -523,7 +580,9 @@ pub mod BladeArmor {
 
 pub mod Club {
     pub const id: u32 = 30;
-    pub const name: felt252 = 'Club';
+    pub fn name() -> ByteArray {
+        "Club"
+    }
     pub const itemType: u8 = 2;
     pub const rarity: u8 = 1;
     pub const width: u32 = 1;
@@ -541,7 +600,9 @@ pub mod Club {
 
 pub mod Fang {
     pub const id: u32 = 31;
-    pub const name: felt252 = 'Fang';
+    pub fn name() -> ByteArray {
+        "Fang"
+    }
     pub const itemType: u8 = 3;
     pub const rarity: u8 = 1;
     pub const width: u32 = 1;
@@ -559,7 +620,9 @@ pub mod Fang {
 
 pub mod ScarletCloak {
     pub const id: u32 = 32;
-    pub const name: felt252 = 'Scarlet Cloak';
+    pub fn name() -> ByteArray {
+        "Scarlet Cloak"
+    }
     pub const itemType: u8 = 3;
     pub const rarity: u8 = 2;
     pub const width: u32 = 2;
@@ -577,7 +640,9 @@ pub mod ScarletCloak {
 
 pub mod DraculaGrimoire {
     pub const id: u32 = 33;
-    pub const name: felt252 = 'Dracula Grimoire';
+    pub fn name() -> ByteArray {
+        "Dracula Grimoire"
+    }
     pub const itemType: u8 = 3;
     pub const rarity: u8 = 3;
     pub const width: u32 = 2;
@@ -595,7 +660,9 @@ pub mod DraculaGrimoire {
 
 pub mod Longbow {
     pub const id: u32 = 34;
-    pub const name: felt252 = 'Longbow';
+    pub fn name() -> ByteArray {
+        "Longbow"
+    }
     pub const itemType: u8 = 2;
     pub const rarity: u8 = 3;
     pub const width: u32 = 1;

@@ -1,8 +1,8 @@
-use starknet::{ContractAddress, ClassHash};
+use starknet::{ContractAddress};
 
 #[starknet::interface]
 pub trait ITokenFactory<TContractState> {
-    fn create_token_for_item(ref self: TContractState, item_id: u32, name: ByteArray, symbol: ByteArray) -> ContractAddress;
+    fn create_token_for_item(ref self: TContractState, item_id: u32, name: ByteArray, symbol: ByteArray, owner: ContractAddress) -> ContractAddress;
     fn get_token_address(self: @TContractState, item_id: u32) -> ContractAddress;
 }
 
@@ -10,8 +10,8 @@ pub trait ITokenFactory<TContractState> {
 pub mod token_factory {
     use super::ITokenFactory;
     use starknet::{
-        ContractAddress, ClassHash, get_contract_address, contract_address_const,
-        syscalls::deploy_syscall
+        ContractAddress, ClassHash, contract_address_const,
+        syscalls::deploy_syscall, get_caller_address
     };
     use dojo::model::{ModelStorage};
     
@@ -20,9 +20,9 @@ pub mod token_factory {
         Item::Item,
     };
 
-    use warpack_masters::constants::{ERC20_SIERRA_CLASS_HASH, TOKEN_SUPPLY_BASE, TOKEN_DECIMALS};
+    use warpack_masters::constants::constants::{ERC20_SIERRA_CLASS_HASH, TOKEN_SUPPLY_BASE};
 
-    use core::num::traits::Pow;
+    use dojo::world::{IWorldDispatcherTrait};
 
     #[abi(embed_v0)]
     impl TokenFactoryImpl of ITokenFactory<ContractState> {
@@ -40,13 +40,13 @@ pub mod token_factory {
             let existing_registry: TokenRegistry = world.read_model(item_id);
             assert(existing_registry.token_address == contract_address_const::<0>(), 'Token already exists');
             
-            let class_hash: ClassHash = ERC20_SIERRA_CLASS_HASH.into();
+            let class_hash: ClassHash = ERC20_SIERRA_CLASS_HASH.try_into().unwrap();
             
             // Deploy the ERC-20 token contract
             let mut constructor_calldata = ArrayTrait::new();
             name.serialize(ref constructor_calldata);
             symbol.serialize(ref constructor_calldata);
-            (TOKEN_SUPPLY_BASE.pow(TOKEN_DECIMALS)).serialize(ref constructor_calldata); // 10M tokens with 18 decimals
+            TOKEN_SUPPLY_BASE.serialize(ref constructor_calldata); // 10M tokens with 18 decimals
             owner.serialize(ref constructor_calldata); // recipient
             owner.serialize(ref constructor_calldata); // owner
             

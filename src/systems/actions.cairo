@@ -42,17 +42,13 @@ mod actions {
     };
 
     use warpack_masters::items::{Backpack, Pack};
-    use warpack_masters::constants::constants::{GRID_X, GRID_Y, INIT_GOLD, INIT_HEALTH, INIT_STAMINA, REBIRTH_FEE, GAME_CONFIG_ID, TOKEN_DECIMALS};
+    use warpack_masters::constants::constants::{GRID_X, GRID_Y, INIT_GOLD, INIT_HEALTH, INIT_STAMINA, REBIRTH_FEE, GAME_CONFIG_ID};
 
     use dojo::model::{ModelStorage};
 
     use openzeppelin_token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
 
     use dojo::world::{IWorldDispatcherTrait};
-
-    use core::num::traits::Pow;
-
-    // use debug::PrintTrait;
 
     #[abi(embed_v0)]
     impl ActionsImpl of IActions<ContractState> {
@@ -144,7 +140,7 @@ mod actions {
             let STRK_ADDRESS: ContractAddress = gameConfig.strk_address;
             
             IERC20Dispatcher { contract_address: STRK_ADDRESS }
-                .transfer_from(player, starknet::get_contract_address(), REBIRTH_FEE.pow(TOKEN_DECIMALS));
+                .transfer_from(player, starknet::get_contract_address(), REBIRTH_FEE);
 
             let prev_name = char.name;
             // required to calling spawn doesn't fail
