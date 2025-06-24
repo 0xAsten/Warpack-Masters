@@ -19,3 +19,5 @@ cairo_test = "2.10.1"
 dojo_cairo_test = { git = "https://github.com/dojoengine/dojo.git", tag = "v1.5.1" }
 openzeppelin_token = { git = "https://github.com/openzeppelin/cairo-contracts", tag = "v1.0.0" }
 openzeppelin = { git = "https://github.com/openzeppelin/cairo-contracts", tag = "v1.0.0" }
+openzeppelin_access = { git = "https://github.com/openzeppelin/cairo-contracts", tag = "v1.0.0" }
+openzeppelin_upgrades = { git = "https://github.com/openzeppelin/cairo-contracts", tag = "v1.0.0" }

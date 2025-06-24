@@ -11,8 +11,9 @@ mod tests {
         systems::{token_factory::{token_factory, ITokenFactoryDispatcher, ITokenFactoryDispatcherTrait}},
         systems::{item::{item_system, IItemDispatcher}},
         models::Item::{m_Item, m_ItemsCounter},
-        models::TokenRegistry::{TokenRegistry},
-        utils::{test_utils::{add_items}}
+        models::TokenRegistry::{TokenRegistry, m_TokenRegistry},
+        utils::{test_utils::{add_items}},
+        externals::erc20::{ERC20Token}
     };
 
     use warpack_masters::{items};
@@ -23,6 +24,7 @@ mod tests {
             resources: [
                 TestResource::Model(m_Item::TEST_CLASS_HASH.try_into().unwrap()),
                 TestResource::Model(m_ItemsCounter::TEST_CLASS_HASH.try_into().unwrap()),
+                TestResource::Model(m_TokenRegistry::TEST_CLASS_HASH.try_into().unwrap()),
                 TestResource::Contract(token_factory::TEST_CLASS_HASH),
                 TestResource::Contract(item_system::TEST_CLASS_HASH),
             ].span()
@@ -56,7 +58,7 @@ mod tests {
         // Add items to the world
         add_items(ref item_system);
 
-        let owner = contract_address_const::<0x123>();
+        let owner = contract_address_const::<'alice'>();
         let item_id = 6; // Dagger item from the items module
 
         // Create token for item
@@ -64,7 +66,8 @@ mod tests {
             item_id,
             items::Dagger::name(),
             "DAG",
-            owner
+            owner,
+            ERC20Token::TEST_CLASS_HASH.try_into().unwrap()
         );
 
         // Verify token registry was created
@@ -103,7 +106,8 @@ mod tests {
             item_id,
             items::Shield::name(),
             "SHD",
-            owner
+            owner,
+            ERC20Token::TEST_CLASS_HASH.try_into().unwrap()
         );
 
         // Get token address
@@ -162,7 +166,8 @@ mod tests {
             item_id,
             items::Dagger::name(),
             "DAG",
-            owner
+            owner,
+            ERC20Token::TEST_CLASS_HASH.try_into().unwrap()
         );
     }
 
@@ -191,7 +196,8 @@ mod tests {
             item_id,
             "WrongName",
             "DAG",
-            owner
+            owner,
+            ERC20Token::TEST_CLASS_HASH.try_into().unwrap()
         );
     }
 
@@ -220,7 +226,8 @@ mod tests {
             item_id,
             items::Dagger::name(),
             "DAG",
-            owner
+            owner,
+            ERC20Token::TEST_CLASS_HASH.try_into().unwrap()
         );
 
         // Try to create token again - should fail
@@ -228,7 +235,8 @@ mod tests {
             item_id,
             items::Dagger::name(),
             "DAG2",
-            owner
+            owner,
+            ERC20Token::TEST_CLASS_HASH.try_into().unwrap()
         );
     }
 
@@ -255,7 +263,8 @@ mod tests {
             6,
             items::Dagger::name(),
             "DAG",
-            owner
+            owner,
+            ERC20Token::TEST_CLASS_HASH.try_into().unwrap()
         );
 
         // Create token for Shield
@@ -263,7 +272,8 @@ mod tests {
             9,
             items::Shield::name(),
             "SHD",
-            owner
+            owner,
+            ERC20Token::TEST_CLASS_HASH.try_into().unwrap()
         );
 
         // Verify both tokens exist and are different
@@ -304,7 +314,8 @@ mod tests {
             item_id,
             items::HealingPotion::name(),
             "HEAL",
-            owner
+            owner,
+            ERC20Token::TEST_CLASS_HASH.try_into().unwrap()
         );
 
         // Verify all registry fields
