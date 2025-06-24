@@ -42,7 +42,7 @@ mod actions {
     };
 
     use warpack_masters::items::{Backpack, Pack};
-    use warpack_masters::constants::constants::{GRID_X, GRID_Y, INIT_GOLD, INIT_HEALTH, INIT_STAMINA, REBIRTH_FEE, GAME_CONFIG_ID};
+    use warpack_masters::constants::constants::{GRID_X, GRID_Y, INIT_GOLD, INIT_HEALTH, INIT_STAMINA, REBIRTH_FEE, GAME_CONFIG_ID, TOKEN_DECIMALS};
 
     use dojo::model::{ModelStorage};
 
@@ -50,6 +50,7 @@ mod actions {
 
     use dojo::world::{IWorldDispatcherTrait};
 
+    use core::num::traits::Pow;
 
     // use debug::PrintTrait;
 
@@ -143,7 +144,7 @@ mod actions {
             let STRK_ADDRESS: ContractAddress = gameConfig.strk_address;
             
             IERC20Dispatcher { contract_address: STRK_ADDRESS }
-                .transfer_from(player, starknet::get_contract_address(), REBIRTH_FEE);
+                .transfer_from(player, starknet::get_contract_address(), REBIRTH_FEE.pow(TOKEN_DECIMALS));
 
             let prev_name = char.name;
             // required to calling spawn doesn't fail

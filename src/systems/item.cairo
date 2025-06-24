@@ -3,7 +3,7 @@ pub trait IItem<T> {
     fn add_item(
         ref self: T,
         id: u32,
-        name: felt252,
+        name: ByteArray,
         itemType: u8,
         rarity: u8,
         width: u32,
@@ -36,7 +36,7 @@ mod item_system {
         fn add_item(
             ref self: ContractState,
             id: u32,
-            name: felt252,
+            name: ByteArray,
             itemType: u8,
             rarity: u8,
             width: u32,

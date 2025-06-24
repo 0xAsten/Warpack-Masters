@@ -3,7 +3,7 @@
 pub struct Item {
     #[key]
     pub id: u32,
-    pub name: felt252,
+    pub name: ByteArray,
     // 1 - Melee Weapon, 2 - Ranged Weapon, 3 - Effect item, 4 - bag
     pub itemType: u8,
     // 0 - None, 1 - common, 2 - rare, 3 - legendary

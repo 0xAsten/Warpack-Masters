@@ -247,7 +247,7 @@ mod tests {
         let (contract_address, _) = world.dns(@"actions").unwrap();
         let action_system = IActionsDispatcher { contract_address };
 
-        action_system.spawn('123', WMClass::Warlock);
+        action_system.spawn('12', WMClass::Warlock);
     }
 
     #[test]
