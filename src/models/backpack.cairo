@@ -18,18 +18,6 @@ pub struct BackpackGrids {
     pub isPlugin: bool,
 }
 
-#[derive(Copy, Drop, Serde)]
-#[dojo::model]
-pub struct BridgeDeposit {
-    #[key]
-    pub player: ContractAddress,
-    #[key]
-    pub item_id: u32,
-    pub quantity: u32,
-    pub token_amount: u256,
-    pub token_address: ContractAddress,
-    pub timestamp: u64,
-}
 
 #[cfg(test)]
 mod tests {
