@@ -83,7 +83,7 @@ mod tests {
         let mut shop_system = IShopDispatcher { contract_address: shop_contract_address };
 
         let mock_erc20_calldata: Array<felt252> = array![
-            0, 'stark', 1, 0, 'strk', 1, 10000000000000000000, 0, alice.into()
+            0, 'stark', 1, 0, 'strk', 1, 10000000000000000000, 0, alice.into(), alice.into()
         ];
         let erc20_address = deploy_contract(ERC20Token::TEST_CLASS_HASH, mock_erc20_calldata.span());
         world.write_model(@GameConfig {
@@ -339,7 +339,7 @@ mod tests {
         let alice = starknet::contract_address_const::<'alice'>();
 
         let mock_erc20_calldata: Array<felt252> = array![
-            0, 'stark', 1, 0, 'strk', 1, 10000000000000000000, 0, alice.into()
+            0, 'stark', 1, 0, 'strk', 1, 10000000000000000000, 0, alice.into(), alice.into()
         ];
 
         let erc20_address = deploy_contract(ERC20Token::TEST_CLASS_HASH, mock_erc20_calldata.span());
@@ -391,7 +391,7 @@ mod tests {
         add_items(ref item_system);
 
         let mock_erc20_calldata: Array<felt252> = array![
-            0, 'stark', 1, 0, 'strk', 1, 10000000000000000000, 0, alice.into()
+            0, 'stark', 1, 0, 'strk', 1, 10000000000000000000, 0, alice.into(), alice.into()
         ];
         let erc20_address = deploy_contract(ERC20Token::TEST_CLASS_HASH, mock_erc20_calldata.span());
         world.write_model(@GameConfig {
