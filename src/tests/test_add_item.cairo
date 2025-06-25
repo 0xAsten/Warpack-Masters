@@ -70,7 +70,8 @@ mod tests {
         let (contract_address, _) = world.dns(@"item_system").unwrap();
         let mut item_system = IItemDispatcher { contract_address };
 
-        add_items(ref item_system);
+        // add_items(ref item_system);
+        item_system.batch_add_items();
 
         let item: ItemsCounter = world.read_model(ITEMS_COUNTER_ID);
         assert(item.count == 34, 'total item count mismatch');

@@ -2327,7 +2327,7 @@
     },
     {
       "address": "0x3935c2bc4d3077081c110afa233486418a98c11b25cbc4e56d5b6041b5353a",
-      "class_hash": "0x1e827cdc0f4d977708fd13ad0bdfc00b329148710ea8a320180d992f819f6c6",
+      "class_hash": "0xf6f9ea67d872877d27415464e879ee6e5e4139ab3110c4cf0005affde0b484",
       "abi": [
         {
           "type": "impl",
@@ -2465,6 +2465,13 @@
               ],
               "outputs": [],
               "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "batch_add_items",
+              "inputs": [],
+              "outputs": [],
+              "state_mutability": "external"
             }
           ]
         },
@@ -2588,6 +2595,7 @@
       "selector": "0x751ea9e8a6e94c7a6f55b05d4658b934ec62a17cfacbb4d859826e79d290cf1",
       "systems": [
         "add_item",
+        "batch_add_items",
         "upgrade"
       ]
     },
