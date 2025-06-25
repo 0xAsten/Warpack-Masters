@@ -84,6 +84,26 @@ mod tests {
 
     #[test]
     #[available_gas(3000000000000000)]
+    fn test_batch_create_tokens_for_items() {
+        let ndef = namespace_def();
+        let mut world = spawn_test_world([ndef].span());
+        world.sync_perms_and_inits(contract_defs());
+
+        let (item_contract_address, _) = world.dns(@"item_system").unwrap();
+        let mut item_system = IItemDispatcher { contract_address: item_contract_address };
+
+        // Add items to the world
+        add_items(ref item_system);
+
+        let (contract_address, _) = world.dns(@"token_factory").unwrap();
+        let token_factory = ITokenFactoryDispatcher { contract_address };
+
+        let owner = contract_address_const::<'alice'>();
+        token_factory.batch_create_tokens_for_items(owner, ERC20Token::TEST_CLASS_HASH.try_into().unwrap());
+    }
+
+    #[test]
+    #[available_gas(3000000000000000)]
     fn test_get_token_address() {
         let ndef = namespace_def();
         let mut world = spawn_test_world([ndef].span());

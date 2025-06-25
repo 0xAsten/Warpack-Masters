@@ -27,6 +27,7 @@ pub mod constants {
 
     pub const GAME_CONFIG_ID: felt252 = 'GAME_CONFIG_ID';
 
+    // OpenZeppelin 2.0.0, 0x65daa9c6005dcbccb0571ffdf530e2e263d1ff00eac2cbd66b2d0fa0871dafa
     pub const ERC20_SIERRA_CLASS_HASH: felt252 = 0x035997337274dff77d12521875c8f5eec22a8ce54c7bf84aa42ede007ba404cd;
     
     // Token supply: 10 million tokens with 18 decimals
