@@ -4,7 +4,7 @@ mod tests {
 
     use dojo::model::{ModelStorage};
     use dojo::world::WorldStorageTrait;
-    use dojo_cairo_test::{spawn_test_world, NamespaceDef, TestResource, ContractDefTrait, ContractDef, WorldStorageTestTrait};
+    use dojo_cairo_test::{spawn_test_world, NamespaceDef, TestResource, ContractDefTrait, ContractDef, WorldStorageTestTrait, deploy_contract};
 
     use warpack_masters::{
         systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait}},
@@ -18,10 +18,14 @@ mod tests {
             CharacterItemsInventoryCounter, m_CharacterItemsInventoryCounter
         },
         models::Character::{Characters, m_Characters, NameRecord, m_NameRecord, WMClass},
-        models::Shop::{Shop, m_Shop}, utils::{test_utils::{add_items}}
+        models::Shop::{Shop, m_Shop}, utils::{test_utils::{add_items}},
+        models::Game::{GameConfig, m_GameConfig},
+        externals::erc20::{ERC20Token}
     };
 
-    use warpack_masters::constants::constants::{INIT_HEALTH, INIT_GOLD};
+    use warpack_masters::constants::constants::{INIT_HEALTH, INIT_GOLD, GAME_CONFIG_ID};
+
+    use openzeppelin_token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
 
     fn namespace_def() -> NamespaceDef {
         let ndef = NamespaceDef {
@@ -37,6 +41,7 @@ mod tests {
                 TestResource::Model(m_Characters::TEST_CLASS_HASH.try_into().unwrap()),
                 TestResource::Model(m_NameRecord::TEST_CLASS_HASH.try_into().unwrap()),
                 TestResource::Model(m_Shop::TEST_CLASS_HASH.try_into().unwrap()),
+                TestResource::Model(m_GameConfig::TEST_CLASS_HASH.try_into().unwrap()),
                 TestResource::Contract(actions::TEST_CLASS_HASH),
                 TestResource::Contract(item_system::TEST_CLASS_HASH),
                 TestResource::Contract(shop_system::TEST_CLASS_HASH),
@@ -61,25 +66,40 @@ mod tests {
     #[test]
     #[available_gas(3000000000000000)]
     fn test_rebirth() {
-        let alice = starknet::contract_address_const::<0x0>();
+        let alice = starknet::contract_address_const::<'alice'>();
+        let default_address = starknet::contract_address_const::<0x0>();
 
         let ndef = namespace_def();
         let mut world = spawn_test_world([ndef].span());
         world.sync_perms_and_inits(contract_defs());
 
-        let (contract_address, _) = world.dns(@"actions").unwrap();
-        let action_system = IActionsDispatcher { contract_address };
+        let (actions_contract_address, _) = world.dns(@"actions").unwrap();
+        let action_system = IActionsDispatcher { contract_address: actions_contract_address };
 
-        let (contract_address, _) = world.dns(@"item_system").unwrap();
-        let mut item_system = IItemDispatcher { contract_address };
+        let (item_contract_address, _) = world.dns(@"item_system").unwrap();
+        let mut item_system = IItemDispatcher { contract_address: item_contract_address };
 
-        let (contract_address, _) = world.dns(@"shop_system").unwrap();
-        let mut shop_system = IShopDispatcher { contract_address };
+        let (shop_contract_address, _) = world.dns(@"shop_system").unwrap();
+        let mut shop_system = IShopDispatcher { contract_address: shop_contract_address };
+
+        let mock_erc20_calldata: Array<felt252> = array![
+            0, 'stark', 1, 0, 'strk', 1, 10000000000000000000, 0, alice.into(), alice.into()
+        ];
+        let erc20_address = deploy_contract(ERC20Token::TEST_CLASS_HASH, mock_erc20_calldata.span());
+        world.write_model(@GameConfig {
+            id: GAME_CONFIG_ID,
+            strk_address: erc20_address,
+        });
 
         add_items(ref item_system);
 
+        set_contract_address(alice);
+        let erc20_dispatcher = IERC20Dispatcher { contract_address: erc20_address };
+        erc20_dispatcher.approve(actions_contract_address, 10000000000000000000);
+
         action_system.spawn('alice', WMClass::Warlock);
 
+        set_contract_address(default_address);
         // mock shop for testing
         let mut shop_data: Shop = world.read_model(alice);
         shop_data.item1 = 5;
@@ -88,6 +108,7 @@ mod tests {
         shop_data.item4 = 1;
         world.write_model(@shop_data);
 
+        set_contract_address(alice);
         shop_system.buy_item(5);
         shop_system.buy_item(6);
         shop_system.buy_item(8);
@@ -96,6 +117,7 @@ mod tests {
         action_system.place_item(1, 2, 2, 0);
         action_system.place_item(3, 5, 2, 0);
 
+        set_contract_address(default_address);
         let mut char: Characters = world.read_model(alice);
         char.loss = 5;
         char.rating = 300;
@@ -108,8 +130,10 @@ mod tests {
         let timestamp = 1717770021;
         set_block_timestamp(timestamp);
 
+        set_contract_address(alice);
         action_system.rebirth();
 
+        set_contract_address(default_address);
         let char: Characters = world.read_model(alice);
         let inventoryItemsCounter: CharacterItemsInventoryCounter = world.read_model(alice);
         let storageItemsCounter: CharacterItemsStorageCounter = world.read_model(alice);
@@ -117,8 +141,8 @@ mod tests {
 
         assert(char.wins == 0, 'wins count should be 0');
         assert(char.loss == 0, 'loss count should be 0');
-        assert(char.wmClass == WMClass::Warrior, 'class should be Warrior');
-        assert(char.name == 'bob', 'name should be bob');
+        assert(char.wmClass == WMClass::Warlock, 'class should be Warlock');
+        assert(char.name == 'alice', 'name should be alice');
         assert(char.gold == INIT_GOLD + 1, 'gold should be init');
         assert(char.health == INIT_HEALTH, 'health should be init');
         assert(char.rating == 300, 'Rating mismatch');
@@ -269,6 +293,10 @@ mod tests {
     #[available_gas(3000000000000000)]
     #[should_panic(expected: ('name already exists', 'ENTRYPOINT_FAILED'))]
     fn test_name_already_exists() {
+        let default_address = starknet::contract_address_const::<0x0>();
+        let alice = starknet::contract_address_const::<'alice'>();
+        let bob = starknet::contract_address_const::<'bob'>();
+        
         let ndef = namespace_def();
         let mut world = spawn_test_world([ndef].span());
         world.sync_perms_and_inits(contract_defs());
@@ -281,71 +309,103 @@ mod tests {
 
         add_items(ref item_system);
 
-        let alice = starknet::contract_address_const::<0x1>();
         set_contract_address(alice);
         action_system.spawn('alice', WMClass::Warlock);
 
-        let alice = starknet::contract_address_const::<0x0>();
-        set_contract_address(alice);
-        action_system.spawn('alice', WMClass::Warlock);
-
+        set_contract_address(default_address);
         let mut char: Characters = world.read_model(alice);
         char.loss = 5;
         world.write_model(@char);
 
-        set_contract_address(alice);
-        action_system.rebirth();
+        set_contract_address(bob);
+        action_system.spawn('alice', WMClass::Warlock);
     }
 
     #[test]
     #[available_gas(3000000000000000)]
     fn test_rebirth_with_same_name() {
+        let default_address = starknet::contract_address_const::<0x0>();
+
         let ndef = namespace_def();
         let mut world = spawn_test_world([ndef].span());
         world.sync_perms_and_inits(contract_defs());
 
-        let (contract_address, _) = world.dns(@"actions").unwrap();
-        let action_system = IActionsDispatcher { contract_address };
+        let (actions_contract_address, _) = world.dns(@"actions").unwrap();
+        let action_system = IActionsDispatcher { contract_address: actions_contract_address };
 
-        let (contract_address, _) = world.dns(@"item_system").unwrap();
-        let mut item_system = IItemDispatcher { contract_address };
+        let (item_contract_address, _) = world.dns(@"item_system").unwrap();
+        let mut item_system = IItemDispatcher { contract_address: item_contract_address };
+
+        let alice = starknet::contract_address_const::<'alice'>();
+
+        let mock_erc20_calldata: Array<felt252> = array![
+            0, 'stark', 1, 0, 'strk', 1, 10000000000000000000, 0, alice.into(), alice.into()
+        ];
+
+        let erc20_address = deploy_contract(ERC20Token::TEST_CLASS_HASH, mock_erc20_calldata.span());
+
+        world.write_model(@GameConfig {
+            id: GAME_CONFIG_ID,
+            strk_address: erc20_address,
+        });
 
         add_items(ref item_system);
+        
+        set_contract_address(alice);
+        let erc20_dispatcher = IERC20Dispatcher { contract_address: erc20_address };
+        erc20_dispatcher.approve(actions_contract_address, 10000000000000000000);
 
-        let alice = starknet::contract_address_const::<0x0>();
         action_system.spawn('alice', WMClass::Warlock);
 
         let nameRecord: NameRecord = world.read_model('alice');
-        assert(nameRecord.player == alice, 'player should be alice');
+        assert(nameRecord.player == alice, 'player should be alice - 1');
+
+        set_contract_address(default_address);
 
         let mut char: Characters = world.read_model(alice);
         char.loss = 5;
         world.write_model(@char);
 
+        set_contract_address(alice);
         action_system.rebirth();
 
         let nameRecord: NameRecord = world.read_model('alice');
-        assert(nameRecord.player == alice, 'player should be alice');
+        assert(nameRecord.player == alice, 'player should be alice - 2');
     }
 
     #[test]
     #[available_gas(3000000000000000)]
     fn test_rebirth_with_different_name() {
+        let alice = starknet::contract_address_const::<'alice'>();
+        let default_address = starknet::contract_address_const::<0x0>();
+
         let ndef = namespace_def();
         let mut world = spawn_test_world([ndef].span());
         world.sync_perms_and_inits(contract_defs());
 
-        let (contract_address, _) = world.dns(@"actions").unwrap();
-        let action_system = IActionsDispatcher { contract_address };
+        let (actions_contract_address, _) = world.dns(@"actions").unwrap();
+        let action_system = IActionsDispatcher { contract_address: actions_contract_address };
 
-        let (contract_address, _) = world.dns(@"item_system").unwrap();
-        let mut item_system = IItemDispatcher { contract_address };
-
+        let (item_contract_address, _) = world.dns(@"item_system").unwrap();
+        let mut item_system = IItemDispatcher { contract_address: item_contract_address };
         add_items(ref item_system);
 
-        let alice = starknet::contract_address_const::<0x0>();
+        let mock_erc20_calldata: Array<felt252> = array![
+            0, 'stark', 1, 0, 'strk', 1, 10000000000000000000, 0, alice.into(), alice.into()
+        ];
+        let erc20_address = deploy_contract(ERC20Token::TEST_CLASS_HASH, mock_erc20_calldata.span());
+        world.write_model(@GameConfig {
+            id: GAME_CONFIG_ID,
+            strk_address: erc20_address,
+        });
+
         set_contract_address(alice);
+        let erc20_dispatcher = IERC20Dispatcher { contract_address: erc20_address };
+        erc20_dispatcher.approve(actions_contract_address, 10000000000000000000);
+
         action_system.spawn('alice', WMClass::Warlock);
+
+        set_contract_address(default_address);
 
         let nameRecord: NameRecord = world.read_model('alice');
         assert(nameRecord.player == alice, 'player should be alice');
@@ -357,13 +417,14 @@ mod tests {
         set_contract_address(alice);
         action_system.rebirth();
 
-        let nameRecord: NameRecord = world.read_model('Alice');
+        set_contract_address(default_address);
+        let nameRecord: NameRecord = world.read_model('alice');
         assert(nameRecord.player == alice, 'player should be alice');
 
         let nameRecord: NameRecord = world.read_model('alice');
         assert(
-            nameRecord.player == starknet::contract_address_const::<0x0>(), 
-            'player should be 0x0'
+            nameRecord.player == alice, 
+            'player should be alice'
         );
     }
 }

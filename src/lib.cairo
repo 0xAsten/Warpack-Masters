@@ -6,6 +6,8 @@ pub mod systems {
     pub mod shop;
     pub mod recipe;
     pub mod config;
+    pub mod token_factory;
+    pub mod storage_bridge;
 }
 
 pub mod models {
@@ -19,10 +21,12 @@ pub mod models {
     pub mod Fight;
     pub mod Recipe;
     pub mod Game;
+    pub mod TokenRegistry;
 }
 
 pub mod externals {
-        pub mod interface;
+        // pub mod interface;
+        pub mod erc20;
 }
 
 pub mod tests {
@@ -37,6 +41,8 @@ pub mod tests {
     pub mod test_spawn;
     pub mod test_prefine_dummy;
     pub mod test_recipe;
+    pub mod test_token_factory;
+    pub mod test_storage_bridge;
 }
 
 pub mod utils {

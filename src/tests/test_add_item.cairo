@@ -77,7 +77,7 @@ mod tests {
 
         let item_six_data: Item = world.read_model(6);
         assert(item_six_data.id == items::Dagger::id, 'I6 id mismatch');
-        assert(item_six_data.name == items::Dagger::name, 'I6 name mismatch');
+        assert(item_six_data.name == items::Dagger::name(), 'I6 name mismatch');
         assert(item_six_data.itemType == items::Dagger::itemType, 'I6 itemType mismatch');
         assert(item_six_data.rarity == items::Dagger::rarity, 'I6 rarity mismatch');
         assert(item_six_data.width == items::Dagger::width, 'I6 width mismatch');
@@ -93,7 +93,7 @@ mod tests {
 
         let item_nine_data: Item = world.read_model(9);
         assert(item_nine_data.id == items::Shield::id, 'I9 id mismatch');
-        assert(item_nine_data.name == items::Shield::name, 'I9 name mismatch');
+        assert(item_nine_data.name == items::Shield::name(), 'I9 name mismatch');
         assert(item_nine_data.itemType == items::Shield::itemType, 'I9 itemType mismatch');
         assert(item_nine_data.rarity == items::Shield::rarity, 'I9 rarity mismatch');
         assert(item_nine_data.width == items::Shield::width, 'I9 width mismatch');
@@ -109,7 +109,7 @@ mod tests {
 
         let item_eleven_data: Item = world.read_model(11);
         assert(item_eleven_data.id == items::HealingPotion::id, 'I11 id mismatch');
-        assert(item_eleven_data.name == items::HealingPotion::name, 'I11 name mismatch');
+        assert(item_eleven_data.name == items::HealingPotion::name(), 'I11 name mismatch');
         assert(item_eleven_data.itemType == items::HealingPotion::itemType, 'I11 itemType mismatch');
         assert(item_eleven_data.rarity == items::HealingPotion::rarity, 'I11 rarity mismatch');
         assert(item_eleven_data.width == items::HealingPotion::width, 'I11 width mismatch');
@@ -125,7 +125,7 @@ mod tests {
 
         let item_fifteen_data: Item = world.read_model(15);
         assert(item_fifteen_data.id == items::AugmentedDagger::id, 'I15 id mismatch');
-        assert(item_fifteen_data.name == items::AugmentedDagger::name, 'I15 name mismatch');
+        assert(item_fifteen_data.name == items::AugmentedDagger::name(), 'I15 name mismatch');
         assert(item_fifteen_data.itemType == items::AugmentedDagger::itemType, 'I15 itemType mismatch');
         assert(item_fifteen_data.rarity == items::AugmentedDagger::rarity, 'I15 rarity mismatch');
         assert(item_fifteen_data.width == items::AugmentedDagger::width, 'I15 width mismatch');
@@ -158,7 +158,7 @@ mod tests {
         item_system
             .add_item(
                 items::Backpack::id,
-                items::Backpack::name,
+                items::Backpack::name(),
                 items::Backpack::itemType,
                 items::Backpack::rarity,
                 items::Backpack::width,
@@ -188,7 +188,7 @@ mod tests {
         item_system
             .add_item(
                 items::Backpack::id,
-                items::Backpack::name,
+                items::Backpack::name(),
                 items::Backpack::itemType,
                 items::Backpack::rarity,
                 10,
@@ -218,7 +218,7 @@ mod tests {
         item_system
             .add_item(
                 items::Backpack::id,
-                items::Backpack::name,
+                items::Backpack::name(),
                 items::Backpack::itemType,
                 items::Backpack::rarity,
                 items::Backpack::width,
@@ -248,7 +248,7 @@ mod tests {
         item_system
             .add_item(
                 items::Backpack::id,
-                items::Backpack::name,
+                items::Backpack::name(),
                 items::Backpack::itemType,
                 items::Backpack::rarity,
                 items::Backpack::width,
@@ -278,7 +278,7 @@ mod tests {
         item_system
             .add_item(
                 items::Backpack::id,
-                items::Backpack::name,
+                items::Backpack::name(),
                 items::Backpack::itemType,
                 7,
                 items::Backpack::width,

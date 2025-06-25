@@ -1,11 +1,14 @@
+use warpack_masters::prdefined_dummies::Dummy0;
+use warpack_masters::models::Character::WMClass;
 use warpack_masters::systems::item::{IItemDispatcher, IItemDispatcherTrait};
+use warpack_masters::systems::dummy::{IDummyDispatcher, IDummyDispatcherTrait};
 use warpack_masters::{items};
 
 pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::Backpack::id,
-            items::Backpack::name,
+            items::Backpack::name(),
             items::Backpack::itemType,
             items::Backpack::rarity,
             items::Backpack::width,
@@ -23,7 +26,7 @@ pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::Pack::id,
-            items::Pack::name,
+            items::Pack::name(),
             items::Pack::itemType,
             items::Pack::rarity,
             items::Pack::width,
@@ -41,7 +44,7 @@ pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::Satchel::id,
-            items::Satchel::name,
+            items::Satchel::name(),
             items::Satchel::itemType,
             items::Satchel::rarity,
             items::Satchel::width,
@@ -59,7 +62,7 @@ pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::Pouch::id,
-            items::Pouch::name,
+            items::Pouch::name(),
             items::Pouch::itemType,
             items::Pouch::rarity,
             items::Pouch::width,
@@ -77,7 +80,7 @@ pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::Herb::id,
-            items::Herb::name,
+            items::Herb::name(),
             items::Herb::itemType,
             items::Herb::rarity,
             items::Herb::width,
@@ -95,7 +98,7 @@ pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::Dagger::id,
-            items::Dagger::name,
+            items::Dagger::name(),
             items::Dagger::itemType,
             items::Dagger::rarity,
             items::Dagger::width,
@@ -113,7 +116,7 @@ pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::Sword::id,
-            items::Sword::name,
+            items::Sword::name(),
             items::Sword::itemType,
             items::Sword::rarity,
             items::Sword::width,
@@ -131,7 +134,7 @@ pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::Spike::id,
-            items::Spike::name,
+            items::Spike::name(),
             items::Spike::itemType,
             items::Spike::rarity,
             items::Spike::width,
@@ -149,7 +152,7 @@ pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::Shield::id,
-            items::Shield::name,
+            items::Shield::name(),
             items::Shield::itemType,
             items::Shield::rarity,
             items::Shield::width,
@@ -167,7 +170,7 @@ pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::Helmet::id,
-            items::Helmet::name,
+            items::Helmet::name(),
             items::Helmet::itemType,
             items::Helmet::rarity,
             items::Helmet::width,
@@ -185,7 +188,7 @@ pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::HealingPotion::id,
-            items::HealingPotion::name,
+            items::HealingPotion::name(),
             items::HealingPotion::itemType,
             items::HealingPotion::rarity,
             items::HealingPotion::width,
@@ -203,7 +206,7 @@ pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::LeatherArmor::id,
-            items::LeatherArmor::name,
+            items::LeatherArmor::name(),
             items::LeatherArmor::itemType,
             items::LeatherArmor::rarity,
             items::LeatherArmor::width,
@@ -221,7 +224,7 @@ pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::Poison::id,
-            items::Poison::name,
+            items::Poison::name(),
             items::Poison::itemType,
             items::Poison::rarity,
             items::Poison::width,
@@ -239,7 +242,7 @@ pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::AugmentedSword::id,
-            items::AugmentedSword::name,
+            items::AugmentedSword::name(),
             items::AugmentedSword::itemType,
             items::AugmentedSword::rarity,
             items::AugmentedSword::width,
@@ -257,7 +260,7 @@ pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::AugmentedDagger::id,
-            items::AugmentedDagger::name,
+            items::AugmentedDagger::name(),
             items::AugmentedDagger::itemType,
             items::AugmentedDagger::rarity,
             items::AugmentedDagger::width,
@@ -275,7 +278,7 @@ pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::SpikeShield::id,
-            items::SpikeShield::name,
+            items::SpikeShield::name(),
             items::SpikeShield::itemType,
             items::SpikeShield::rarity,
             items::SpikeShield::width,
@@ -293,7 +296,7 @@ pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::PlagueFlower::id,
-            items::PlagueFlower::name,
+            items::PlagueFlower::name(),
             items::PlagueFlower::itemType,
             items::PlagueFlower::rarity,
             items::PlagueFlower::width,
@@ -311,7 +314,7 @@ pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::MailArmor::id,
-            items::MailArmor::name,
+            items::MailArmor::name(),
             items::MailArmor::itemType,
             items::MailArmor::rarity,
             items::MailArmor::width,
@@ -329,7 +332,7 @@ pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::Buckler::id,
-            items::Buckler::name,
+            items::Buckler::name(),
             items::Buckler::itemType,
             items::Buckler::rarity,
             items::Buckler::width,
@@ -347,7 +350,7 @@ pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::MagicWater::id,
-            items::MagicWater::name,
+            items::MagicWater::name(),
             items::MagicWater::itemType,
             items::MagicWater::rarity,
             items::MagicWater::width,
@@ -365,7 +368,7 @@ pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::VampiricArmor::id,
-            items::VampiricArmor::name,
+            items::VampiricArmor::name(),
             items::VampiricArmor::itemType,
             items::VampiricArmor::rarity,
             items::VampiricArmor::width,
@@ -383,7 +386,7 @@ pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::Greatsword::id,
-            items::Greatsword::name,
+            items::Greatsword::name(),
             items::Greatsword::itemType,
             items::Greatsword::rarity,
             items::Greatsword::width,
@@ -401,7 +404,7 @@ pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::Bow::id,
-            items::Bow::name,
+            items::Bow::name(),
             items::Bow::itemType,
             items::Bow::rarity,
             items::Bow::width,
@@ -419,7 +422,7 @@ pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::Crossbow::id,
-            items::Crossbow::name,
+            items::Crossbow::name(),
             items::Crossbow::itemType,
             items::Crossbow::rarity,
             items::Crossbow::width,
@@ -437,7 +440,7 @@ pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::Hammer::id,
-            items::Hammer::name,
+            items::Hammer::name(),
             items::Hammer::itemType,
             items::Hammer::rarity,
             items::Hammer::width,
@@ -455,7 +458,7 @@ pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::AmuletOfFury::id,
-            items::AmuletOfFury::name,
+            items::AmuletOfFury::name(),
             items::AmuletOfFury::itemType,
             items::AmuletOfFury::rarity,
             items::AmuletOfFury::width,
@@ -473,7 +476,7 @@ pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::RageGauntlet::id,
-            items::RageGauntlet::name,
+            items::RageGauntlet::name(),
             items::RageGauntlet::itemType,
             items::RageGauntlet::rarity,
             items::RageGauntlet::width,
@@ -491,7 +494,7 @@ pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::KnightHelmet::id,
-            items::KnightHelmet::name,
+            items::KnightHelmet::name(),
             items::KnightHelmet::itemType,
             items::KnightHelmet::rarity,
             items::KnightHelmet::width,
@@ -509,7 +512,7 @@ pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::BladeArmor::id,
-            items::BladeArmor::name,
+            items::BladeArmor::name(),
             items::BladeArmor::itemType,
             items::BladeArmor::rarity,
             items::BladeArmor::width,
@@ -527,7 +530,7 @@ pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::Club::id,
-            items::Club::name,
+            items::Club::name(),
             items::Club::itemType,
             items::Club::rarity,
             items::Club::width,
@@ -545,7 +548,7 @@ pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::Fang::id,
-            items::Fang::name,
+            items::Fang::name(),
             items::Fang::itemType,
             items::Fang::rarity,
             items::Fang::width,
@@ -563,7 +566,7 @@ pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::ScarletCloak::id,
-            items::ScarletCloak::name,
+            items::ScarletCloak::name(),
             items::ScarletCloak::itemType,
             items::ScarletCloak::rarity,
             items::ScarletCloak::width,
@@ -581,7 +584,7 @@ pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::DraculaGrimoire::id,
-            items::DraculaGrimoire::name,
+            items::DraculaGrimoire::name(),
             items::DraculaGrimoire::itemType,
             items::DraculaGrimoire::rarity,
             items::DraculaGrimoire::width,
@@ -599,7 +602,7 @@ pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
         .add_item(
             items::Longbow::id,
-            items::Longbow::name,
+            items::Longbow::name(),
             items::Longbow::itemType,
             items::Longbow::rarity,
             items::Longbow::width,
@@ -615,3 +618,6 @@ pub fn add_items(ref item_system: IItemDispatcher) {
         );
 }
 
+pub fn add_dummy(ref dummy_system: IDummyDispatcher) {
+    dummy_system.prefine_dummy(0, 'Dummy', WMClass::Warlock, Dummy0::get_items());
+}
