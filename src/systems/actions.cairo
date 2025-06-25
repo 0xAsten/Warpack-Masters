@@ -127,7 +127,6 @@ mod actions {
         fn rebirth(
             ref self: ContractState,
         ) {
-            println!("rebirth");
             let mut world = self.world(@"Warpacks");
 
             let player = get_caller_address();
