@@ -3260,7 +3260,7 @@
     },
     {
       "address": "0x36640a4f145e10eda77f8a1c17030c1649a71fba5462dd9b66e4d09781f2f41",
-      "class_hash": "0x33b06362c566ec64e7ebb2b9b7eecbc0e04df7b42e4ec2ac469f7290e99b74",
+      "class_hash": "0x24bb27185a5a0c3a206522a2a1e1d224ffaec88c772c6322eb8e5f16e70c075",
       "abi": [
         {
           "type": "impl",
@@ -3368,6 +3368,22 @@
                 }
               ],
               "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "batch_create_tokens_for_items",
+              "inputs": [
+                {
+                  "name": "owner",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "erc20_class_hash",
+                  "type": "core::starknet::class_hash::ClassHash"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
             }
           ]
         },
@@ -3491,6 +3507,7 @@
       "selector": "0xcdaa91e50a017caf9facf3591aa90e27ab6760193eff6a5bdee1edbdf6de90",
       "systems": [
         "create_token_for_item",
+        "batch_create_tokens_for_items",
         "upgrade"
       ]
     }

@@ -23,5 +23,5 @@ echo "World: $WORLD_ADDRESS"
 echo "Token Factory: $TOKEN_FACTORY_ADDRESS"
 echo "---------------------------------------------------------------------------"
 
-sozo execute -P ${ENV} Warpacks-token_factory batch_create_tokens_for_items -c  --wait --rpc-url $STARKNET_RPC_URL
+sozo execute -P ${ENV} Warpacks-token_factory batch_create_tokens_for_items 0x06cac844965c5d6517f3194ea13a884388fff54fae265a6d9e7ceec428a53a19 0x035997337274dff77d12521875c8f5eec22a8ce54c7bf84aa42ede007ba404cd  --wait --rpc-url $STARKNET_RPC_URL
 
