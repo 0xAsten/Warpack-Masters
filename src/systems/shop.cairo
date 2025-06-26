@@ -47,6 +47,16 @@ mod shop_system {
         birthCount: u32,
     }
 
+    #[derive(Copy, Drop, Serde)]
+    #[dojo::event(historical: true)]
+    struct ShopRerolled {
+        #[key]
+        player: ContractAddress,
+        cost_paid: u32,
+        reroll_count: u32,
+        used_free_reroll: bool,
+    }
+
     #[abi(embed_v0)]
     impl ShopImpl of IShop<ContractState> {
         fn buy_item(ref self: ContractState, item_id: u32) {
@@ -157,89 +167,111 @@ mod shop_system {
             let player = get_caller_address();
 
             let mut char: Characters = world.read_model(player);
-            assert(char.gold >= 1, 'Not enough gold');
-
-            // TODO: Will move these arrays after Dojo supports storing array
-            let mut common: Array<u32> = ArrayTrait::new();
-            let mut rare: Array<u32> = ArrayTrait::new();
-            let mut legendary: Array<u32> = ArrayTrait::new();
-
-            let itemsCounter: ItemsCounter = world.read_model(ITEMS_COUNTER_ID);
-            let mut count = itemsCounter.count;
-
-            loop {
-                if count == 0 {
-                    break;
-                }
-
-                let item: Item = world.read_model(count);
-
-                // skip some without images
-                // if item.id == 14 || item.id == 18 || item.id == 19 || item.id == 22 {
-                //     count -= 1;
-                //     continue;
-                // }
-
-                match item.rarity {
-                    0 => {},
-                    1 => {
-                        common.append(count);
-                    },
-                    2 => {
-                        rare.append(count);
-                    },
-                    3 => {
-                        legendary.append(count);
-                    },
-                    _ => {},
-                }
-
-                count -= 1;
-            };
-
-            assert(common.len() > 0, 'No common items found');
-
             let mut shop: Shop = world.read_model(player);
-
-            let (seed1, seed2, seed3, seed4) = pseudo_seed();
-
-            // common: 70%, rare: 20%, legendary: 10%
-            let mut i = 0;
-            for seed in array![seed1, seed2, seed3, seed4] {
-                let mut random_index = 0;
-
-                if char.wins < 3 {
-                    random_index = random(seed, 90);
-                } else {
-                    random_index = random(seed, 100);
-                }
-    
-                let itemId = if random_index < 70 {
-                    random_index = random(seed, common.len());
-                    *common.at(random_index)
-                } else if random_index < 90 {
-                    random_index = random(seed, rare.len());
-                    *rare.at(random_index)
-                } else {
-                    random_index = random(seed, legendary.len());
-                    *legendary.at(random_index)
-                };
-
-                match i {
-                    0 => shop.item1 = itemId,
-                    1 => shop.item2 = itemId,
-                    2 => shop.item3 = itemId,
-                    3 => shop.item4 = itemId,
-                    _ => {},
-                }
-
-                i += 1;
+            
+            // Determine reroll cost based on rerolls since last fight
+            let reroll_cost = if shop.rerolls_since_fight < 2 {
+                1  // First 2 rerolls cost 1 gold
+            } else {
+                2  // 3rd+ rerolls cost 2 gold
             };
+            
+            // Check if player has free rerolls or enough gold
+            let used_free_reroll = if shop.free_rerolls > 0 {
+                shop.free_rerolls -= 1;
+                true
+            } else {
+                assert(char.gold >= reroll_cost, 'Not enough gold');
+                char.gold -= reroll_cost;
+                false
+            };
+            
+            // Increment reroll counter
+            shop.rerolls_since_fight += 1;
 
-            char.gold -= 1;
+            let (item1, item2, item3, item4) = generate_shop_items(ref world, player, char.wins);
+
+            shop.item1 = item1;
+            shop.item2 = item2;
+            shop.item3 = item3;
+            shop.item4 = item4;
+
+            // Emit reroll event
+            world.emit_event(@ShopRerolled {
+                player,
+                cost_paid: if used_free_reroll { 0 } else { reroll_cost },
+                reroll_count: shop.rerolls_since_fight,
+                used_free_reroll,
+            });
 
             world.write_model(@shop);
             world.write_model(@char);
         }
+    }
+
+    fn generate_shop_items(ref world: WorldStorage, player: ContractAddress, wins: u32) -> (u32, u32, u32, u32) {
+        // TODO: Will move these arrays after Dojo supports storing array
+        let mut common: Array<u32> = ArrayTrait::new();
+        let mut rare: Array<u32> = ArrayTrait::new();
+        let mut legendary: Array<u32> = ArrayTrait::new();
+
+        let itemsCounter: ItemsCounter = world.read_model(ITEMS_COUNTER_ID);
+        let mut count = itemsCounter.count;
+
+        loop {
+            if count == 0 {
+                break;
+            }
+
+            let item: Item = world.read_model(count);
+
+            match item.rarity {
+                0 => {},
+                1 => {
+                    common.append(count);
+                },
+                2 => {
+                    rare.append(count);
+                },
+                3 => {
+                    legendary.append(count);
+                },
+                _ => {},
+            }
+
+            count -= 1;
+        };
+
+        assert(common.len() > 0, 'No common items found');
+
+        let (seed1, seed2, seed3, seed4) = pseudo_seed();
+
+        let mut items: Array<u32> = ArrayTrait::new();
+
+        // common: 70%, rare: 20%, legendary: 10%
+        for seed in array![seed1, seed2, seed3, seed4] {
+            let mut random_index = 0;
+
+            if wins < 3 {
+                random_index = random(seed, 90);
+            } else {
+                random_index = random(seed, 100);
+            }
+
+            let itemId = if random_index < 70 {
+                random_index = random(seed, common.len());
+                *common.at(random_index)
+            } else if random_index < 90 {
+                random_index = random(seed, rare.len());
+                *rare.at(random_index)
+            } else {
+                random_index = random(seed, legendary.len());
+                *legendary.at(random_index)
+            };
+
+            items.append(itemId);
+        };
+
+        (*items.at(0), *items.at(1), *items.at(2), *items.at(3))
     }
 }
