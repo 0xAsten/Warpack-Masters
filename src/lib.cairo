@@ -43,6 +43,7 @@ pub mod tests {
     pub mod test_recipe;
     pub mod test_token_factory;
     pub mod test_storage_bridge;
+    pub mod test_move_item_within_inventory;
 }
 
 pub mod utils {

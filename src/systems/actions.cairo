@@ -16,6 +16,7 @@ pub trait IActions<T> {
     fn move_item_from_inventory_to_storage(ref self: T, inventory_item_id: u32);
     fn get_balance(self: @T) -> u256;
     fn withdraw_strk(ref self: T, amount: u256);
+    fn move_item_within_inventory(ref self: T, inventory_item_id: u32, x: u32, y: u32, rotation: u32);
 }
 
 // TODO: rename the count filed in counter model
@@ -278,19 +279,6 @@ mod actions {
             world.write_model(@storageItem);
         }
 
-        // fn move_item_within_inventory(ref self: ContractState, inventory_item_id: u32, x: u32, y: u32, rotation: u32) {
-        //     let mut world = self.world(@"Warpacks");
-
-        //     let player = get_caller_address();
-
-        //     // check if the player has joined the matching battle
-        //     self._check_if_player_has_joined_a_matched_battle(player);
-
-        //     let mut inventoryItem: CharacterItemInventory = world.read_model((player, inventory_item_id));
-        //     let itemId = inventoryItem.itemId;
-        //     assert(itemId != 0, 'invalid inventory item id');
-        // }
-
         fn move_item_from_inventory_to_storage(ref self: ContractState, inventory_item_id: u32) {
             let mut world = self.world(@"Warpacks");
 
@@ -323,6 +311,16 @@ mod actions {
                 world.write_model(@CharacterItemStorage { player, id: storageCounter.count, itemId: itemId, });
                 world.write_model(@CharacterItemsStorageCounter { player, count: storageCounter.count });
             }
+        }
+
+        fn move_item_within_inventory(ref self: ContractState, inventory_item_id: u32, x: u32, y: u32, rotation: u32) {
+            let player = get_caller_address();
+
+            // check if the player has joined the matching battle
+            self._check_if_player_has_joined_a_matched_battle(player);
+
+            let itemId = self._remove_item_from_inventory(player, inventory_item_id);
+            self._add_item_to_inventory(player, itemId, x, y, rotation);
         }
     }
 
