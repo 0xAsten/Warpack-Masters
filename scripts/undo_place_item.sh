@@ -15,6 +15,6 @@ echo " "
 echo actions : $ACTIONS_ADDRESS
 echo "---------------------------------------------------------------------------"
 
-sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS undo_place_item -c 3 --wait --rpc-url $STARKNET_RPC_URL \
+sozo execute --world $WORLD_ADDRESS $ACTIONS_ADDRESS move_item_from_inventory_to_storage -c 3 --wait --rpc-url $STARKNET_RPC_URL \
 	--account-address 0x1e59eb74ce98fced4e9b10cb8d9db58f856194da24984fd64193e0d787ce519 \
 	--private-key 0x76468ff8e97cf4ad25412f6134f3b3ce835ee9732da92b3b6b1974de76b8975

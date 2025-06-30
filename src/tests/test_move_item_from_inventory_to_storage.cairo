@@ -36,8 +36,8 @@ mod tests {
                 TestResource::Contract(actions::TEST_CLASS_HASH),
                 TestResource::Contract(item_system::TEST_CLASS_HASH),
                 TestResource::Contract(shop_system::TEST_CLASS_HASH),
-                TestResource::Event(shop_system::e_BuyItem::TEST_CLASS_HASH),
-                TestResource::Event(shop_system::e_SellItem::TEST_CLASS_HASH),
+                TestResource::Event(actions::e_BuyItem::TEST_CLASS_HASH),
+                TestResource::Event(actions::e_SellItem::TEST_CLASS_HASH),
             ].span()
         };
  
@@ -57,7 +57,7 @@ mod tests {
 
     #[test]
     #[available_gas(3000000000000000)]
-    fn test_undo_place_item() {
+    fn test_move_item_from_inventory_to_storage() {
         let ndef = namespace_def();
         let mut world = spawn_test_world([ndef].span());
         world.sync_perms_and_inits(contract_defs());
@@ -67,9 +67,6 @@ mod tests {
 
         let (contract_address, _) = world.dns(@"item_system").unwrap();
         let mut item_system = IItemDispatcher { contract_address };
-
-        let (contract_address, _) = world.dns(@"shop_system").unwrap();
-        let mut shop_system = IShopDispatcher { contract_address };
 
         let alice = starknet::contract_address_const::<0x0>();
 
@@ -88,11 +85,11 @@ mod tests {
         shop_data.item4 = 1;
         world.write_model(@shop_data);
 
-        shop_system.buy_item(5);
+        action_system.move_item_from_shop_to_storage(5);
         // place a sword on (4,2)
-        action_system.place_item(2, 4, 2, 0);
+        action_system.move_item_from_storage_to_inventory(2, 4, 2, 0);
 
-        action_system.undo_place_item(3);
+        action_system.move_item_from_inventory_to_storage(3);
 
         let storageItemCounter: CharacterItemsStorageCounter = world.read_model(alice);
         assert(storageItemCounter.count == 2, 'storage item count mismatch');
@@ -134,11 +131,11 @@ mod tests {
         assert(backpack_grid_data.isWeapon == false, 'isWeapon should be false');
         assert(backpack_grid_data.isPlugin == false, 'isPlugin should be false');
 
-        shop_system.buy_item(6);
+        action_system.move_item_from_shop_to_storage(6);
         // place a shield on (2,2)
-        action_system.place_item(1, 2, 2, 0);
+        action_system.move_item_from_storage_to_inventory(1, 2, 2, 0);
 
-        action_system.undo_place_item(3);
+        action_system.move_item_from_inventory_to_storage(3);
 
         let storageItemCounter: CharacterItemsStorageCounter = world.read_model(alice);
         assert(storageItemCounter.count == 2, 'storage item count mismatch');
@@ -190,11 +187,11 @@ mod tests {
         assert(backpack_grid_data.isWeapon == false, 'isWeapon should be false');
         assert(backpack_grid_data.isPlugin == false, 'isPlugin should be false');
 
-        shop_system.buy_item(8);
+        action_system.move_item_from_shop_to_storage(8);
         // place a potion on (5,2)
-        action_system.place_item(3, 5, 2, 0);
+        action_system.move_item_from_storage_to_inventory(3, 5, 2, 0);
 
-        action_system.undo_place_item(3);
+        action_system.move_item_from_inventory_to_storage(3);
 
         let storageItemCounter: CharacterItemsStorageCounter = world.read_model(alice);
         assert(storageItemCounter.count == 3, 'storage item count mismatch');
@@ -223,11 +220,11 @@ mod tests {
         assert(backpack_grid_data.isWeapon == false, 'isWeapon should be false');
         assert(backpack_grid_data.isPlugin == false, 'isPlugin should be false');
 
-        action_system.place_item(2, 4, 2, 0);
-        action_system.place_item(1, 2, 2, 0);
-        action_system.place_item(3, 5, 2, 0);
+        action_system.move_item_from_storage_to_inventory(2, 4, 2, 0);
+        action_system.move_item_from_storage_to_inventory(1, 2, 2, 0);
+        action_system.move_item_from_storage_to_inventory(3, 5, 2, 0);
 
-        action_system.undo_place_item(4);
+        action_system.move_item_from_inventory_to_storage(4);
 
         let storageItemCounter: CharacterItemsStorageCounter = world.read_model(alice);
         assert(storageItemCounter.count == 3, 'storage item count mismatch');
@@ -265,8 +262,8 @@ mod tests {
 
     #[test]
     #[available_gas(3000000000000000)]
-    #[should_panic(expected: ('invalid inventory item id', 'ENTRYPOINT_FAILED'))]
-    fn test_undo_place_item_revert_not_in_inventory() {
+    #[should_panic(expected: ('item not found', 'ENTRYPOINT_FAILED'))]
+    fn test_move_item_from_inventory_to_storage_revert_not_in_inventory() {
         let ndef = namespace_def();
         let mut world = spawn_test_world([ndef].span());
         world.sync_perms_and_inits(contract_defs());
@@ -281,12 +278,12 @@ mod tests {
 
         action_system.spawn('Alice', WMClass::Warlock);
 
-        action_system.undo_place_item(3);
+        action_system.move_item_from_inventory_to_storage(3);
     }
 
     #[test]
     #[available_gas(3000000000000000)]
-    fn test_undo_place_item_with_plugins_check() {
+    fn test_move_item_from_inventory_to_storage_with_plugins_check() {
         let ndef = namespace_def();
         let mut world = spawn_test_world([ndef].span());
         world.sync_perms_and_inits(contract_defs());
@@ -318,17 +315,17 @@ mod tests {
         shop_data.item4 = 1;
         world.write_model(@shop_data);
 
-        shop_system.buy_item(13);
-        action_system.place_item(2, 5, 2, 0);
+        action_system.move_item_from_shop_to_storage(13);
+        action_system.move_item_from_storage_to_inventory(2, 5, 2, 0);
 
-        shop_system.buy_item(7);
+        action_system.move_item_from_shop_to_storage(7);
         // place a sword on (4,2)
-        action_system.place_item(2, 4, 2, 0);
+        action_system.move_item_from_storage_to_inventory(2, 4, 2, 0);
         
-        shop_system.buy_item(17);
-        action_system.place_item(2, 2, 2, 0);
+        action_system.move_item_from_shop_to_storage(17);
+        action_system.move_item_from_storage_to_inventory(2, 2, 2, 0);
 
-        action_system.undo_place_item(3);
+        action_system.move_item_from_inventory_to_storage(3);
         let storageItemCounter: CharacterItemsStorageCounter = world.read_model(alice);
         assert(storageItemCounter.count == 2, 'storage item count mismatch');
         let storageItem: CharacterItemStorage = world.read_model((alice, 2));
@@ -350,7 +347,7 @@ mod tests {
         assert(invetoryItem.plugins.len() == 1, 'plugins length mismatch');
         assert(*invetoryItem.plugins.at(0) == (6, 80, 3), 'plugin length mismatch');
 
-        action_system.undo_place_item(4);
+        action_system.move_item_from_inventory_to_storage(4);
         let storageItemCounter: CharacterItemsStorageCounter = world.read_model(alice);
         assert(storageItemCounter.count == 2, 'storage item count mismatch');
         let storageItem: CharacterItemStorage = world.read_model((alice, 1));
@@ -365,7 +362,7 @@ mod tests {
         assert(invetoryItem.rotation == 0, 'rotation mismatch');
         assert(invetoryItem.plugins.len() == 0, 'plugins length mismatch');
 
-        action_system.place_item(1, 4, 2, 0);
+        action_system.move_item_from_storage_to_inventory(1, 4, 2, 0);
         let storageItemCounter: CharacterItemsStorageCounter = world.read_model(alice);
         assert(storageItemCounter.count == 2, 'storage item count mismatch');
         let storageItem: CharacterItemStorage = world.read_model((alice, 1));

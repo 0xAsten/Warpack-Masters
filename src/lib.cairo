@@ -30,10 +30,10 @@ pub mod externals {
 }
 
 pub mod tests {
-    pub mod test_place_item;
+    pub mod test_move_item_from_storage_to_inventory;
     pub mod test_add_item;
     pub mod test_buy_item;
-    pub mod test_undo_place_item;
+    pub mod test_move_item_from_inventory_to_storage;
     pub mod test_sell_item;
     pub mod test_reroll_shop;
     pub mod test_fight;
@@ -43,6 +43,9 @@ pub mod tests {
     pub mod test_recipe;
     pub mod test_token_factory;
     pub mod test_storage_bridge;
+    pub mod test_move_item_within_inventory;
+    pub mod test_move_item_from_shop_to_inventory;
+    pub mod test_move_item_from_inventory_to_shop;
 }
 
 pub mod utils {

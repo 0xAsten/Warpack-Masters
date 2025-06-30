@@ -9,7 +9,6 @@ mod tests {
     use warpack_masters::{
         systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait}},
         systems::{item::{item_system, IItemDispatcher}},
-        systems::{shop::{shop_system, IShopDispatcher, IShopDispatcherTrait}},
         models::backpack::{BackpackGrids, m_BackpackGrids},
         models::Item::{m_Item, m_ItemsCounter},
         models::CharacterItem::{
@@ -44,9 +43,8 @@ mod tests {
                 TestResource::Model(m_GameConfig::TEST_CLASS_HASH.try_into().unwrap()),
                 TestResource::Contract(actions::TEST_CLASS_HASH),
                 TestResource::Contract(item_system::TEST_CLASS_HASH),
-                TestResource::Contract(shop_system::TEST_CLASS_HASH),
-                TestResource::Event(shop_system::e_BuyItem::TEST_CLASS_HASH),
-                TestResource::Event(shop_system::e_SellItem::TEST_CLASS_HASH),
+                TestResource::Event(actions::e_BuyItem::TEST_CLASS_HASH),
+                TestResource::Event(actions::e_SellItem::TEST_CLASS_HASH),
             ].span()
         };
         ndef
@@ -57,8 +55,6 @@ mod tests {
             ContractDefTrait::new(@"Warpacks", @"actions")
                 .with_writer_of([dojo::utils::bytearray_hash(@"Warpacks")].span()),
             ContractDefTrait::new(@"Warpacks", @"item_system")
-                .with_writer_of([dojo::utils::bytearray_hash(@"Warpacks")].span()),
-            ContractDefTrait::new(@"Warpacks", @"shop_system")
                 .with_writer_of([dojo::utils::bytearray_hash(@"Warpacks")].span()),
         ].span()
     }
@@ -78,9 +74,6 @@ mod tests {
 
         let (item_contract_address, _) = world.dns(@"item_system").unwrap();
         let mut item_system = IItemDispatcher { contract_address: item_contract_address };
-
-        let (shop_contract_address, _) = world.dns(@"shop_system").unwrap();
-        let mut shop_system = IShopDispatcher { contract_address: shop_contract_address };
 
         let mock_erc20_calldata: Array<felt252> = array![
             0, 'stark', 1, 0, 'strk', 1, 10000000000000000000, 0, alice.into(), alice.into()
@@ -109,13 +102,13 @@ mod tests {
         world.write_model(@shop_data);
 
         set_contract_address(alice);
-        shop_system.buy_item(5);
-        shop_system.buy_item(6);
-        shop_system.buy_item(8);
+        action_system.move_item_from_shop_to_storage(5);
+        action_system.move_item_from_shop_to_storage(6);
+        action_system.move_item_from_shop_to_storage(8);
 
-        action_system.place_item(2, 4, 2, 0);
-        action_system.place_item(1, 2, 2, 0);
-        action_system.place_item(3, 5, 2, 0);
+        action_system.move_item_from_storage_to_inventory(2, 4, 2, 0);
+        action_system.move_item_from_storage_to_inventory(1, 2, 2, 0);
+        action_system.move_item_from_storage_to_inventory(3, 5, 2, 0);
 
         set_contract_address(default_address);
         let mut char: Characters = world.read_model(alice);
