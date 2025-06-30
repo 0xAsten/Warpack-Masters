@@ -17,6 +17,8 @@ pub trait IActions<T> {
     fn get_balance(self: @T) -> u256;
     fn withdraw_strk(ref self: T, amount: u256);
     fn move_item_within_inventory(ref self: T, inventory_item_id: u32, x: u32, y: u32, rotation: u32);
+    fn move_item_from_shop_to_storage(ref self: T, item_id: u32);
+    fn move_item_from_storage_to_shop(ref self: T, storage_item_id: u32);
 }
 
 // TODO: rename the count filed in counter model
@@ -35,7 +37,7 @@ mod actions {
             Position, CharacterItemsStorageCounter, CharacterItemStorage, CharacterItemInventory,
             CharacterItemsInventoryCounter
         },
-        Item::Item,
+        Item::{Item},
         Character::{Characters, NameRecord},
         Shop::Shop,
         Fight::{BattleLog, BattleLogCounter},
@@ -50,6 +52,30 @@ mod actions {
     use openzeppelin_token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
 
     use dojo::world::{IWorldDispatcherTrait};
+
+    use dojo::event::EventStorage;
+
+    #[derive(Copy, Drop, Serde)]
+    #[dojo::event(historical: true)]
+    struct BuyItem {
+        #[key]
+        player: ContractAddress,
+        itemId: u32,
+        cost: u32,
+        itemRarity: u8,
+        birthCount: u32,
+    }
+
+    #[derive(Copy, Drop, Serde)]
+    #[dojo::event(historical: true)]
+    struct SellItem {
+        #[key]
+        player: ContractAddress,
+        itemId: u32,
+        price: u32,
+        itemRarity: u8,
+        birthCount: u32,
+    }
 
     #[abi(embed_v0)]
     impl ActionsImpl of IActions<ContractState> {
@@ -322,6 +348,64 @@ mod actions {
             let itemId = self._remove_item_from_inventory(player, inventory_item_id);
             self._add_item_to_inventory(player, itemId, x, y, rotation);
         }
+
+        fn move_item_from_shop_to_storage(ref self: ContractState, item_id: u32) {
+            let mut world = self.world(@"Warpacks");
+
+            let player = get_caller_address();
+
+            assert(item_id != 0, 'invalid item_id');
+
+            self._buy_item(player, item_id);
+
+            let mut storageCounter: CharacterItemsStorageCounter = world.read_model(player);
+            let mut count = storageCounter.count;
+            let mut isUpdated = false;
+            loop {
+                if count == 0 {
+                    break;
+                }
+
+                let mut storageItem: CharacterItemStorage = world.read_model((player, count));
+                if storageItem.itemId == 0 {
+                    storageItem.itemId = item_id;
+                    isUpdated = true;
+                    world.write_model(@storageItem);
+                    break;
+                }
+
+                count -= 1;
+            };
+
+            if isUpdated == false {
+                storageCounter.count += 1;
+                world.write_model(@CharacterItemStorage { player, id: storageCounter.count, itemId: item_id, });
+                world.write_model(@CharacterItemsStorageCounter { player, count: storageCounter.count });
+            }
+        }
+
+        fn move_item_from_storage_to_shop(ref self: ContractState, storage_item_id: u32) {
+            let mut world = self.world(@"Warpacks");
+
+            let player = get_caller_address();
+
+            let mut storageItem: CharacterItemStorage = world.read_model((player, storage_item_id));
+            let item_id = storageItem.itemId;
+            assert(item_id != 0, 'invalid item_id');
+
+            self._sell_item(player, item_id);
+
+            storageItem.itemId = 0;
+            world.write_model(@storageItem);
+        }
+
+        // fn move_item_from_shop_to_inventory(ref self: ContractState, shop_item_id: u32) {
+        //     let mut world = self.world(@"Warpacks");
+
+        //     let player = get_caller_address();
+
+        //     let itemId = self._remove_item_from_shop(player, shop_item_id);
+        // }
     }
 
     #[generate_trait]
@@ -685,6 +769,69 @@ mod actions {
             world.write_model(@inventoryItem);
             world.write_model(@inventoryCounter);
             
+        }
+
+        fn _buy_item(ref self: ContractState, player: ContractAddress, item_id: u32) {
+            let mut world = self.world(@"Warpacks");
+
+            let mut shop_data: Shop = world.read_model(player);
+            assert(
+                shop_data.item1 == item_id
+                    || shop_data.item2 == item_id
+                    || shop_data.item3 == item_id
+                    || shop_data.item4 == item_id,
+                'item not on sale'
+            );
+
+            let item: Item = world.read_model(item_id);
+            let mut player_char: Characters = world.read_model(player);
+
+            assert(player_char.gold >= item.price, 'Not enough gold');
+            player_char.gold -= item.price;
+
+            //delete respective item bought from the shop
+            if (shop_data.item1 == item_id) {
+                shop_data.item1 = 0
+            } else if (shop_data.item2 == item_id) {
+                shop_data.item2 = 0
+            } else if (shop_data.item3 == item_id) {
+                shop_data.item3 = 0
+            } else if (shop_data.item4 == item_id) {
+                shop_data.item4 = 0
+            }
+
+            world.emit_event(@BuyItem {
+                player,
+                itemId: item_id,
+                cost: item.price,
+                itemRarity: item.rarity,
+                birthCount: player_char.birthCount
+            });
+
+            world.write_model(@player_char);
+            world.write_model(@shop_data);
+        }
+
+        fn _sell_item(ref self: ContractState, player: ContractAddress, item_id: u32) {
+            let mut world = self.world(@"Warpacks");
+
+            let item: Item = world.read_model(item_id);
+            let mut playerChar: Characters = world.read_model(player);
+
+            let item_price = item.price;
+            let sell_price = item_price / 2;
+
+            playerChar.gold += sell_price;
+
+            world.emit_event(@SellItem {
+                player,
+                itemId: item_id,
+                price: sell_price,
+                itemRarity: item.rarity,
+                birthCount: playerChar.birthCount
+            });
+
+            world.write_model(@playerChar);
         }
     }
 }

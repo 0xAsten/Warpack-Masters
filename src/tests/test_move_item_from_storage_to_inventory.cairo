@@ -38,8 +38,8 @@ mod tests {
                 TestResource::Contract(actions::TEST_CLASS_HASH),
                 TestResource::Contract(item_system::TEST_CLASS_HASH),
                 TestResource::Contract(shop_system::TEST_CLASS_HASH),
-                TestResource::Event(shop_system::e_BuyItem::TEST_CLASS_HASH),
-                TestResource::Event(shop_system::e_SellItem::TEST_CLASS_HASH),
+                TestResource::Event(actions::e_BuyItem::TEST_CLASS_HASH),
+                TestResource::Event(actions::e_SellItem::TEST_CLASS_HASH),
             ].span()
         };
  
@@ -95,7 +95,7 @@ mod tests {
         shop_data.item4 = 1;
         world.write_model(@shop_data);
 
-        shop_system.buy_item(7);
+        action_system.move_item_from_shop_to_storage(7);
         // place a sword on (4,2)
         action_system.move_item_from_storage_to_inventory(2, 4, 2, 0);
         // (4,2) (4,3) (4,4) should be occupied
@@ -136,7 +136,7 @@ mod tests {
         assert(invetoryItem.rotation == 0, 'rotation mismatch');
         assert(invetoryItem.plugins.len() == 0, 'plugin length mismatch');
 
-        shop_system.buy_item(9);
+        action_system.move_item_from_shop_to_storage(9);
         // place a shield on (2,2)
         action_system.move_item_from_storage_to_inventory(2, 2, 2, 0);
         // (2,2) (3,2) (2,3) (3,3) should be occupied
@@ -184,7 +184,7 @@ mod tests {
         assert(invetoryItem.rotation == 0, 'rotation mismatch');
         assert(invetoryItem.plugins.len() == 0, 'plugin length mismatch');
 
-        shop_system.buy_item(8);
+        action_system.move_item_from_shop_to_storage(8);
         // place a potion on (5,2)
         action_system.move_item_from_storage_to_inventory(2, 5, 2, 0);
         // (5,2) should be occupied
@@ -241,7 +241,7 @@ mod tests {
         shop_data.item1 = 4;
         world.write_model(@shop_data);
 
-        shop_system.buy_item(4);
+        action_system.move_item_from_shop_to_storage(4);
         // place a sword on (10,0)
         action_system.move_item_from_storage_to_inventory(2, 10, 0, 0);
     }
@@ -275,7 +275,7 @@ mod tests {
         shop_data.item1 = 4;
         world.write_model(@shop_data);
 
-        shop_system.buy_item(4);
+        action_system.move_item_from_shop_to_storage(4);
         // place a sword on (0,12)
         action_system.move_item_from_storage_to_inventory(2, 0, 12, 0);
     }
@@ -309,7 +309,7 @@ mod tests {
         shop_data.item1 = 4;
         world.write_model(@shop_data);
 
-        shop_system.buy_item(4);
+        action_system.move_item_from_shop_to_storage(4);
         // place a sword on (2,2) with rotation 30
         action_system.move_item_from_storage_to_inventory(2, 0, 0, 30);
     }
@@ -343,7 +343,7 @@ mod tests {
         shop_data.item1 = 6;
         world.write_model(@shop_data);
 
-        shop_system.buy_item(6);
+        action_system.move_item_from_shop_to_storage(6);
         // place a sword on (8,6) with rotation 90
         action_system.move_item_from_storage_to_inventory(2, 8, 6, 90);
     }
@@ -377,7 +377,7 @@ mod tests {
         shop_data.item1 = 7;
         world.write_model(@shop_data);
 
-        shop_system.buy_item(7);
+        action_system.move_item_from_shop_to_storage(7);
         // place a sword on (0,5)
         action_system.move_item_from_storage_to_inventory(2, 0, 5, 0);
     }
@@ -412,11 +412,11 @@ mod tests {
         shop_data.item2 = 6;
         world.write_model(@shop_data);
 
-        shop_system.buy_item(5);
+        action_system.move_item_from_shop_to_storage(5);
         // place a sword on (4,2)
         action_system.move_item_from_storage_to_inventory(2, 4, 2, 0);
 
-        shop_system.buy_item(6);
+        action_system.move_item_from_shop_to_storage(6);
         // try to place the shield on of the occupied grids
         // this will collide with grid (4,2)
         action_system.move_item_from_storage_to_inventory(2, 3, 2, 90);
@@ -473,7 +473,7 @@ mod tests {
         shop_data.item1 = 5;
         world.write_model(@shop_data);
 
-        shop_system.buy_item(5);
+        action_system.move_item_from_shop_to_storage(5);
 
         // place a sword on (4,2)
         action_system.move_item_from_storage_to_inventory(2, 4, 2, 0);
@@ -515,7 +515,7 @@ mod tests {
         shop_data.item4 = 1;
         world.write_model(@shop_data);
 
-        shop_system.buy_item(6);
+        action_system.move_item_from_shop_to_storage(6);
         // place a sword on (3,3)
         action_system.move_item_from_storage_to_inventory(2, 3, 3, 270);
         // (3,3) (4,3) (5,3) should be occupied
@@ -570,7 +570,7 @@ mod tests {
         shop_data.item4 = 1;
         world.write_model(@shop_data);
 
-        shop_system.buy_item(13);
+        action_system.move_item_from_shop_to_storage(13);
         action_system.move_item_from_storage_to_inventory(2, 5, 2, 0);
         // (5, 2) should be occupied
         let mut backpack_grid_data: BackpackGrids = world.read_model((alice, 5, 2));
@@ -578,7 +578,7 @@ mod tests {
         let inventoryItem: CharacterItemInventory =  world.read_model((alice, 3));
         assert(inventoryItem.plugins.len() == 0, 'plugin length mismatch');
 
-        shop_system.buy_item(7);
+        action_system.move_item_from_shop_to_storage(7);
         // place a sword on (4,2)
         action_system.move_item_from_storage_to_inventory(2, 4, 2, 0);
         // (4,2) (4,3) (4,4) should be occupied
@@ -586,7 +586,7 @@ mod tests {
         assert(inventoryItem.plugins.len() == 1, 'plugin length mismatch');
         assert(*inventoryItem.plugins.at(0) == (6, 100, 2), 'plugin length mismatch');
         
-        shop_system.buy_item(17);
+        action_system.move_item_from_shop_to_storage(17);
         action_system.move_item_from_storage_to_inventory(2, 2, 2, 0);
         let inventoryItem: CharacterItemInventory =  world.read_model((alice, 5));
         assert(inventoryItem.plugins.len() == 0, 'plugin length mismatch');

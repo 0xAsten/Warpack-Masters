@@ -36,8 +36,8 @@ mod tests {
                 TestResource::Contract(actions::TEST_CLASS_HASH),
                 TestResource::Contract(item_system::TEST_CLASS_HASH),
                 TestResource::Contract(shop_system::TEST_CLASS_HASH),
-                TestResource::Event(shop_system::e_BuyItem::TEST_CLASS_HASH),
-                TestResource::Event(shop_system::e_SellItem::TEST_CLASS_HASH),
+                TestResource::Event(actions::e_BuyItem::TEST_CLASS_HASH),
+                TestResource::Event(actions::e_SellItem::TEST_CLASS_HASH),
             ].span()
         };
  
@@ -68,9 +68,6 @@ mod tests {
         let (contract_address, _) = world.dns(@"item_system").unwrap();
         let mut item_system = IItemDispatcher { contract_address };
 
-        let (contract_address, _) = world.dns(@"shop_system").unwrap();
-        let mut shop_system = IShopDispatcher { contract_address };
-
         let alice = starknet::contract_address_const::<0x0>();
 
         add_items(ref item_system);
@@ -88,7 +85,7 @@ mod tests {
         shop_data.item4 = 1;
         world.write_model(@shop_data);
 
-        shop_system.buy_item(5);
+        action_system.move_item_from_shop_to_storage(5);
         // place a sword on (4,2)
         action_system.move_item_from_storage_to_inventory(2, 4, 2, 0);
 
@@ -134,7 +131,7 @@ mod tests {
         assert(backpack_grid_data.isWeapon == false, 'isWeapon should be false');
         assert(backpack_grid_data.isPlugin == false, 'isPlugin should be false');
 
-        shop_system.buy_item(6);
+        action_system.move_item_from_shop_to_storage(6);
         // place a shield on (2,2)
         action_system.move_item_from_storage_to_inventory(1, 2, 2, 0);
 
@@ -190,7 +187,7 @@ mod tests {
         assert(backpack_grid_data.isWeapon == false, 'isWeapon should be false');
         assert(backpack_grid_data.isPlugin == false, 'isPlugin should be false');
 
-        shop_system.buy_item(8);
+        action_system.move_item_from_shop_to_storage(8);
         // place a potion on (5,2)
         action_system.move_item_from_storage_to_inventory(3, 5, 2, 0);
 
@@ -318,14 +315,14 @@ mod tests {
         shop_data.item4 = 1;
         world.write_model(@shop_data);
 
-        shop_system.buy_item(13);
+        action_system.move_item_from_shop_to_storage(13);
         action_system.move_item_from_storage_to_inventory(2, 5, 2, 0);
 
-        shop_system.buy_item(7);
+        action_system.move_item_from_shop_to_storage(7);
         // place a sword on (4,2)
         action_system.move_item_from_storage_to_inventory(2, 4, 2, 0);
         
-        shop_system.buy_item(17);
+        action_system.move_item_from_shop_to_storage(17);
         action_system.move_item_from_storage_to_inventory(2, 2, 2, 0);
 
         action_system.move_item_from_inventory_to_storage(3);

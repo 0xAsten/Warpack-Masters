@@ -39,8 +39,8 @@ mod tests {
                 TestResource::Contract(actions::TEST_CLASS_HASH),
                 TestResource::Contract(item_system::TEST_CLASS_HASH),
                 TestResource::Contract(shop_system::TEST_CLASS_HASH),
-                TestResource::Event(shop_system::e_BuyItem::TEST_CLASS_HASH),
-                TestResource::Event(shop_system::e_SellItem::TEST_CLASS_HASH),
+                TestResource::Event(actions::e_BuyItem::TEST_CLASS_HASH),
+                TestResource::Event(actions::e_SellItem::TEST_CLASS_HASH),
             ].span()
         };
  
@@ -85,7 +85,7 @@ mod tests {
         shop_data.item1 = 5;
         world.write_model(@shop_data);
 
-        shop_system.buy_item(5);
+        action_system.move_item_from_shop_to_storage(5);
 
         let char_data: Characters = world.read_model(alice);
         assert(char_data.gold == INIT_GOLD - items::Spike::price, 'gold value mismatch');
@@ -131,7 +131,7 @@ mod tests {
         player_data.gold = 0;
         world.write_model(@player_data);
 
-        shop_system.buy_item(3);
+        action_system.move_item_from_shop_to_storage(3);
     }
 
 
@@ -149,14 +149,11 @@ mod tests {
         let (contract_address, _) = world.dns(@"item_system").unwrap();
         let mut item_system = IItemDispatcher { contract_address };
 
-        let (contract_address, _) = world.dns(@"shop_system").unwrap();
-        let mut shop_system = IShopDispatcher { contract_address };
-
         add_items(ref item_system);
 
         action_system.spawn('Alice', WMClass::Warrior);
 
-        shop_system.buy_item(4);
+        action_system.move_item_from_shop_to_storage(4);
     }
 
 
@@ -195,8 +192,8 @@ mod tests {
         shop_data.item4 = 11;
         world.write_model(@shop_data);
 
-        shop_system.buy_item(11);
-        shop_system.buy_item(11);
+        action_system.move_item_from_shop_to_storage(11);
+        action_system.move_item_from_shop_to_storage(11);
     }
 
 
@@ -235,8 +232,8 @@ mod tests {
         shop_data.item4 = 12;
         world.write_model(@shop_data);
 
-        shop_system.buy_item(3);
-        shop_system.buy_item(0);
+        action_system.move_item_from_shop_to_storage(3);
+        action_system.move_item_from_shop_to_storage(0);
     }
 }
 

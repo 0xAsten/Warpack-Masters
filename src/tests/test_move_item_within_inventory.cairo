@@ -38,8 +38,8 @@ mod tests {
                 TestResource::Contract(actions::TEST_CLASS_HASH),
                 TestResource::Contract(item_system::TEST_CLASS_HASH),
                 TestResource::Contract(shop_system::TEST_CLASS_HASH),
-                TestResource::Event(shop_system::e_BuyItem::TEST_CLASS_HASH),
-                TestResource::Event(shop_system::e_SellItem::TEST_CLASS_HASH),
+                TestResource::Event(actions::e_BuyItem::TEST_CLASS_HASH),
+                TestResource::Event(actions::e_SellItem::TEST_CLASS_HASH),
             ].span()
         };
  
@@ -96,7 +96,7 @@ mod tests {
         world.write_model(@shop_data);
 
         // Buy and place a sword initially at (4,2)
-        shop_system.buy_item(7);
+        action_system.move_item_from_shop_to_storage(7);
         action_system.move_item_from_storage_to_inventory(2, 4, 2, 0);
         
         // Verify initial placement
@@ -180,7 +180,7 @@ mod tests {
         shop_data.item1 = 7; // sword
         world.write_model(@shop_data);
 
-        shop_system.buy_item(7);
+        action_system.move_item_from_shop_to_storage(7);
         action_system.move_item_from_storage_to_inventory(2, 4, 2, 0);
 
         // Try to move to x position that's out of range
@@ -216,7 +216,7 @@ mod tests {
         shop_data.item1 = 7; // sword
         world.write_model(@shop_data);
 
-        shop_system.buy_item(7);
+        action_system.move_item_from_shop_to_storage(7);
         action_system.move_item_from_storage_to_inventory(2, 4, 2, 0);
 
         // Try to move to y position that's out of range
@@ -252,7 +252,7 @@ mod tests {
         shop_data.item1 = 7; // sword
         world.write_model(@shop_data);
 
-        shop_system.buy_item(7);
+        action_system.move_item_from_shop_to_storage(7);
         action_system.move_item_from_storage_to_inventory(2, 4, 2, 0);
 
         // Try to move with invalid rotation
@@ -288,7 +288,7 @@ mod tests {
         shop_data.item1 = 7; // sword (1x3 item)
         world.write_model(@shop_data);
 
-        shop_system.buy_item(7);
+        action_system.move_item_from_shop_to_storage(7);
         action_system.move_item_from_storage_to_inventory(2, 4, 2, 0);
 
         // Try to move sword to position where it would go out of bounds in y direction
@@ -325,10 +325,10 @@ mod tests {
         shop_data.item2 = 6; // shield
         world.write_model(@shop_data);
 
-        shop_system.buy_item(7);
+        action_system.move_item_from_shop_to_storage(7);
         action_system.move_item_from_storage_to_inventory(2, 4, 2, 0);
 
-        shop_system.buy_item(6);
+        action_system.move_item_from_shop_to_storage(6);
         action_system.move_item_from_storage_to_inventory(2, 2, 2, 0);
 
         // Try to move the sword to a position that would collide with the shield
@@ -388,7 +388,7 @@ mod tests {
         shop_data.item1 = 6; // shield (2x2)
         world.write_model(@shop_data);
 
-        shop_system.buy_item(6);
+        action_system.move_item_from_shop_to_storage(6);
         // Place shield initially at (3,3) with rotation 0
         action_system.move_item_from_storage_to_inventory(2, 2, 2, 0);
 
@@ -451,11 +451,11 @@ mod tests {
         world.write_model(@shop_data);
 
         // Place a plugin first
-        shop_system.buy_item(13);
+        action_system.move_item_from_shop_to_storage(13);
         action_system.move_item_from_storage_to_inventory(2, 3, 2, 0);
 
         // Place a weapon next to the plugin
-        shop_system.buy_item(7);
+        action_system.move_item_from_shop_to_storage(7);
         action_system.move_item_from_storage_to_inventory(2, 4, 2, 0);
 
         // Verify weapon has plugin attached
@@ -479,10 +479,10 @@ mod tests {
         assert(*inventoryItem.plugins.at(0) == (6, 100, 2), 'plugin data mismatch');
         
         // Add another plugin and test multiple plugins
-        shop_system.buy_item(1);
+        action_system.move_item_from_shop_to_storage(1);
         action_system.move_item_from_storage_to_inventory(2, 6, 2, 0);
 
-        shop_system.buy_item(17);
+        action_system.move_item_from_shop_to_storage(17);
         action_system.move_item_from_storage_to_inventory(2, 5, 2, 0);
 
         // Verify weapon now has both plugins

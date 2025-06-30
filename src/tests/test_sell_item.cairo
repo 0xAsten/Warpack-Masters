@@ -40,8 +40,8 @@ mod tests {
                 TestResource::Contract(actions::TEST_CLASS_HASH),
                 TestResource::Contract(item_system::TEST_CLASS_HASH),
                 TestResource::Contract(shop_system::TEST_CLASS_HASH),
-                TestResource::Event(shop_system::e_BuyItem::TEST_CLASS_HASH),
-                TestResource::Event(shop_system::e_SellItem::TEST_CLASS_HASH),
+                TestResource::Event(actions::e_BuyItem::TEST_CLASS_HASH),
+                TestResource::Event(actions::e_SellItem::TEST_CLASS_HASH),
             ].span()
         };
         ndef
@@ -93,13 +93,13 @@ mod tests {
         shop_data.item4 = 9;
         world.write_model(@shop_data);
 
-        shop_system.buy_item(6);
+        action_system.move_item_from_shop_to_storage(6);
         let storageItemCount: CharacterItemsStorageCounter = world.read_model(alice);
         assert(storageItemCount.count == 2, 'storage count mismatch');
 
         let prev_char_data: Characters = world.read_model(alice);
 
-        shop_system.sell_item(2);
+        action_system.move_item_from_storage_to_shop(2);
         let storageItemCount: CharacterItemsStorageCounter = world.read_model(alice);
         assert(storageItemCount.count == 2, 'storage count mismatch');
 
@@ -115,8 +115,8 @@ mod tests {
         let storageItem: CharacterItemStorage = world.read_model((alice, 2));
         assert(storageItem.itemId == 0, 'item id mismatch');
 
-        shop_system.buy_item(8);
-        shop_system.buy_item(9);
+        action_system.move_item_from_shop_to_storage(8);
+        action_system.move_item_from_shop_to_storage(9);
 
         let mut shop_data: Shop = world.read_model(alice);
         assert(shop_data.item1 == 4, 'shop item mismatch');
@@ -130,12 +130,12 @@ mod tests {
         shop_data.item4 = 10;
         world.write_model(@shop_data);
 
-        shop_system.buy_item(3);
+        action_system.move_item_from_shop_to_storage(3);
 
         let storageItemCount: CharacterItemsStorageCounter = world.read_model(alice);
         assert(storageItemCount.count == 3, 'storage count mismatch');
 
-        shop_system.sell_item(2);
+        action_system.move_item_from_storage_to_shop(2);
         let storageItemCount: CharacterItemsStorageCounter = world.read_model(alice);
         assert(storageItemCount.count == 3, 'storage count mismatch');
 
@@ -146,7 +146,7 @@ mod tests {
         let storageItem: CharacterItemStorage = world.read_model((alice, 3));
         assert(storageItem.itemId == 3, 'item id mismatch');
 
-        shop_system.buy_item(5);
+        action_system.move_item_from_shop_to_storage(5);
         let storageItemCount: CharacterItemsStorageCounter = world.read_model(alice);
         assert(storageItemCount.count == 3, 'storage count mismatch');
 
@@ -187,8 +187,8 @@ mod tests {
         shop_data.item1 = 4;
         world.write_model(@shop_data);
 
-        shop_system.buy_item(4);
-        shop_system.sell_item(0);
+        action_system.move_item_from_shop_to_storage(4);
+        action_system.move_item_from_storage_to_shop(0);
     }
 
     #[test]
@@ -220,8 +220,8 @@ mod tests {
         shop_data.item1 = 10;
         world.write_model(@shop_data);
 
-        shop_system.buy_item(10);
-        shop_system.sell_item(3);
+        action_system.move_item_from_shop_to_storage(10);
+        action_system.move_item_from_storage_to_shop(3);
     }
 }
 
