@@ -1329,7 +1329,7 @@
   "contracts": [
     {
       "address": "0x5e712fedb602b9a9f7b53cc8e092650b66008152de28a95465364601eb2909e",
-      "class_hash": "0x18e1b0bab09f6db3adf2c37fe35048d6559b44d673de64b4b31766bcda1b815",
+      "class_hash": "0x7cf4e223486131f2a3864c8e368c8108a28bc6275dd73126ba178a2228d6238",
       "abi": [
         {
           "type": "impl",
@@ -1447,7 +1447,7 @@
             },
             {
               "type": "function",
-              "name": "place_item",
+              "name": "move_item_from_storage_to_inventory",
               "inputs": [
                 {
                   "name": "storage_item_id",
@@ -1471,7 +1471,7 @@
             },
             {
               "type": "function",
-              "name": "undo_place_item",
+              "name": "move_item_from_inventory_to_storage",
               "inputs": [
                 {
                   "name": "inventory_item_id",
@@ -1499,6 +1499,94 @@
                 {
                   "name": "amount",
                   "type": "core::integer::u256"
+                },
+                {
+                  "name": "recipient",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "move_item_within_inventory",
+              "inputs": [
+                {
+                  "name": "inventory_item_id",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "x",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "y",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "rotation",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "move_item_from_shop_to_storage",
+              "inputs": [
+                {
+                  "name": "item_id",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "move_item_from_storage_to_shop",
+              "inputs": [
+                {
+                  "name": "storage_item_id",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "move_item_from_shop_to_inventory",
+              "inputs": [
+                {
+                  "name": "item_id",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "x",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "y",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "rotation",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "move_item_from_inventory_to_shop",
+              "inputs": [
+                {
+                  "name": "inventory_item_id",
+                  "type": "core::integer::u32"
                 }
               ],
               "outputs": [],
@@ -1627,9 +1715,14 @@
       "systems": [
         "spawn",
         "rebirth",
-        "place_item",
-        "undo_place_item",
+        "move_item_from_storage_to_inventory",
+        "move_item_from_inventory_to_storage",
         "withdraw_strk",
+        "move_item_within_inventory",
+        "move_item_from_shop_to_storage",
+        "move_item_from_storage_to_shop",
+        "move_item_from_shop_to_inventory",
+        "move_item_from_inventory_to_shop",
         "upgrade"
       ]
     },
@@ -2826,7 +2919,7 @@
     },
     {
       "address": "0x409b582347e5815238e462a27902a4aac2c9a52315355a451ee7f9495b1c8d5",
-      "class_hash": "0xb7513ecd9e239eb95415aa67cee97d0211587ed36f386b45c3dd0a1264b38c",
+      "class_hash": "0x14d31926c4090ae98fe9520e471ed12b657c95dc211c77d1746bcf5b2be0302",
       "abi": [
         {
           "type": "impl",
@@ -2887,30 +2980,6 @@
           "type": "interface",
           "name": "warpack_masters::systems::shop::IShop",
           "items": [
-            {
-              "type": "function",
-              "name": "buy_item",
-              "inputs": [
-                {
-                  "name": "item_id",
-                  "type": "core::integer::u32"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "sell_item",
-              "inputs": [
-                {
-                  "name": "storage_item_id",
-                  "type": "core::integer::u32"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
             {
               "type": "function",
               "name": "reroll_shop",
@@ -3039,8 +3108,6 @@
       "tag": "Warpacks-shop_system",
       "selector": "0x4fc6e53062bad497f56645e733043df064f1a4d8bb0ce745f62942d893b8dd",
       "systems": [
-        "buy_item",
-        "sell_item",
         "reroll_shop",
         "upgrade"
       ]
@@ -3638,7 +3705,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x5ab8e605a854e19e235f9d39704d9b9284f53da797c5eee92059caf20c570a7",
+      "class_hash": "0x1d1e188f5c855978e69a6724a6f9fcd10afc6712d8e52c4418bac7b57b923bc",
       "tag": "Warpacks-BuyItem",
       "selector": "0x222c957197f3def390ba92afb039775d6feeca9d6048ef5585392fbb8a5ab9"
     },
@@ -3650,7 +3717,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x487e41d65e00fa598b94999adbadbc9caf2ed8c4de009baa39bfb3a79088651",
+      "class_hash": "0x702322491f2c7c21f3bca541579447afdce8751686b84c5e2f7247dd7545a6a",
       "tag": "Warpacks-SellItem",
       "selector": "0x17d7432b9e7cbae7e6d2920ef19d5a96f6ce2f428f22d820a7298f1864d7dff"
     },

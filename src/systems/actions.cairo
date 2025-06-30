@@ -1,4 +1,5 @@
 use warpack_masters::models::Character::WMClass;
+use starknet::ContractAddress;
 
 #[starknet::interface]
 pub trait IActions<T> {
