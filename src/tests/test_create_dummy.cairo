@@ -157,8 +157,8 @@ mod tests {
     {
         set_contract_address(dummy0);
         action_system.spawn(name, wmClass);
-        action_system.undo_place_item(1);
-        action_system.undo_place_item(2);
+        action_system.move_item_from_inventory_to_storage(1);
+        action_system.move_item_from_inventory_to_storage(2);
 
         set_contract_address(action_system_address);
         let mut character = get!(world, dummy0, (Characters));

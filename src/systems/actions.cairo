@@ -13,7 +13,7 @@ pub trait IActions<T> {
     fn place_item(
         ref self: T, storage_item_id: u32, x: u32, y: u32, rotation: u32
     );
-    fn undo_place_item(ref self: T, inventory_item_id: u32);
+    fn move_item_from_inventory_to_storage(ref self: T, inventory_item_id: u32);
     fn get_balance(self: @T) -> u256;
     fn withdraw_strk(ref self: T, amount: u256);
 }
@@ -256,10 +256,8 @@ mod actions {
 
             let player = get_caller_address();
 
-            // check if the player has fought the matching battle
-            let mut battleLogCounter: BattleLogCounter = world.read_model(player);
-            let mut latestBattleLog: BattleLog = world.read_model((player, battleLogCounter.count));
-            assert(battleLogCounter.count == 0 || latestBattleLog.winner != 0, 'battle not fought');
+            // check if the player has joined the matching battle
+            self._check_if_player_has_joined_a_matched_battle(player);
 
             assert(x < GRID_X, 'x out of range');
             assert(y < GRID_Y, 'y out of range');
@@ -270,7 +268,7 @@ mod actions {
 
             let mut storageItem: CharacterItemStorage = world.read_model((player, storage_item_id));
 
-            assert(storageItem.itemId != 0, 'item not owned');
+            assert(storageItem.itemId != 0, 'item not found');
 
             let itemId = storageItem.itemId;
             let item: Item = world.read_model(itemId);
@@ -439,19 +437,70 @@ mod actions {
             world.write_model(@storageItem);
         }
 
-        fn undo_place_item(ref self: ContractState, inventory_item_id: u32) {
+        // fn place_item_within_grid(ref self: ContractState, inventory_item_id: u32, x: u32, y: u32, rotation: u32) {
+        //     let mut world = self.world(@"Warpacks");
+
+        //     let player = get_caller_address();
+
+        //     // check if the player has joined the matching battle
+        //     self._check_if_player_has_joined_a_matched_battle(player);
+
+        //     let mut inventoryItem: CharacterItemInventory = world.read_model((player, inventory_item_id));
+        //     let itemId = inventoryItem.itemId;
+        //     assert(itemId != 0, 'invalid inventory item id');
+        // }
+
+        fn move_item_from_inventory_to_storage(ref self: ContractState, inventory_item_id: u32) {
             let mut world = self.world(@"Warpacks");
 
             let player = get_caller_address();
 
-            // check if the player has fought the matching battle
+            // check if the player has joined the matching battle
+            self._check_if_player_has_joined_a_matched_battle(player);
+
+            let itemId = self._remove_item_from_inventory(player, inventory_item_id);
+        
+            let mut storageCounter: CharacterItemsStorageCounter = world.read_model(player);
+            let mut count = storageCounter.count;
+            loop {
+                if count == 0 {
+                    break;
+                }
+
+                let mut storageItem: CharacterItemStorage = world.read_model((player, count));
+                if storageItem.itemId == 0 {
+                    storageItem.itemId = itemId;
+                    world.write_model(@storageItem);
+                    break;
+                }
+
+                count -= 1;
+            };
+
+            if count == 0 {
+                storageCounter.count += 1;
+                world.write_model(@CharacterItemStorage { player, id: storageCounter.count, itemId: itemId, });
+                world.write_model(@CharacterItemsStorageCounter { player, count: storageCounter.count });
+            }
+        }
+    }
+
+    #[generate_trait]
+    impl InternalImpl of InternalTrait {
+        fn _check_if_player_has_joined_a_matched_battle(ref self: ContractState, player: ContractAddress) {
+            let mut world = self.world(@"Warpacks");
+
             let mut battleLogCounter: BattleLogCounter = world.read_model(player);
             let latestBattleLog: BattleLog = world.read_model((player, battleLogCounter.count));
-            assert(battleLogCounter.count == 0 || latestBattleLog.winner != 0, 'battle not fought');
+            assert(battleLogCounter.count == 0 || latestBattleLog.winner != 0, 'matched battle not joined');
+        }
+
+        fn _remove_item_from_inventory(ref self: ContractState, player: ContractAddress, inventory_item_id: u32) -> u32 {
+            let mut world = self.world(@"Warpacks");
 
             let mut inventoryItem: CharacterItemInventory = world.read_model((player, inventory_item_id));
             let itemId = inventoryItem.itemId;
-            assert(itemId != 0, 'invalid inventory item id');
+            assert(itemId != 0, 'item not found');
             let item: Item = world.read_model(itemId);
 
             let x = inventoryItem.position.x;
@@ -621,29 +670,6 @@ mod actions {
                 j = y;
                 i += 1;
             };
-        
-            let mut storageCounter: CharacterItemsStorageCounter = world.read_model(player);
-            let mut count = storageCounter.count;
-            loop {
-                if count == 0 {
-                    break;
-                }
-
-                let mut storageItem: CharacterItemStorage = world.read_model((player, count));
-                if storageItem.itemId == 0 {
-                    storageItem.itemId = itemId;
-                    world.write_model(@storageItem);
-                    break;
-                }
-
-                count -= 1;
-            };
-
-            if count == 0 {
-                storageCounter.count += 1;
-                world.write_model(@CharacterItemStorage { player, id: storageCounter.count, itemId: itemId, });
-                world.write_model(@CharacterItemsStorageCounter { player, count: storageCounter.count });
-            }
 
             inventoryItem.itemId = 0;
             inventoryItem.position.x = 0;
@@ -651,6 +677,8 @@ mod actions {
             inventoryItem.rotation = 0;
             inventoryItem.plugins = array![];
             world.write_model(@inventoryItem);
+
+            itemId
         }
     }
 }

@@ -57,7 +57,7 @@ mod tests {
 
     #[test]
     #[available_gas(3000000000000000)]
-    fn test_undo_place_item() {
+    fn test_move_item_from_inventory_to_storage() {
         let ndef = namespace_def();
         let mut world = spawn_test_world([ndef].span());
         world.sync_perms_and_inits(contract_defs());
@@ -92,7 +92,7 @@ mod tests {
         // place a sword on (4,2)
         action_system.place_item(2, 4, 2, 0);
 
-        action_system.undo_place_item(3);
+        action_system.move_item_from_inventory_to_storage(3);
 
         let storageItemCounter: CharacterItemsStorageCounter = world.read_model(alice);
         assert(storageItemCounter.count == 2, 'storage item count mismatch');
@@ -138,7 +138,7 @@ mod tests {
         // place a shield on (2,2)
         action_system.place_item(1, 2, 2, 0);
 
-        action_system.undo_place_item(3);
+        action_system.move_item_from_inventory_to_storage(3);
 
         let storageItemCounter: CharacterItemsStorageCounter = world.read_model(alice);
         assert(storageItemCounter.count == 2, 'storage item count mismatch');
@@ -194,7 +194,7 @@ mod tests {
         // place a potion on (5,2)
         action_system.place_item(3, 5, 2, 0);
 
-        action_system.undo_place_item(3);
+        action_system.move_item_from_inventory_to_storage(3);
 
         let storageItemCounter: CharacterItemsStorageCounter = world.read_model(alice);
         assert(storageItemCounter.count == 3, 'storage item count mismatch');
@@ -227,7 +227,7 @@ mod tests {
         action_system.place_item(1, 2, 2, 0);
         action_system.place_item(3, 5, 2, 0);
 
-        action_system.undo_place_item(4);
+        action_system.move_item_from_inventory_to_storage(4);
 
         let storageItemCounter: CharacterItemsStorageCounter = world.read_model(alice);
         assert(storageItemCounter.count == 3, 'storage item count mismatch');
@@ -265,8 +265,8 @@ mod tests {
 
     #[test]
     #[available_gas(3000000000000000)]
-    #[should_panic(expected: ('invalid inventory item id', 'ENTRYPOINT_FAILED'))]
-    fn test_undo_place_item_revert_not_in_inventory() {
+    #[should_panic(expected: ('item not found', 'ENTRYPOINT_FAILED'))]
+    fn test_move_item_from_inventory_to_storage_revert_not_in_inventory() {
         let ndef = namespace_def();
         let mut world = spawn_test_world([ndef].span());
         world.sync_perms_and_inits(contract_defs());
@@ -281,12 +281,12 @@ mod tests {
 
         action_system.spawn('Alice', WMClass::Warlock);
 
-        action_system.undo_place_item(3);
+        action_system.move_item_from_inventory_to_storage(3);
     }
 
     #[test]
     #[available_gas(3000000000000000)]
-    fn test_undo_place_item_with_plugins_check() {
+    fn test_move_item_from_inventory_to_storage_with_plugins_check() {
         let ndef = namespace_def();
         let mut world = spawn_test_world([ndef].span());
         world.sync_perms_and_inits(contract_defs());
@@ -328,7 +328,7 @@ mod tests {
         shop_system.buy_item(17);
         action_system.place_item(2, 2, 2, 0);
 
-        action_system.undo_place_item(3);
+        action_system.move_item_from_inventory_to_storage(3);
         let storageItemCounter: CharacterItemsStorageCounter = world.read_model(alice);
         assert(storageItemCounter.count == 2, 'storage item count mismatch');
         let storageItem: CharacterItemStorage = world.read_model((alice, 2));
@@ -350,7 +350,7 @@ mod tests {
         assert(invetoryItem.plugins.len() == 1, 'plugins length mismatch');
         assert(*invetoryItem.plugins.at(0) == (6, 80, 3), 'plugin length mismatch');
 
-        action_system.undo_place_item(4);
+        action_system.move_item_from_inventory_to_storage(4);
         let storageItemCounter: CharacterItemsStorageCounter = world.read_model(alice);
         assert(storageItemCounter.count == 2, 'storage item count mismatch');
         let storageItem: CharacterItemStorage = world.read_model((alice, 1));

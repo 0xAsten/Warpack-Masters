@@ -33,7 +33,7 @@ pub mod tests {
     pub mod test_place_item;
     pub mod test_add_item;
     pub mod test_buy_item;
-    pub mod test_undo_place_item;
+    pub mod test_move_item_from_inventory_to_storage;
     pub mod test_sell_item;
     pub mod test_reroll_shop;
     pub mod test_fight;
