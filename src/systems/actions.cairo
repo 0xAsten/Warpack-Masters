@@ -19,6 +19,7 @@ pub trait IActions<T> {
     fn move_item_within_inventory(ref self: T, inventory_item_id: u32, x: u32, y: u32, rotation: u32);
     fn move_item_from_shop_to_storage(ref self: T, item_id: u32);
     fn move_item_from_storage_to_shop(ref self: T, storage_item_id: u32);
+    fn move_item_from_shop_to_inventory(ref self: T, item_id: u32, x: u32, y: u32, rotation: u32);
 }
 
 // TODO: rename the count filed in counter model
@@ -354,8 +355,6 @@ mod actions {
 
             let player = get_caller_address();
 
-            assert(item_id != 0, 'invalid item_id');
-
             self._buy_item(player, item_id);
 
             let mut storageCounter: CharacterItemsStorageCounter = world.read_model(player);
@@ -399,13 +398,13 @@ mod actions {
             world.write_model(@storageItem);
         }
 
-        // fn move_item_from_shop_to_inventory(ref self: ContractState, shop_item_id: u32) {
-        //     let mut world = self.world(@"Warpacks");
+        fn move_item_from_shop_to_inventory(ref self: ContractState, item_id: u32, x: u32, y: u32, rotation: u32) {
+            let player = get_caller_address();
 
-        //     let player = get_caller_address();
+            self._buy_item(player, item_id);
 
-        //     let itemId = self._remove_item_from_shop(player, shop_item_id);
-        // }
+            self._add_item_to_inventory(player, item_id, x, y, rotation);
+        }
     }
 
     #[generate_trait]
@@ -772,6 +771,8 @@ mod actions {
         }
 
         fn _buy_item(ref self: ContractState, player: ContractAddress, item_id: u32) {
+            assert(item_id != 0, 'invalid item_id');
+
             let mut world = self.world(@"Warpacks");
 
             let mut shop_data: Shop = world.read_model(player);
