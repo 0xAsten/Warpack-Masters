@@ -15,7 +15,7 @@ pub trait IActions<T> {
     );
     fn move_item_from_inventory_to_storage(ref self: T, inventory_item_id: u32);
     fn get_balance(self: @T) -> u256;
-    fn withdraw_strk(ref self: T, amount: u256);
+    fn withdraw_strk(ref self: T, amount: u256, recipient: ContractAddress);
     fn move_item_within_inventory(ref self: T, inventory_item_id: u32, x: u32, y: u32, rotation: u32);
     fn move_item_from_shop_to_storage(ref self: T, item_id: u32);
     fn move_item_from_storage_to_shop(ref self: T, storage_item_id: u32);
@@ -255,16 +255,16 @@ mod actions {
             self.spawn(prev_name, char.wmClass);
         }
 
-        fn withdraw_strk(ref self: ContractState, amount: u256) {
+        fn withdraw_strk(ref self: ContractState, amount: u256, recipient: ContractAddress) {
             let mut world = self.world(@"Warpacks");
 
-            let player = get_caller_address();
-            assert(world.dispatcher.is_owner(0, player), 'player not world owner');
+            let caller = get_caller_address();
+            assert(world.dispatcher.is_owner(0, caller), 'caller not world owner');
 
             let gameConfig: GameConfig = world.read_model(GAME_CONFIG_ID);
             let STRK_ADDRESS: ContractAddress = gameConfig.strk_address;
             IERC20Dispatcher { contract_address: STRK_ADDRESS }
-                .transfer(player, amount);
+                .transfer(recipient, amount);
         }
 
         fn get_balance(self: @ContractState) -> u256 {
