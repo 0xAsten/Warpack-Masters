@@ -10,7 +10,7 @@ pub trait IActions<T> {
     fn rebirth(
         ref self: T,
     );
-    fn place_item(
+    fn move_item_from_storage_to_inventory(
         ref self: T, storage_item_id: u32, x: u32, y: u32, rotation: u32
     );
     fn move_item_from_inventory_to_storage(ref self: T, inventory_item_id: u32);
@@ -95,8 +95,8 @@ mod actions {
             world.write_model(@CharacterItemStorage { player, id: 2, itemId: Pack::id });
             world.write_model(@CharacterItemsStorageCounter { player, count: 2 });
 
-            self.place_item(1, 4, 2, 0);
-            self.place_item(2, 2, 2, 0);
+            self.move_item_from_storage_to_inventory(1, 4, 2, 0);
+            self.move_item_from_storage_to_inventory(2, 2, 2, 0);
 
             // keep the previous rating, totalWins and totalLoss during rebirth
             let prev_rating = player_exists.rating;
@@ -249,7 +249,7 @@ mod actions {
                 .balance_of(player);
         }
         
-        fn place_item(
+        fn move_item_from_storage_to_inventory(
             ref self: ContractState, storage_item_id: u32, x: u32, y: u32, rotation: u32
         ) {
             let mut world = self.world(@"Warpacks");
@@ -271,173 +271,14 @@ mod actions {
             assert(storageItem.itemId != 0, 'item not found');
 
             let itemId = storageItem.itemId;
-            let item: Item = world.read_model(itemId);
-
-            assert(item.width > 0 && item.height > 0, 'invalid item dimensions');
-
-            let itemHeight = item.height;
-            let itemWidth = item.width;
-            let isWeapon = if item.itemType == 1 || item.itemType == 2 {
-                true
-            } else {
-                false
-            };
-
-            // put into inventory
-            let mut inventoryCounter: CharacterItemsInventoryCounter = world.read_model(player);
-            let mut count = inventoryCounter.count;
-
-            let mut inventoryItem = CharacterItemInventory {
-                player,
-                id: 0,
-                itemId: itemId,
-                position: Position { x, y },
-                rotation: rotation,
-                plugins: array![],
-            };
-
-            loop {
-                if count == 0 {
-                    break;
-                }
-
-                let currentInventoryItem: CharacterItemInventory = world.read_model((player, count));
-                if currentInventoryItem.itemId == 0 {
-                    inventoryItem.id = count;
-                    break;
-                }
-
-                count -= 1;
-            };
-
-            if count == 0 {
-                inventoryCounter.count += 1;
-                inventoryItem.id = inventoryCounter.count;
-            }
-
-            let mut xMax = 0;
-            let mut yMax = 0;
-
             
-            if rotation == 0 || rotation == 180 {
-                // only check grids which are above the starting (x,y)
-                xMax = x + itemWidth - 1;
-                yMax = y + itemHeight - 1;
-            } else if rotation == 90 || rotation == 270 {
-                // only check grids which are to the right of the starting (x,y)
-                //item_h becomes item_w and vice versa
-                xMax = x + itemHeight - 1;
-                yMax = y + itemWidth - 1;
-            } else {
-                assert(false, 'invalid rotation');
-            }
-
-            assert(xMax < GRID_X, 'item out of bound for x');
-            assert(yMax < GRID_Y, 'item out of bound for y');
-
-            let mut i = x;
-            let mut j = y;
-            let mut isHandled: Felt252Dict<bool> = Default::default();
-            loop {
-                if i > xMax {
-                    break;
-                }
-                loop {
-                    if j > yMax {
-                        break;
-                    }
-
-                    let playerBackpackGrids: BackpackGrids = world.read_model((player, i, j));
-                    if item.itemType == 4 {
-                        assert(!playerBackpackGrids.enabled, 'Already enabled');
-                        world.write_model(@BackpackGrids {
-                            player: player, x: i, y: j, enabled: true, occupied: false, itemId: 0, inventoryItemId: 0, isWeapon: false, isPlugin: false
-                        });
-                    } else {
-                        assert(playerBackpackGrids.enabled, 'Grid not enabled');
-                        assert(!playerBackpackGrids.occupied, 'Already occupied');
-                        world.write_model(@BackpackGrids {
-                            player: player, x: i, y: j, enabled: true, occupied: true, itemId: itemId, inventoryItemId: inventoryItem.id, isWeapon: isWeapon, isPlugin: item.isPlugin
-                        });
-
-                        // to check around if it is a weapon or plugin
-                        if isWeapon || item.isPlugin {
-                            // left
-                            if i > 0 && i == x {
-                                let grid: BackpackGrids = world.read_model((player, i - 1, j));
-                                if !isHandled.get(grid.inventoryItemId.into()) {
-                                    if isWeapon && grid.isPlugin {
-                                        let plugin: Item = world.read_model(grid.itemId);
-                                        inventoryItem.plugins.append((plugin.effectType, plugin.chance, plugin.effectStacks));
-                                    } else if item.isPlugin && grid.isWeapon {
-                                        let mut weapon: CharacterItemInventory = world.read_model((player, grid.inventoryItemId));
-                                        weapon.plugins.append((item.effectType, item.chance, item.effectStacks));
-                                        world.write_model(@weapon);
-                                    }
-                                    isHandled.insert(grid.inventoryItemId.into(), true);
-                                }
-                            }
-                            // top
-                            if j < GRID_Y - 1 && j == yMax {
-                                let grid: BackpackGrids = world.read_model((player, i, j + 1));
-                                if !isHandled.get(grid.inventoryItemId.into()) {
-                                    if isWeapon && grid.isPlugin {
-                                        let plugin: Item = world.read_model(grid.itemId);
-                                        inventoryItem.plugins.append((plugin.effectType, plugin.chance, plugin.effectStacks));
-                                    } else if item.isPlugin && grid.isWeapon {
-                                        let mut weapon: CharacterItemInventory = world.read_model((player, grid.inventoryItemId));
-                                        weapon.plugins.append((item.effectType, item.chance, item.effectStacks));
-                                        world.write_model(@weapon);
-                                    }
-                                    isHandled.insert(grid.inventoryItemId.into(), true);
-                                }
-                            }
-                            // right
-                            if i < GRID_X - 1 && i == xMax {
-                                let grid: BackpackGrids = world.read_model((player, i + 1, j));
-                                if !isHandled.get(grid.inventoryItemId.into()) {
-                                    if isWeapon && grid.isPlugin {
-                                        let plugin: Item = world.read_model(grid.itemId);
-                                        inventoryItem.plugins.append((plugin.effectType, plugin.chance, plugin.effectStacks));
-                                    } else if item.isPlugin && grid.isWeapon {
-                                        let mut weapon: CharacterItemInventory = world.read_model((player, grid.inventoryItemId));
-                                        weapon.plugins.append((item.effectType, item.chance, item.effectStacks));
-                                        world.write_model(@weapon);
-                                    }
-                                    isHandled.insert(grid.inventoryItemId.into(), true);
-                                }
-                            }
-                            // bottom
-                            if j > 0 && j == y {
-                                let grid: BackpackGrids = world.read_model((player, i, j - 1));
-                                if !isHandled.get(grid.inventoryItemId.into()) {
-                                    if isWeapon && grid.isPlugin {
-                                        let plugin: Item = world.read_model(grid.itemId);
-                                        inventoryItem.plugins.append((plugin.effectType, plugin.chance, plugin.effectStacks));
-                                    } else if item.isPlugin && grid.isWeapon {
-                                        let mut weapon: CharacterItemInventory = world.read_model((player, grid.inventoryItemId));
-                                        weapon.plugins.append((item.effectType, item.chance, item.effectStacks));
-                                        world.write_model(@weapon);
-                                    }
-                                    isHandled.insert(grid.inventoryItemId.into(), true);
-                                }   
-                            }
-                        }
-                    }
-
-                    j += 1;
-                };
-                j = y;
-                i += 1;
-            };
+            self._add_item_to_inventory(player, itemId, x, y, rotation);
 
             storageItem.itemId = 0;
-            world.write_model(@inventoryItem);
-            world.write_model(@inventoryCounter);
             world.write_model(@storageItem);
         }
 
-        // fn place_item_within_grid(ref self: ContractState, inventory_item_id: u32, x: u32, y: u32, rotation: u32) {
+        // fn move_item_within_inventory(ref self: ContractState, inventory_item_id: u32, x: u32, y: u32, rotation: u32) {
         //     let mut world = self.world(@"Warpacks");
 
         //     let player = get_caller_address();
@@ -679,6 +520,173 @@ mod actions {
             world.write_model(@inventoryItem);
 
             itemId
+        }
+
+        fn _add_item_to_inventory(ref self: ContractState, player: ContractAddress, itemId: u32, x: u32, y: u32, rotation: u32) {
+            let mut world = self.world(@"Warpacks");
+
+            let item: Item = world.read_model(itemId);
+
+            assert(item.width > 0 && item.height > 0, 'invalid item dimensions');
+
+            let itemHeight = item.height;
+            let itemWidth = item.width;
+            let isWeapon = if item.itemType == 1 || item.itemType == 2 {
+                true
+            } else {
+                false
+            };
+
+            let mut inventoryCounter: CharacterItemsInventoryCounter = world.read_model(player);
+            let mut count = inventoryCounter.count;
+
+            let mut inventoryItem = CharacterItemInventory {
+                player,
+                id: 0,
+                itemId: itemId,
+                position: Position { x, y },
+                rotation: rotation,
+                plugins: array![],
+            };
+
+            loop {
+                if count == 0 {
+                    break;
+                }
+
+                let currentInventoryItem: CharacterItemInventory = world.read_model((player, count));
+                if currentInventoryItem.itemId == 0 {
+                    inventoryItem.id = count;
+                    break;
+                }
+
+                count -= 1;
+            };
+
+            if count == 0 {
+                inventoryCounter.count += 1;
+                inventoryItem.id = inventoryCounter.count;
+            }
+
+            let mut xMax = 0;
+            let mut yMax = 0;
+
+            
+            if rotation == 0 || rotation == 180 {
+                // only check grids which are above the starting (x,y)
+                xMax = x + itemWidth - 1;
+                yMax = y + itemHeight - 1;
+            } else if rotation == 90 || rotation == 270 {
+                // only check grids which are to the right of the starting (x,y)
+                //item_h becomes item_w and vice versa
+                xMax = x + itemHeight - 1;
+                yMax = y + itemWidth - 1;
+            } else {
+                assert(false, 'invalid rotation');
+            }
+
+            assert(xMax < GRID_X, 'item out of bound for x');
+            assert(yMax < GRID_Y, 'item out of bound for y');
+
+            let mut i = x;
+            let mut j = y;
+            let mut isHandled: Felt252Dict<bool> = Default::default();
+            loop {
+                if i > xMax {
+                    break;
+                }
+                loop {
+                    if j > yMax {
+                        break;
+                    }
+
+                    let playerBackpackGrids: BackpackGrids = world.read_model((player, i, j));
+                    if item.itemType == 4 {
+                        assert(!playerBackpackGrids.enabled, 'Already enabled');
+                        world.write_model(@BackpackGrids {
+                            player: player, x: i, y: j, enabled: true, occupied: false, itemId: 0, inventoryItemId: 0, isWeapon: false, isPlugin: false
+                        });
+                    } else {
+                        assert(playerBackpackGrids.enabled, 'Grid not enabled');
+                        assert(!playerBackpackGrids.occupied, 'Already occupied');
+                        world.write_model(@BackpackGrids {
+                            player: player, x: i, y: j, enabled: true, occupied: true, itemId: itemId, inventoryItemId: inventoryItem.id, isWeapon: isWeapon, isPlugin: item.isPlugin
+                        });
+
+                        // to check around if it is a weapon or plugin
+                        if isWeapon || item.isPlugin {
+                            // left
+                            if i > 0 && i == x {
+                                let grid: BackpackGrids = world.read_model((player, i - 1, j));
+                                if !isHandled.get(grid.inventoryItemId.into()) {
+                                    if isWeapon && grid.isPlugin {
+                                        let plugin: Item = world.read_model(grid.itemId);
+                                        inventoryItem.plugins.append((plugin.effectType, plugin.chance, plugin.effectStacks));
+                                    } else if item.isPlugin && grid.isWeapon {
+                                        let mut weapon: CharacterItemInventory = world.read_model((player, grid.inventoryItemId));
+                                        weapon.plugins.append((item.effectType, item.chance, item.effectStacks));
+                                        world.write_model(@weapon);
+                                    }
+                                    isHandled.insert(grid.inventoryItemId.into(), true);
+                                }
+                            }
+                            // top
+                            if j < GRID_Y - 1 && j == yMax {
+                                let grid: BackpackGrids = world.read_model((player, i, j + 1));
+                                if !isHandled.get(grid.inventoryItemId.into()) {
+                                    if isWeapon && grid.isPlugin {
+                                        let plugin: Item = world.read_model(grid.itemId);
+                                        inventoryItem.plugins.append((plugin.effectType, plugin.chance, plugin.effectStacks));
+                                    } else if item.isPlugin && grid.isWeapon {
+                                        let mut weapon: CharacterItemInventory = world.read_model((player, grid.inventoryItemId));
+                                        weapon.plugins.append((item.effectType, item.chance, item.effectStacks));
+                                        world.write_model(@weapon);
+                                    }
+                                    isHandled.insert(grid.inventoryItemId.into(), true);
+                                }
+                            }
+                            // right
+                            if i < GRID_X - 1 && i == xMax {
+                                let grid: BackpackGrids = world.read_model((player, i + 1, j));
+                                if !isHandled.get(grid.inventoryItemId.into()) {
+                                    if isWeapon && grid.isPlugin {
+                                        let plugin: Item = world.read_model(grid.itemId);
+                                        inventoryItem.plugins.append((plugin.effectType, plugin.chance, plugin.effectStacks));
+                                    } else if item.isPlugin && grid.isWeapon {
+                                        let mut weapon: CharacterItemInventory = world.read_model((player, grid.inventoryItemId));
+                                        weapon.plugins.append((item.effectType, item.chance, item.effectStacks));
+                                        world.write_model(@weapon);
+                                    }
+                                    isHandled.insert(grid.inventoryItemId.into(), true);
+                                }
+                            }
+                            // bottom
+                            if j > 0 && j == y {
+                                let grid: BackpackGrids = world.read_model((player, i, j - 1));
+                                if !isHandled.get(grid.inventoryItemId.into()) {
+                                    if isWeapon && grid.isPlugin {
+                                        let plugin: Item = world.read_model(grid.itemId);
+                                        inventoryItem.plugins.append((plugin.effectType, plugin.chance, plugin.effectStacks));
+                                    } else if item.isPlugin && grid.isWeapon {
+                                        let mut weapon: CharacterItemInventory = world.read_model((player, grid.inventoryItemId));
+                                        weapon.plugins.append((item.effectType, item.chance, item.effectStacks));
+                                        world.write_model(@weapon);
+                                    }
+                                    isHandled.insert(grid.inventoryItemId.into(), true);
+                                }   
+                            }
+                        }
+                    }
+
+                    j += 1;
+                };
+                j = y;
+                i += 1;
+            };
+
+            world.write_model(@inventoryItem);
+            world.write_model(@inventoryCounter);
+            
         }
     }
 }

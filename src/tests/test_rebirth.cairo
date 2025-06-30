@@ -113,9 +113,9 @@ mod tests {
         shop_system.buy_item(6);
         shop_system.buy_item(8);
 
-        action_system.place_item(2, 4, 2, 0);
-        action_system.place_item(1, 2, 2, 0);
-        action_system.place_item(3, 5, 2, 0);
+        action_system.move_item_from_storage_to_inventory(2, 4, 2, 0);
+        action_system.move_item_from_storage_to_inventory(1, 2, 2, 0);
+        action_system.move_item_from_storage_to_inventory(3, 5, 2, 0);
 
         set_contract_address(default_address);
         let mut char: Characters = world.read_model(alice);

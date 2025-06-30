@@ -30,7 +30,7 @@ pub mod externals {
 }
 
 pub mod tests {
-    pub mod test_place_item;
+    pub mod test_move_item_from_storage_to_inventory;
     pub mod test_add_item;
     pub mod test_buy_item;
     pub mod test_move_item_from_inventory_to_storage;

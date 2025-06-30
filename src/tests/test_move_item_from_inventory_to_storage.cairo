@@ -90,7 +90,7 @@ mod tests {
 
         shop_system.buy_item(5);
         // place a sword on (4,2)
-        action_system.place_item(2, 4, 2, 0);
+        action_system.move_item_from_storage_to_inventory(2, 4, 2, 0);
 
         action_system.move_item_from_inventory_to_storage(3);
 
@@ -136,7 +136,7 @@ mod tests {
 
         shop_system.buy_item(6);
         // place a shield on (2,2)
-        action_system.place_item(1, 2, 2, 0);
+        action_system.move_item_from_storage_to_inventory(1, 2, 2, 0);
 
         action_system.move_item_from_inventory_to_storage(3);
 
@@ -192,7 +192,7 @@ mod tests {
 
         shop_system.buy_item(8);
         // place a potion on (5,2)
-        action_system.place_item(3, 5, 2, 0);
+        action_system.move_item_from_storage_to_inventory(3, 5, 2, 0);
 
         action_system.move_item_from_inventory_to_storage(3);
 
@@ -223,9 +223,9 @@ mod tests {
         assert(backpack_grid_data.isWeapon == false, 'isWeapon should be false');
         assert(backpack_grid_data.isPlugin == false, 'isPlugin should be false');
 
-        action_system.place_item(2, 4, 2, 0);
-        action_system.place_item(1, 2, 2, 0);
-        action_system.place_item(3, 5, 2, 0);
+        action_system.move_item_from_storage_to_inventory(2, 4, 2, 0);
+        action_system.move_item_from_storage_to_inventory(1, 2, 2, 0);
+        action_system.move_item_from_storage_to_inventory(3, 5, 2, 0);
 
         action_system.move_item_from_inventory_to_storage(4);
 
@@ -319,14 +319,14 @@ mod tests {
         world.write_model(@shop_data);
 
         shop_system.buy_item(13);
-        action_system.place_item(2, 5, 2, 0);
+        action_system.move_item_from_storage_to_inventory(2, 5, 2, 0);
 
         shop_system.buy_item(7);
         // place a sword on (4,2)
-        action_system.place_item(2, 4, 2, 0);
+        action_system.move_item_from_storage_to_inventory(2, 4, 2, 0);
         
         shop_system.buy_item(17);
-        action_system.place_item(2, 2, 2, 0);
+        action_system.move_item_from_storage_to_inventory(2, 2, 2, 0);
 
         action_system.move_item_from_inventory_to_storage(3);
         let storageItemCounter: CharacterItemsStorageCounter = world.read_model(alice);
@@ -365,7 +365,7 @@ mod tests {
         assert(invetoryItem.rotation == 0, 'rotation mismatch');
         assert(invetoryItem.plugins.len() == 0, 'plugins length mismatch');
 
-        action_system.place_item(1, 4, 2, 0);
+        action_system.move_item_from_storage_to_inventory(1, 4, 2, 0);
         let storageItemCounter: CharacterItemsStorageCounter = world.read_model(alice);
         assert(storageItemCounter.count == 2, 'storage item count mismatch');
         let storageItem: CharacterItemStorage = world.read_model((alice, 1));

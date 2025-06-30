@@ -59,7 +59,7 @@ mod tests {
 
     #[test]
     #[available_gas(3000000000000000)]
-    fn test_place_item() {
+    fn test_move_item_from_storage_to_inventory() {
         let ndef = namespace_def();
         let mut world = spawn_test_world([ndef].span());
         world.sync_perms_and_inits(contract_defs());
@@ -97,7 +97,7 @@ mod tests {
 
         shop_system.buy_item(7);
         // place a sword on (4,2)
-        action_system.place_item(2, 4, 2, 0);
+        action_system.move_item_from_storage_to_inventory(2, 4, 2, 0);
         // (4,2) (4,3) (4,4) should be occupied
         let mut backpack_grid_data: BackpackGrids = world.read_model((alice, 4, 2));
         assert(backpack_grid_data.occupied == true, '(4,2) should be occupied');
@@ -138,7 +138,7 @@ mod tests {
 
         shop_system.buy_item(9);
         // place a shield on (2,2)
-        action_system.place_item(2, 2, 2, 0);
+        action_system.move_item_from_storage_to_inventory(2, 2, 2, 0);
         // (2,2) (3,2) (2,3) (3,3) should be occupied
         let mut backpack_grid_data: BackpackGrids = world.read_model((alice, 2, 2));
         assert(backpack_grid_data.occupied == true, '(2,2) should be occupied');
@@ -186,7 +186,7 @@ mod tests {
 
         shop_system.buy_item(8);
         // place a potion on (5,2)
-        action_system.place_item(2, 5, 2, 0);
+        action_system.move_item_from_storage_to_inventory(2, 5, 2, 0);
         // (5,2) should be occupied
         let mut backpack_grid_data: BackpackGrids = world.read_model((alice, 5, 2));
         assert(backpack_grid_data.occupied == true, '(5,2) should be occupied');
@@ -215,7 +215,7 @@ mod tests {
     #[test]
     #[available_gas(3000000000000000)]
     #[should_panic(expected: ('x out of range', 'ENTRYPOINT_FAILED'))]
-    fn test_place_item_revert_x_out_of_range() {
+    fn test_move_item_from_storage_to_inventory_revert_x_out_of_range() {
         let ndef = namespace_def();
         let mut world = spawn_test_world([ndef].span());
         world.sync_perms_and_inits(contract_defs());
@@ -243,13 +243,13 @@ mod tests {
 
         shop_system.buy_item(4);
         // place a sword on (10,0)
-        action_system.place_item(2, 10, 0, 0);
+        action_system.move_item_from_storage_to_inventory(2, 10, 0, 0);
     }
 
     #[test]
     #[available_gas(3000000000000000)]
     #[should_panic(expected: ('y out of range', 'ENTRYPOINT_FAILED'))]
-    fn test_place_item_revert_y_out_of_range() {
+    fn test_move_item_from_storage_to_inventory_revert_y_out_of_range() {
         let ndef = namespace_def();
         let mut world = spawn_test_world([ndef].span());
         world.sync_perms_and_inits(contract_defs());
@@ -277,13 +277,13 @@ mod tests {
 
         shop_system.buy_item(4);
         // place a sword on (0,12)
-        action_system.place_item(2, 0, 12, 0);
+        action_system.move_item_from_storage_to_inventory(2, 0, 12, 0);
     }
 
     #[test]
     #[available_gas(3000000000000000)]
     #[should_panic(expected: ('invalid rotation', 'ENTRYPOINT_FAILED'))]
-    fn test_place_item_revert_invalid_rotation() {
+    fn test_move_item_from_storage_to_inventory_revert_invalid_rotation() {
         let ndef = namespace_def();
         let mut world = spawn_test_world([ndef].span());
         world.sync_perms_and_inits(contract_defs());
@@ -311,13 +311,13 @@ mod tests {
 
         shop_system.buy_item(4);
         // place a sword on (2,2) with rotation 30
-        action_system.place_item(2, 0, 0, 30);
+        action_system.move_item_from_storage_to_inventory(2, 0, 0, 30);
     }
 
     #[test]
     #[available_gas(3000000000000000)]
     #[should_panic(expected: ('item out of bound for x', 'ENTRYPOINT_FAILED'))]
-    fn test_place_item_revert_x_OOB() {
+    fn test_move_item_from_storage_to_inventory_revert_x_OOB() {
         let ndef = namespace_def();
         let mut world = spawn_test_world([ndef].span());
         world.sync_perms_and_inits(contract_defs());
@@ -345,13 +345,13 @@ mod tests {
 
         shop_system.buy_item(6);
         // place a sword on (8,6) with rotation 90
-        action_system.place_item(2, 8, 6, 90);
+        action_system.move_item_from_storage_to_inventory(2, 8, 6, 90);
     }
 
     #[test]
     #[available_gas(3000000000000000)]
     #[should_panic(expected: ('item out of bound for y', 'ENTRYPOINT_FAILED'))]
-    fn test_place_item_revert_y_OOB() {
+    fn test_move_item_from_storage_to_inventory_revert_y_OOB() {
         let ndef = namespace_def();
         let mut world = spawn_test_world([ndef].span());
         world.sync_perms_and_inits(contract_defs());
@@ -379,13 +379,13 @@ mod tests {
 
         shop_system.buy_item(7);
         // place a sword on (0,5)
-        action_system.place_item(2, 0, 5, 0);
+        action_system.move_item_from_storage_to_inventory(2, 0, 5, 0);
     }
 
     #[test]
     #[available_gas(3000000000000000)]
     #[should_panic(expected: ('Already occupied', 'ENTRYPOINT_FAILED'))]
-    fn test_place_item_revert_occupied_grids() {
+    fn test_move_item_from_storage_to_inventory_revert_occupied_grids() {
         let ndef = namespace_def();
         let mut world = spawn_test_world([ndef].span());
         world.sync_perms_and_inits(contract_defs());
@@ -414,18 +414,18 @@ mod tests {
 
         shop_system.buy_item(5);
         // place a sword on (4,2)
-        action_system.place_item(2, 4, 2, 0);
+        action_system.move_item_from_storage_to_inventory(2, 4, 2, 0);
 
         shop_system.buy_item(6);
         // try to place the shield on of the occupied grids
         // this will collide with grid (4,2)
-        action_system.place_item(2, 3, 2, 90);
+        action_system.move_item_from_storage_to_inventory(2, 3, 2, 90);
     }
 
     #[test]
     #[available_gas(3000000000000000)]
-    #[should_panic(expected: ('item not owned', 'ENTRYPOINT_FAILED'))]
-    fn test_place_item_revert_item_not_owned() {
+    #[should_panic(expected: ('item not found', 'ENTRYPOINT_FAILED'))]
+    fn test_move_item_from_storage_to_inventory_revert_item_not_owned() {
         let ndef = namespace_def();
         let mut world = spawn_test_world([ndef].span());
         world.sync_perms_and_inits(contract_defs());
@@ -441,13 +441,13 @@ mod tests {
         action_system.spawn('Alice', WMClass::Warlock);
 
         // place a sword on (2,2)
-        action_system.place_item(2, 2, 2, 0);
+        action_system.move_item_from_storage_to_inventory(2, 2, 2, 0);
     }
 
     #[test]
     #[available_gas(3000000000000000)]
-    #[should_panic(expected: ('item not owned', 'ENTRYPOINT_FAILED'))]
-    fn test_place_item_revert_item_not_already_placed() {
+    #[should_panic(expected: ('item not found', 'ENTRYPOINT_FAILED'))]
+    fn test_move_item_from_storage_to_inventory_revert_item_not_already_placed() {
         let ndef = namespace_def();
         let mut world = spawn_test_world([ndef].span());
         world.sync_perms_and_inits(contract_defs());
@@ -476,14 +476,14 @@ mod tests {
         shop_system.buy_item(5);
 
         // place a sword on (4,2)
-        action_system.place_item(2, 4, 2, 0);
+        action_system.move_item_from_storage_to_inventory(2, 4, 2, 0);
         // try to place the same sword on (5,2)
-        action_system.place_item(2, 5, 2, 0);
+        action_system.move_item_from_storage_to_inventory(2, 5, 2, 0);
     }
 
     #[test]
     #[available_gas(3000000000000000)]
-    fn test_place_item_with_rotation() {
+    fn test_move_item_from_storage_to_inventory_with_rotation() {
         let ndef = namespace_def();
         let mut world = spawn_test_world([ndef].span());
         world.sync_perms_and_inits(contract_defs());
@@ -517,7 +517,7 @@ mod tests {
 
         shop_system.buy_item(6);
         // place a sword on (3,3)
-        action_system.place_item(2, 3, 3, 270);
+        action_system.move_item_from_storage_to_inventory(2, 3, 3, 270);
         // (3,3) (4,3) (5,3) should be occupied
         let mut backpack_grid_data: BackpackGrids = world.read_model((alice, 3, 3));
         assert(backpack_grid_data.occupied == true, '(3,3) should be occupied');
@@ -534,7 +534,7 @@ mod tests {
 
     #[test]
     #[available_gas(3000000000000000)]
-    fn test_place_item_with_plugins_check() {
+    fn test_move_item_from_storage_to_inventory_with_plugins_check() {
         let ndef = namespace_def();
         let mut world = spawn_test_world([ndef].span());
         world.sync_perms_and_inits(contract_defs());
@@ -571,7 +571,7 @@ mod tests {
         world.write_model(@shop_data);
 
         shop_system.buy_item(13);
-        action_system.place_item(2, 5, 2, 0);
+        action_system.move_item_from_storage_to_inventory(2, 5, 2, 0);
         // (5, 2) should be occupied
         let mut backpack_grid_data: BackpackGrids = world.read_model((alice, 5, 2));
         assert(backpack_grid_data.isPlugin, 'isPlugin mismatch');
@@ -580,14 +580,14 @@ mod tests {
 
         shop_system.buy_item(7);
         // place a sword on (4,2)
-        action_system.place_item(2, 4, 2, 0);
+        action_system.move_item_from_storage_to_inventory(2, 4, 2, 0);
         // (4,2) (4,3) (4,4) should be occupied
         let inventoryItem: CharacterItemInventory =  world.read_model((alice, 4));
         assert(inventoryItem.plugins.len() == 1, 'plugin length mismatch');
         assert(*inventoryItem.plugins.at(0) == (6, 100, 2), 'plugin length mismatch');
         
         shop_system.buy_item(17);
-        action_system.place_item(2, 2, 2, 0);
+        action_system.move_item_from_storage_to_inventory(2, 2, 2, 0);
         let inventoryItem: CharacterItemInventory =  world.read_model((alice, 5));
         assert(inventoryItem.plugins.len() == 0, 'plugin length mismatch');
 

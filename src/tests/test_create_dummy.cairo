@@ -182,7 +182,7 @@ mod tests {
             set!(world, (storageItem));
 
             set_contract_address(dummy0);
-            action_system.place_item(3, item.position.x, item.position.y, item.rotation);
+            action_system.move_item_from_storage_to_inventory(3, item.position.x, item.position.y, item.rotation);
             i += 1;
         };
 
