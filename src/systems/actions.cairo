@@ -20,6 +20,7 @@ pub trait IActions<T> {
     fn move_item_from_shop_to_storage(ref self: T, item_id: u32);
     fn move_item_from_storage_to_shop(ref self: T, storage_item_id: u32);
     fn move_item_from_shop_to_inventory(ref self: T, item_id: u32, x: u32, y: u32, rotation: u32);
+    fn move_item_from_inventory_to_shop(ref self: T, inventory_item_id: u32);
 }
 
 // TODO: rename the count filed in counter model
@@ -404,6 +405,13 @@ mod actions {
             self._buy_item(player, item_id);
 
             self._add_item_to_inventory(player, item_id, x, y, rotation);
+        }
+
+        fn move_item_from_inventory_to_shop(ref self: ContractState, inventory_item_id: u32) {
+            let player = get_caller_address();
+
+            let item_id = self._remove_item_from_inventory(player, inventory_item_id);
+            self._sell_item(player, item_id);
         }
     }
 

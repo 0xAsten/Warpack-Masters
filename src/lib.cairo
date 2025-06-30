@@ -45,6 +45,7 @@ pub mod tests {
     pub mod test_storage_bridge;
     pub mod test_move_item_within_inventory;
     pub mod test_move_item_from_shop_to_inventory;
+    pub mod test_move_item_from_inventory_to_shop;
 }
 
 pub mod utils {
