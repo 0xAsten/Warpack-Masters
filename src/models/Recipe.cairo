@@ -13,6 +13,6 @@ pub struct Recipe {
 #[dojo::model]
 pub struct RecipesCounter {
     #[key]
-    pub id: u32,
+    pub id: felt252,
     pub count: u32,
 }
