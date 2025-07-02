@@ -22,6 +22,7 @@ pub struct Item {
     pub cooldown: u8,
     pub energyCost: u8,
     pub isPlugin: bool,
+    pub enabled: bool,
 }
 
 #[derive(Drop, Serde)]

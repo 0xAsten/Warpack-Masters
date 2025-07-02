@@ -6,6 +6,7 @@ pub mod constants {
     pub const INIT_STAMINA: u8 = 100;
 
     pub const ITEMS_COUNTER_ID: felt252 = 'ITEMS_COUNTER_ID';
+    pub const RECIPES_COUNTER_ID: felt252 = 'RECIPES_COUNTER_ID';
     pub const STORAGE_FLAG: u32 = 999;
 
     // const EFFECT_ARMOR: felt252 = 'armor';
