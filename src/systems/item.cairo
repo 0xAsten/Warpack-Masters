@@ -103,6 +103,7 @@ mod item_system {
                 cooldown,
                 energyCost,
                 isPlugin,
+                enabled: true,
             };
 
             world.write_model(@item);

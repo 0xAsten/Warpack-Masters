@@ -22,6 +22,7 @@ pub trait IActions<T> {
     fn move_item_from_storage_to_shop(ref self: T, storage_item_id: u32);
     fn move_item_from_shop_to_inventory(ref self: T, item_id: u32, x: u32, y: u32, rotation: u32);
     fn move_item_from_inventory_to_shop(ref self: T, inventory_item_id: u32);
+    fn craft_item(ref self: T, recipe_id: u32, storage_ids: Array<u32>);
 }
 
 // TODO: rename the count filed in counter model
@@ -31,6 +32,7 @@ mod actions {
     use super::{IActions, WMClass};
     use starknet::ContractAddress;
     use core::dict::Felt252Dict;
+    use core::array::Array;
     use core::bytes_31::bytes31;
 
     use starknet::{get_caller_address, get_block_timestamp};
@@ -44,7 +46,8 @@ mod actions {
         Character::{Characters, NameRecord},
         Shop::Shop,
         Fight::{BattleLog, BattleLogCounter},
-        Game::GameConfig
+        Game::GameConfig,
+        Recipe::Recipe
     };
 
     use warpack_masters::items::{Backpack, Pack};
@@ -309,37 +312,14 @@ mod actions {
         }
 
         fn move_item_from_inventory_to_storage(ref self: ContractState, inventory_item_id: u32) {
-            let mut world = self.world(@"Warpacks");
-
             let player = get_caller_address();
 
             // check if the player has joined the matching battle
             self._check_if_player_has_joined_a_matched_battle(player);
 
-            let itemId = self._remove_item_from_inventory(player, inventory_item_id);
+            let item_id = self._remove_item_from_inventory(player, inventory_item_id);
         
-            let mut storageCounter: CharacterItemsStorageCounter = world.read_model(player);
-            let mut count = storageCounter.count;
-            loop {
-                if count == 0 {
-                    break;
-                }
-
-                let mut storageItem: CharacterItemStorage = world.read_model((player, count));
-                if storageItem.itemId == 0 {
-                    storageItem.itemId = itemId;
-                    world.write_model(@storageItem);
-                    break;
-                }
-
-                count -= 1;
-            };
-
-            if count == 0 {
-                storageCounter.count += 1;
-                world.write_model(@CharacterItemStorage { player, id: storageCounter.count, itemId: itemId, });
-                world.write_model(@CharacterItemsStorageCounter { player, count: storageCounter.count });
-            }
+            self._add_item_to_storage(player, item_id);
         }
 
         fn move_item_within_inventory(ref self: ContractState, inventory_item_id: u32, x: u32, y: u32, rotation: u32) {
@@ -353,36 +333,11 @@ mod actions {
         }
 
         fn move_item_from_shop_to_storage(ref self: ContractState, item_id: u32) {
-            let mut world = self.world(@"Warpacks");
-
             let player = get_caller_address();
 
             self._buy_item(player, item_id);
 
-            let mut storageCounter: CharacterItemsStorageCounter = world.read_model(player);
-            let mut count = storageCounter.count;
-            let mut isUpdated = false;
-            loop {
-                if count == 0 {
-                    break;
-                }
-
-                let mut storageItem: CharacterItemStorage = world.read_model((player, count));
-                if storageItem.itemId == 0 {
-                    storageItem.itemId = item_id;
-                    isUpdated = true;
-                    world.write_model(@storageItem);
-                    break;
-                }
-
-                count -= 1;
-            };
-
-            if isUpdated == false {
-                storageCounter.count += 1;
-                world.write_model(@CharacterItemStorage { player, id: storageCounter.count, itemId: item_id, });
-                world.write_model(@CharacterItemsStorageCounter { player, count: storageCounter.count });
-            }
+            self._add_item_to_storage(player, item_id);
         }
 
         fn move_item_from_storage_to_shop(ref self: ContractState, storage_item_id: u32) {
@@ -413,6 +368,52 @@ mod actions {
 
             let item_id = self._remove_item_from_inventory(player, inventory_item_id);
             self._sell_item(player, item_id);
+        }
+
+        fn craft_item(
+            ref self: ContractState, recipe_id: u32, storage_ids: Array<u32>
+        ) {
+            let mut world = self.world(@"Warpacks");
+
+            let player = get_caller_address();
+
+            let recipe: Recipe = world.read_model(recipe_id);
+            assert(recipe.enabled, 'recipe is not enabled');
+
+            let item_ids_len = recipe.item_ids.len();
+            assert(item_ids_len > 0, 'must have at least one item');
+            assert(item_ids_len == recipe.item_amounts.len(), 'must the same length');
+
+            let mut required_items: Felt252Dict<u32> = Default::default();
+            for i in 0..item_ids_len {
+                let item_id = *recipe.item_ids[i];
+                let item_amount = *recipe.item_amounts[i];
+                required_items.insert(item_id.into(), item_amount);
+            };
+
+            let storage_ids_len = storage_ids.len();
+            assert(storage_ids_len > 0, 'must have at least one item');
+
+            for i in 0..storage_ids_len {
+                let storage_id = *storage_ids[i];
+                let mut storage_item: CharacterItemStorage = world.read_model((player, storage_id));
+                assert(storage_item.itemId != 0, 'item not owned');
+
+                let required_item_amount = required_items.get(storage_item.itemId.into());
+                if (required_item_amount > 0) {
+                    required_items.insert(storage_item.itemId.into(), required_item_amount - 1);
+                    storage_item.itemId = 0;
+                    world.write_model(@storage_item);
+                }
+            };
+
+            for i in 0..item_ids_len {
+                let item_id = *recipe.item_ids[i];
+
+                assert(required_items.get(item_id.into()) == 0, 'item not enough');
+            };
+
+            self._add_item_to_storage(player, recipe.result_item_id);
         }
     }
 
@@ -842,6 +843,33 @@ mod actions {
             });
 
             world.write_model(@playerChar);
+        }
+
+        fn _add_item_to_storage(ref self: ContractState, player: ContractAddress, item_id: u32) {
+            let mut world = self.world(@"Warpacks");
+
+            let mut storageCounter: CharacterItemsStorageCounter = world.read_model(player);
+            let mut count = storageCounter.count;
+            loop {
+                if count == 0 {
+                    break;
+                }
+
+                let mut storageItem: CharacterItemStorage = world.read_model((player, count));
+                if storageItem.itemId == 0 {
+                    storageItem.itemId = item_id;
+                    world.write_model(@storageItem);
+                    break;
+                }
+
+                count -= 1;
+            };
+
+            if count == 0 {
+                storageCounter.count += 1;
+                world.write_model(@CharacterItemStorage { player, id: storageCounter.count, itemId: item_id });
+                world.write_model(@storageCounter);
+            }
         }
     }
 }
