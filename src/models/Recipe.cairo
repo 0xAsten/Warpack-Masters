@@ -1,6 +1,6 @@
 #[derive(Drop, Serde)]
 #[dojo::model]
-pub struct Recipe {
+pub struct RecipeV2 {
     #[key]
     pub id: u32,
     pub item_ids: Array<u32>,

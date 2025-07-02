@@ -12,7 +12,7 @@ mod recipe_system {
     use starknet::{get_caller_address};
     use warpack_masters::models::{
         Item::Item,
-        Recipe::{Recipe, RecipesCounter},
+        Recipe::{RecipeV2, RecipesCounter},
     };
     use warpack_masters::constants::constants::{RECIPES_COUNTER_ID};
 
@@ -49,7 +49,7 @@ mod recipe_system {
             let new_id = recipes_counter.count + 1;
             recipes_counter.count = new_id;
 
-            world.write_model(@Recipe {
+            world.write_model(@RecipeV2 {
                 id: new_id,
                 item_ids,
                 item_amounts,

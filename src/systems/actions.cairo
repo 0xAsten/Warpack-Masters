@@ -47,7 +47,7 @@ mod actions {
         Shop::Shop,
         Fight::{BattleLog, BattleLogCounter},
         Game::GameConfig,
-        Recipe::Recipe
+        Recipe::RecipeV2
     };
 
     use warpack_masters::items::{Backpack, Pack};
@@ -377,7 +377,7 @@ mod actions {
 
             let player = get_caller_address();
 
-            let recipe: Recipe = world.read_model(recipe_id);
+            let recipe: RecipeV2 = world.read_model(recipe_id);
             assert(recipe.enabled, 'recipe is not enabled');
 
             let item_ids_len = recipe.item_ids.len();

@@ -1329,7 +1329,7 @@
   "contracts": [
     {
       "address": "0x5e712fedb602b9a9f7b53cc8e092650b66008152de28a95465364601eb2909e",
-      "class_hash": "0x7cf4e223486131f2a3864c8e368c8108a28bc6275dd73126ba178a2228d6238",
+      "class_hash": "0x275e35fc5f03d1fd4a8dc63157718aa487025105c6ded126fcff8181307ae4f",
       "abi": [
         {
           "type": "impl",
@@ -1591,6 +1591,22 @@
               ],
               "outputs": [],
               "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "craft_item",
+              "inputs": [
+                {
+                  "name": "recipe_id",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "storage_ids",
+                  "type": "core::array::Array::<core::integer::u32>"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
             }
           ]
         },
@@ -1723,6 +1739,7 @@
         "move_item_from_storage_to_shop",
         "move_item_from_shop_to_inventory",
         "move_item_from_inventory_to_shop",
+        "craft_item",
         "upgrade"
       ]
     },
@@ -2217,7 +2234,7 @@
     },
     {
       "address": "0x200b7b82b5abb72e647c53f1068f88d867bd3443566146bc99ce007e02af90f",
-      "class_hash": "0x7644ae1cecb10e84f54cce9b1add14367649d3763a4c552913088ffd5855b53",
+      "class_hash": "0x56d4847e8aaac79ff7666a63f17c563053843380a393416c3b317e665869bc1",
       "abi": [
         {
           "type": "impl",
@@ -2420,7 +2437,7 @@
     },
     {
       "address": "0x3935c2bc4d3077081c110afa233486418a98c11b25cbc4e56d5b6041b5353a",
-      "class_hash": "0xf6f9ea67d872877d27415464e879ee6e5e4139ab3110c4cf0005affde0b484",
+      "class_hash": "0x1d79d2e60ad99439c1b20e0bacefb9fe4aadb2907cfd2cee28daa9d77603f37",
       "abi": [
         {
           "type": "impl",
@@ -2694,7 +2711,7 @@
     },
     {
       "address": "0x48274bb50cb9ad689dcbade79a611a8f66aed72c72ac21077e6ef68438a0da1",
-      "class_hash": "0x36caa9b1b4a171d896146e777849d797415586cd88ec8bb9266ff77fffcd333",
+      "class_hash": "0x18e9d37e0397a2ae215ef1205e79d8c1fe7f9104ecde7c5bbdfeef4604d932e",
       "abi": [
         {
           "type": "impl",
@@ -2760,31 +2777,15 @@
               "name": "add_recipe",
               "inputs": [
                 {
-                  "name": "item1_id",
-                  "type": "core::integer::u32"
+                  "name": "item_ids",
+                  "type": "core::array::Array::<core::integer::u32>"
                 },
                 {
-                  "name": "item2_id",
-                  "type": "core::integer::u32"
+                  "name": "item_amounts",
+                  "type": "core::array::Array::<core::integer::u32>"
                 },
                 {
                   "name": "result_item_id",
-                  "type": "core::integer::u32"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "craft_item",
-              "inputs": [
-                {
-                  "name": "storage_item_id1",
-                  "type": "core::integer::u32"
-                },
-                {
-                  "name": "storage_item_id2",
                   "type": "core::integer::u32"
                 }
               ],
@@ -2913,13 +2914,12 @@
       "selector": "0x50e7fbb7b06f98479b3360e5e61dbc63d249552de73a8b797e3ebafccc5730d",
       "systems": [
         "add_recipe",
-        "craft_item",
         "upgrade"
       ]
     },
     {
       "address": "0x409b582347e5815238e462a27902a4aac2c9a52315355a451ee7f9495b1c8d5",
-      "class_hash": "0x14d31926c4090ae98fe9520e471ed12b657c95dc211c77d1746bcf5b2be0302",
+      "class_hash": "0x2a6b1c700a5b46a7864c57589f30478da90b819a463edfb3ef6cc1110dc905b",
       "abi": [
         {
           "type": "impl",
@@ -3114,7 +3114,7 @@
     },
     {
       "address": "0x7da0464cd242ca1e8a83765da4645ff02dd3a0b8f807d70edb1c92a82314489",
-      "class_hash": "0x3de1b56ba1b03ec657451d2ac7e7ed099f4bb22cec6c94e826b3260f2e8d638",
+      "class_hash": "0x14f96181f71514815d1fee2bebb1af9f7040b613b6745c287d3b2a80c4cd76c",
       "abi": [
         {
           "type": "impl",
@@ -3327,7 +3327,7 @@
     },
     {
       "address": "0x36640a4f145e10eda77f8a1c17030c1649a71fba5462dd9b66e4d09781f2f41",
-      "class_hash": "0x24bb27185a5a0c3a206522a2a1e1d224ffaec88c772c6322eb8e5f16e70c075",
+      "class_hash": "0x3fa830123da0ba196f2c248aa5400837973f482de202fdc647ddc3334abfc5f",
       "abi": [
         {
           "type": "impl",
@@ -3661,7 +3661,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x6e930ea5e165d900ec8b04f02557f85b987962f06bfd0bd189840fe44a7b658",
+      "class_hash": "0x290a5df5fd864ae6057e3b726aa0f0f26f9894acbef7663f88d0f7b671338a2",
       "tag": "Warpacks-Item",
       "selector": "0x7de0a1a6e53c8570967a20ee3f8af0c328eec4f3203d197b95d163e363862d6"
     },
@@ -3679,9 +3679,15 @@
     },
     {
       "members": [],
-      "class_hash": "0x4c9af604445d256134c2878f9f8e3ef12089701a7c1e481fb173af41489d985",
-      "tag": "Warpacks-Recipe",
-      "selector": "0x708e34d0df14f6ad4ab428ed5e5b8dec9c32f88d71cebd7c1ed9063a0771dcb"
+      "class_hash": "0x479a50e743bef6dc2780e226354ea81843433b8a74cb3d788a82478b8167538",
+      "tag": "Warpacks-RecipeV2",
+      "selector": "0x35ff569d8f257d8fc47ad932dd67d1005fbfb8974a4cd0a67bd3a356ace65ec"
+    },
+    {
+      "members": [],
+      "class_hash": "0x48c9e9d9d3ba1b2a488f017e65eea80d1bc35f188bfa332b9df090909a3fd3e",
+      "tag": "Warpacks-RecipesCounter",
+      "selector": "0x45fef67c13a5377473295dcfb02c0afb61dabc8e1d71111acb4f459255ba4c"
     },
     {
       "members": [],

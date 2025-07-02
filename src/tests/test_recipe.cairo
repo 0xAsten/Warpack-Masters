@@ -14,7 +14,7 @@ mod tests {
         models::CharacterItem::{
             CharacterItemStorage, m_CharacterItemStorage, CharacterItemsStorageCounter, m_CharacterItemsStorageCounter
         },
-        models::Recipe::{Recipe, m_Recipe, m_RecipesCounter},
+        models::Recipe::{RecipeV2, m_Recipe, m_RecipesCounter},
         utils::test_utils::add_items
     };
 
@@ -64,7 +64,7 @@ mod tests {
 
         recipe_system.add_recipe(array![1, 2], array![1, 1], 3);
 
-        let recipe: Recipe = world.read_model(1);
+        let recipe: RecipeV2 = world.read_model(1);
         assert(recipe.id == 1, 'wrong recipe id');
         assert(*recipe.item_ids[0] == 1, 'wrong item_id at index 0');
         assert(*recipe.item_ids[1] == 2, 'wrong item_id at index 1');
@@ -91,7 +91,7 @@ mod tests {
 
         recipe_system.add_recipe(array![1], array![2], 2);
 
-        let recipe: Recipe = world.read_model(1);
+        let recipe: RecipeV2 = world.read_model(1);
         assert(recipe.id == 1, 'wrong recipe id');
         assert(*recipe.item_ids[0] == 1, 'wrong item_id at index 0');
         assert(*recipe.item_amounts[0] == 2, 'wrong item_amount at index 0');
