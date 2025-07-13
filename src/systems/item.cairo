@@ -21,6 +21,12 @@ pub trait IItem<T> {
     fn batch_add_items(
         ref self: T,
     );
+
+    fn update_item_enabled(
+        ref self: T,
+        id: u32,
+        enabled: bool,
+    );
 }
 
 #[dojo::contract]
@@ -693,6 +699,21 @@ mod item_system {
                 items::Longbow::energyCost,
                 items::Longbow::isPlugin,
             );
+        }
+
+        fn update_item_enabled(
+            ref self: ContractState,
+            id: u32,
+            enabled: bool,
+        ) {
+            let mut world = self.world(@"Warpacks");
+            let player = get_caller_address();
+            
+            assert(world.dispatcher.is_owner(0, player), 'player not world owner');
+            
+            let mut item: Item = world.read_model(id);
+            item.enabled = enabled;
+            world.write_model(@item);
         }
     }
 }
