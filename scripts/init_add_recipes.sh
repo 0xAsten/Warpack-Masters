@@ -26,4 +26,4 @@ echo "--------------------------------------------------------------------------
 
 # Generated add recipes commands
 # 2*Dagger + 1*Herb = Augument Dageer
-sozo execute -P ${ENV} Warpacks-recipe_system add_recipe 2 6 5 2 2 1 15 --wait --rpc-url $STARKNET_RPC_URL --fee ETH
+sozo execute -P ${ENV} Warpacks-recipe_system add_recipe 2 6 5 2 2 1 15 --wait --rpc-url $STARKNET_RPC_URL
