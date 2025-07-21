@@ -7,7 +7,14 @@ pub trait IERC20<TState> {
     fn allowance(self: @TState, owner: ContractAddress, spender: ContractAddress) -> u256;
     fn transfer(ref self: TState, recipient: ContractAddress, amount: u256) -> bool;
     fn transfer_from(
-        ref self: TState, sender: ContractAddress, recipient: ContractAddress, amount: u256,
+        ref self: TState, sender: ContractAddress, recipient: ContractAddress, amount: u256
     ) -> bool;
     fn approve(ref self: TState, spender: ContractAddress, amount: u256) -> bool;
 }
+
+#[starknet::interface]
+pub trait IERC20MINTABLE<TState> {
+    fn burn(ref self: TState, value: u256) -> u256;
+    fn mint(ref self: TState, recipient: ContractAddress, amount: u256) -> u256;
+}
+

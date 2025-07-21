@@ -47,15 +47,17 @@ mod actions {
         Shop::Shop,
         Fight::{BattleLog, BattleLogCounter},
         Game::GameConfig,
-        Recipe::RecipeV2
+        Recipe::RecipeV2,
+        TokenRegistry::{TokenRegistry},
     };
 
     use warpack_masters::items::{Backpack, Pack};
-    use warpack_masters::constants::constants::{GRID_X, GRID_Y, INIT_GOLD, INIT_HEALTH, INIT_STAMINA, REBIRTH_FEE, GAME_CONFIG_ID};
+    use warpack_masters::constants::constants::{GRID_X, GRID_Y, INIT_GOLD, INIT_HEALTH, INIT_STAMINA, REBIRTH_FEE, GAME_CONFIG_ID, GOLD_ITEM_ID};
 
     use dojo::model::{ModelStorage};
 
     use openzeppelin_token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
+    use warpack_masters::externals::interface::{IERC20MINTABLEDispatcher, IERC20MINTABLEDispatcherTrait};
 
     use dojo::world::{IWorldDispatcherTrait};
 
@@ -138,12 +140,15 @@ mod actions {
             let prev_birth_count = player_exists.birthCount;
             let updatedAt = get_block_timestamp();
 
+            self._mint_gold(player, INIT_GOLD + 1)
+
             // add one gold for reroll shop
             world.write_model(@Characters { 
                 player,
                 name,
                 wmClass,
-                gold: INIT_GOLD + 1,
+                // gold: INIT_GOLD + 1,
+                gold: 0,
                 health: INIT_HEALTH,
                 wins: 0,
                 loss: 0,
@@ -795,10 +800,13 @@ mod actions {
             );
 
             let item: Item = world.read_model(item_id);
-            let mut player_char: Characters = world.read_model(player);
+            let player_char: Characters = world.read_model(player);
 
-            assert(player_char.gold >= item.price, 'Not enough gold');
-            player_char.gold -= item.price;
+            // assert(player_char.gold >= item.price, 'Not enough gold');
+            // player_char.gold -= item.price;
+
+            self._tansfer_in_gold(item.price)
+            self._burn_gold(item.price);
 
             //delete respective item bought from the shop
             if (shop_data.item1 == item_id) {
@@ -819,7 +827,7 @@ mod actions {
                 birthCount: player_char.birthCount
             });
 
-            world.write_model(@player_char);
+            // world.write_model(@player_char);
             world.write_model(@shop_data);
         }
 
@@ -827,12 +835,13 @@ mod actions {
             let mut world = self.world(@"Warpacks");
 
             let item: Item = world.read_model(item_id);
-            let mut playerChar: Characters = world.read_model(player);
+            // let mut playerChar: Characters = world.read_model(player);
 
             let item_price = item.price;
             let sell_price = item_price / 2;
 
-            playerChar.gold += sell_price;
+            // playerChar.gold += sell_price;
+            self._mint_gold(player,  sell_price)
 
             world.emit_event(@SellItem {
                 player,
@@ -842,7 +851,7 @@ mod actions {
                 birthCount: playerChar.birthCount
             });
 
-            world.write_model(@playerChar);
+            // world.write_model(@playerChar);
         }
 
         fn _add_item_to_storage(ref self: ContractState, player: ContractAddress, item_id: u32) {
@@ -870,6 +879,46 @@ mod actions {
                 world.write_model(@CharacterItemStorage { player, id: storageCounter.count, itemId: item_id });
                 world.write_model(@storageCounter);
             }
+        }
+
+        fn _mint_gold(ref self: ContractState, recipient: ContractAddress, amount: u256){
+            let mut world = self.world(@"Warpacks");
+
+            let registry: TokenRegistry = world.read_model(GOLD_ITEM_ID);
+            assert(registry.token_address != starknet::contract_address_const::<0>(), 'Token not registered');
+            assert(registry.is_active, 'Token not active');
+            
+            // Mint tokens to the player
+            let token_amount = amount * 1_000_000_000_000_000_000;
+            let token_contract = IERC20MINTABLEDispatcher { contract_address: registry.token_address };
+            token_contract.mint(recipient, token_amount);
+        }
+        
+        fn _burn_gold(ref self: ContractState, value: u256){
+            let mut world = self.world(@"Warpacks");
+
+            let registry: TokenRegistry = world.read_model(GOLD_ITEM_ID);
+            assert(registry.token_address != starknet::contract_address_const::<0>(), 'Token not registered');
+            assert(registry.is_active, 'Token not active');
+            
+            // Mint tokens to the player
+            let token_amount = value * 1_000_000_000_000_000_000;
+            let token_contract = IERC20MINTABLEDispatcher { contract_address: registry.token_address };
+            token_contract.burn(token_amount);
+        }
+
+        fn _tansfer_in_gold(ref self: ContractState, value: u256){
+            let mut world = self.world(@"Warpacks");
+            let player = get_caller_address();
+
+            let registry: TokenRegistry = world.read_model(GOLD_ITEM_ID);
+            assert(registry.token_address != starknet::contract_address_const::<0>(), 'Token not registered');
+            assert(registry.is_active, 'Token not active');
+
+            let token_amount = value * 1_000_000_000_000_000_000;
+
+            IERC20Dispatcher { contract_address: registry.token_address }
+                .transfer_from(player, starknet::get_contract_address(), token_amount);
         }
     }
 }

@@ -18,6 +18,9 @@ mod shop_system {
 
     use dojo::model::{ModelStorage};
 
+    use openzeppelin_token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
+    use warpack_masters::externals::interface::{IERC20MINTABLEDispatcher, IERC20MINTABLEDispatcherTrait};
+
     #[abi(embed_v0)]
     impl ShopImpl of IShop<ContractState> {
         fn reroll_shop(ref self: ContractState) {
@@ -25,8 +28,8 @@ mod shop_system {
 
             let player = get_caller_address();
 
-            let mut char: Characters = world.read_model(player);
-            assert(char.gold >= 1, 'Not enough gold');
+            let char: Characters = world.read_model(player);
+            // assert(char.gold >= 1, 'Not enough gold');
 
             // TODO: Will move these arrays after Dojo supports storing array
             let mut common: Array<u32> = ArrayTrait::new();
@@ -105,10 +108,42 @@ mod shop_system {
                 i += 1;
             };
 
-            char.gold -= 1;
+            let reroll_cost: u256 = 1;
+            self._tansfer_in_gold(reroll_cost)
+            self._burn_gold(reroll_cost)
 
             world.write_model(@shop);
-            world.write_model(@char);
+            // world.write_model(@char);
+        }
+    }
+
+    #[generate_trait]
+    impl InternalImpl of InternalTrait {
+        fn _burn_gold(ref self: ContractState, value: u256){
+            let mut world = self.world(@"Warpacks");
+
+            let registry: TokenRegistry = world.read_model(GOLD_ITEM_ID);
+            assert(registry.token_address != starknet::contract_address_const::<0>(), 'Token not registered');
+            assert(registry.is_active, 'Token not active');
+            
+            // Mint tokens to the player
+            let token_amount = value * 1_000_000_000_000_000_000;
+            let token_contract = IERC20MINTABLEDispatcher { contract_address: registry.token_address };
+            token_contract.burn(token_amount);
+        }
+
+        fn _tansfer_in_gold(ref self: ContractState, value: u256){
+            let mut world = self.world(@"Warpacks");
+            let player = get_caller_address();
+
+            let registry: TokenRegistry = world.read_model(GOLD_ITEM_ID);
+            assert(registry.token_address != starknet::contract_address_const::<0>(), 'Token not registered');
+            assert(registry.is_active, 'Token not active');
+
+            let token_amount = value * 1_000_000_000_000_000_000;
+
+            IERC20Dispatcher { contract_address: registry.token_address }
+                .transfer_from(player, starknet::get_contract_address(), token_amount);
         }
     }
 }

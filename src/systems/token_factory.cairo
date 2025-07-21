@@ -5,7 +5,7 @@ pub trait ITokenFactory<TContractState> {
     fn create_token_for_item(ref self: TContractState, item_id: u32, name: ByteArray, symbol: ByteArray, owner: ContractAddress, erc20_class_hash: ClassHash) -> ContractAddress;
     fn get_token_address(self: @TContractState, item_id: u32) -> ContractAddress;
     fn batch_create_tokens_for_items(ref self: TContractState, owner: ContractAddress, erc20_class_hash: ClassHash);
-    fn reigster_gold(ref self: TContractState, gold_address: ContractAddress)
+    fn reigster_gold(ref self: TContractState, gold_address: ContractAddress);
 }
 
 #[dojo::contract]
@@ -189,11 +189,12 @@ pub mod token_factory {
         }
 
         fn reigster_gold(ref self: ContractState, gold_address: ContractAddress) {
+            let mut world = self.world(@"Warpacks");
             let token_registry = TokenRegistry {
-                GOLD_ITEM_ID,
-                "Gold",
-                "gold",
-                token_address,
+                item_id: GOLD_ITEM_ID,
+                name: "Gold",
+                symbol: "gold",
+                token_address: gold_address,
                 is_active: true,
             };
             
