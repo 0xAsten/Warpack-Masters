@@ -5,6 +5,7 @@ pub trait ITokenFactory<TContractState> {
     fn create_token_for_item(ref self: TContractState, item_id: u32, name: ByteArray, symbol: ByteArray, owner: ContractAddress, erc20_class_hash: ClassHash) -> ContractAddress;
     fn get_token_address(self: @TContractState, item_id: u32) -> ContractAddress;
     fn batch_create_tokens_for_items(ref self: TContractState, owner: ContractAddress, erc20_class_hash: ClassHash);
+    fn reigster_gold(ref self: TContractState, gold_address: ContractAddress)
 }
 
 #[dojo::contract]
@@ -22,7 +23,7 @@ pub mod token_factory {
     };
     use warpack_masters::items;
 
-    use warpack_masters::constants::constants::{TOKEN_SUPPLY_BASE};
+    use warpack_masters::constants::constants::{TOKEN_SUPPLY_BASE, GOLD_ITEM_ID};
 
     use dojo::world::{IWorldDispatcherTrait};
 
@@ -185,6 +186,18 @@ pub mod token_factory {
             
             // Item 34: Longbow
             self.create_token_for_item(items::Longbow::id, items::Longbow::name(), "LONGBOW", owner, erc20_class_hash);
+        }
+
+        fn reigster_gold(ref self: ContractState, gold_address: ContractAddress) {
+            let token_registry = TokenRegistry {
+                GOLD_ITEM_ID,
+                "Gold",
+                "gold",
+                token_address,
+                is_active: true,
+            };
+            
+            world.write_model(@token_registry);
         }
     }
 } 

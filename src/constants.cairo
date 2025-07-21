@@ -33,4 +33,6 @@ pub mod constants {
     
     // Token supply: 10 million tokens with 18 decimals
     pub const TOKEN_SUPPLY_BASE: u256 = 10_000_000 * 1_000_000_000_000_000_000; // 10 million
+
+    pub const GOLD_ITEM_ID: u32 = 9999;
 }
