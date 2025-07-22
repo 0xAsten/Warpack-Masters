@@ -140,7 +140,7 @@ mod actions {
             let prev_birth_count = player_exists.birthCount;
             let updatedAt = get_block_timestamp();
 
-            self._mint_gold(player, INIT_GOLD + 1)
+            self._mint_gold(player, INIT_GOLD.into() + 1);
 
             // add one gold for reroll shop
             world.write_model(@Characters { 
@@ -805,8 +805,8 @@ mod actions {
             // assert(player_char.gold >= item.price, 'Not enough gold');
             // player_char.gold -= item.price;
 
-            self._tansfer_in_gold(item.price)
-            self._burn_gold(item.price);
+            self._tansfer_in_gold(item.price.into());
+            self._burn_gold(item.price.into());
 
             //delete respective item bought from the shop
             if (shop_data.item1 == item_id) {
@@ -835,13 +835,13 @@ mod actions {
             let mut world = self.world(@"Warpacks");
 
             let item: Item = world.read_model(item_id);
-            // let mut playerChar: Characters = world.read_model(player);
+            let playerChar: Characters = world.read_model(player);
 
             let item_price = item.price;
             let sell_price = item_price / 2;
 
             // playerChar.gold += sell_price;
-            self._mint_gold(player,  sell_price)
+            self._mint_gold(player,  sell_price.into());
 
             world.emit_event(@SellItem {
                 player,

@@ -11,10 +11,13 @@ mod shop_system {
     use warpack_masters::models::{
         Item::{Item, ItemsCounter}
     };
-    use warpack_masters::models::Character::{Characters};
+    use warpack_masters::models::{
+        Character::{Characters}, 
+        TokenRegistry::{TokenRegistry},
+    };
     use warpack_masters::models::Shop::Shop;
     use warpack_masters::utils::random::{pseudo_seed, random};
-    use warpack_masters::constants::constants::{ITEMS_COUNTER_ID};
+    use warpack_masters::constants::constants::{ITEMS_COUNTER_ID, GOLD_ITEM_ID};
 
     use dojo::model::{ModelStorage};
 
@@ -109,8 +112,8 @@ mod shop_system {
             };
 
             let reroll_cost: u256 = 1;
-            self._tansfer_in_gold(reroll_cost)
-            self._burn_gold(reroll_cost)
+            self._tansfer_in_gold(reroll_cost.into());
+            self._burn_gold(reroll_cost.into());
 
             world.write_model(@shop);
             // world.write_model(@char);

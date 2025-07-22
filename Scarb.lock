@@ -137,6 +137,7 @@ dependencies = [
  "dojo_cairo_test",
  "openzeppelin",
  "openzeppelin_access",
+ "openzeppelin_introspection",
  "openzeppelin_token",
  "openzeppelin_upgrades",
 ]

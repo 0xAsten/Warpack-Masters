@@ -27,6 +27,7 @@ pub mod models {
 pub mod externals {
         pub mod interface;
         pub mod erc20;
+        pub mod erc20_mintable;
 }
 
 pub mod tests {
