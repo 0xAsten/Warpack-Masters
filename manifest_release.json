@@ -1329,7 +1329,7 @@
   "contracts": [
     {
       "address": "0x76347fb4152f015783c49f513ec5127c35833f3a699b496e3b02b31f9489704",
-      "class_hash": "0x275e35fc5f03d1fd4a8dc63157718aa487025105c6ded126fcff8181307ae4f",
+      "class_hash": "0x4d8f336b9afbbe27e11d212d0526d158bf2a3d67d011d7c51af22bc497cb77e",
       "abi": [
         {
           "type": "impl",
@@ -2936,7 +2936,7 @@
     },
     {
       "address": "0x325d018759b9341b195ea0c2bc00be32cecec8b1ef86b33c38ac27e76bf4073",
-      "class_hash": "0x2a6b1c700a5b46a7864c57589f30478da90b819a463edfb3ef6cc1110dc905b",
+      "class_hash": "0x555ecba1c9c04b3aa2ab252119d9a257853a1172fdaca38f91eab1323b020e7",
       "abi": [
         {
           "type": "impl",
@@ -3344,7 +3344,7 @@
     },
     {
       "address": "0x522c4e97c6d7e41d22a8bc049117eb571a2f65f89500e192a23be308756b21",
-      "class_hash": "0x3fa830123da0ba196f2c248aa5400837973f482de202fdc647ddc3334abfc5f",
+      "class_hash": "0x193cf957b03c0c772d90fb74cd01fc68418fcb7573c77cb3a8bc7c68bc12386",
       "abi": [
         {
           "type": "impl",
@@ -3464,6 +3464,18 @@
                 {
                   "name": "erc20_class_hash",
                   "type": "core::starknet::class_hash::ClassHash"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "reigster_gold",
+              "inputs": [
+                {
+                  "name": "gold_address",
+                  "type": "core::starknet::contract_address::ContractAddress"
                 }
               ],
               "outputs": [],
@@ -3592,6 +3604,7 @@
       "systems": [
         "create_token_for_item",
         "batch_create_tokens_for_items",
+        "reigster_gold",
         "upgrade"
       ]
     }
