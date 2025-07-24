@@ -23,3 +23,9 @@ Contract deployment transaction: 0x02e45f253ca0485f1e798dc678db9f24a328d8c97cc18
 Contract deployed:
 0x034dc20ea98d615518c783f498869d08d260dffec86fdef9448bd04ff8482001
 ```
+
+## Grant mint permisson to the Action System
+
+https://sepolia.voyager.online/contract/0x034dc20ea98d615518c783f498869d08d260dffec86fdef9448bd04ff8482001#writeContract
+
+Minter Role: 0x032df0fed2c77648de5860a4cc508cd0818c85b8b8a1ab4ceeef8d981c8956a6

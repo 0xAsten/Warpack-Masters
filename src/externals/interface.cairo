@@ -14,7 +14,6 @@ pub trait IERC20<TState> {
 
 #[starknet::interface]
 pub trait IERC20MINTABLE<TState> {
-    fn burn(ref self: TState, value: u256) -> u256;
-    fn mint(ref self: TState, recipient: ContractAddress, amount: u256) -> u256;
+    fn burn(ref self: TState, value: u256);
+    fn mint(ref self: TState, recipient: ContractAddress, amount: u256);
 }
-
