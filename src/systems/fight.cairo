@@ -8,10 +8,11 @@ pub trait IFight<T> {
 mod fight_system {
     use super::IFight;
 
-    use starknet::{get_caller_address, get_block_timestamp};
+    use starknet::{get_caller_address, get_block_timestamp, ContractAddress};
     use warpack_masters::models::{
         CharacterItem::{CharacterItemInventory, CharacterItemsInventoryCounter},
-        Item::Item
+        Item::Item,
+        TokenRegistry::TokenRegistry,
     };
     use warpack_masters::models::Character::{Characters, PLAYER, DUMMY};
 
@@ -22,7 +23,8 @@ mod fight_system {
         DummyCharacterItem, DummyCharacterItemsCounter
     };
     use warpack_masters::models::Fight::{BattleLog, BattleLogCounter, CharStatus, AttackStatus, BattleLogDetail};
-    use warpack_masters::constants::constants::{EFFECT_REGEN, EFFECT_REFLECT, EFFECT_POISON, EFFECT_VAMPIRISM, INIT_STAMINA};
+    use warpack_masters::constants::constants::{EFFECT_REGEN, EFFECT_REFLECT, EFFECT_POISON, EFFECT_VAMPIRISM, INIT_STAMINA, GOLD_ITEM_ID};
+    use warpack_masters::externals::interface::{IERC20MINTABLEDispatcher, IERC20MINTABLEDispatcherTrait};
 
     use dojo::model::{ModelStorage};
     use dojo::event::EventStorage;
@@ -593,7 +595,7 @@ mod fight_system {
                 char.wins += 1;
                 char.totalWins += 1;
                 char.winStreak += 1;
-                char.gold += 5;
+                // char.gold += 5;
                 if char.wins < 5 {
                     char.health += 10;
                 } else if char.wins == 5 {
@@ -620,11 +622,13 @@ mod fight_system {
                 } else {
                     dummyChar.rating -= 10;
                 }
+
+                self._mint_gold(player, 5)
             } else {
                 char.loss += 1;
                 char.totalLoss += 1;
                 char.winStreak = 0;
-                char.gold += 2;
+                // char.gold += 2;
 
                 dummyChar.rating += 25;
 
@@ -633,6 +637,8 @@ mod fight_system {
                 } else {
                     char.rating -= 10;
                 }
+
+                self._mint_gold(player, 2)
             }
             char.updatedAt = get_block_timestamp();
             world.write_model(@char);
@@ -1110,5 +1116,21 @@ mod fight_system {
         }
 
         ''
+    }
+
+    #[generate_trait]
+    impl InternalImpl of InternalTrait {
+        fn _mint_gold(ref self: ContractState, recipient: ContractAddress, amount: u256){
+            let mut world = self.world(@"Warpacks");
+
+            let registry: TokenRegistry = world.read_model(GOLD_ITEM_ID);
+            assert(registry.token_address != starknet::contract_address_const::<0>(), 'Token not registered');
+            assert(registry.is_active, 'Token not active');
+            
+            // Mint tokens to the player
+            let token_amount = amount * 1_000_000_000_000_000_000;
+            let token_contract = IERC20MINTABLEDispatcher { contract_address: registry.token_address };
+            token_contract.mint(recipient, token_amount);
+        }
     }
 }
