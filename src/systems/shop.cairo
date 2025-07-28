@@ -83,7 +83,7 @@ mod shop_system {
             for seed in array![seed1, seed2, seed3, seed4] {
                 let mut random_index = 0;
 
-                if char.wins < 3 {
+                if char.wins < 21 {
                     random_index = random(seed, 90);
                 } else {
                     random_index = random(seed, 100);
