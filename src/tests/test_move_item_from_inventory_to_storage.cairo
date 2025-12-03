@@ -1,5 +1,6 @@
 #[cfg(test)]
 mod tests {
+    use core::array::{ArrayTrait, SpanTrait};
     use dojo::model::ModelStorage;
     use dojo::world::WorldStorageTrait;
     use dojo_cairo_test::{
@@ -11,13 +12,14 @@ mod tests {
         InventoryCounter, InventoryItem, StorageCounter, StorageItem, m_InventoryCounter,
         m_InventoryItem, m_StorageCounter, m_StorageItem,
     };
+    use warpack_masters::models::Game::m_GameConfig;
     use warpack_masters::models::Item::{m_Item, m_ItemsCounter};
     use warpack_masters::models::Shop::{Shop, m_Shop};
     use warpack_masters::models::backpack::{BackpackGrids, m_BackpackGrids};
     use warpack_masters::systems::actions::{IActionsDispatcher, IActionsDispatcherTrait, actions};
     use warpack_masters::systems::item::{IItemDispatcher, item_system};
     use warpack_masters::systems::shop::{IShopDispatcher, IShopDispatcherTrait, shop_system};
-    use warpack_masters::utils::test_utils::add_items;
+    use warpack_masters::utils::test_utils::{add_items, setup_rebirth_fee_context};
 
     fn namespace_def() -> NamespaceDef {
         let ndef = NamespaceDef {
@@ -33,6 +35,7 @@ mod tests {
                 TestResource::Model(m_Character::TEST_CLASS_HASH.try_into().unwrap()),
                 TestResource::Model(m_CharacterName::TEST_CLASS_HASH.try_into().unwrap()),
                 TestResource::Model(m_Shop::TEST_CLASS_HASH.try_into().unwrap()),
+                TestResource::Model(m_GameConfig::TEST_CLASS_HASH.try_into().unwrap()),
                 TestResource::Contract(actions::TEST_CLASS_HASH),
                 TestResource::Contract(item_system::TEST_CLASS_HASH),
                 TestResource::Contract(shop_system::TEST_CLASS_HASH),
@@ -73,6 +76,8 @@ mod tests {
         let alice = warpack_masters::utils::address::zero_address();
 
         add_items(ref item_system);
+        let players = array![alice];
+        setup_rebirth_fee_context(world, action_system.contract_address, players.span());
 
         action_system.spawn('Alice', WMClass::Warlock);
 
@@ -393,4 +398,3 @@ mod tests {
         assert(invetoryItem.plugins.len() == 0, 'plugins length mismatch');
     }
 }
-

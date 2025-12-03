@@ -7,7 +7,9 @@ mod tests {
         spawn_test_world,
     };
     use starknet::testing::set_contract_address;
-    use warpack_masters::constants::constants::{INIT_GOLD, INIT_HEALTH};
+    use warpack_masters::constants::constants::{
+        INIT_GOLD, INIT_HEALTH, MAX_LOSSES_BEFORE_REBIRTH,
+    };
     use warpack_masters::models::Character::{
         Character, CharacterName, PLAYER, WMClass, m_Character, m_CharacterName,
     };
@@ -22,6 +24,7 @@ mod tests {
     use warpack_masters::models::Fight::{
         BattleLog, e_BattleLogDetail, m_BattleLog, m_BattleLogCounter,
     };
+    use warpack_masters::models::Game::m_GameConfig;
     use warpack_masters::models::Item::{m_Item, m_ItemsCounter};
     use warpack_masters::models::backpack::m_BackpackGrids;
     use warpack_masters::systems::actions::{IActionsDispatcher, IActionsDispatcherTrait, actions};
@@ -51,6 +54,7 @@ mod tests {
                 TestResource::Model(m_InventoryCounter::TEST_CLASS_HASH.try_into().unwrap()),
                 TestResource::Model(m_StorageItem::TEST_CLASS_HASH.try_into().unwrap()),
                 TestResource::Model(m_StorageCounter::TEST_CLASS_HASH.try_into().unwrap()),
+                TestResource::Model(m_GameConfig::TEST_CLASS_HASH.try_into().unwrap()),
                 TestResource::Event(e_BattleLogDetail::TEST_CLASS_HASH),
                 TestResource::Contract(actions::TEST_CLASS_HASH),
                 TestResource::Contract(item_system::TEST_CLASS_HASH),
@@ -191,7 +195,7 @@ mod tests {
 
         // Update character loss count
         let mut char: Character = world.read_model(alice);
-        char.loss = 5;
+        char.loss = MAX_LOSSES_BEFORE_REBIRTH.into();
         world.write_model(@char);
 
         fight_system.match_dummy();
@@ -377,4 +381,3 @@ mod tests {
         }
     }
 }
-

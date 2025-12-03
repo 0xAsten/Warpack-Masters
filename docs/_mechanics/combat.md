@@ -111,4 +111,4 @@ Damage is calculated in this order:
 - Loss counter increases
 - Win streak resets to 0
 
-After 5 losses, a character must use the rebirth system to continue.
+After 3 losses, a character must use the rebirth system to continue.

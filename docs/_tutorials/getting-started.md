@@ -65,8 +65,8 @@ The battle will play out automatically based on the items you've placed and thei
 Now that you understand the basics, it's time to learn about the [combat system]({{ site.baseurl }}/tutorials/combat-basics) and how different items interact during battle.
 
 Remember:
-- You can only fight if you have fewer than 5 losses
-- After 5 losses, you'll need to use the rebirth system
+- You can only fight if you have fewer than 3 losses
+- After 3 losses, you'll need to use the rebirth system
 - Each victory grants gold and increases your rating
 
 Good luck, and may your strategies lead you to victory!

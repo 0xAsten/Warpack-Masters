@@ -6,11 +6,11 @@ related_mechanics: [combat, items]
 
 # Rebirth System
 
-The rebirth system in Warpack Masters is a core progression mechanic that allows players to reset and start fresh after accumulating 5 losses, while maintaining certain progress aspects.
+The rebirth system in Warpack Masters is a core progression mechanic that allows players to reset and start fresh after accumulating 3 losses, while maintaining certain progress aspects.
 
 ## When to Rebirth
 
-Rebirth becomes mandatory when you reach 5 losses. At this point, you cannot participate in further battles until you go through the rebirth process.
+Rebirth becomes mandatory when you reach 3 losses. At this point, you cannot participate in further battles until you go through the rebirth process.
 
 ## Rebirth Cost
 
@@ -18,6 +18,8 @@ Rebirth has an associated cost in STRK tokens (the game's currency):
 
 - The cost is defined as `REBIRTH_FEE` in the game constants
 - You must have enough STRK tokens in your wallet to complete the rebirth
+- The same fee is charged on first-time character creation so initial entry uses the rebirth path
+- World owners can update the live fee through the config contract without redeploying
 
 ## What Resets
 
@@ -55,7 +57,7 @@ After rebirth, your character begins with:
 
 The rebirth system creates interesting strategic decisions:
 
-- When to voluntarily rebirth before hitting 5 losses
+- When to voluntarily rebirth before hitting 3 losses
 - How to balance short-term success vs. long-term progression
 - Whether to spend resources before rebirthing
 - How to adapt your strategy based on accumulated knowledge
@@ -64,7 +66,7 @@ The rebirth system creates interesting strategic decisions:
 
 The rebirth process follows these steps in the code:
 
-1. Verify the player has reached 5 losses
+1. Verify the player has reached 3 losses
 2. Collect the STRK token fee
 3. Save the character's persistent data (name, class, rating, etc.)
 4. Clear all items from inventory and storage
@@ -83,4 +85,3 @@ While rebirth resets many aspects of your character, it's an essential part of t
 - Higher birth counts might unlock special features
 - The persisting rating allows for matchmaking appropriate to your skill level
 - Knowledge gained from previous runs helps optimize future strategies
-

@@ -1,8 +1,21 @@
+use core::array::{Array, ArrayTrait, Span, SpanTrait};
+use dojo::model::ModelStorage;
+use dojo::world::storage::WorldStorage;
+use openzeppelin_interfaces::erc20::{IERC20Dispatcher, IERC20DispatcherTrait};
+use starknet::ContractAddress;
+use warpack_masters::constants::constants::{GAME_CONFIG_ID, REBIRTH_FEE};
+use warpack_masters::externals::erc20::ERC20Token;
 use warpack_masters::items;
 use warpack_masters::models::Character::WMClass;
+use warpack_masters::models::Game::GameConfig;
 use warpack_masters::prdefined_dummies::Dummy0;
 use warpack_masters::systems::dummy::{IDummyDispatcher, IDummyDispatcherTrait};
 use warpack_masters::systems::item::{IItemDispatcher, IItemDispatcherTrait};
+
+#[cfg(test)]
+pub use dojo::utils::test::deploy_contract;
+#[cfg(test)]
+use starknet::testing::set_contract_address;
 
 pub fn add_items(ref item_system: IItemDispatcher) {
     item_system
@@ -616,6 +629,56 @@ pub fn add_items(ref item_system: IItemDispatcher) {
             items::Longbow::energyCost,
             items::Longbow::isPlugin,
         );
+}
+
+#[cfg(test)]
+pub fn setup_rebirth_fee_context(
+    world: WorldStorage,
+    actions_address: ContractAddress,
+    players: Span<ContractAddress>,
+) -> ContractAddress {
+    assert(players.len() > 0, 'players required');
+
+    let mint_recipient = *players.at(0);
+    let mock_erc20_calldata: Array<felt252> = array![
+        0, 'stark', 1, 0, 'strk', 1, 10000000000000000000, 0, mint_recipient.into(),
+        mint_recipient.into(),
+    ];
+    let erc20_address = deploy_contract(
+        ERC20Token::TEST_CLASS_HASH, mock_erc20_calldata.span(),
+    );
+
+    world
+        .write_model(
+            @GameConfig {
+                id: GAME_CONFIG_ID,
+                strk_address: erc20_address,
+                rebirth_fee: REBIRTH_FEE,
+            },
+        );
+
+    // Fund each player with enough STRK and approve the actions contract
+    let dispatcher = IERC20Dispatcher { contract_address: erc20_address };
+    let mut i = 0;
+    loop {
+        if i == players.len() {
+            break;
+        }
+
+        let player = *players.at(i);
+
+        set_contract_address(mint_recipient);
+        dispatcher.transfer(player, REBIRTH_FEE * 10);
+
+        set_contract_address(player);
+        dispatcher.approve(actions_address, REBIRTH_FEE * 10);
+
+        i += 1;
+    }
+
+    set_contract_address(warpack_masters::utils::address::zero_address());
+
+    erc20_address
 }
 
 pub fn add_dummy(ref dummy_system: IDummyDispatcher) {

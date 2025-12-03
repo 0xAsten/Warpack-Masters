@@ -19,6 +19,7 @@ mod tests {
         InventoryCounter, StorageCounter, CharacterItemInventory, CharacterItemStorage,
         m_InventoryCounter, m_StorageCounter, m_CharacterItemInventory, m_CharacterItemStorage,
     };
+    use warpack_masters::models::Game::m_GameConfig;
     use warpack_masters::models::Item::{m_Item, m_ItemsCounter};
     use warpack_masters::models::Shop::{Shop, m_Shop};
     use warpack_masters::models::backpack::{BackpackGrids, m_BackpackGrids};
@@ -43,6 +44,7 @@ mod tests {
                 TestResource::Model(m_Character::TEST_CLASS_HASH.try_into().unwrap()),
                 TestResource::Model(m_CharacterName::TEST_CLASS_HASH.try_into().unwrap()),
                 TestResource::Model(m_Shop::TEST_CLASS_HASH.try_into().unwrap()),
+                TestResource::Model(m_GameConfig::TEST_CLASS_HASH.try_into().unwrap()),
                 TestResource::Contract(actions::TEST_CLASS_HASH),
                 TestResource::Contract(item_system::TEST_CLASS_HASH),
             ]
@@ -361,4 +363,3 @@ mod tests {
 //     assert(char.stamina == INIT_STAMINA, 'stamina mismatch');
 // }
 }
-

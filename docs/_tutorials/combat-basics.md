@@ -79,6 +79,6 @@ After a battle:
 
 - **Winning** rewards you with 5 gold, increased rating, and potentially health bonuses
 - **Losing** gives you 2 gold and decreases your rating
-- After 5 losses, you'll need to use the rebirth system
+- After 3 losses, you'll need to use the rebirth system
 
 In the [next tutorial]({{ site.baseurl }}/tutorials/item-synergies), we'll cover how to create powerful item synergies.

@@ -25,6 +25,7 @@ pub mod constants {
     pub const EFFECT_VAMPIRISM: u8 = 8;
 
     pub const REBIRTH_FEE: u256 = 10 * 1_000_000_000_000_000_000;
+    pub const MAX_LOSSES_BEFORE_REBIRTH: u8 = 3;
 
     pub const GAME_CONFIG_ID: felt252 = 'GAME_CONFIG_ID';
 

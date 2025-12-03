@@ -10,7 +10,7 @@ mod tests {
     // import world dispatcher
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
     use starknet::testing::set_contract_address;
-    use warpack_masters::constants::constants::{INIT_HEALTH, INIT_STAMINA};
+    use warpack_masters::constants::constants::{GAME_CONFIG_ID, INIT_HEALTH, INIT_STAMINA, REBIRTH_FEE};
     use warpack_masters::prdefined_dummies::{
         Dummy0, Dummy1, Dummy10, Dummy11, Dummy12, Dummy13, Dummy14, Dummy15, Dummy16, Dummy17,
         Dummy18, Dummy19, Dummy2, Dummy20, Dummy3, Dummy4, Dummy5, Dummy6, Dummy7, Dummy8, Dummy9,
@@ -25,6 +25,7 @@ mod tests {
             character_item_inventory, character_item_storage, character_items_inventory_counter,
             character_items_storage_counter,
         },
+        models::Game::GameConfig,
         models::DummyCharacter::{
             DummyCharacter, DummyCharacterCounter, dummy_character, dummy_character_counter,
         },
@@ -62,6 +63,7 @@ mod tests {
         world.grant_writer(Model::<Character>::selector(), action_system_address);
         world.grant_writer(Model::<CharacterName>::selector(), action_system_address);
         world.grant_writer(Model::<Shop>::selector(), action_system_address);
+        world.grant_writer(Model::<GameConfig>::selector(), action_system_address);
 
         let item_system_address = world
             .deploy_contract('salt2', item_system::TEST_CLASS_HASH.try_into().unwrap());
@@ -100,6 +102,14 @@ mod tests {
             world,
         );
         add_items(ref item_system);
+        world
+            .write_model(
+                @GameConfig {
+                    id: GAME_CONFIG_ID,
+                    strk_address: warpack_masters::utils::address::zero_address(),
+                    rebirth_fee: REBIRTH_FEE,
+                },
+            );
 
         let dummy0 = warpack_masters::utils::address::address_from(0x001);
         create_dummy(
@@ -511,4 +521,3 @@ mod tests {
         println!("{}", str);
     }
 }
-
